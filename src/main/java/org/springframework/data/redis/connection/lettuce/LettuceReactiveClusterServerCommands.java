@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.api.reactive.RedisServerReactiveCommands;
+import io.lettuce.core.api.reactive.ValkeyServerReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -40,9 +40,9 @@ import java.util.stream.Collector;
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.ClusterTopologyProvider;
 import org.springframework.data.redis.connection.ReactiveClusterServerCommands;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.util.Assert;
 
@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
 class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 		implements ReactiveClusterServerCommands {
 
-	private final LettuceReactiveRedisClusterConnection connection;
+	private final LettuceReactiveValkeyClusterConnection connection;
 	private final ClusterTopologyProvider topologyProvider;
 
 	/**
@@ -68,7 +68,7 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	 * @throws IllegalArgumentException when {@code connection} is {@literal null}.
 	 * @throws IllegalArgumentException when {@code topologyProvider} is {@literal null}.
 	 */
-	LettuceReactiveClusterServerCommands(LettuceReactiveRedisClusterConnection connection,
+	LettuceReactiveClusterServerCommands(LettuceReactiveValkeyClusterConnection connection,
 			ClusterTopologyProvider topologyProvider) {
 
 		super(connection);
@@ -78,47 +78,47 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<String> bgReWriteAof(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::bgrewriteaof).next();
+	public Mono<String> bgReWriteAof(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::bgrewriteaof).next();
 	}
 
 	@Override
-	public Mono<String> bgSave(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::bgsave).next();
+	public Mono<String> bgSave(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::bgsave).next();
 	}
 
 	@Override
-	public Mono<Long> lastSave(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::lastsave).map(Date::getTime).next();
+	public Mono<Long> lastSave(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::lastsave).map(Date::getTime).next();
 	}
 
 	@Override
-	public Mono<String> save(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::save).next();
+	public Mono<String> save(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::save).next();
 	}
 
 	@Override
-	public Mono<Long> dbSize(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::dbsize).next();
+	public Mono<Long> dbSize(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::dbsize).next();
 	}
 
 	@Override
-	public Mono<String> flushDb(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::flushdb).next();
+	public Mono<String> flushDb(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::flushdb).next();
 	}
 
 	@Override
-	public Mono<String> flushDb(RedisClusterNode node, FlushOption option) {
+	public Mono<String> flushDb(ValkeyClusterNode node, FlushOption option) {
 		return connection.execute(node, it -> it.flushdb(LettuceConverters.toFlushMode(option))).next();
 	}
 
 	@Override
-	public Mono<String> flushAll(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::flushall).next();
+	public Mono<String> flushAll(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::flushall).next();
 	}
 
 	@Override
-	public Mono<String> flushAll(RedisClusterNode node, FlushOption option) {
+	public Mono<String> flushAll(ValkeyClusterNode node, FlushOption option) {
 		return connection.execute(node, it -> it.flushall(LettuceConverters.toFlushMode(option))).next();
 	}
 
@@ -128,9 +128,9 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<Properties> info(RedisClusterNode node) {
+	public Mono<Properties> info(ValkeyClusterNode node) {
 
-		return connection.execute(node, RedisServerReactiveCommands::info) //
+		return connection.execute(node, ValkeyServerReactiveCommands::info) //
 				.map(LettuceConverters::toProperties) //
 				.next();
 	}
@@ -145,7 +145,7 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<Properties> info(RedisClusterNode node, String section) {
+	public Mono<Properties> info(ValkeyClusterNode node, String section) {
 
 		Assert.hasText(section, "Section must not be null or empty");
 
@@ -163,7 +163,7 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<Properties> getConfig(RedisClusterNode node, String pattern) {
+	public Mono<Properties> getConfig(ValkeyClusterNode node, String pattern) {
 
 		Assert.hasText(pattern, "Pattern must not be null or empty");
 
@@ -178,7 +178,7 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<String> setConfig(RedisClusterNode node, String param, String value) {
+	public Mono<String> setConfig(ValkeyClusterNode node, String param, String value) {
 
 		Assert.hasText(param, "Parameter must not be null or empty");
 		Assert.hasText(value, "Value must not be null or empty");
@@ -192,51 +192,51 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	@Override
-	public Mono<String> resetConfigStats(RedisClusterNode node) {
-		return connection.execute(node, RedisServerReactiveCommands::configResetstat).next();
+	public Mono<String> resetConfigStats(ValkeyClusterNode node) {
+		return connection.execute(node, ValkeyServerReactiveCommands::configResetstat).next();
 	}
 
 	@Override
-	public Mono<Long> time(RedisClusterNode node) {
+	public Mono<Long> time(ValkeyClusterNode node) {
 
-		return connection.execute(node, RedisServerReactiveCommands::time) //
+		return connection.execute(node, ValkeyServerReactiveCommands::time) //
 				.map(ByteUtils::getBytes) //
 				.collectList() //
 				.map(LettuceConverters.toTimeConverter(TimeUnit.MILLISECONDS)::convert);
 	}
 
 	@Override
-	public Flux<RedisClientInfo> getClientList() {
+	public Flux<ValkeyClientInfo> getClientList() {
 		return Flux.merge(executeOnAllNodesMany(this::getClientList)).map(Tuple2::getT2);
 	}
 
 	@Override
-	public Flux<RedisClientInfo> getClientList(RedisClusterNode node) {
+	public Flux<ValkeyClientInfo> getClientList(ValkeyClusterNode node) {
 
-		return connection.execute(node, RedisServerReactiveCommands::clientList)
-				.concatMapIterable(LettuceConverters.stringToRedisClientListConverter()::convert);
+		return connection.execute(node, ValkeyServerReactiveCommands::clientList)
+				.concatMapIterable(LettuceConverters.stringToValkeyClientListConverter()::convert);
 	}
 
-	private <T> Collection<Publisher<Tuple2<RedisClusterNode, T>>> executeOnAllNodes(
-			Function<RedisClusterNode, Mono<T>> callback) {
+	private <T> Collection<Publisher<Tuple2<ValkeyClusterNode, T>>> executeOnAllNodes(
+			Function<ValkeyClusterNode, Mono<T>> callback) {
 
-		Set<RedisClusterNode> nodes = topologyProvider.getTopology().getNodes();
-		List<Publisher<Tuple2<RedisClusterNode, T>>> pipeline = new ArrayList<>(nodes.size());
+		Set<ValkeyClusterNode> nodes = topologyProvider.getTopology().getNodes();
+		List<Publisher<Tuple2<ValkeyClusterNode, T>>> pipeline = new ArrayList<>(nodes.size());
 
-		for (RedisClusterNode redisClusterNode : nodes) {
+		for (ValkeyClusterNode redisClusterNode : nodes) {
 			pipeline.add(callback.apply(redisClusterNode).map(p -> Tuples.of(redisClusterNode, p)));
 		}
 
 		return pipeline;
 	}
 
-	private <T> Collection<Publisher<Tuple2<RedisClusterNode, T>>> executeOnAllNodesMany(
-			Function<RedisClusterNode, Flux<T>> callback) {
+	private <T> Collection<Publisher<Tuple2<ValkeyClusterNode, T>>> executeOnAllNodesMany(
+			Function<ValkeyClusterNode, Flux<T>> callback) {
 
-		Set<RedisClusterNode> nodes = topologyProvider.getTopology().getNodes();
-		List<Publisher<Tuple2<RedisClusterNode, T>>> pipeline = new ArrayList<>(nodes.size());
+		Set<ValkeyClusterNode> nodes = topologyProvider.getTopology().getNodes();
+		List<Publisher<Tuple2<ValkeyClusterNode, T>>> pipeline = new ArrayList<>(nodes.size());
 
-		for (RedisClusterNode redisClusterNode : nodes) {
+		for (ValkeyClusterNode redisClusterNode : nodes) {
 			pipeline.add(callback.apply(redisClusterNode).map(p -> Tuples.of(redisClusterNode, p)));
 		}
 
@@ -244,10 +244,10 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 	}
 
 	/**
-	 * Collector to merge {@link Tuple2} of {@link RedisClusterNode} and {@link Properties} into a single
-	 * {@link Properties} object by prefixing original the keys with {@link RedisClusterNode#asString()}.
+	 * Collector to merge {@link Tuple2} of {@link ValkeyClusterNode} and {@link Properties} into a single
+	 * {@link Properties} object by prefixing original the keys with {@link ValkeyClusterNode#asString()}.
 	 */
-	private enum PropertiesCollector implements Collector<Tuple2<RedisClusterNode, Properties>, Properties, Properties> {
+	private enum PropertiesCollector implements Collector<Tuple2<ValkeyClusterNode, Properties>, Properties, Properties> {
 
 		INSTANCE;
 
@@ -257,7 +257,7 @@ class LettuceReactiveClusterServerCommands extends LettuceReactiveServerCommands
 		}
 
 		@Override
-		public BiConsumer<Properties, Tuple2<RedisClusterNode, Properties>> accumulator() {
+		public BiConsumer<Properties, Tuple2<ValkeyClusterNode, Properties>> accumulator() {
 
 			return (properties, tuple) -> {
 

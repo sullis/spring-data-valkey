@@ -19,7 +19,7 @@ SPRING_PROFILE?=ci
 SHELL=/bin/bash -euo pipefail
 
 #######
-# Redis
+# Valkey
 #######
 .PRECIOUS: work/$(PROJECT)-%.conf
 

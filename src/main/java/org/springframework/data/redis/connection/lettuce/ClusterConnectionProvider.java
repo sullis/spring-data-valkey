@@ -17,11 +17,11 @@ package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.ReadFrom;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.pubsub.StatefulRedisClusterPubSubConnection;
-import io.lettuce.core.codec.RedisCodec;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.pubsub.StatefulValkeyClusterPubSubConnection;
+import io.lettuce.core.codec.ValkeyCodec;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +33,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link LettuceConnectionProvider} and {@link RedisClientProvider} for Redis Cluster connections.
+ * {@link LettuceConnectionProvider} and {@link ValkeyClientProvider} for Valkey Cluster connections.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClientProvider {
+class ClusterConnectionProvider implements LettuceConnectionProvider, ValkeyClientProvider {
 
 	private volatile boolean initialized;
 
@@ -50,9 +50,9 @@ class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClien
 	@Nullable
 	private final ReadFrom readFrom;
 
-	private final RedisClusterClient client;
+	private final ValkeyClusterClient client;
 
-	private final RedisCodec<?, ?> codec;
+	private final ValkeyCodec<?, ?> codec;
 
 	/**
 	 * Create new {@link ClusterConnectionProvider}.
@@ -60,7 +60,7 @@ class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClien
 	 * @param client must not be {@literal null}.
 	 * @param codec must not be {@literal null}.
 	 */
-	ClusterConnectionProvider(RedisClusterClient client, RedisCodec<?, ?> codec) {
+	ClusterConnectionProvider(ValkeyClusterClient client, ValkeyCodec<?, ?> codec) {
 		this(client, codec, null);
 	}
 
@@ -72,7 +72,7 @@ class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClien
 	 * @param readFrom can be {@literal null}.
 	 * @since 2.1
 	 */
-	ClusterConnectionProvider(RedisClusterClient client, RedisCodec<?, ?> codec, @Nullable ReadFrom readFrom) {
+	ClusterConnectionProvider(ValkeyClusterClient client, ValkeyCodec<?, ?> codec, @Nullable ReadFrom readFrom) {
 
 		Assert.notNull(client, "Client must not be null");
 		Assert.notNull(codec, "Codec must not be null");
@@ -105,13 +105,13 @@ class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClien
 			}
 		}
 
-		if (connectionType.equals(StatefulRedisPubSubConnection.class)
-				|| connectionType.equals(StatefulRedisClusterPubSubConnection.class)) {
+		if (connectionType.equals(StatefulValkeyPubSubConnection.class)
+				|| connectionType.equals(StatefulValkeyClusterPubSubConnection.class)) {
 
 			return client.connectPubSubAsync(codec).thenApply(connectionType::cast);
 		}
 
-		if (StatefulRedisClusterConnection.class.isAssignableFrom(connectionType)
+		if (StatefulValkeyClusterConnection.class.isAssignableFrom(connectionType)
 				|| connectionType.equals(StatefulConnection.class)) {
 
 			return client.connectAsync(codec).thenApply(connection -> {
@@ -125,7 +125,7 @@ class ClusterConnectionProvider implements LettuceConnectionProvider, RedisClien
 	}
 
 	@Override
-	public RedisClusterClient getRedisClient() {
+	public ValkeyClusterClient getValkeyClient() {
 		return this.client;
 	}
 }

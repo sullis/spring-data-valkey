@@ -27,12 +27,12 @@ import org.springframework.util.Assert;
  * @param <V> the type backing the {@link Record}.
  * @author Christoph Strobl
  * @since 2.2
- * @see <a href="https://redis.io/topics/streams-intro#streams-basics">Redis Documentation - Stream Basics</a>
+ * @see <a href="https://redis.io/topics/streams-intro#streams-basics">Valkey Documentation - Stream Basics</a>
  */
 public interface Record<S, V> {
 
 	/**
-	 * The id of the stream (aka the {@literal key} in Redis).
+	 * The id of the stream (aka the {@literal key} in Valkey).
 	 *
 	 * @return can be {@literal null}.
 	 */
@@ -40,7 +40,7 @@ public interface Record<S, V> {
 	S getStream();
 
 	/**
-	 * The id of the stream (aka the {@literal key} in Redis).
+	 * The id of the stream (aka the {@literal key} in Valkey).
 	 *
 	 * @return can be {@literal null}.
 	 * @throws IllegalStateException if the stream is {@literal null}.
@@ -111,7 +111,7 @@ public interface Record<S, V> {
 	/**
 	 * Create a new instance of {@link Record} with the given {@literal key} to store the record at.
 	 *
-	 * @param key the Redis key identifying the stream.
+	 * @param key the Valkey key identifying the stream.
 	 * @param <SK>
 	 * @return new instance of {@link Record}.
 	 */

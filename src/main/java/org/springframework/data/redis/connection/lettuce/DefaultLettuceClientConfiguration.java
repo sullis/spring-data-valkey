@@ -43,14 +43,14 @@ class DefaultLettuceClientConfiguration implements LettuceClientConfiguration {
 	private final Optional<ClientOptions> clientOptions;
 	private final Optional<String> clientName;
 	private final Optional<ReadFrom> readFrom;
-	private final Optional<RedisCredentialsProviderFactory> redisCredentialsProviderFactory;
+	private final Optional<ValkeyCredentialsProviderFactory> redisCredentialsProviderFactory;
 	private final Duration timeout;
 	private final Duration shutdownTimeout;
 	private final Duration shutdownQuietPeriod;
 
 	DefaultLettuceClientConfiguration(boolean useSsl, SslVerifyMode verifyMode, boolean startTls,
 			@Nullable ClientResources clientResources, @Nullable ClientOptions clientOptions, @Nullable String clientName,
-			@Nullable ReadFrom readFrom, @Nullable RedisCredentialsProviderFactory redisCredentialsProviderFactory,
+			@Nullable ReadFrom readFrom, @Nullable ValkeyCredentialsProviderFactory redisCredentialsProviderFactory,
 			Duration timeout, Duration shutdownTimeout, Duration shutdownQuietPeriod) {
 
 		this.useSsl = useSsl;
@@ -107,7 +107,7 @@ class DefaultLettuceClientConfiguration implements LettuceClientConfiguration {
 	}
 
 	@Override
-	public Optional<RedisCredentialsProviderFactory> getRedisCredentialsProviderFactory() {
+	public Optional<ValkeyCredentialsProviderFactory> getValkeyCredentialsProviderFactory() {
 		return redisCredentialsProviderFactory;
 	}
 

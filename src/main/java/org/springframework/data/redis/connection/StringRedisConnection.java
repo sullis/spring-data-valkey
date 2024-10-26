@@ -45,20 +45,20 @@ import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ValkeyCallback;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Convenience extension of {@link RedisConnection} that accepts and returns {@link String}s instead of byte arrays.
- * Uses a {@link RedisSerializer} underneath to perform the conversion.
+ * Convenience extension of {@link ValkeyConnection} that accepts and returns {@link String}s instead of byte arrays.
+ * Uses a {@link ValkeySerializer} underneath to perform the conversion.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -72,11 +72,11 @@ import org.springframework.util.CollectionUtils;
  * @author ihaohong
  * @author Shyngys Sapraliyev
  *
- * @see RedisCallback
- * @see RedisSerializer
- * @see StringRedisTemplate
+ * @see ValkeyCallback
+ * @see ValkeySerializer
+ * @see StringValkeyTemplate
  */
-public interface StringRedisConnection extends RedisConnection {
+public interface StringValkeyConnection extends ValkeyConnection {
 
 	/**
 	 * String-friendly ZSet tuple.
@@ -93,7 +93,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param command Command to execute
 	 * @param args Possible command arguments (may be null)
 	 * @return execution result.
-	 * @see RedisCommands#execute(String, byte[]...)
+	 * @see ValkeyCommands#execute(String, byte[]...)
 	 */
 	Object execute(String command, String... args);
 
@@ -104,7 +104,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param command Command to execute
 	 * @return execution result.
-	 * @see RedisCommands#execute(String, byte[]...)
+	 * @see ValkeyCommands#execute(String, byte[]...)
 	 */
 	Object execute(String command);
 
@@ -113,8 +113,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
-	 * @see RedisKeyCommands#exists(byte[])
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
+	 * @see ValkeyKeyCommands#exists(byte[])
 	 */
 	Boolean exists(String key);
 
@@ -123,8 +123,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
-	 * @see RedisKeyCommands#exists(byte[][])
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
+	 * @see ValkeyKeyCommands#exists(byte[][])
 	 * @since 2.1
 	 */
 	@Nullable
@@ -135,8 +135,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
-	 * @see RedisKeyCommands#del(byte[]...)
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
+	 * @see ValkeyKeyCommands#del(byte[]...)
 	 */
 	Long del(String... keys);
 
@@ -147,8 +147,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param targetKey must not be {@literal null}.
 	 * @param replace whether to replace existing keys.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/copy">Redis Documentation: COPY</a>
-	 * @see RedisKeyCommands#copy(byte[], byte[], boolean)
+	 * @see <a href="https://redis.io/commands/copy">Valkey Documentation: COPY</a>
+	 * @see ValkeyKeyCommands#copy(byte[], byte[], boolean)
 	 */
 	Boolean copy(String sourceKey, String targetKey, boolean replace);
 
@@ -158,7 +158,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -169,8 +169,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/type">Redis Documentation: TYPE</a>
-	 * @see RedisKeyCommands#type(byte[])
+	 * @see <a href="https://redis.io/commands/type">Valkey Documentation: TYPE</a>
+	 * @see ValkeyKeyCommands#type(byte[])
 	 */
 	DataType type(String key);
 
@@ -179,7 +179,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/touch">Redis Documentation: TOUCH</a>
+	 * @see <a href="https://redis.io/commands/touch">Valkey Documentation: TOUCH</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -190,8 +190,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param pattern must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/keys">Redis Documentation: KEYS</a>
-	 * @see RedisKeyCommands#keys(byte[])
+	 * @see <a href="https://redis.io/commands/keys">Valkey Documentation: KEYS</a>
+	 * @see ValkeyKeyCommands#keys(byte[])
 	 */
 	Collection<String> keys(String pattern);
 
@@ -200,8 +200,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/rename">Redis Documentation: RENAME</a>
-	 * @see RedisKeyCommands#rename(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/rename">Valkey Documentation: RENAME</a>
+	 * @see ValkeyKeyCommands#rename(byte[], byte[])
 	 */
 	void rename(String oldKey, String newKey);
 
@@ -211,8 +211,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/renamenx">Redis Documentation: RENAMENX</a>
-	 * @see RedisKeyCommands#renameNX(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/renamenx">Valkey Documentation: RENAMENX</a>
+	 * @see ValkeyKeyCommands#renameNX(byte[], byte[])
 	 */
 	Boolean renameNX(String oldKey, String newKey);
 
@@ -222,8 +222,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param seconds
 	 * @return
-	 * @see <a href="https://redis.io/commands/expire">Redis Documentation: EXPIRE</a>
-	 * @see RedisKeyCommands#expire(byte[], long)
+	 * @see <a href="https://redis.io/commands/expire">Valkey Documentation: EXPIRE</a>
+	 * @see ValkeyKeyCommands#expire(byte[], long)
 	 */
 	Boolean expire(String key, long seconds);
 
@@ -233,8 +233,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param millis
 	 * @return
-	 * @see <a href="https://redis.io/commands/pexpire">Redis Documentation: PEXPIRE</a>
-	 * @see RedisKeyCommands#pExpire(byte[], long)
+	 * @see <a href="https://redis.io/commands/pexpire">Valkey Documentation: PEXPIRE</a>
+	 * @see ValkeyKeyCommands#pExpire(byte[], long)
 	 */
 	Boolean pExpire(String key, long millis);
 
@@ -244,8 +244,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param unixTime
 	 * @return
-	 * @see <a href="https://redis.io/commands/expireat">Redis Documentation: EXPIREAT</a>
-	 * @see RedisKeyCommands#expireAt(byte[], long)
+	 * @see <a href="https://redis.io/commands/expireat">Valkey Documentation: EXPIREAT</a>
+	 * @see ValkeyKeyCommands#expireAt(byte[], long)
 	 */
 	Boolean expireAt(String key, long unixTime);
 
@@ -255,8 +255,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param unixTimeInMillis
 	 * @return
-	 * @see <a href="https://redis.io/commands/pexpireat">Redis Documentation: PEXPIREAT</a>
-	 * @see RedisKeyCommands#pExpireAt(byte[], long)
+	 * @see <a href="https://redis.io/commands/pexpireat">Valkey Documentation: PEXPIREAT</a>
+	 * @see ValkeyKeyCommands#pExpireAt(byte[], long)
 	 */
 	Boolean pExpireAt(String key, long unixTimeInMillis);
 
@@ -265,8 +265,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/persist">Redis Documentation: PERSIST</a>
-	 * @see RedisKeyCommands#persist(byte[])
+	 * @see <a href="https://redis.io/commands/persist">Valkey Documentation: PERSIST</a>
+	 * @see ValkeyKeyCommands#persist(byte[])
 	 */
 	Boolean persist(String key);
 
@@ -276,8 +276,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param dbIndex
 	 * @return
-	 * @see <a href="https://redis.io/commands/move">Redis Documentation: MOVE</a>
-	 * @see RedisKeyCommands#move(byte[], int)
+	 * @see <a href="https://redis.io/commands/move">Valkey Documentation: MOVE</a>
+	 * @see ValkeyKeyCommands#move(byte[], int)
 	 */
 	Boolean move(String key, int dbIndex);
 
@@ -286,8 +286,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/ttl">Redis Documentation: TTL</a>
-	 * @see RedisKeyCommands#ttl(byte[])
+	 * @see <a href="https://redis.io/commands/ttl">Valkey Documentation: TTL</a>
+	 * @see ValkeyKeyCommands#ttl(byte[])
 	 */
 	Long ttl(String key);
 
@@ -298,8 +298,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeUnit must not be {@literal null}.
 	 * @return
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/ttl">Redis Documentation: TTL</a>
-	 * @see RedisKeyCommands#ttl(byte[], TimeUnit)
+	 * @see <a href="https://redis.io/commands/ttl">Valkey Documentation: TTL</a>
+	 * @see ValkeyKeyCommands#ttl(byte[], TimeUnit)
 	 */
 	Long ttl(String key, TimeUnit timeUnit);
 
@@ -308,8 +308,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pttl">Redis Documentation: PTTL</a>
-	 * @see RedisKeyCommands#pTtl(byte[])
+	 * @see <a href="https://redis.io/commands/pttl">Valkey Documentation: PTTL</a>
+	 * @see ValkeyKeyCommands#pTtl(byte[])
 	 */
 	Long pTtl(String key);
 
@@ -320,8 +320,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeUnit must not be {@literal null}.
 	 * @return
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/pttl">Redis Documentation: PTTL</a>
-	 * @see RedisKeyCommands#pTtl(byte[], TimeUnit)
+	 * @see <a href="https://redis.io/commands/pttl">Valkey Documentation: PTTL</a>
+	 * @see ValkeyKeyCommands#pTtl(byte[], TimeUnit)
 	 */
 	Long pTtl(String key, TimeUnit timeUnit);
 
@@ -330,8 +330,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param message the message to echo.
 	 * @return
-	 * @see <a href="https://redis.io/commands/echo">Redis Documentation: ECHO</a>
-	 * @see RedisConnectionCommands#echo(byte[])
+	 * @see <a href="https://redis.io/commands/echo">Valkey Documentation: ECHO</a>
+	 * @see ValkeyConnectionCommands#echo(byte[])
 	 */
 	String echo(String message);
 
@@ -341,7 +341,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param params must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	List<String> sort(String key, SortParameters params);
 
@@ -352,7 +352,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param params must not be {@literal null}.
 	 * @param storeKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	Long sort(String key, SortParameters params, String storeKey);
 
@@ -390,7 +390,7 @@ public interface StringRedisConnection extends RedisConnection {
 	Long refcount(String key);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with values/Redis strings
+	// Methods dealing with values/Valkey strings
 	// -------------------------------------------------------------------------
 
 	/**
@@ -398,8 +398,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/get">Redis Documentation: GET</a>
-	 * @see RedisStringCommands#get(byte[])
+	 * @see <a href="https://redis.io/commands/get">Valkey Documentation: GET</a>
+	 * @see ValkeyStringCommands#get(byte[])
 	 */
 	String get(String key);
 
@@ -408,7 +408,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getdel">Redis Documentation: GETDEL</a>
+	 * @see <a href="https://redis.io/commands/getdel">Valkey Documentation: GETDEL</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -420,7 +420,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param expiration must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -432,8 +432,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/getset">Redis Documentation: GETSET</a>
-	 * @see RedisStringCommands#getSet(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/getset">Valkey Documentation: GETSET</a>
+	 * @see ValkeyStringCommands#getSet(byte[], byte[])
 	 */
 	String getSet(String key, String value);
 
@@ -442,8 +442,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/mget">Redis Documentation: MGET</a>
-	 * @see RedisStringCommands#mGet(byte[]...)
+	 * @see <a href="https://redis.io/commands/mget">Valkey Documentation: MGET</a>
+	 * @see ValkeyStringCommands#mGet(byte[]...)
 	 */
 	List<String> mGet(String... keys);
 
@@ -452,8 +452,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
-	 * @see RedisStringCommands#set(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
+	 * @see ValkeyStringCommands#set(byte[], byte[])
 	 */
 	@Nullable
 	Boolean set(String key, String value);
@@ -468,8 +468,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *          {@link Expiration#keepTtl()} to keep the existing expiration.
 	 * @param option can be {@literal null}. Defaulted to {@link SetOption#UPSERT}.
 	 * @since 1.7
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
-	 * @see RedisStringCommands#set(byte[], byte[], Expiration, SetOption)
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
+	 * @see ValkeyStringCommands#set(byte[], byte[], Expiration, SetOption)
 	 */
 	@Nullable
 	Boolean set(String key, String value, Expiration expiration, SetOption option);
@@ -480,8 +480,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
-	 * @see RedisStringCommands#setNX(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/setnx">Valkey Documentation: SETNX</a>
+	 * @see ValkeyStringCommands#setNX(byte[], byte[])
 	 */
 	@Nullable
 	Boolean setNX(String key, String value);
@@ -492,8 +492,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param seconds
 	 * @param value must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
-	 * @see RedisStringCommands#setEx(byte[], long, byte[])
+	 * @see <a href="https://redis.io/commands/setex">Valkey Documentation: SETEX</a>
+	 * @see ValkeyStringCommands#setEx(byte[], long, byte[])
 	 */
 	@Nullable
 	Boolean setEx(String key, long seconds, String value);
@@ -505,8 +505,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param milliseconds
 	 * @param value must not be {@literal null}.
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/psetex">Redis Documentation: PSETEX</a>
-	 * @see RedisStringCommands#pSetEx(byte[], long, byte[])
+	 * @see <a href="https://redis.io/commands/psetex">Valkey Documentation: PSETEX</a>
+	 * @see ValkeyStringCommands#pSetEx(byte[], long, byte[])
 	 */
 	@Nullable
 	Boolean pSetEx(String key, long milliseconds, String value);
@@ -515,8 +515,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * Set multiple keys to multiple values using key-value pairs provided in {@code tuple}.
 	 *
 	 * @param tuple must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/mset">Redis Documentation: MSET</a>
-	 * @see RedisStringCommands#mSet(Map)
+	 * @see <a href="https://redis.io/commands/mset">Valkey Documentation: MSET</a>
+	 * @see ValkeyStringCommands#mSet(Map)
 	 */
 	@Nullable
 	Boolean mSetString(Map<String, String> tuple);
@@ -526,8 +526,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * not exist.
 	 *
 	 * @param tuple must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/msetnx">Redis Documentation: MSETNX</a>
-	 * @see RedisStringCommands#mSetNX(Map)
+	 * @see <a href="https://redis.io/commands/msetnx">Valkey Documentation: MSETNX</a>
+	 * @see ValkeyStringCommands#mSetNX(Map)
 	 */
 	Boolean mSetNXString(Map<String, String> tuple);
 
@@ -536,8 +536,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/incr">Redis Documentation: INCR</a>
-	 * @see RedisStringCommands#incr(byte[])
+	 * @see <a href="https://redis.io/commands/incr">Valkey Documentation: INCR</a>
+	 * @see ValkeyStringCommands#incr(byte[])
 	 */
 	Long incr(String key);
 
@@ -547,8 +547,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/incrby">Redis Documentation: INCRBY</a>
-	 * @see RedisStringCommands#incrBy(byte[], long)
+	 * @see <a href="https://redis.io/commands/incrby">Valkey Documentation: INCRBY</a>
+	 * @see ValkeyStringCommands#incrBy(byte[], long)
 	 */
 	Long incrBy(String key, long value);
 
@@ -558,8 +558,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/incrbyfloat">Redis Documentation: INCRBYFLOAT</a>
-	 * @see RedisStringCommands#incrBy(byte[], double)
+	 * @see <a href="https://redis.io/commands/incrbyfloat">Valkey Documentation: INCRBYFLOAT</a>
+	 * @see ValkeyStringCommands#incrBy(byte[], double)
 	 */
 	Double incrBy(String key, double value);
 
@@ -568,8 +568,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/decr">Redis Documentation: DECR</a>
-	 * @see RedisStringCommands#decr(byte[])
+	 * @see <a href="https://redis.io/commands/decr">Valkey Documentation: DECR</a>
+	 * @see ValkeyStringCommands#decr(byte[])
 	 */
 	Long decr(String key);
 
@@ -579,8 +579,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/decrby">Redis Documentation: DECRBY</a>
-	 * @see RedisStringCommands#decrBy(byte[], long)
+	 * @see <a href="https://redis.io/commands/decrby">Valkey Documentation: DECRBY</a>
+	 * @see ValkeyStringCommands#decrBy(byte[], long)
 	 */
 	Long decrBy(String key, long value);
 
@@ -590,8 +590,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/append">Redis Documentation: APPEND</a>
-	 * @see RedisStringCommands#append(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/append">Valkey Documentation: APPEND</a>
+	 * @see ValkeyStringCommands#append(byte[], byte[])
 	 */
 	Long append(String key, String value);
 
@@ -602,8 +602,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/getrange">Redis Documentation: GETRANGE</a>
-	 * @see RedisStringCommands#getRange(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/getrange">Valkey Documentation: GETRANGE</a>
+	 * @see ValkeyStringCommands#getRange(byte[], long, long)
 	 */
 	String getRange(String key, long start, long end);
 
@@ -613,8 +613,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @param offset
-	 * @see <a href="https://redis.io/commands/setrange">Redis Documentation: SETRANGE</a>
-	 * @see RedisStringCommands#setRange(byte[], byte[], long)
+	 * @see <a href="https://redis.io/commands/setrange">Valkey Documentation: SETRANGE</a>
+	 * @see ValkeyStringCommands#setRange(byte[], byte[], long)
 	 */
 	void setRange(String key, String value, long offset);
 
@@ -624,8 +624,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param offset
 	 * @return
-	 * @see <a href="https://redis.io/commands/getbit">Redis Documentation: GETBIT</a>
-	 * @see RedisStringCommands#getBit(byte[], long)
+	 * @see <a href="https://redis.io/commands/getbit">Valkey Documentation: GETBIT</a>
+	 * @see ValkeyStringCommands#getBit(byte[], long)
 	 */
 	Boolean getBit(String key, long offset);
 
@@ -636,8 +636,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param offset
 	 * @param value
 	 * @return the original bit value stored at {@code offset}.
-	 * @see <a href="https://redis.io/commands/setbit">Redis Documentation: SETBIT</a>
-	 * @see RedisStringCommands#setBit(byte[], long, boolean)
+	 * @see <a href="https://redis.io/commands/setbit">Valkey Documentation: SETBIT</a>
+	 * @see ValkeyStringCommands#setBit(byte[], long, boolean)
 	 */
 	Boolean setBit(String key, long offset, boolean value);
 
@@ -646,8 +646,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/bitcount">Redis Documentation: BITCOUNT</a>
-	 * @see RedisStringCommands#bitCount(byte[])
+	 * @see <a href="https://redis.io/commands/bitcount">Valkey Documentation: BITCOUNT</a>
+	 * @see ValkeyStringCommands#bitCount(byte[])
 	 */
 	Long bitCount(String key);
 
@@ -659,8 +659,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/bitcount">Redis Documentation: BITCOUNT</a>
-	 * @see RedisStringCommands#bitCount(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/bitcount">Valkey Documentation: BITCOUNT</a>
+	 * @see ValkeyStringCommands#bitCount(byte[], long, long)
 	 */
 	Long bitCount(String key, long start, long end);
 
@@ -671,8 +671,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destination must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/bitop">Redis Documentation: BITOP</a>
-	 * @see RedisStringCommands#bitOp(BitOperation, byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/bitop">Valkey Documentation: BITOP</a>
+	 * @see ValkeyStringCommands#bitOp(BitOperation, byte[], byte[]...)
 	 */
 	Long bitOp(BitOperation op, String destination, String... keys);
 
@@ -683,7 +683,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param bit the bit value to look for.
 	 * @return {@literal null} when used in pipeline / transaction. The position of the first bit set to 1 or 0 according
 	 *         to the request.
-	 * @see <a href="https://redis.io/commands/bitpos">Redis Documentation: BITPOS</a>
+	 * @see <a href="https://redis.io/commands/bitpos">Valkey Documentation: BITPOS</a>
 	 * @since 2.1
 	 */
 	default Long bitPos(String key, boolean bit) {
@@ -701,7 +701,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}. Use {@link Range#unbounded()} to not limit search.
 	 * @return {@literal null} when used in pipeline / transaction. The position of the first bit set to 1 or 0 according
 	 *         to the request.
-	 * @see <a href="https://redis.io/commands/bitpos">Redis Documentation: BITPOS</a>
+	 * @see <a href="https://redis.io/commands/bitpos">Valkey Documentation: BITPOS</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -712,13 +712,13 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/strlen">Redis Documentation: STRLEN</a>
-	 * @see RedisStringCommands#strLen(byte[])
+	 * @see <a href="https://redis.io/commands/strlen">Valkey Documentation: STRLEN</a>
+	 * @see ValkeyStringCommands#strLen(byte[])
 	 */
 	Long strLen(String key);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Lists
+	// Methods dealing with Valkey Lists
 	// -------------------------------------------------------------------------
 
 	/**
@@ -727,19 +727,19 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpush">Redis Documentation: RPUSH</a>
-	 * @see RedisListCommands#rPush(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/rpush">Valkey Documentation: RPUSH</a>
+	 * @see ValkeyListCommands#rPush(byte[], byte[]...)
 	 */
 	Long rPush(String key, String... values);
 
 	/**
 	 * Returns the index of matching elements inside the list stored at given {@literal key}. <br />
-	 * Requires Redis 6.0.6 or newer.
+	 * Requires Valkey 6.0.6 or newer.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param element must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/lpos">Redis Documentation: LPOS</a>
+	 * @see <a href="https://redis.io/commands/lpos">Valkey Documentation: LPOS</a>
 	 * @since 2.4
 	 */
 	@Nullable
@@ -749,7 +749,7 @@ public interface StringRedisConnection extends RedisConnection {
 
 	/**
 	 * Returns the index of matching elements inside the list stored at given {@literal key}. <br />
-	 * Requires Redis 6.0.6 or newer.
+	 * Requires Valkey 6.0.6 or newer.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param element must not be {@literal null}.
@@ -757,7 +757,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *          means to return the first match, 2 to return the second match, and so forth.
 	 * @param count number of matches to return.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/lpos">Redis Documentation: LPOS</a>
+	 * @see <a href="https://redis.io/commands/lpos">Valkey Documentation: LPOS</a>
 	 * @since 2.4
 	 */
 	List<Long> lPos(String key, String element, @Nullable Integer rank, @Nullable Integer count);
@@ -768,8 +768,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpush">Redis Documentation: LPUSH</a>
-	 * @see RedisListCommands#lPush(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/lpush">Valkey Documentation: LPUSH</a>
+	 * @see ValkeyListCommands#lPush(byte[], byte[]...)
 	 */
 	Long lPush(String key, String... values);
 
@@ -779,8 +779,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpushx">Redis Documentation: RPUSHX</a>
-	 * @see RedisListCommands#rPushX(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/rpushx">Valkey Documentation: RPUSHX</a>
+	 * @see ValkeyListCommands#rPushX(byte[], byte[])
 	 */
 	Long rPushX(String key, String value);
 
@@ -790,8 +790,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpushx">Redis Documentation: LPUSHX</a>
-	 * @see RedisListCommands#lPushX(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/lpushx">Valkey Documentation: LPUSHX</a>
+	 * @see ValkeyListCommands#lPushX(byte[], byte[])
 	 */
 	Long lPushX(String key, String value);
 
@@ -800,8 +800,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/llen">Redis Documentation: LLEN</a>
-	 * @see RedisListCommands#lLen(byte[])
+	 * @see <a href="https://redis.io/commands/llen">Valkey Documentation: LLEN</a>
+	 * @see ValkeyListCommands#lLen(byte[])
 	 */
 	Long lLen(String key);
 
@@ -812,8 +812,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/lrange">Redis Documentation: LRANGE</a>
-	 * @see RedisListCommands#lRange(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/lrange">Valkey Documentation: LRANGE</a>
+	 * @see ValkeyListCommands#lRange(byte[], long, long)
 	 */
 	List<String> lRange(String key, long start, long end);
 
@@ -823,8 +823,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param start
 	 * @param end
-	 * @see <a href="https://redis.io/commands/ltrim">Redis Documentation: LTRIM</a>
-	 * @see RedisListCommands#lTrim(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/ltrim">Valkey Documentation: LTRIM</a>
+	 * @see ValkeyListCommands#lTrim(byte[], long, long)
 	 */
 	void lTrim(String key, long start, long end);
 
@@ -834,8 +834,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param index
 	 * @return
-	 * @see <a href="https://redis.io/commands/lindex">Redis Documentation: LINDEX</a>
-	 * @see RedisListCommands#lIndex(byte[], long)
+	 * @see <a href="https://redis.io/commands/lindex">Valkey Documentation: LINDEX</a>
+	 * @see ValkeyListCommands#lIndex(byte[], long)
 	 */
 	String lIndex(String key, long index);
 
@@ -847,8 +847,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param pivot
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/linsert">Redis Documentation: LINSERT</a>
-	 * @see RedisListCommands#lIndex(byte[], long)
+	 * @see <a href="https://redis.io/commands/linsert">Valkey Documentation: LINSERT</a>
+	 * @see ValkeyListCommands#lIndex(byte[], long)
 	 */
 	Long lInsert(String key, Position where, String pivot, String value);
 
@@ -863,7 +863,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param to must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/lmove">Redis Documentation: LMOVE</a>
+	 * @see <a href="https://redis.io/commands/lmove">Valkey Documentation: LMOVE</a>
 	 * @see #bLMove(byte[], byte[], Direction, Direction, double)
 	 * @see #lMove(byte[], byte[], Direction, Direction)
 	 */
@@ -882,7 +882,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeout
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/blmove">Redis Documentation: BLMOVE</a>
+	 * @see <a href="https://redis.io/commands/blmove">Valkey Documentation: BLMOVE</a>
 	 * @see #lMove(byte[], byte[], Direction, Direction)
 	 * @see #bLMove(byte[], byte[], Direction, Direction, double)
 	 */
@@ -895,8 +895,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param index
 	 * @param value
-	 * @see <a href="https://redis.io/commands/lset">Redis Documentation: LSET</a>
-	 * @see RedisListCommands#lSet(byte[], long, byte[])
+	 * @see <a href="https://redis.io/commands/lset">Valkey Documentation: LSET</a>
+	 * @see ValkeyListCommands#lSet(byte[], long, byte[])
 	 */
 	void lSet(String key, long index, String value);
 
@@ -907,8 +907,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/lrem">Redis Documentation: LREM</a>
-	 * @see RedisListCommands#lRem(byte[], long, byte[])
+	 * @see <a href="https://redis.io/commands/lrem">Valkey Documentation: LREM</a>
+	 * @see ValkeyListCommands#lRem(byte[], long, byte[])
 	 */
 	Long lRem(String key, long count, String value);
 
@@ -917,8 +917,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpop">Redis Documentation: LPOP</a>
-	 * @see RedisListCommands#lPop(byte[])
+	 * @see <a href="https://redis.io/commands/lpop">Valkey Documentation: LPOP</a>
+	 * @see ValkeyListCommands#lPop(byte[])
 	 */
 	String lPop(String key);
 
@@ -928,8 +928,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpop">Redis Documentation: LPOP</a>
-	 * @see RedisListCommands#lPop(byte[], long)
+	 * @see <a href="https://redis.io/commands/lpop">Valkey Documentation: LPOP</a>
+	 * @see ValkeyListCommands#lPop(byte[], long)
 	 * @since 2.6
 	 */
 	List<String> lPop(String key, long count);
@@ -939,8 +939,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpop">Redis Documentation: RPOP</a>
-	 * @see RedisListCommands#rPop(byte[])
+	 * @see <a href="https://redis.io/commands/rpop">Valkey Documentation: RPOP</a>
+	 * @see ValkeyListCommands#rPop(byte[])
 	 */
 	String rPop(String key);
 
@@ -950,8 +950,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpop">Redis Documentation: RPOP</a>
-	 * @see RedisListCommands#rPop(byte[], long)
+	 * @see <a href="https://redis.io/commands/rpop">Valkey Documentation: RPOP</a>
+	 * @see ValkeyListCommands#rPop(byte[], long)
 	 * @since 2.6
 	 */
 	List<String> rPop(String key, long count);
@@ -963,8 +963,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeout
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/blpop">Redis Documentation: BLPOP</a>
-	 * @see RedisListCommands#bLPop(int, byte[]...)
+	 * @see <a href="https://redis.io/commands/blpop">Valkey Documentation: BLPOP</a>
+	 * @see ValkeyListCommands#bLPop(int, byte[]...)
 	 */
 	List<String> bLPop(int timeout, String... keys);
 
@@ -975,8 +975,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeout
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/brpop">Redis Documentation: BRPOP</a>
-	 * @see RedisListCommands#bRPop(int, byte[]...)
+	 * @see <a href="https://redis.io/commands/brpop">Valkey Documentation: BRPOP</a>
+	 * @see ValkeyListCommands#bRPop(int, byte[]...)
 	 */
 	List<String> bRPop(int timeout, String... keys);
 
@@ -986,8 +986,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param srcKey must not be {@literal null}.
 	 * @param dstKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpoplpush">Redis Documentation: RPOPLPUSH</a>
-	 * @see RedisListCommands#rPopLPush(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/rpoplpush">Valkey Documentation: RPOPLPUSH</a>
+	 * @see ValkeyListCommands#rPopLPush(byte[], byte[])
 	 */
 	String rPopLPush(String srcKey, String dstKey);
 
@@ -1000,13 +1000,13 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param srcKey must not be {@literal null}.
 	 * @param dstKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/brpoplpush">Redis Documentation: BRPOPLPUSH</a>
-	 * @see RedisListCommands#bRPopLPush(int, byte[], byte[])
+	 * @see <a href="https://redis.io/commands/brpoplpush">Valkey Documentation: BRPOPLPUSH</a>
+	 * @see ValkeyListCommands#bRPopLPush(int, byte[], byte[])
 	 */
 	String bRPopLPush(int timeout, String srcKey, String dstKey);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Sets
+	// Methods dealing with Valkey Sets
 	// -------------------------------------------------------------------------
 
 	/**
@@ -1015,8 +1015,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/sadd">Redis Documentation: SADD</a>
-	 * @see RedisSetCommands#sAdd(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/sadd">Valkey Documentation: SADD</a>
+	 * @see ValkeySetCommands#sAdd(byte[], byte[]...)
 	 */
 	Long sAdd(String key, String... values);
 
@@ -1026,8 +1026,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/srem">Redis Documentation: SREM</a>
-	 * @see RedisSetCommands#sRem(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/srem">Valkey Documentation: SREM</a>
+	 * @see ValkeySetCommands#sRem(byte[], byte[]...)
 	 */
 	Long sRem(String key, String... values);
 
@@ -1036,8 +1036,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/spop">Redis Documentation: SPOP</a>
-	 * @see RedisSetCommands#sPop(byte[])
+	 * @see <a href="https://redis.io/commands/spop">Valkey Documentation: SPOP</a>
+	 * @see ValkeySetCommands#sPop(byte[])
 	 */
 	String sPop(String key);
 
@@ -1047,8 +1047,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count the number of random members to return.
 	 * @return empty {@link List} if {@literal key} does not exist.
-	 * @see <a href="https://redis.io/commands/spop">Redis Documentation: SPOP</a>
-	 * @see RedisSetCommands#sPop(byte[], long)
+	 * @see <a href="https://redis.io/commands/spop">Valkey Documentation: SPOP</a>
+	 * @see ValkeySetCommands#sPop(byte[], long)
 	 * @since 2.0
 	 */
 	List<String> sPop(String key, long count);
@@ -1060,8 +1060,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/smove">Redis Documentation: SMOVE</a>
-	 * @see RedisSetCommands#sMove(byte[], byte[], byte[])
+	 * @see <a href="https://redis.io/commands/smove">Valkey Documentation: SMOVE</a>
+	 * @see ValkeySetCommands#sMove(byte[], byte[], byte[])
 	 */
 	Boolean sMove(String srcKey, String destKey, String value);
 
@@ -1070,8 +1070,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/scard">Redis Documentation: SCARD</a>
-	 * @see RedisSetCommands#sCard(byte[])
+	 * @see <a href="https://redis.io/commands/scard">Valkey Documentation: SCARD</a>
+	 * @see ValkeySetCommands#sCard(byte[])
 	 */
 	Long sCard(String key);
 
@@ -1081,8 +1081,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/sismember">Redis Documentation: SISMEMBER</a>
-	 * @see RedisSetCommands#sIsMember(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/sismember">Valkey Documentation: SISMEMBER</a>
+	 * @see ValkeySetCommands#sIsMember(byte[], byte[])
 	 */
 	Boolean sIsMember(String key, String value);
 
@@ -1093,8 +1093,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param values must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/smismember">Redis Documentation: SMISMEMBER</a>
-	 * @see RedisSetCommands#sMIsMember(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/smismember">Valkey Documentation: SMISMEMBER</a>
+	 * @see ValkeySetCommands#sMIsMember(byte[], byte[]...)
 	 */
 	@Nullable
 	List<Boolean> sMIsMember(String key, String... values);
@@ -1104,8 +1104,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sinter">Redis Documentation: SINTER</a>
-	 * @see RedisSetCommands#sInter(byte[]...)
+	 * @see <a href="https://redis.io/commands/sinter">Valkey Documentation: SINTER</a>
+	 * @see ValkeySetCommands#sInter(byte[]...)
 	 */
 	Set<String> sInter(String... keys);
 
@@ -1115,8 +1115,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sinterstore">Redis Documentation: SINTERSTORE</a>
-	 * @see RedisSetCommands#sInterStore(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/sinterstore">Valkey Documentation: SINTERSTORE</a>
+	 * @see ValkeySetCommands#sInterStore(byte[], byte[]...)
 	 */
 	Long sInterStore(String destKey, String... keys);
 
@@ -1125,8 +1125,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sunion">Redis Documentation: SUNION</a>
-	 * @see RedisSetCommands#sUnion(byte[]...)
+	 * @see <a href="https://redis.io/commands/sunion">Valkey Documentation: SUNION</a>
+	 * @see ValkeySetCommands#sUnion(byte[]...)
 	 */
 	Set<String> sUnion(String... keys);
 
@@ -1136,8 +1136,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sunionstore">Redis Documentation: SUNIONSTORE</a>
-	 * @see RedisSetCommands#sUnionStore(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/sunionstore">Valkey Documentation: SUNIONSTORE</a>
+	 * @see ValkeySetCommands#sUnionStore(byte[], byte[]...)
 	 */
 	Long sUnionStore(String destKey, String... keys);
 
@@ -1146,8 +1146,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
-	 * @see RedisSetCommands#sDiff(byte[]...)
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
+	 * @see ValkeySetCommands#sDiff(byte[]...)
 	 */
 	Set<String> sDiff(String... keys);
 
@@ -1157,8 +1157,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
-	 * @see RedisSetCommands#sDiffStore(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
+	 * @see ValkeySetCommands#sDiffStore(byte[], byte[]...)
 	 */
 	Long sDiffStore(String destKey, String... keys);
 
@@ -1167,8 +1167,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/smembers">Redis Documentation: SMEMBERS</a>
-	 * @see RedisSetCommands#sMembers(byte[])
+	 * @see <a href="https://redis.io/commands/smembers">Valkey Documentation: SMEMBERS</a>
+	 * @see ValkeySetCommands#sMembers(byte[])
 	 */
 	Set<String> sMembers(String key);
 
@@ -1177,8 +1177,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
-	 * @see RedisSetCommands#sRandMember(byte[])
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
+	 * @see ValkeySetCommands#sRandMember(byte[])
 	 */
 	String sRandMember(String key);
 
@@ -1188,8 +1188,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
-	 * @see RedisSetCommands#sRem(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
+	 * @see ValkeySetCommands#sRem(byte[], byte[]...)
 	 */
 	List<String> sRandMember(String key, long count);
 
@@ -1200,13 +1200,13 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param options must not be {@literal null}.
 	 * @return
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
-	 * @see RedisSetCommands#sScan(byte[], ScanOptions)
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
+	 * @see ValkeySetCommands#sScan(byte[], ScanOptions)
 	 */
 	Cursor<String> sScan(String key, ScanOptions options);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Sorted Sets
+	// Methods dealing with Valkey Sorted Sets
 	// -------------------------------------------------------------------------
 
 	/**
@@ -1216,8 +1216,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param score the score.
 	 * @param value the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
-	 * @see RedisZSetCommands#zAdd(byte[], double, byte[])
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
+	 * @see ValkeyZSetCommands#zAdd(byte[], double, byte[])
 	 */
 	Boolean zAdd(String key, double score, String value);
 
@@ -1231,8 +1231,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null} use {@link ZAddArgs#empty()} instead.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
-	 * @see RedisZSetCommands#zAdd(byte[], double, byte[], ZAddArgs)
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
+	 * @see ValkeyZSetCommands#zAdd(byte[], double, byte[], ZAddArgs)
 	 */
 	Boolean zAdd(String key, double score, String value, ZAddArgs args);
 
@@ -1242,8 +1242,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param tuples the tuples.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
-	 * @see RedisZSetCommands#zAdd(byte[], Set)
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
+	 * @see ValkeyZSetCommands#zAdd(byte[], Set)
 	 */
 	Long zAdd(String key, Set<StringTuple> tuples);
 
@@ -1256,8 +1256,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null} use {@link ZAddArgs#empty()} instead.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
-	 * @see RedisZSetCommands#zAdd(byte[], Set, ZAddArgs)
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
+	 * @see ValkeyZSetCommands#zAdd(byte[], Set, ZAddArgs)
 	 */
 	@Nullable
 	Long zAdd(String key, Set<StringTuple> tuples, ZAddArgs args);
@@ -1268,8 +1268,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
-	 * @see RedisZSetCommands#zRem(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
+	 * @see ValkeyZSetCommands#zRem(byte[], byte[]...)
 	 */
 	Long zRem(String key, String... values);
 
@@ -1280,8 +1280,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param increment
 	 * @param value the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
-	 * @see RedisZSetCommands#zIncrBy(byte[], double, byte[])
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
+	 * @see ValkeyZSetCommands#zIncrBy(byte[], double, byte[])
 	 */
 	Double zIncrBy(String key, double increment, String value);
 
@@ -1291,7 +1291,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	String zRandMember(String key);
@@ -1306,7 +1306,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *          absolute value of the specified count.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	List<String> zRandMember(String key, long count);
@@ -1317,7 +1317,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	StringTuple zRandMemberWithScore(String key);
@@ -1332,7 +1332,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *          absolute value of the specified count.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	List<StringTuple> zRandMemberWithScores(String key, long count);
@@ -1343,8 +1343,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
-	 * @see RedisZSetCommands#zRank(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
+	 * @see ValkeyZSetCommands#zRank(byte[], byte[])
 	 */
 	Long zRank(String key, String value);
 
@@ -1354,8 +1354,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
-	 * @see RedisZSetCommands#zRevRank(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
+	 * @see ValkeyZSetCommands#zRevRank(byte[], byte[])
 	 */
 	Long zRevRank(String key, String value);
 
@@ -1366,8 +1366,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
-	 * @see RedisZSetCommands#zRange(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
+	 * @see ValkeyZSetCommands#zRange(byte[], long, long)
 	 */
 	Set<String> zRange(String key, long start, long end);
 
@@ -1378,8 +1378,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
-	 * @see RedisZSetCommands#zRangeWithScores(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
+	 * @see ValkeyZSetCommands#zRangeWithScores(byte[], long, long)
 	 */
 	Set<StringTuple> zRangeWithScores(String key, long start, long end);
 
@@ -1390,8 +1390,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScore(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScore(byte[], double, double)
 	 */
 	Set<String> zRangeByScore(String key, double min, double max);
 
@@ -1402,8 +1402,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScoreWithScores(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScoreWithScores(byte[], double, double)
 	 */
 	Set<StringTuple> zRangeByScoreWithScores(String key, double min, double max);
 
@@ -1417,8 +1417,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param offset
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScore(byte[], double, double, long, long)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScore(byte[], double, double, long, long)
 	 */
 	Set<String> zRangeByScore(String key, double min, double max, long offset, long count);
 
@@ -1432,8 +1432,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param offset
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScoreWithScores(byte[], double, double, long, long)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScoreWithScores(byte[], double, double, long, long)
 	 */
 	Set<StringTuple> zRangeByScoreWithScores(String key, double min, double max, long offset, long count);
 
@@ -1444,8 +1444,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
-	 * @see RedisZSetCommands#zRevRange(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
+	 * @see ValkeyZSetCommands#zRevRange(byte[], long, long)
 	 */
 	Set<String> zRevRange(String key, long start, long end);
 
@@ -1456,8 +1456,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
-	 * @see RedisZSetCommands#zRevRangeWithScores(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
+	 * @see ValkeyZSetCommands#zRevRangeWithScores(byte[], long, long)
 	 */
 	Set<StringTuple> zRevRangeWithScores(String key, long start, long end);
 
@@ -1468,8 +1468,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
-	 * @see RedisZSetCommands#zRevRangeByScore(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
+	 * @see ValkeyZSetCommands#zRevRangeByScore(byte[], double, double)
 	 */
 	Set<String> zRevRangeByScore(String key, double min, double max);
 
@@ -1481,8 +1481,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRevRangeByScoreWithScores(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRevRangeByScoreWithScores(byte[], double, double)
 	 */
 	Set<StringTuple> zRevRangeByScoreWithScores(String key, double min, double max);
 
@@ -1496,8 +1496,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param offset
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRevRangeByScore(byte[], double, double, long, long)
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRevRangeByScore(byte[], double, double, long, long)
 	 */
 	Set<String> zRevRangeByScore(String key, double min, double max, long offset, long count);
 
@@ -1511,8 +1511,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param offset
 	 * @param count
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRevRangeByScoreWithScores(byte[], double, double, long, long)
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRevRangeByScoreWithScores(byte[], double, double, long, long)
 	 */
 	Set<StringTuple> zRevRangeByScoreWithScores(String key, double min, double max, long offset, long count);
 
@@ -1523,8 +1523,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
-	 * @see RedisZSetCommands#zCount(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
+	 * @see ValkeyZSetCommands#zCount(byte[], double, double)
 	 */
 	Long zCount(String key, double min, double max);
 
@@ -1536,8 +1536,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
-	 * @see RedisZSetCommands#zLexCount(byte[], org.springframework.data.domain.Range)
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
+	 * @see ValkeyZSetCommands#zLexCount(byte[], org.springframework.data.domain.Range)
 	 */
 	@Nullable
 	Long zLexCount(String key, org.springframework.data.domain.Range<String> range);
@@ -1547,7 +1547,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1559,7 +1559,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1573,7 +1573,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/bzpopmin">Redis Documentation: BZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/bzpopmin">Valkey Documentation: BZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1584,7 +1584,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1596,7 +1596,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1610,7 +1610,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/bzpopmax">Redis Documentation: BZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/bzpopmax">Valkey Documentation: BZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -1621,8 +1621,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcard">Redis Documentation: ZCARD</a>
-	 * @see RedisZSetCommands#zCard(byte[])
+	 * @see <a href="https://redis.io/commands/zcard">Valkey Documentation: ZCARD</a>
+	 * @see ValkeyZSetCommands#zCard(byte[])
 	 */
 	Long zCard(String key);
 
@@ -1632,8 +1632,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param value the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
-	 * @see RedisZSetCommands#zScore(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
+	 * @see ValkeyZSetCommands#zScore(byte[], byte[])
 	 */
 	Double zScore(String key, String value);
 
@@ -1643,8 +1643,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param values the values.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
-	 * @see RedisZSetCommands#zMScore(byte[], byte[][])
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
+	 * @see ValkeyZSetCommands#zMScore(byte[], byte[][])
 	 * @since 2.6
 	 */
 	List<Double> zMScore(String key, String... values);
@@ -1656,8 +1656,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
-	 * @see RedisZSetCommands#zRemRange(byte[], long, long)
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
+	 * @see ValkeyZSetCommands#zRemRange(byte[], long, long)
 	 */
 	Long zRemRange(String key, long start, long end);
 
@@ -1669,7 +1669,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return the number of elements removed, or {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebylex">Redis Documentation: ZREMRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zremrangebylex">Valkey Documentation: ZREMRANGEBYLEX</a>
 	 */
 	Long zRemRangeByLex(String key, org.springframework.data.domain.Range<String> range);
 
@@ -1680,8 +1680,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param min
 	 * @param max
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRemRangeByScore(byte[], double, double)
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRemRangeByScore(byte[], double, double)
 	 */
 	Long zRemRangeByScore(String key, double min, double max);
 
@@ -1691,7 +1691,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	@Nullable
 	Set<String> zDiff(String... sets);
@@ -1702,7 +1702,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	@Nullable
 	Set<StringTuple> zDiffWithScores(String... sets);
@@ -1714,7 +1714,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	@Nullable
 	Long zDiffStore(String destKey, String... sets);
@@ -1725,7 +1725,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<String> zInter(String... sets);
@@ -1736,7 +1736,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<StringTuple> zInterWithScores(String... sets);
@@ -1749,7 +1749,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	default Set<StringTuple> zInterWithScores(Aggregate aggregate, int[] weights, String... sets) {
@@ -1764,7 +1764,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<StringTuple> zInterWithScores(Aggregate aggregate, Weights weights, String... sets);
@@ -1775,8 +1775,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
-	 * @see RedisZSetCommands#zInterStore(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
+	 * @see ValkeyZSetCommands#zInterStore(byte[], byte[]...)
 	 */
 	Long zInterStore(String destKey, String... sets);
 
@@ -1788,8 +1788,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param weights
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
-	 * @see RedisZSetCommands#zInterStore(byte[], Aggregate, int[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
+	 * @see ValkeyZSetCommands#zInterStore(byte[], Aggregate, int[], byte[]...)
 	 */
 	Long zInterStore(String destKey, Aggregate aggregate, int[] weights, String... sets);
 
@@ -1799,7 +1799,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<String> zUnion(String... sets);
@@ -1810,7 +1810,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<StringTuple> zUnionWithScores(String... sets);
@@ -1823,7 +1823,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	default Set<StringTuple> zUnionWithScores(Aggregate aggregate, int[] weights, String... sets) {
@@ -1838,7 +1838,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<StringTuple> zUnionWithScores(Aggregate aggregate, Weights weights, String... sets);
@@ -1849,8 +1849,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param destKey must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
-	 * @see RedisZSetCommands#zUnionStore(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
+	 * @see ValkeyZSetCommands#zUnionStore(byte[], byte[]...)
 	 */
 	Long zUnionStore(String destKey, String... sets);
 
@@ -1862,8 +1862,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param weights
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
-	 * @see RedisZSetCommands#zUnionStore(byte[], Aggregate, int[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
+	 * @see ValkeyZSetCommands#zUnionStore(byte[], Aggregate, int[], byte[]...)
 	 */
 	Long zUnionStore(String destKey, Aggregate aggregate, int[] weights, String... sets);
 
@@ -1874,8 +1874,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param options must not be {@literal null}.
 	 * @return
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
-	 * @see RedisZSetCommands#zScan(byte[], ScanOptions)
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
+	 * @see ValkeyZSetCommands#zScan(byte[], ScanOptions)
 	 */
 	Cursor<StringTuple> zScan(String key, ScanOptions options);
 
@@ -1887,8 +1887,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param max must not be {@literal null}.
 	 * @return
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScore(byte[], String, String)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScore(byte[], String, String)
 	 */
 	Set<String> zRangeByScore(String key, String min, String max);
 
@@ -1903,8 +1903,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count
 	 * @return
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see RedisZSetCommands#zRangeByScore(byte[], double, double, long, long)
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see ValkeyZSetCommands#zRangeByScore(byte[], double, double, long, long)
 	 */
 	Set<String> zRangeByScore(String key, String min, String max, long offset, long count);
 
@@ -1914,8 +1914,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRangeByLex(byte[])
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRangeByLex(byte[])
 	 */
 	Set<String> zRangeByLex(String key);
 
@@ -1926,8 +1926,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRangeByLex(byte[], org.springframework.data.domain.Range)
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRangeByLex(byte[], org.springframework.data.domain.Range)
 	 */
 	Set<String> zRangeByLex(String key, org.springframework.data.domain.Range<String> range);
 
@@ -1940,8 +1940,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit can be {@literal null}.
 	 * @return
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRangeByLex(byte[], org.springframework.data.domain.Range, org.springframework.data.redis.connection.Limit)
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRangeByLex(byte[], org.springframework.data.domain.Range, org.springframework.data.redis.connection.Limit)
 	 */
 	Set<String> zRangeByLex(String key, org.springframework.data.domain.Range<String> range,
 			org.springframework.data.redis.connection.Limit limit);
@@ -1952,8 +1952,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRevRangeByLex(byte[])
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRevRangeByLex(byte[])
 	 */
 	default Set<String> zRevRangeByLex(String key) {
 		return zRevRangeByLex(key, org.springframework.data.domain.Range.unbounded());
@@ -1966,8 +1966,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRevRangeByLex(byte[], org.springframework.data.domain.Range)
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRevRangeByLex(byte[], org.springframework.data.domain.Range)
 	 */
 	default Set<String> zRevRangeByLex(String key, org.springframework.data.domain.Range<String> range) {
 		return zRevRangeByLex(key, range, org.springframework.data.redis.connection.Limit.unlimited());
@@ -1982,8 +1982,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
-	 * @see RedisZSetCommands#zRevRangeByLex(byte[], org.springframework.data.domain.Range, org.springframework.data.redis.connection.Limit)
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
+	 * @see ValkeyZSetCommands#zRevRangeByLex(byte[], org.springframework.data.domain.Range, org.springframework.data.redis.connection.Limit)
 	 */
 	Set<String> zRevRangeByLex(String key, org.springframework.data.domain.Range<String> range,
 			org.springframework.data.redis.connection.Limit limit);
@@ -1996,7 +1996,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreByLex(String dstKey, String srcKey, org.springframework.data.domain.Range<String> range) {
@@ -2012,7 +2012,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreByLex(String dstKey, String srcKey, org.springframework.data.domain.Range<String> range,
@@ -2026,7 +2026,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreRevByLex(String dstKey, String srcKey, org.springframework.data.domain.Range<String> range) {
@@ -2042,7 +2042,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreRevByLex(String dstKey, String srcKey, org.springframework.data.domain.Range<String> range,
@@ -2056,7 +2056,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreByScore(String dstKey, String srcKey,
@@ -2073,7 +2073,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreByScore(String dstKey, String srcKey, org.springframework.data.domain.Range<? extends Number> range,
@@ -2087,7 +2087,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreRevByScore(String dstKey, String srcKey,
@@ -2104,7 +2104,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreRevByScore(String dstKey, String srcKey,
@@ -2112,7 +2112,7 @@ public interface StringRedisConnection extends RedisConnection {
 			org.springframework.data.redis.connection.Limit limit);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Hashes
+	// Methods dealing with Valkey Hashes
 	// -------------------------------------------------------------------------
 
 	/**
@@ -2122,8 +2122,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param field must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/hset">Redis Documentation: HSET</a>
-	 * @see RedisHashCommands#hSet(byte[], byte[], byte[])
+	 * @see <a href="https://redis.io/commands/hset">Valkey Documentation: HSET</a>
+	 * @see ValkeyHashCommands#hSet(byte[], byte[], byte[])
 	 */
 	Boolean hSet(String key, String field, String value);
 
@@ -2134,8 +2134,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param field must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/hsetnx">Redis Documentation: HSETNX</a>
-	 * @see RedisHashCommands#hSetNX(byte[], byte[], byte[])
+	 * @see <a href="https://redis.io/commands/hsetnx">Valkey Documentation: HSETNX</a>
+	 * @see ValkeyHashCommands#hSetNX(byte[], byte[], byte[])
 	 */
 	Boolean hSetNX(String key, String field, String value);
 
@@ -2145,8 +2145,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param field must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hget">Redis Documentation: HGET</a>
-	 * @see RedisHashCommands#hGet(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/hget">Valkey Documentation: HGET</a>
+	 * @see ValkeyHashCommands#hGet(byte[], byte[])
 	 */
 	String hGet(String key, String field);
 
@@ -2156,8 +2156,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param fields must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hmget">Redis Documentation: HMGET</a>
-	 * @see RedisHashCommands#hMGet(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/hmget">Valkey Documentation: HMGET</a>
+	 * @see ValkeyHashCommands#hMGet(byte[], byte[]...)
 	 */
 	List<String> hMGet(String key, String... fields);
 
@@ -2166,8 +2166,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param hashes must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/hmset">Redis Documentation: HMSET</a>
-	 * @see RedisHashCommands#hMGet(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/hmset">Valkey Documentation: HMSET</a>
+	 * @see ValkeyHashCommands#hMGet(byte[], byte[]...)
 	 */
 	void hMSet(String key, Map<String, String> hashes);
 
@@ -2178,8 +2178,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param field must not be {@literal null}.
 	 * @param delta
 	 * @return
-	 * @see <a href="https://redis.io/commands/hincrby">Redis Documentation: HINCRBY</a>
-	 * @see RedisHashCommands#hIncrBy(byte[], byte[], long)
+	 * @see <a href="https://redis.io/commands/hincrby">Valkey Documentation: HINCRBY</a>
+	 * @see ValkeyHashCommands#hIncrBy(byte[], byte[], long)
 	 */
 	Long hIncrBy(String key, String field, long delta);
 
@@ -2190,8 +2190,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param field
 	 * @param delta
 	 * @return
-	 * @see <a href="https://redis.io/commands/hincrbyfloat">Redis Documentation: HINCRBYFLOAT</a>
-	 * @see RedisHashCommands#hIncrBy(byte[], byte[], double)
+	 * @see <a href="https://redis.io/commands/hincrbyfloat">Valkey Documentation: HINCRBYFLOAT</a>
+	 * @see ValkeyHashCommands#hIncrBy(byte[], byte[], double)
 	 */
 	Double hIncrBy(String key, String field, double delta);
 
@@ -2201,7 +2201,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	String hRandField(String key);
@@ -2212,7 +2212,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	Map.Entry<String, String> hRandFieldWithValues(String key);
@@ -2227,7 +2227,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count number of fields to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	List<String> hRandField(String key, long count);
@@ -2242,7 +2242,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count number of fields to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	List<Map.Entry<String, String>> hRandFieldWithValues(String key, long count);
@@ -2253,8 +2253,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param field must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hexits">Redis Documentation: HEXISTS</a>
-	 * @see RedisHashCommands#hExists(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/hexits">Valkey Documentation: HEXISTS</a>
+	 * @see ValkeyHashCommands#hExists(byte[], byte[])
 	 */
 	Boolean hExists(String key, String field);
 
@@ -2264,8 +2264,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key must not be {@literal null}.
 	 * @param fields must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hdel">Redis Documentation: HDEL</a>
-	 * @see RedisHashCommands#hDel(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/hdel">Valkey Documentation: HDEL</a>
+	 * @see ValkeyHashCommands#hDel(byte[], byte[]...)
 	 */
 	Long hDel(String key, String... fields);
 
@@ -2274,8 +2274,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hlen">Redis Documentation: HLEN</a>
-	 * @see RedisHashCommands#hLen(byte[])
+	 * @see <a href="https://redis.io/commands/hlen">Valkey Documentation: HLEN</a>
+	 * @see ValkeyHashCommands#hLen(byte[])
 	 */
 	Long hLen(String key);
 
@@ -2284,8 +2284,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hkeys">Redis Documentation: HKEYS</a>?
-	 * @see RedisHashCommands#hKeys(byte[])
+	 * @see <a href="https://redis.io/commands/hkeys">Valkey Documentation: HKEYS</a>?
+	 * @see ValkeyHashCommands#hKeys(byte[])
 	 */
 	Set<String> hKeys(String key);
 
@@ -2294,8 +2294,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hvals">Redis Documentation: HVALS</a>
-	 * @see RedisHashCommands#hVals(byte[])
+	 * @see <a href="https://redis.io/commands/hvals">Valkey Documentation: HVALS</a>
+	 * @see ValkeyHashCommands#hVals(byte[])
 	 */
 	List<String> hVals(String key);
 
@@ -2304,8 +2304,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hgetall">Redis Documentation: HGETALL</a>
-	 * @see RedisHashCommands#hGetAll(byte[])
+	 * @see <a href="https://redis.io/commands/hgetall">Valkey Documentation: HGETALL</a>
+	 * @see ValkeyHashCommands#hGetAll(byte[])
 	 */
 	Map<String, String> hGetAll(String key);
 
@@ -2316,8 +2316,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param options must not be {@literal null}.
 	 * @return
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
-	 * @see RedisHashCommands#hScan(byte[], ScanOptions)
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
+	 * @see ValkeyHashCommands#hScan(byte[], ScanOptions)
 	 */
 	Cursor<Map.Entry<String, String>> hScan(String key, ScanOptions options);
 
@@ -2344,8 +2344,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param values must not be {@literal null}.
 	 * @return
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
-	 * @see RedisHyperLogLogCommands#pfAdd(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
+	 * @see ValkeyHyperLogLogCommands#pfAdd(byte[], byte[]...)
 	 */
 	Long pfAdd(String key, String... values);
 
@@ -2354,8 +2354,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
-	 * @see RedisHyperLogLogCommands#pfCount(byte[]...)
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
+	 * @see ValkeyHyperLogLogCommands#pfCount(byte[]...)
 	 */
 	Long pfCount(String... keys);
 
@@ -2364,13 +2364,13 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param destinationKey must not be {@literal null}.
 	 * @param sourceKeys must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/pfmerge">Redis Documentation: PFMERGE</a>
-	 * @see RedisHyperLogLogCommands#pfMerge(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/pfmerge">Valkey Documentation: PFMERGE</a>
+	 * @see ValkeyHyperLogLogCommands#pfMerge(byte[], byte[]...)
 	 */
 	void pfMerge(String destinationKey, String... sourceKeys);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Geo-Indexes
+	// Methods dealing with Valkey Geo-Indexes
 	// -------------------------------------------------------------------------
 
 	/**
@@ -2381,8 +2381,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param member must not be {@literal null}.
 	 * @return Number of elements added.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
-	 * @see RedisGeoCommands#geoAdd(byte[], Point, byte[])
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
+	 * @see ValkeyGeoCommands#geoAdd(byte[], Point, byte[])
 	 */
 	Long geoAdd(String key, Point point, String member);
 
@@ -2393,8 +2393,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param location must not be {@literal null}.
 	 * @return Number of elements added.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
-	 * @see RedisGeoCommands#geoAdd(byte[], GeoLocation)
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
+	 * @see ValkeyGeoCommands#geoAdd(byte[], GeoLocation)
 	 */
 	Long geoAdd(String key, GeoLocation<String> location);
 
@@ -2405,8 +2405,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param memberCoordinateMap must not be {@literal null}.
 	 * @return Number of elements added.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
-	 * @see RedisGeoCommands#geoAdd(byte[], Map)
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
+	 * @see ValkeyGeoCommands#geoAdd(byte[], Map)
 	 */
 	Long geoAdd(String key, Map<String, Point> memberCoordinateMap);
 
@@ -2417,8 +2417,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param locations must not be {@literal null}.
 	 * @return Number of elements added.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
-	 * @see RedisGeoCommands#geoAdd(byte[], Iterable)
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
+	 * @see ValkeyGeoCommands#geoAdd(byte[], Iterable)
 	 */
 	Long geoAdd(String key, Iterable<GeoLocation<String>> locations);
 
@@ -2430,8 +2430,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param member2 must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
-	 * @see RedisGeoCommands#geoDist(byte[], byte[], byte[])
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
+	 * @see ValkeyGeoCommands#geoDist(byte[], byte[], byte[])
 	 */
 	Distance geoDist(String key, String member1, String member2);
 
@@ -2444,8 +2444,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param metric must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
-	 * @see RedisGeoCommands#geoDist(byte[], byte[], byte[], Metric)
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
+	 * @see ValkeyGeoCommands#geoDist(byte[], byte[], byte[], Metric)
 	 */
 	Distance geoDist(String key, String member1, String member2, Metric metric);
 
@@ -2456,8 +2456,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
-	 * @see RedisGeoCommands#geoHash(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
+	 * @see ValkeyGeoCommands#geoHash(byte[], byte[]...)
 	 */
 	List<String> geoHash(String key, String... members);
 
@@ -2468,8 +2468,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
-	 * @see RedisGeoCommands#geoPos(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
+	 * @see ValkeyGeoCommands#geoPos(byte[], byte[]...)
 	 */
 	List<Point> geoPos(String key, String... members);
 
@@ -2480,8 +2480,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param within must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
-	 * @see RedisGeoCommands#geoRadius(byte[], Circle)
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
+	 * @see ValkeyGeoCommands#geoRadius(byte[], Circle)
 	 */
 	GeoResults<GeoLocation<String>> geoRadius(String key, Circle within);
 
@@ -2493,8 +2493,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
-	 * @see RedisGeoCommands#geoRadius(byte[], Circle, GeoRadiusCommandArgs)
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
+	 * @see ValkeyGeoCommands#geoRadius(byte[], Circle, GeoRadiusCommandArgs)
 	 */
 	GeoResults<GeoLocation<String>> geoRadius(String key, Circle within, GeoRadiusCommandArgs args);
 
@@ -2507,8 +2507,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param radius
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
-	 * @see RedisGeoCommands#geoRadiusByMember(byte[], byte[], double)
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
+	 * @see ValkeyGeoCommands#geoRadiusByMember(byte[], byte[], double)
 	 */
 	GeoResults<GeoLocation<String>> geoRadiusByMember(String key, String member, double radius);
 
@@ -2521,8 +2521,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param radius must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
-	 * @see RedisGeoCommands#geoRadiusByMember(byte[], byte[], Distance)
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
+	 * @see ValkeyGeoCommands#geoRadiusByMember(byte[], byte[], Distance)
 	 */
 	GeoResults<GeoLocation<String>> geoRadiusByMember(String key, String member, Distance radius);
 
@@ -2536,8 +2536,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
-	 * @see RedisGeoCommands#geoRadiusByMember(byte[], byte[], Distance, GeoRadiusCommandArgs)
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
+	 * @see ValkeyGeoCommands#geoRadiusByMember(byte[], byte[], Distance, GeoRadiusCommandArgs)
 	 */
 	GeoResults<GeoLocation<String>> geoRadiusByMember(String key, String member, Distance radius,
 			GeoRadiusCommandArgs args);
@@ -2549,8 +2549,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param members must not be {@literal null}.
 	 * @since 1.8
 	 * @return Number of members elements removed.
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
-	 * @see RedisGeoCommands#geoRemove(byte[], byte[]...)
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
+	 * @see ValkeyGeoCommands#geoRemove(byte[], byte[]...)
 	 */
 	Long geoRemove(String key, String... members);
 
@@ -2565,7 +2565,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<String>> geoSearch(String key, GeoReference<String> reference, GeoShape predicate,
@@ -2582,14 +2582,14 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	Long geoSearchStore(String destKey, String key, GeoReference<String> reference, GeoShape predicate,
 			GeoSearchStoreCommandArgs args);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Pub/Sub
+	// Methods dealing with Valkey Pub/Sub
 	// -------------------------------------------------------------------------
 
 	/**
@@ -2598,8 +2598,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param channel the channel to publish to, must not be {@literal null}.
 	 * @param message message to publish
 	 * @return the number of clients that received the message
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
-	 * @see RedisPubSubCommands#publish(byte[], byte[])
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
+	 * @see ValkeyPubSubCommands#publish(byte[], byte[])
 	 */
 	Long publish(String channel, String message);
 
@@ -2611,8 +2611,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param listener message listener, must not be {@literal null}.
 	 * @param channels channel names, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/subscribe">Redis Documentation: SUBSCRIBE</a>
-	 * @see RedisPubSubCommands#subscribe(MessageListener, byte[]...)
+	 * @see <a href="https://redis.io/commands/subscribe">Valkey Documentation: SUBSCRIBE</a>
+	 * @see ValkeyPubSubCommands#subscribe(MessageListener, byte[]...)
 	 */
 	void subscribe(MessageListener listener, String... channels);
 
@@ -2625,13 +2625,13 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param listener message listener, must not be {@literal null}.
 	 * @param patterns channel name patterns, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/psubscribe">Redis Documentation: PSUBSCRIBE</a>
-	 * @see RedisPubSubCommands#pSubscribe(MessageListener, byte[]...)
+	 * @see <a href="https://redis.io/commands/psubscribe">Valkey Documentation: PSUBSCRIBE</a>
+	 * @see ValkeyPubSubCommands#pSubscribe(MessageListener, byte[]...)
 	 */
 	void pSubscribe(MessageListener listener, String... patterns);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Lua Scripting
+	// Methods dealing with Valkey Lua Scripting
 	// -------------------------------------------------------------------------
 
 	/**
@@ -2640,8 +2640,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param script must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/script-load">Redis Documentation: SCRIPT LOAD</a>
-	 * @see RedisScriptingCommands#scriptLoad(byte[])
+	 * @see <a href="https://redis.io/commands/script-load">Valkey Documentation: SCRIPT LOAD</a>
+	 * @see ValkeyScriptingCommands#scriptLoad(byte[])
 	 */
 	String scriptLoad(String script);
 
@@ -2653,8 +2653,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param numKeys
 	 * @param keysAndArgs must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/eval">Redis Documentation: EVAL</a>
-	 * @see RedisScriptingCommands#eval(byte[], ReturnType, int, byte[]...)
+	 * @see <a href="https://redis.io/commands/eval">Valkey Documentation: EVAL</a>
+	 * @see ValkeyScriptingCommands#eval(byte[], ReturnType, int, byte[]...)
 	 */
 	<T> T eval(String script, ReturnType returnType, int numKeys, String... keysAndArgs);
 
@@ -2666,8 +2666,8 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param numKeys
 	 * @param keysAndArgs must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/evalsha">Redis Documentation: EVALSHA</a>
-	 * @see RedisScriptingCommands#evalSha(String, ReturnType, int, byte[]...)
+	 * @see <a href="https://redis.io/commands/evalsha">Valkey Documentation: EVALSHA</a>
+	 * @see ValkeyScriptingCommands#evalSha(String, ReturnType, int, byte[]...)
 	 */
 	<T> T evalSha(String scriptSha, ReturnType returnType, int numKeys, String... keysAndArgs);
 
@@ -2676,20 +2676,20 @@ public interface StringRedisConnection extends RedisConnection {
 	 *
 	 * @param name
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/client-setname">Redis Documentation: CLIENT SETNAME</a>
-	 * @see RedisServerCommands#setClientName(byte[])
+	 * @see <a href="https://redis.io/commands/client-setname">Valkey Documentation: CLIENT SETNAME</a>
+	 * @see ValkeyServerCommands#setClientName(byte[])
 	 */
 	void setClientName(String name);
 
 	/**
 	 * Request information and statistics about connected clients.
 	 *
-	 * @return {@link List} of {@link RedisClientInfo} objects.
+	 * @return {@link List} of {@link ValkeyClientInfo} objects.
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/client-list">Redis Documentation: CLIENT LIST</a>
-	 * @see RedisServerCommands#getClientList()
+	 * @see <a href="https://redis.io/commands/client-list">Valkey Documentation: CLIENT LIST</a>
+	 * @see ValkeyServerCommands#getClientList()
 	 */
-	List<RedisClientInfo> getClientList();
+	List<ValkeyClientInfo> getClientList();
 
 	/**
 	 * Get / Manipulate specific integer fields of varying bit widths and arbitrary non (necessary) aligned offset stored
@@ -2702,7 +2702,7 @@ public interface StringRedisConnection extends RedisConnection {
 	List<Long> bitfield(String key, BitFieldSubCommands command);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Streams
+	// Methods dealing with Valkey Streams
 	// -------------------------------------------------------------------------
 
 	static RecordId[] entryIds(String... entryIds) {
@@ -2722,7 +2722,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param entryIds record Id's to acknowledge.
 	 * @return length of acknowledged records. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xack">Redis Documentation: XACK</a>
+	 * @see <a href="https://redis.io/commands/xack">Valkey Documentation: XACK</a>
 	 */
 	@Nullable
 	default Long xAck(String key, String group, String... entryIds) {
@@ -2738,7 +2738,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param body record body.
 	 * @return the record Id. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xadd">Redis Documentation: XADD</a>
+	 * @see <a href="https://redis.io/commands/xadd">Valkey Documentation: XADD</a>
 	 */
 	@Nullable
 	default RecordId xAdd(String key, Map<String, String> body) {
@@ -2777,7 +2777,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param newOwner the name of the new {@literal consumer}.
 	 * @param options must not be {@literal null}.
 	 * @return list of {@link RecordId ids} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	List<RecordId> xClaimJustId(String key, String group, String newOwner, XClaimOptions options);
@@ -2791,7 +2791,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param minIdleTime must not be {@literal null}.
 	 * @param recordIds must not be {@literal null}.
 	 * @return list of {@link StringRecord} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	default List<StringRecord> xClaim(String key, String group, String newOwner, Duration minIdleTime,
@@ -2807,7 +2807,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param newOwner the name of the new {@literal consumer}.
 	 * @param options must not be {@literal null}.
 	 * @return list of {@link StringRecord} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	List<StringRecord> xClaim(String key, String group, String newOwner, XClaimOptions options);
@@ -2820,7 +2820,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param entryIds stream record Id's.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xdel">Redis Documentation: XDEL</a>
+	 * @see <a href="https://redis.io/commands/xdel">Valkey Documentation: XDEL</a>
 	 */
 	@Nullable
 	default Long xDel(String key, String... entryIds) {
@@ -2916,7 +2916,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param key the stream key.
 	 * @return length of the stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xlen">Redis Documentation: XLEN</a>
+	 * @see <a href="https://redis.io/commands/xlen">Valkey Documentation: XLEN</a>
 	 */
 	@Nullable
 	Long xLen(String key);
@@ -2928,7 +2928,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param groupName the name of the {@literal consumer group}. Must not be {@literal null}.
 	 * @return a summary of pending messages within the given {@literal consumer group} or {@literal null} when used in
 	 *         pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -2945,7 +2945,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count limit the number of results. Must not be {@literal null}.
 	 * @return pending messages for the given {@literal consumer group} or {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -2962,7 +2962,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count limit the number of results. Must not be {@literal null}.
 	 * @return pending messages for the given {@literal consumer group} or {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -2978,7 +2978,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param options the options containing {@literal range}, {@literal consumer} and {@literal count}. Must not be
 	 *          {@literal null}.
 	 * @return pending messages matching given criteria or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -2991,7 +2991,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	default List<StringRecord> xRange(String key, org.springframework.data.domain.Range<String> range) {
@@ -3007,7 +3007,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	List<StringRecord> xRange(String key, org.springframework.data.domain.Range<String> range,
@@ -3019,7 +3019,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param stream the streams to read from.
 	 * @return list ith members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadAsString(StreamOffset<String> stream) {
@@ -3032,7 +3032,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadAsString(StreamOffset<String>... streams) {
@@ -3046,7 +3046,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param stream the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadAsString(StreamReadOptions readOptions, StreamOffset<String> stream) {
@@ -3060,7 +3060,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	List<StringRecord> xReadAsString(StreamReadOptions readOptions, StreamOffset<String>... streams);
@@ -3072,7 +3072,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param stream the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadGroupAsString(Consumer consumer, StreamOffset<String> stream) {
@@ -3086,7 +3086,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadGroupAsString(Consumer consumer, StreamOffset<String>... streams) {
@@ -3101,7 +3101,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param stream the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	default List<StringRecord> xReadGroupAsString(Consumer consumer, StreamReadOptions readOptions,
@@ -3117,7 +3117,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	List<StringRecord> xReadGroupAsString(Consumer consumer, StreamReadOptions readOptions,
@@ -3130,7 +3130,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param range must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	default List<StringRecord> xRevRange(String key, org.springframework.data.domain.Range<String> range) {
@@ -3146,7 +3146,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param limit must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	List<StringRecord> xRevRange(String key, org.springframework.data.domain.Range<String> range,
@@ -3159,7 +3159,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param count length of the stream.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
 	 * @since 2.2
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long xTrim(String key, long count);
@@ -3172,7 +3172,7 @@ public interface StringRedisConnection extends RedisConnection {
 	 * @param approximateTrimming the trimming must be performed in a approximated way in order to maximize performances.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long xTrim(String key, long count, boolean approximateTrimming);

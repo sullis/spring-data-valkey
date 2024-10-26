@@ -76,7 +76,7 @@ public class IndexConfiguration implements ConfigurableIndexDefinitionProvider {
 
 	public void addIndexDefinition(IndexDefinition indexDefinition) {
 
-		Assert.notNull(indexDefinition, "RedisIndexDefinition must not be null in order to be added");
+		Assert.notNull(indexDefinition, "ValkeyIndexDefinition must not be null in order to be added");
 		this.definitions.add(indexDefinition);
 	}
 
@@ -86,8 +86,8 @@ public class IndexConfiguration implements ConfigurableIndexDefinitionProvider {
 		for (IndexDefinition indexDef : definitions) {
 			if (ClassUtils.isAssignable(type, indexDef.getClass()) && indexDef.getKeyspace().equals(keyspace)) {
 
-				if (indexDef instanceof PathBasedRedisIndexDefinition) {
-					if (ObjectUtils.nullSafeEquals(((PathBasedRedisIndexDefinition) indexDef).getPath(), path)) {
+				if (indexDef instanceof PathBasedValkeyIndexDefinition) {
+					if (ObjectUtils.nullSafeEquals(((PathBasedValkeyIndexDefinition) indexDef).getPath(), path)) {
 						def.add(indexDef);
 					}
 				} else {

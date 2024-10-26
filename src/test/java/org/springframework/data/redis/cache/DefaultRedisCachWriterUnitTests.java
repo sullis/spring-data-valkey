@@ -36,37 +36,37 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.PessimisticLockingFailureException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisKeyCommands;
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
 /**
- * Unit tests for {@link DefaultRedisCacheWriter}
+ * Unit tests for {@link DefaultValkeyCacheWriter}
  *
  * @author John Blum
  * @author Christoph Strobl
  */
 @ExtendWith(MockitoExtension.class)
-class DefaultRedisCacheWriterUnitTests {
+class DefaultValkeyCacheWriterUnitTests {
 
 	@Mock
 	private CacheStatisticsCollector mockCacheStatisticsCollector = mock(CacheStatisticsCollector.class);
 
 	@Mock
-	private RedisConnection mockConnection;
+	private ValkeyConnection mockConnection;
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
-	private RedisConnectionFactory mockConnectionFactory;
+	private ValkeyConnectionFactory mockConnectionFactory;
 
 	@BeforeEach
 	void setup() {
 		doReturn(this.mockConnection).when(this.mockConnectionFactory).getConnection();
 	}
 
-	private RedisCacheWriter newRedisCacheWriter() {
-		return spy(new DefaultRedisCacheWriter(this.mockConnectionFactory, mock(BatchStrategy.class))
+	private ValkeyCacheWriter newValkeyCacheWriter() {
+		return spy(new DefaultValkeyCacheWriter(this.mockConnectionFactory, mock(BatchStrategy.class))
 				.withStatisticsCollector(this.mockCacheStatisticsCollector));
 	}
 
@@ -79,12 +79,12 @@ class DefaultRedisCacheWriterUnitTests {
 		Duration ttl = Duration.ofSeconds(15);
 		Expiration expiration = Expiration.from(ttl);
 
-		RedisStringCommands mockStringCommands = mock(RedisStringCommands.class);
+		ValkeyStringCommands mockStringCommands = mock(ValkeyStringCommands.class);
 
 		doReturn(mockStringCommands).when(this.mockConnection).stringCommands();
 		doReturn(value).when(mockStringCommands).getEx(any(), any());
 
-		RedisCacheWriter cacheWriter = newRedisCacheWriter();
+		ValkeyCacheWriter cacheWriter = newValkeyCacheWriter();
 
 		assertThat(cacheWriter.get("TestCache", key, ttl)).isEqualTo(value);
 
@@ -100,12 +100,12 @@ class DefaultRedisCacheWriterUnitTests {
 		byte[] key = "TestKey".getBytes();
 		byte[] value = "TestValue".getBytes();
 
-		RedisStringCommands mockStringCommands = mock(RedisStringCommands.class);
+		ValkeyStringCommands mockStringCommands = mock(ValkeyStringCommands.class);
 
 		doReturn(mockStringCommands).when(this.mockConnection).stringCommands();
 		doReturn(value).when(mockStringCommands).get(any());
 
-		RedisCacheWriter cacheWriter = newRedisCacheWriter();
+		ValkeyCacheWriter cacheWriter = newValkeyCacheWriter();
 
 		assertThat(cacheWriter.get("TestCache", key, null)).isEqualTo(value);
 
@@ -121,16 +121,16 @@ class DefaultRedisCacheWriterUnitTests {
 		byte[] key = "TestKey".getBytes();
 		byte[] value = "TestValue".getBytes();
 
-		RedisStringCommands mockStringCommands = mock(RedisStringCommands.class);
-		RedisKeyCommands mockKeyCommands = mock(RedisKeyCommands.class);
+		ValkeyStringCommands mockStringCommands = mock(ValkeyStringCommands.class);
+		ValkeyKeyCommands mockKeyCommands = mock(ValkeyKeyCommands.class);
 
 		doReturn(mockStringCommands).when(this.mockConnection).stringCommands();
 		doReturn(mockKeyCommands).when(this.mockConnection).keyCommands();
 		doThrow(new PessimisticLockingFailureException("you-shall-not-pass")).when(mockStringCommands).set(any(byte[].class),
 				any(byte[].class), any(), any());
 
-		RedisCacheWriter cacheWriter = spy(
-				new DefaultRedisCacheWriter(this.mockConnectionFactory, Duration.ofMillis(10), mock(BatchStrategy.class))
+		ValkeyCacheWriter cacheWriter = spy(
+				new DefaultValkeyCacheWriter(this.mockConnectionFactory, Duration.ofMillis(10), mock(BatchStrategy.class))
 						.withStatisticsCollector(this.mockCacheStatisticsCollector));
 
 		assertThatException()

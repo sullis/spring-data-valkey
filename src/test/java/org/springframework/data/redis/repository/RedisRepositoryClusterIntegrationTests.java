@@ -26,12 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.repository.configuration.EnableValkeyRepositories;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -41,23 +41,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
-@EnabledOnRedisClusterAvailable
-class RedisRepositoryClusterIntegrationTests extends RedisRepositoryIntegrationTestBase {
+@EnabledOnValkeyClusterAvailable
+class ValkeyRepositoryClusterIntegrationTests extends ValkeyRepositoryIntegrationTestBase {
 
 	static final List<String> CLUSTER_NODES = Arrays.asList(CLUSTER_NODE_1.asString(), CLUSTER_NODE_2.asString(),
 			CLUSTER_NODE_3.asString());
 
 	@Configuration
-	@EnableRedisRepositories(considerNestedRepositories = true, indexConfiguration = MyIndexConfiguration.class,
+	@EnableValkeyRepositories(considerNestedRepositories = true, indexConfiguration = MyIndexConfiguration.class,
 			keyspaceConfiguration = MyKeyspaceConfiguration.class,
 			includeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 					classes = { PersonRepository.class, CityRepository.class, ImmutableObjectRepository.class, UserRepository.class }) })
 	static class Config {
 
 		@Bean
-		RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory connectionFactory) {
+		ValkeyTemplate<?, ?> redisTemplate(ValkeyConnectionFactory connectionFactory) {
 
-			RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
+			ValkeyTemplate<byte[], byte[]> template = new ValkeyTemplate<>();
 
 			template.setConnectionFactory(connectionFactory);
 
@@ -65,8 +65,8 @@ class RedisRepositoryClusterIntegrationTests extends RedisRepositoryIntegrationT
 		}
 
 		@Bean
-		RedisConnectionFactory connectionFactory() {
-			RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(CLUSTER_NODES);
+		ValkeyConnectionFactory connectionFactory() {
+			ValkeyClusterConfiguration clusterConfig = new ValkeyClusterConfiguration(CLUSTER_NODES);
 			JedisConnectionFactory connectionFactory = new JedisConnectionFactory(clusterConfig);
 			return connectionFactory;
 		}

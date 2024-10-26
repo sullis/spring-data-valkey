@@ -20,4 +20,4 @@ asciidoc:
     spring-framework-javadoc: '{springjavadocurl}'
     springhateoasversion: ${spring-hateoas}
     releasetrainversion: ${releasetrain}
-    store: Redis
+    store: Valkey

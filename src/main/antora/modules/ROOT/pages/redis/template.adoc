@@ -1,17 +1,17 @@
 [[redis:template]]
-= Working with Objects through `RedisTemplate`
+= Working with Objects through `ValkeyTemplate`
 
-Most users are likely to use javadoc:org.springframework.data.redis.core.RedisTemplate[] and its corresponding package, `org.springframework.data.redis.core` or its reactive variant javadoc:org.springframework.data.redis.core.ReactiveRedisTemplate[].
-The template is, in fact, the central class of the Redis module, due to its rich feature set.
-The template offers a high-level abstraction for Redis interactions.
-While `[Reactive]RedisConnection` offers low-level methods that accept and return binary values (`byte` arrays), the template takes care of serialization and connection management, freeing the user from dealing with such details.
+Most users are likely to use javadoc:org.springframework.data.redis.core.ValkeyTemplate[] and its corresponding package, `org.springframework.data.redis.core` or its reactive variant javadoc:org.springframework.data.redis.core.ReactiveValkeyTemplate[].
+The template is, in fact, the central class of the Valkey module, due to its rich feature set.
+The template offers a high-level abstraction for Valkey interactions.
+While `[Reactive]ValkeyConnection` offers low-level methods that accept and return binary values (`byte` arrays), the template takes care of serialization and connection management, freeing the user from dealing with such details.
 
-The javadoc:org.springframework.data.redis.core.RedisTemplate[] class implements the javadoc:org.springframework.data.redis.core.RedisOperations[]  interface and its reactive variant javadoc:org.springframework.data.redis.core.ReactiveRedisTemplate[] implements javadoc:org.springframework.data.redis.core.ReactiveRedisOperations[].
+The javadoc:org.springframework.data.redis.core.ValkeyTemplate[] class implements the javadoc:org.springframework.data.redis.core.ValkeyOperations[]  interface and its reactive variant javadoc:org.springframework.data.redis.core.ReactiveValkeyTemplate[] implements javadoc:org.springframework.data.redis.core.ReactiveValkeyOperations[].
 
-NOTE: The preferred way to reference operations on a `[Reactive]RedisTemplate` instance is through the
-`[Reactive]RedisOperations` interface.
+NOTE: The preferred way to reference operations on a `[Reactive]ValkeyTemplate` instance is through the
+`[Reactive]ValkeyOperations` interface.
 
-Moreover, the template provides operations views (following the grouping from the Redis command https://redis.io/commands[reference]) that offer rich, generified interfaces for working against a certain type or certain key (through the `KeyBound` interfaces) as described in the following table:
+Moreover, the template provides operations views (following the grouping from the Valkey command https://redis.io/commands[reference]) that offer rich, generified interfaces for working against a certain type or certain key (through the `KeyBound` interfaces) as described in the following table:
 
 .Operational views
 [%collapsible]
@@ -28,48 +28,48 @@ Imperative::
 2+^|_Key Type Operations_
 
 |javadoc:org.springframework.data.redis.core.GeoOperations[]
-|Redis geospatial operations, such as `GEOADD`, `GEORADIUS`,...
+|Valkey geospatial operations, such as `GEOADD`, `GEORADIUS`,...
 
 |javadoc:org.springframework.data.redis.core.HashOperations[]
-|Redis hash operations
+|Valkey hash operations
 
 |javadoc:org.springframework.data.redis.core.HyperLogLogOperations[]
-|Redis HyperLogLog operations, such as `PFADD`, `PFCOUNT`,...
+|Valkey HyperLogLog operations, such as `PFADD`, `PFCOUNT`,...
 
 |javadoc:org.springframework.data.redis.core.ListOperations[]
-|Redis list operations
+|Valkey list operations
 
 |javadoc:org.springframework.data.redis.core.SetOperations[]
-|Redis set operations
+|Valkey set operations
 
 |javadoc:org.springframework.data.redis.core.ValueOperations[]
-|Redis string (or value) operations
+|Valkey string (or value) operations
 
 |javadoc:org.springframework.data.redis.core.ZSetOperations[]
-|Redis zset (or sorted set) operations
+|Valkey zset (or sorted set) operations
 
 2+^|_Key Bound Operations_
 
 |javadoc:org.springframework.data.redis.core.BoundGeoOperations[]
-|Redis key bound geospatial operations
+|Valkey key bound geospatial operations
 
 |javadoc:org.springframework.data.redis.core.BoundHashOperations[]
-|Redis hash key bound operations
+|Valkey hash key bound operations
 
 |javadoc:org.springframework.data.redis.core.BoundKeyOperations[]
-|Redis key bound operations
+|Valkey key bound operations
 
 |javadoc:org.springframework.data.redis.core.BoundListOperations[]
-|Redis list key bound operations
+|Valkey list key bound operations
 
 |javadoc:org.springframework.data.redis.core.BoundSetOperations[]
-|Redis set key bound operations
+|Valkey set key bound operations
 
 |javadoc:org.springframework.data.redis.core.BoundValueOperations[]
-|Redis string (or value) key bound operations
+|Valkey string (or value) key bound operations
 
 |javadoc:org.springframework.data.redis.core.BoundZSetOperations[]
-|Redis zset (or sorted set) key bound operations
+|Valkey zset (or sorted set) key bound operations
 
 |====
 
@@ -83,37 +83,37 @@ Reactive::
 2+^|_Key Type Operations_
 
 |javadoc:org.springframework.data.redis.core.ReactiveGeoOperations[]
-|Redis geospatial operations such as `GEOADD`, `GEORADIUS`, and others)
+|Valkey geospatial operations such as `GEOADD`, `GEORADIUS`, and others)
 
 |javadoc:org.springframework.data.redis.core.ReactiveHashOperations[]
-|Redis hash operations
+|Valkey hash operations
 
 |javadoc:org.springframework.data.redis.core.ReactiveHyperLogLogOperations[]
-|Redis HyperLogLog operations such as (`PFADD`, `PFCOUNT`, and others)
+|Valkey HyperLogLog operations such as (`PFADD`, `PFCOUNT`, and others)
 
 |javadoc:org.springframework.data.redis.core.ReactiveListOperations[]
-|Redis list operations
+|Valkey list operations
 
 |javadoc:org.springframework.data.redis.core.ReactiveSetOperations[]
-|Redis set operations
+|Valkey set operations
 
 |javadoc:org.springframework.data.redis.core.ReactiveValueOperations[]
-|Redis string (or value) operations
+|Valkey string (or value) operations
 
 |javadoc:org.springframework.data.redis.core.ReactiveZSetOperations[]
-|Redis zset (or sorted set) operations
+|Valkey zset (or sorted set) operations
 |====
 ======
 =======
 
 Once configured, the template is thread-safe and can be reused across multiple instances.
 
-`RedisTemplate` uses a Java-based serializer for most of its operations.
+`ValkeyTemplate` uses a Java-based serializer for most of its operations.
 This means that any object written or read by the template is serialized and deserialized through Java.
 
-You can change the serialization mechanism on the template, and the Redis module offers several implementations, which are available in the `org.springframework.data.redis.serializer` package.
+You can change the serialization mechanism on the template, and the Valkey module offers several implementations, which are available in the `org.springframework.data.redis.serializer` package.
 See <<redis:serializer,Serializers>> for more information.
-You can also set any of the serializers to null and use RedisTemplate with raw byte arrays by setting the `enableDefaultSerializer` property to `false`.
+You can also set any of the serializers to null and use ValkeyTemplate with raw byte arrays by setting the `enableDefaultSerializer` property to `false`.
 Note that the template requires all keys to be non-null.
 However, values can be null as long as the underlying serializer accepts them.
 Read the Javadoc of each serializer for more information.
@@ -137,9 +137,9 @@ class MyConfig {
   }
 
   @Bean
-  RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+  ValkeyTemplate<String, String> redisTemplate(ValkeyConnectionFactory connectionFactory) {
 
-    RedisTemplate<String, String> template = new RedisTemplate<>();
+    ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
     template.setConnectionFactory(connectionFactory);
     return template;
   }
@@ -159,8 +159,8 @@ class MyConfig {
   }
 
   @Bean
-  ReactiveRedisTemplate<String, String> ReactiveRedisTemplate(ReactoveRedisConnectionFactory connectionFactory) {
-    return new ReactiveRedisTemplate<>(connectionFactory, RedisSerializationContext.string());
+  ReactiveValkeyTemplate<String, String> ReactiveValkeyTemplate(ReactoveValkeyConnectionFactory connectionFactory) {
+    return new ReactiveValkeyTemplate<>(connectionFactory, ValkeySerializationContext.string());
   }
 }
 ----
@@ -177,14 +177,14 @@ XML::
 
   <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"/>
   <!-- redis template definition -->
-  <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="redisConnectionFactory"/>
+  <bean id="redisTemplate" class="org.springframework.data.redis.core.ValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
   ...
 
 </beans>
 ----
 ======
 
-.Pushing an item to a List using `[Reactive]RedisTemplate`
+.Pushing an item to a List using `[Reactive]ValkeyTemplate`
 [tabs]
 ======
 Imperative::
@@ -195,7 +195,7 @@ public class Example {
 
   // inject the actual operations
   @Autowired
-  private RedisOperations<String, String> operations;
+  private ValkeyOperations<String, String> operations;
 
   // inject the template as ListOperations
   @Resource(name="redisTemplate")
@@ -215,7 +215,7 @@ public class Example {
 
   // inject the actual template
   @Autowired
-  private ReactiveRedisOperations<String, String> operations;
+  private ReactiveValkeyOperations<String, String> operations;
 
   public Mono<Long> addLink(String userId, URL url) {
     return operations.opsForList().leftPush(userId, url.toExternalForm());
@@ -227,8 +227,8 @@ public class Example {
 [[redis:string]]
 == String-focused Convenience Classes
 
-Since it is quite common for the keys and values stored in Redis to be `java.lang.String`, the Redis modules provides two extensions to `RedisConnection` and `RedisTemplate`, respectively the `StringRedisConnection` (and its `DefaultStringRedisConnection` implementation) and `StringRedisTemplate` as a convenient one-stop solution for intensive String operations.
-In addition to being bound to `String` keys, the template and the connection use the `StringRedisSerializer` underneath, which means the stored keys and values are human-readable (assuming the same encoding is used both in Redis and your code).
+Since it is quite common for the keys and values stored in Valkey to be `java.lang.String`, the Valkey modules provides two extensions to `ValkeyConnection` and `ValkeyTemplate`, respectively the `StringValkeyConnection` (and its `DefaultStringValkeyConnection` implementation) and `StringValkeyTemplate` as a convenient one-stop solution for intensive String operations.
+In addition to being bound to `String` keys, the template and the connection use the `StringValkeySerializer` underneath, which means the stored keys and values are human-readable (assuming the same encoding is used both in Valkey and your code).
 The following listings show an example:
 
 [tabs]
@@ -238,7 +238,7 @@ Java Imperative::
 [source,java,role="primary"]
 ----
 @Configuration
-class RedisConfiguration {
+class ValkeyConfiguration {
 
   @Bean
   LettuceConnectionFactory redisConnectionFactory() {
@@ -246,9 +246,9 @@ class RedisConfiguration {
   }
 
   @Bean
-  StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+  StringValkeyTemplate stringValkeyTemplate(ValkeyConnectionFactory redisConnectionFactory) {
 
-    StringRedisTemplate template = new StringRedisTemplate();
+    StringValkeyTemplate template = new StringValkeyTemplate();
     template.setConnectionFactory(redisConnectionFactory);
     return template;
   }
@@ -260,7 +260,7 @@ Java Reactive::
 [source,java,role="secondary"]
 ----
 @Configuration
-class RedisConfiguration {
+class ValkeyConfiguration {
 
   @Bean
   LettuceConnectionFactory redisConnectionFactory() {
@@ -268,8 +268,8 @@ class RedisConfiguration {
   }
 
   @Bean
-  ReactiveStringRedisTemplate reactiveRedisTemplate(ReactiveRedisConnectionFactory factory) {
-    return new ReactiveStringRedisTemplate<>(factory);
+  ReactiveStringValkeyTemplate reactiveValkeyTemplate(ReactiveValkeyConnectionFactory factory) {
+    return new ReactiveStringValkeyTemplate<>(factory);
   }
 }
 ----
@@ -286,7 +286,7 @@ XML::
 
   <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"/>
 
-  <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate" p:connection-factory-ref="redisConnectionFactory"/>
+  <bean id="stringValkeyTemplate" class="org.springframework.data.redis.core.StringValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
 
 </beans>
 ----
@@ -301,7 +301,7 @@ Imperative::
 public class Example {
 
   @Autowired
-  private StringRedisTemplate redisTemplate;
+  private StringValkeyTemplate redisTemplate;
 
   public void addLink(String userId, URL url) {
     redisTemplate.opsForList().leftPush(userId, url.toExternalForm());
@@ -316,7 +316,7 @@ Reactive::
 public class Example {
 
   @Autowired
-  private ReactiveStringRedisTemplate redisTemplate;
+  private ReactiveStringValkeyTemplate redisTemplate;
 
   public Mono<Long> addLink(String userId, URL url) {
     return redisTemplate.opsForList().leftPush(userId, url.toExternalForm());
@@ -325,20 +325,20 @@ public class Example {
 ----
 ======
 
-As with the other Spring templates, `RedisTemplate` and `StringRedisTemplate` let you talk directly to Redis through the `RedisCallback` interface.
-This feature gives complete control to you, as it talks directly to the `RedisConnection`.
-Note that the callback receives an instance of `StringRedisConnection` when a `StringRedisTemplate` is used.
-The following example shows how to use the `RedisCallback` interface:
+As with the other Spring templates, `ValkeyTemplate` and `StringValkeyTemplate` let you talk directly to Valkey through the `ValkeyCallback` interface.
+This feature gives complete control to you, as it talks directly to the `ValkeyConnection`.
+Note that the callback receives an instance of `StringValkeyConnection` when a `StringValkeyTemplate` is used.
+The following example shows how to use the `ValkeyCallback` interface:
 
 [source,java]
 ----
 public void useCallback() {
 
-  redisOperations.execute(new RedisCallback<Object>() {
-    public Object doInRedis(RedisConnection connection) throws DataAccessException {
+  redisOperations.execute(new ValkeyCallback<Object>() {
+    public Object doInValkey(ValkeyConnection connection) throws DataAccessException {
       Long size = connection.dbSize();
-      // Can cast to StringRedisConnection if using a StringRedisTemplate
-      ((StringRedisConnection)connection).set("key", "value");
+      // Can cast to StringValkeyConnection if using a StringValkeyTemplate
+      ((StringValkeyConnection)connection).set("key", "value");
     }
    });
 }
@@ -347,32 +347,32 @@ public void useCallback() {
 [[redis:serializer]]
 == Serializers
 
-From the framework perspective, the data stored in Redis is only bytes.
-While Redis itself supports various types, for the most part, these refer to the way the data is stored rather than what it represents.
+From the framework perspective, the data stored in Valkey is only bytes.
+While Valkey itself supports various types, for the most part, these refer to the way the data is stored rather than what it represents.
 It is up to the user to decide whether the information gets translated into strings or any other objects.
 
-In Spring Data, the conversion between the user (custom) types and raw data (and vice-versa) is handled by Spring Data Redis in the `org.springframework.data.redis.serializer` package.
+In Spring Data, the conversion between the user (custom) types and raw data (and vice-versa) is handled by Spring Data Valkey in the `org.springframework.data.redis.serializer` package.
 
 This package contains two types of serializers that, as the name implies, take care of the serialization process:
 
-* Two-way serializers based on javadoc:org.springframework.data.redis.serializer.RedisSerializer[].
-* Element readers and writers that use `RedisElementReader` and ``RedisElementWriter``.
+* Two-way serializers based on javadoc:org.springframework.data.redis.serializer.ValkeySerializer[].
+* Element readers and writers that use `ValkeyElementReader` and ``ValkeyElementWriter``.
 
-The main difference between these variants is that `RedisSerializer` primarily serializes to `byte[]` while readers and writers use `ByteBuffer`.
+The main difference between these variants is that `ValkeySerializer` primarily serializes to `byte[]` while readers and writers use `ByteBuffer`.
 
 Multiple implementations are available (including two that have been already mentioned in this documentation):
 
-* javadoc:org.springframework.data.redis.serializer.JdkSerializationRedisSerializer[], which is used by default for javadoc:org.springframework.data.redis.cache.RedisCache[] and javadoc:org.springframework.data.redis.core.RedisTemplate[].
-* the `StringRedisSerializer`.
+* javadoc:org.springframework.data.redis.serializer.JdkSerializationValkeySerializer[], which is used by default for javadoc:org.springframework.data.redis.cache.ValkeyCache[] and javadoc:org.springframework.data.redis.core.ValkeyTemplate[].
+* the `StringValkeySerializer`.
 
-However, one can use `OxmSerializer` for Object/XML mapping through Spring {spring-framework-docs}/data-access.html#oxm[OXM] support or javadoc:org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer[] or javadoc:org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer[] for storing data in https://en.wikipedia.org/wiki/JSON[JSON] format.
+However, one can use `OxmSerializer` for Object/XML mapping through Spring {spring-framework-docs}/data-access.html#oxm[OXM] support or javadoc:org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer[] or javadoc:org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializer[] for storing data in https://en.wikipedia.org/wiki/JSON[JSON] format.
 
 Do note that the storage format is not limited only to values.
 It can be used for keys, values, or hashes without any restrictions.
 
 [WARNING]
 ====
-By default, javadoc:org.springframework.data.redis.cache.RedisCache[] and javadoc:org.springframework.data.redis.core.RedisTemplate[] are configured to use Java native serialization.
+By default, javadoc:org.springframework.data.redis.cache.ValkeyCache[] and javadoc:org.springframework.data.redis.core.ValkeyTemplate[] are configured to use Java native serialization.
 Java native serialization is known for allowing the running of remote code caused by payloads that exploit vulnerable libraries and classes injecting unverified bytecode.
 Manipulated input could lead to unwanted code being run in the application during the deserialization step.
 As a consequence, do not use serialization in untrusted environments.

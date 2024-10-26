@@ -36,30 +36,30 @@ import org.springframework.data.util.TypeInformation;
  * @param <T>
  */
 @ExtendWith(MockitoExtension.class)
-class BasicRedisPersistentEntityUnitTests<T> {
+class BasicValkeyPersistentEntityUnitTests<T> {
 
 	@Mock TypeInformation<T> entityInformation;
 	@Mock KeySpaceResolver keySpaceResolver;
 	@Mock TimeToLiveAccessor ttlAccessor;
 
-	private BasicRedisPersistentEntity<T> entity;
+	private BasicValkeyPersistentEntity<T> entity;
 
 	@BeforeEach
 	@SuppressWarnings("unchecked")
 	void setUp() {
 
 		when(entityInformation.getType()).thenReturn((Class<T>) ConversionTestEntities.Person.class);
-		entity = new BasicRedisPersistentEntity<>(entityInformation, keySpaceResolver, ttlAccessor);
+		entity = new BasicValkeyPersistentEntity<>(entityInformation, keySpaceResolver, ttlAccessor);
 	}
 
 	@Test // DATAREDIS-425
 	void addingMultipleIdPropertiesWithoutAnExplicitOneThrowsException() {
 
 
-		RedisPersistentProperty property1 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property1 = mock(ValkeyPersistentProperty.class);
 		when(property1.isIdProperty()).thenReturn(true);
 
-		RedisPersistentProperty property2 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property2 = mock(ValkeyPersistentProperty.class);
 		when(property2.isIdProperty()).thenReturn(true);
 
 		entity.addPersistentProperty(property1);
@@ -73,11 +73,11 @@ class BasicRedisPersistentEntityUnitTests<T> {
 	@SuppressWarnings("unchecked")
 	void addingMultipleExplicitIdPropertiesThrowsException() {
 
-		RedisPersistentProperty property1 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property1 = mock(ValkeyPersistentProperty.class);
 		when(property1.isIdProperty()).thenReturn(true);
 		when(property1.isAnnotationPresent(any(Class.class))).thenReturn(true);
 
-		RedisPersistentProperty property2 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property2 = mock(ValkeyPersistentProperty.class);
 		when(property2.isIdProperty()).thenReturn(true);
 		when(property2.isAnnotationPresent(any(Class.class))).thenReturn(true);
 
@@ -91,10 +91,10 @@ class BasicRedisPersistentEntityUnitTests<T> {
 	@SuppressWarnings("unchecked")
 	void explicitIdPropertiyShouldBeFavoredOverNonExplicit() {
 
-		RedisPersistentProperty property1 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property1 = mock(ValkeyPersistentProperty.class);
 		when(property1.isIdProperty()).thenReturn(true);
 
-		RedisPersistentProperty property2 = mock(RedisPersistentProperty.class);
+		ValkeyPersistentProperty property2 = mock(ValkeyPersistentProperty.class);
 		when(property2.isIdProperty()).thenReturn(true);
 		when(property2.isAnnotationPresent(any(Class.class))).thenReturn(true);
 

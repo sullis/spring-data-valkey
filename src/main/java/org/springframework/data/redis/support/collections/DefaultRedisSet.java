@@ -23,120 +23,120 @@ import java.util.Set;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.ScanOptions;
 
 /**
- * Default implementation for {@link RedisSet}. Note that the collection support works only with normal,
+ * Default implementation for {@link ValkeySet}. Note that the collection support works only with normal,
  * non-pipeline/multi-exec connections as it requires a reply to be sent right away.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public class DefaultRedisSet<E> extends AbstractRedisCollection<E> implements RedisSet<E> {
+public class DefaultValkeySet<E> extends AbstractValkeyCollection<E> implements ValkeySet<E> {
 
 	private final BoundSetOperations<String, E> boundSetOps;
 
-	private class DefaultRedisSetIterator extends RedisIterator<E> {
+	private class DefaultValkeySetIterator extends ValkeyIterator<E> {
 
-		public DefaultRedisSetIterator(Iterator<E> delegate) {
+		public DefaultValkeySetIterator(Iterator<E> delegate) {
 			super(delegate);
 		}
 
 		@Override
-		protected void removeFromRedisStorage(E item) {
-			DefaultRedisSet.this.remove(item);
+		protected void removeFromValkeyStorage(E item) {
+			DefaultValkeySet.this.remove(item);
 		}
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisSet} instance.
+	 * Constructs a new {@link DefaultValkeySet} instance.
 	 *
-	 * @param key Redis key of this set.
-	 * @param operations {@link RedisOperations} for the value type of this set.
+	 * @param key Valkey key of this set.
+	 * @param operations {@link ValkeyOperations} for the value type of this set.
 	 */
-	public DefaultRedisSet(String key, RedisOperations<String, E> operations) {
+	public DefaultValkeySet(String key, ValkeyOperations<String, E> operations) {
 
 		super(key, operations);
 		boundSetOps = operations.boundSetOps(key);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisSet} instance.
+	 * Constructs a new {@link DefaultValkeySet} instance.
 	 *
 	 * @param boundOps {@link BoundSetOperations} for the value type of this set.
 	 */
-	public DefaultRedisSet(BoundSetOperations<String, E> boundOps) {
+	public DefaultValkeySet(BoundSetOperations<String, E> boundOps) {
 
 		super(boundOps.getKey(), boundOps.getOperations());
 		this.boundSetOps = boundOps;
 	}
 
 	@Override
-	public Set<E> diff(RedisSet<?> set) {
+	public Set<E> diff(ValkeySet<?> set) {
 		return boundSetOps.diff(set.getKey());
 	}
 
 	@Override
-	public Set<E> diff(Collection<? extends RedisSet<?>> sets) {
+	public Set<E> diff(Collection<? extends ValkeySet<?>> sets) {
 		return boundSetOps.diff(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisSet<E> diffAndStore(RedisSet<?> set, String destKey) {
+	public ValkeySet<E> diffAndStore(ValkeySet<?> set, String destKey) {
 		boundSetOps.diffAndStore(set.getKey(), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
-	public RedisSet<E> diffAndStore(Collection<? extends RedisSet<?>> sets, String destKey) {
+	public ValkeySet<E> diffAndStore(Collection<? extends ValkeySet<?>> sets, String destKey) {
 		boundSetOps.diffAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
-	public Set<E> intersect(RedisSet<?> set) {
+	public Set<E> intersect(ValkeySet<?> set) {
 		return boundSetOps.intersect(set.getKey());
 	}
 
 	@Override
-	public Set<E> intersect(Collection<? extends RedisSet<?>> sets) {
+	public Set<E> intersect(Collection<? extends ValkeySet<?>> sets) {
 		return boundSetOps.intersect(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisSet<E> intersectAndStore(RedisSet<?> set, String destKey) {
+	public ValkeySet<E> intersectAndStore(ValkeySet<?> set, String destKey) {
 		boundSetOps.intersectAndStore(set.getKey(), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
-	public RedisSet<E> intersectAndStore(Collection<? extends RedisSet<?>> sets, String destKey) {
+	public ValkeySet<E> intersectAndStore(Collection<? extends ValkeySet<?>> sets, String destKey) {
 		boundSetOps.intersectAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
-	public Set<E> union(RedisSet<?> set) {
+	public Set<E> union(ValkeySet<?> set) {
 		return boundSetOps.union(set.getKey());
 	}
 
 	@Override
-	public Set<E> union(Collection<? extends RedisSet<?>> sets) {
+	public Set<E> union(Collection<? extends ValkeySet<?>> sets) {
 		return boundSetOps.union(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisSet<E> unionAndStore(RedisSet<?> set, String destKey) {
+	public ValkeySet<E> unionAndStore(ValkeySet<?> set, String destKey) {
 		boundSetOps.unionAndStore(set.getKey(), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
-	public RedisSet<E> unionAndStore(Collection<? extends RedisSet<?>> sets, String destKey) {
+	public ValkeySet<E> unionAndStore(Collection<? extends ValkeySet<?>> sets, String destKey) {
 		boundSetOps.unionAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisSet<>(boundSetOps.getOperations().boundSetOps(destKey));
+		return new DefaultValkeySet<>(boundSetOps.getOperations().boundSetOps(destKey));
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public class DefaultRedisSet<E> extends AbstractRedisCollection<E> implements Re
 	public Iterator<E> iterator() {
 		Set<E> members = boundSetOps.members();
 		checkResult(members);
-		return new DefaultRedisSetIterator(members.iterator());
+		return new DefaultValkeySetIterator(members.iterator());
 	}
 
 	@Override

@@ -26,13 +26,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * {@code @ParameterizedRedisTest} is used to signal that the annotated method is a <em>parameterized test</em> method
+ * {@code @ParameterizedValkeyTest} is used to signal that the annotated method is a <em>parameterized test</em> method
  * within a potentially parametrized test class.
  * <p>
  * Such methods must not be {@code private} or {@code static}.
  * <h3>Argument Providers and Sources</h3>
  * <p>
- * Test classes defining {@code @ParameterizedRedisTest} methods must specify at least one
+ * Test classes defining {@code @ParameterizedValkeyTest} methods must specify at least one
  * {@link org.junit.jupiter.params.provider.ArgumentsProvider ArgumentsProvider} via
  * {@link org.junit.jupiter.params.provider.ArgumentsSource @ArgumentsSource} or a corresponding composed annotation
  * (e.g., {@code @ValueSource}, {@code @CsvSource}, etc.). The provider is responsible for providing a
@@ -40,7 +40,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * used to invoke the parameterized test method.
  * <h3>Method Parameter List</h3>
  * <p>
- * A {@code @ParameterizedRedisTest} method may declare parameters that are resolved from the class-level
+ * A {@code @ParameterizedValkeyTest} method may declare parameters that are resolved from the class-level
  * {@link org.junit.jupiter.params.provider.ArgumentsSource}. Additional parameters that exceed the parameter index by
  * the class argument source can be resolved by additional {@link org.junit.jupiter.api.extension.ParameterResolver
  * ParameterResolvers} (e.g., {@code TestInfo}, {@code TestReporter}, etc). Specifically, a parameterized test method
@@ -59,7 +59,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * <p>
  * <h3>Constructor Parameter List</h3>
  * <p>
- * A class defining {@code @ParameterizedRedisTest} may declare a constructor accepting arguments. Constructor arguments
+ * A class defining {@code @ParameterizedValkeyTest} may declare a constructor accepting arguments. Constructor arguments
  * are resolved from the same class-level {@link org.junit.jupiter.params.provider.ArgumentsSource} as method arguments.
  * Therefore, constructor arguments follow the same index/aggregator semantics as method arguments.
  * <h3>Test Class Lifecycle</h3>
@@ -75,8 +75,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @TestTemplate
-@ExtendWith(ParameterizedRedisTestExtension.class)
-public @interface ParameterizedRedisTest {
+@ExtendWith(ParameterizedValkeyTestExtension.class)
+public @interface ParameterizedValkeyTest {
 
 	/**
 	 * Placeholder for the {@linkplain org.junit.jupiter.api.TestInfo#getDisplayName display name} of a

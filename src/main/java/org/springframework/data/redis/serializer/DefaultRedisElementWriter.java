@@ -21,17 +21,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Default implementation of {@link RedisElementWriter}.
+ * Default implementation of {@link ValkeyElementWriter}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.0
  */
-class DefaultRedisElementWriter<T> implements RedisElementWriter<T> {
+class DefaultValkeyElementWriter<T> implements ValkeyElementWriter<T> {
 
-	private final @Nullable RedisSerializer<T> serializer;
+	private final @Nullable ValkeySerializer<T> serializer;
 
-	DefaultRedisElementWriter(RedisSerializer<T> serializer) {
+	DefaultValkeyElementWriter(ValkeySerializer<T> serializer) {
 		this.serializer = serializer;
 	}
 

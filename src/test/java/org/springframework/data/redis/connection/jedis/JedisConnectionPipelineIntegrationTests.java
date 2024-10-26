@@ -50,7 +50,7 @@ public class JedisConnectionPipelineIntegrationTests extends AbstractConnectionP
 			connection.close();
 		} catch (Exception ignore) {
 			// Jedis leaves some incomplete data in OutputStream on NPE caused by null key/value tests
-			// Attempting to close the connection will result in error on sending QUIT to Redis
+			// Attempting to close the connection will result in error on sending QUIT to Valkey
 		}
 		connection = null;
 	}

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisSetCommands;
+import org.springframework.data.redis.connection.ValkeySetCommands;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.Cursor.CursorId;
 import org.springframework.data.redis.core.KeyBoundCursor;
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class JedisSetCommands implements RedisSetCommands {
+class JedisSetCommands implements ValkeySetCommands {
 
 	private final JedisConnection connection;
 

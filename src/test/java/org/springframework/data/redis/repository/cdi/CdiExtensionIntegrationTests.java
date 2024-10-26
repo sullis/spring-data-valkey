@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for Spring Data Redis CDI extension.
+ * Integration tests for Spring Data Valkey CDI extension.
  *
  * @author Mark Paluch
  */

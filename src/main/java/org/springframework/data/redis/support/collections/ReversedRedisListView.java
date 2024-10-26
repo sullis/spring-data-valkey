@@ -25,12 +25,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisListCommands.Direction;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.connection.ValkeyListCommands.Direction;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.lang.Nullable;
 
 /**
- * Implementation and view of an existing {@link RedisList} where the elements in the list (deque) are returned in
+ * Implementation and view of an existing {@link ValkeyList} where the elements in the list (deque) are returned in
  * reverse order.
  *
  * @param <E> the type of elements in this collection.
@@ -38,15 +38,15 @@ import org.springframework.lang.Nullable;
  * @author Mark Paluch
  * @since 3.2
  */
-class ReversedRedisListView<E> implements RedisList<E> {
+class ReversedValkeyListView<E> implements ValkeyList<E> {
 
-	private final RedisList<E> base;
+	private final ValkeyList<E> base;
 
-	ReversedRedisListView(RedisList<E> list) {
+	ReversedValkeyListView(ValkeyList<E> list) {
 		this.base = list;
 	}
 
-	// ========== RedisCollection ==========
+	// ========== ValkeyCollection ==========
 
 	@Override
 	public String getKey() {
@@ -60,7 +60,7 @@ class ReversedRedisListView<E> implements RedisList<E> {
 	}
 
 	@Override
-	public RedisOperations<String, ?> getOperations() {
+	public ValkeyOperations<String, ?> getOperations() {
 		return this.base.getOperations();
 	}
 
@@ -90,25 +90,25 @@ class ReversedRedisListView<E> implements RedisList<E> {
 
 	@Nullable
 	@Override
-	public E moveFirstTo(RedisList<E> destination, Direction destinationPosition) {
+	public E moveFirstTo(ValkeyList<E> destination, Direction destinationPosition) {
 		return this.base.moveLastTo(destination, destinationPosition);
 	}
 
 	@Nullable
 	@Override
-	public E moveFirstTo(RedisList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit) {
+	public E moveFirstTo(ValkeyList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit) {
 		return base.moveLastTo(destination, destinationPosition, timeout, unit);
 	}
 
 	@Nullable
 	@Override
-	public E moveLastTo(RedisList<E> destination, Direction destinationPosition) {
+	public E moveLastTo(ValkeyList<E> destination, Direction destinationPosition) {
 		return base.moveFirstTo(destination, destinationPosition);
 	}
 
 	@Nullable
 	@Override
-	public E moveLastTo(RedisList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit) {
+	public E moveLastTo(ValkeyList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit) {
 		return base.moveFirstTo(destination, destinationPosition, timeout, unit);
 	}
 
@@ -123,13 +123,13 @@ class ReversedRedisListView<E> implements RedisList<E> {
 	}
 
 	@Override
-	public RedisList<E> trim(int start, int end) {
+	public ValkeyList<E> trim(int start, int end) {
 		this.base.trim(end, start);
 		return this;
 	}
 
 	@Override
-	public RedisList<E> trim(long start, long end) {
+	public ValkeyList<E> trim(long start, long end) {
 		this.base.trim(end, start);
 		return this;
 	}
@@ -608,7 +608,7 @@ class ReversedRedisListView<E> implements RedisList<E> {
 	}
 
 	@Override
-	public RedisList<E> reversed() {
+	public ValkeyList<E> reversed() {
 		return this.base;
 	}
 

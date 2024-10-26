@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link IndexedData} implementation indicating storage of data within a Redis GEO structure.
+ * {@link IndexedData} implementation indicating storage of data within a Valkey GEO structure.
  *
  * @author Christoph Strobl
  * @since 1.8

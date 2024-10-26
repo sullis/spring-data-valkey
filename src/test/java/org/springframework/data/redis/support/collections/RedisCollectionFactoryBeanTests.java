@@ -26,29 +26,29 @@ import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.StringObjectFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.support.collections.RedisCollectionFactoryBean.CollectionType;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.support.collections.ValkeyCollectionFactoryBean.CollectionType;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
- * Integration tests for {@link RedisCollectionFactoryBean}.
+ * Integration tests for {@link ValkeyCollectionFactoryBean}.
  *
  * @author Costin Leau
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-public class RedisCollectionFactoryBeanTests {
+public class ValkeyCollectionFactoryBeanTests {
 
 	protected ObjectFactory<String> factory = new StringObjectFactory();
-	protected StringRedisTemplate template;
-	protected RedisStore col;
+	protected StringValkeyTemplate template;
+	protected ValkeyStore col;
 
-	RedisCollectionFactoryBeanTests() {
+	ValkeyCollectionFactoryBeanTests() {
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		this.template = new StringRedisTemplate(jedisConnFactory);
+		this.template = new StringValkeyTemplate(jedisConnFactory);
 	}
 
 	@BeforeEach
@@ -62,19 +62,19 @@ public class RedisCollectionFactoryBeanTests {
 	void tearDown() throws Exception {
 
 		// clean up the whole db
-		template.execute((RedisCallback<Object>) connection -> {
+		template.execute((ValkeyCallback<Object>) connection -> {
 			connection.serverCommands().flushDb();
 			return null;
 		});
 	}
 
-	private RedisStore createCollection(String key) {
+	private ValkeyStore createCollection(String key) {
 		return createCollection(key, null);
 	}
 
-	private RedisStore createCollection(String key, CollectionType type) {
+	private ValkeyStore createCollection(String key, CollectionType type) {
 
-		RedisCollectionFactoryBean fb = new RedisCollectionFactoryBean();
+		ValkeyCollectionFactoryBean fb = new ValkeyCollectionFactoryBean();
 		fb.setKey(key);
 		fb.setTemplate(template);
 		fb.setType(type);
@@ -86,20 +86,20 @@ public class RedisCollectionFactoryBeanTests {
 	@Test
 	void testNone() {
 
-		RedisStore store = createCollection("nosrt", CollectionType.PROPERTIES);
-		assertThat(store).isInstanceOf(RedisProperties.class);
+		ValkeyStore store = createCollection("nosrt", CollectionType.PROPERTIES);
+		assertThat(store).isInstanceOf(ValkeyProperties.class);
 
 		store = createCollection("nosrt", CollectionType.MAP);
-		assertThat(store).isInstanceOf(DefaultRedisMap.class);
+		assertThat(store).isInstanceOf(DefaultValkeyMap.class);
 
 		store = createCollection("nosrt", CollectionType.SET);
-		assertThat(store).isInstanceOf(DefaultRedisSet.class);
+		assertThat(store).isInstanceOf(DefaultValkeySet.class);
 
 		store = createCollection("nosrt", CollectionType.LIST);
-		assertThat(store).isInstanceOf(DefaultRedisList.class);
+		assertThat(store).isInstanceOf(DefaultValkeyList.class);
 
 		store = createCollection("nosrt");
-		assertThat(store).isInstanceOf(DefaultRedisList.class);
+		assertThat(store).isInstanceOf(DefaultValkeyList.class);
 	}
 
 	@Test // GH-2633
@@ -108,20 +108,20 @@ public class RedisCollectionFactoryBeanTests {
 		template.delete("key");
 		template.opsForHash().put("key", "k", "v");
 
-		assertThat(createCollection("key")).isInstanceOf(DefaultRedisMap.class);
-		assertThat(createCollection("key", CollectionType.MAP)).isInstanceOf(DefaultRedisMap.class);
+		assertThat(createCollection("key")).isInstanceOf(DefaultValkeyMap.class);
+		assertThat(createCollection("key", CollectionType.MAP)).isInstanceOf(DefaultValkeyMap.class);
 
 		template.delete("key");
 		template.opsForSet().add("key", "1", "2");
 
-		assertThat(createCollection("key")).isInstanceOf(DefaultRedisSet.class);
-		assertThat(createCollection("key", CollectionType.SET)).isInstanceOf(DefaultRedisSet.class);
+		assertThat(createCollection("key")).isInstanceOf(DefaultValkeySet.class);
+		assertThat(createCollection("key", CollectionType.SET)).isInstanceOf(DefaultValkeySet.class);
 
 		template.delete("key");
 		template.opsForList().leftPush("key", "1", "2");
 
-		assertThat(createCollection("key")).isInstanceOf(DefaultRedisList.class);
-		assertThat(createCollection("key", CollectionType.LIST)).isInstanceOf(DefaultRedisList.class);
+		assertThat(createCollection("key")).isInstanceOf(DefaultValkeyList.class);
+		assertThat(createCollection("key", CollectionType.LIST)).isInstanceOf(DefaultValkeyList.class);
 	}
 
 	@Test
@@ -131,16 +131,16 @@ public class RedisCollectionFactoryBeanTests {
 		String val = "value";
 
 		template.boundSetOps(key).add(val);
-		RedisStore col = createCollection(key);
-		assertThat(col).isInstanceOf(DefaultRedisSet.class);
+		ValkeyStore col = createCollection(key);
+		assertThat(col).isInstanceOf(DefaultValkeySet.class);
 
 		key = "map";
 		template.boundHashOps(key).put(val, val);
 		col = createCollection(key);
-		assertThat(col).isInstanceOf(DefaultRedisMap.class);
+		assertThat(col).isInstanceOf(DefaultValkeyMap.class);
 
 		col = createCollection(key, CollectionType.PROPERTIES);
-		assertThat(col).isInstanceOf(RedisProperties.class);
+		assertThat(col).isInstanceOf(ValkeyProperties.class);
 	}
 
 	@Test // GH-2633
@@ -167,7 +167,7 @@ public class RedisCollectionFactoryBeanTests {
 	@Test // Gh-2633
 	void shouldFailWhenNotInitialized() {
 
-		RedisCollectionFactoryBean fb = new RedisCollectionFactoryBean();
+		ValkeyCollectionFactoryBean fb = new ValkeyCollectionFactoryBean();
 		fb.setKey("key");
 		fb.setTemplate(template);
 		fb.setType(CollectionType.SET);
@@ -181,14 +181,14 @@ public class RedisCollectionFactoryBeanTests {
 		template.delete("key");
 		template.opsForHash().put("key", "k", "v");
 
-		RedisCollectionFactoryBean fb = new RedisCollectionFactoryBean();
+		ValkeyCollectionFactoryBean fb = new ValkeyCollectionFactoryBean();
 		fb.setBeanName("key");
 		fb.setTemplate(template);
 		fb.afterPropertiesSet();
 
 		assertThat(fb.getObject()).satisfies(value -> {
-			assertThat(value).isInstanceOf(RedisMap.class);
-			assertThat((RedisMap)value).containsEntry("k", "v");
+			assertThat(value).isInstanceOf(ValkeyMap.class);
+			assertThat((ValkeyMap)value).containsEntry("k", "v");
 		});
 	}
 }

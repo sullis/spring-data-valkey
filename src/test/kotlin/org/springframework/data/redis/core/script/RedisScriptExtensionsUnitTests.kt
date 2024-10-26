@@ -24,21 +24,21 @@ import org.springframework.core.io.ByteArrayResource
  *
  * @author Mark Paluch
  */
-class RedisScriptExtensionsUnitTests {
+class ValkeyScriptExtensionsUnitTests {
 
 	@Test // GH-2234
-	fun shouldCreateRedisScriptFromString() {
+	fun shouldCreateValkeyScriptFromString() {
 
-		val update = RedisScript<String>("foo")
+		val update = ValkeyScript<String>("foo")
 
 		assertThat(update.resultType).isEqualTo(String::class.java)
 		assertThat(update.scriptAsString).isEqualTo("foo")
 	}
 
 	@Test // GH-2234
-	fun shouldCreateRedisScriptFromResource() {
+	fun shouldCreateValkeyScriptFromResource() {
 
-		val update = RedisScript<String>(ByteArrayResource("foo".toByteArray()))
+		val update = ValkeyScript<String>(ByteArrayResource("foo".toByteArray()))
 
 		assertThat(update.resultType).isEqualTo(String::class.java)
 		assertThat(update.scriptAsString).isEqualTo("foo")

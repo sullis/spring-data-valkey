@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisInvalidSubscriptionException;
+import org.springframework.data.redis.connection.ValkeyInvalidSubscriptionException;
 import org.springframework.data.redis.connection.Subscription;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -237,7 +237,7 @@ public abstract class AbstractSubscription implements Subscription {
 
 	private void checkPulse() {
 		if (!isAlive()) {
-			throw new RedisInvalidSubscriptionException("Subscription has been unsubscribed and cannot be used anymore");
+			throw new ValkeyInvalidSubscriptionException("Subscription has been unsubscribed and cannot be used anymore");
 		}
 	}
 

@@ -22,14 +22,14 @@ import org.springframework.util.Assert;
 
 /**
  * Strategy interface that specifies a serializer that can serialize an element to its binary representation to be used
- * as Redis protocol payload.
+ * as Valkey protocol payload.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.0
  */
 @FunctionalInterface
-public interface RedisElementWriter<T> {
+public interface ValkeyElementWriter<T> {
 
 	/**
 	 * Serialize a {@code element} to its {@link ByteBuffer} representation.
@@ -40,14 +40,14 @@ public interface RedisElementWriter<T> {
 	ByteBuffer write(@Nullable T element);
 
 	/**
-	 * Create new {@link RedisElementWriter} using given {@link RedisSerializer}.
+	 * Create new {@link ValkeyElementWriter} using given {@link ValkeySerializer}.
 	 *
 	 * @param serializer must not be {@literal null}.
-	 * @return new instance of {@link RedisElementWriter}.
+	 * @return new instance of {@link ValkeyElementWriter}.
 	 */
-	static <T> RedisElementWriter<T> from(RedisSerializer<T> serializer) {
+	static <T> ValkeyElementWriter<T> from(ValkeySerializer<T> serializer) {
 
 		Assert.notNull(serializer, "Serializer must not be null");
-		return new DefaultRedisElementWriter<>(serializer);
+		return new DefaultValkeyElementWriter<>(serializer);
 	}
 }

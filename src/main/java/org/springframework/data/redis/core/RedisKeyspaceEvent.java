@@ -19,32 +19,32 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis specific {@link ApplicationEvent} published when a key expires in Redis.
+ * Valkey specific {@link ApplicationEvent} published when a key expires in Valkey.
  *
  * @author Christoph Strobl
  * @since 1.7
  */
-public class RedisKeyspaceEvent extends ApplicationEvent {
+public class ValkeyKeyspaceEvent extends ApplicationEvent {
 
 	private final @Nullable String channel;
 
 	/**
-	 * Creates new {@link RedisKeyspaceEvent}.
+	 * Creates new {@link ValkeyKeyspaceEvent}.
 	 *
 	 * @param key The key that expired. Must not be {@literal null}.
 	 */
-	public RedisKeyspaceEvent(byte[] key) {
+	public ValkeyKeyspaceEvent(byte[] key) {
 		this(null, key);
 	}
 
 	/**
-	 * Creates new {@link RedisKeyspaceEvent}.
+	 * Creates new {@link ValkeyKeyspaceEvent}.
 	 *
 	 * @param channel The source channel aka subscription topic. Can be {@literal null}.
 	 * @param key The key that expired. Must not be {@literal null}.
 	 * @since 1.8
 	 */
-	public RedisKeyspaceEvent(@Nullable String channel, byte[] key) {
+	public ValkeyKeyspaceEvent(@Nullable String channel, byte[] key) {
 
 		super(key);
 		this.channel = channel;

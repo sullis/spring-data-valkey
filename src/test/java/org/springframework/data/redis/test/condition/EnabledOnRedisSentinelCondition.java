@@ -26,13 +26,13 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@link ExecutionCondition} for {@link EnabledOnRedisSentinelCondition @EnabledOnRedisSentinelAvailable}.
+ * {@link ExecutionCondition} for {@link EnabledOnValkeySentinelCondition @EnabledOnValkeySentinelAvailable}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
- * @see EnabledOnRedisSentinelCondition
+ * @see EnabledOnValkeySentinelCondition
  */
-class EnabledOnRedisSentinelCondition implements ExecutionCondition {
+class EnabledOnValkeySentinelCondition implements ExecutionCondition {
 
 	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled(
 			"@EnabledOnSentinelAvailable is not present");
@@ -41,22 +41,22 @@ class EnabledOnRedisSentinelCondition implements ExecutionCondition {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
 
-		Optional<EnabledOnRedisSentinelAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
-				EnabledOnRedisSentinelAvailable.class);
+		Optional<EnabledOnValkeySentinelAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
+				EnabledOnValkeySentinelAvailable.class);
 
 		if (!optional.isPresent()) {
 			return ENABLED_BY_DEFAULT;
 		}
 
-		EnabledOnRedisSentinelAvailable annotation = optional.get();
+		EnabledOnValkeySentinelAvailable annotation = optional.get();
 
-		if (RedisDetector.canConnectToPort(annotation.value())) {
+		if (ValkeyDetector.canConnectToPort(annotation.value())) {
 
-			return enabled("Connection successful to Redis Sentinel at %s:%d".formatted(SettingsUtils.getHost(),
+			return enabled("Connection successful to Valkey Sentinel at %s:%d".formatted(SettingsUtils.getHost(),
 					annotation.value()));
 		}
 
-		return disabled("Cannot connect to Redis Sentinel at %s:%d".formatted(SettingsUtils.getHost(),
+		return disabled("Cannot connect to Valkey Sentinel at %s:%d".formatted(SettingsUtils.getHost(),
 				annotation.value()));
 	}
 }

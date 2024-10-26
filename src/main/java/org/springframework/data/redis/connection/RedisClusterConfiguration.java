@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.data.redis.connection.RedisConfiguration.ClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.ClusterConfiguration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.NumberUtils;
@@ -32,8 +32,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Configuration class used to set up a {@link RedisConnection} via {@link RedisConnectionFactory} for connecting to
- * <a href="https://redis.io/topics/cluster-spec">Redis Cluster</a>. Useful when setting up a highly available Redis
+ * Configuration class used to set up a {@link ValkeyConnection} via {@link ValkeyConnectionFactory} for connecting to
+ * <a href="https://redis.io/topics/cluster-spec">Valkey Cluster</a>. Useful when setting up a highly available Valkey
  * environment.
  *
  * @author Christoph Strobl
@@ -41,26 +41,26 @@ import org.springframework.util.StringUtils;
  * @author John Blum
  * @since 1.7
  */
-public class RedisClusterConfiguration implements RedisConfiguration, ClusterConfiguration {
+public class ValkeyClusterConfiguration implements ValkeyConfiguration, ClusterConfiguration {
 
 	private static final String REDIS_CLUSTER_NODES_CONFIG_PROPERTY = "spring.redis.cluster.nodes";
 	private static final String REDIS_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY = "spring.redis.cluster.max-redirects";
 
 	private @Nullable Integer maxRedirects;
 
-	private RedisPassword password = RedisPassword.none();
+	private ValkeyPassword password = ValkeyPassword.none();
 
-	private final Set<RedisNode> clusterNodes = new LinkedHashSet<>();
+	private final Set<ValkeyNode> clusterNodes = new LinkedHashSet<>();
 
 	private @Nullable String username = null;
 
 	/**
-	 * Creates a new, default {@link RedisClusterConfiguration}.
+	 * Creates a new, default {@link ValkeyClusterConfiguration}.
 	 */
-	public RedisClusterConfiguration() {}
+	public ValkeyClusterConfiguration() {}
 
 	/**
-	 * Creates a new {@link RedisClusterConfiguration} for given {@link String hostPort} combinations.
+	 * Creates a new {@link ValkeyClusterConfiguration} for given {@link String hostPort} combinations.
 	 *
 	 * <pre class="code">
 	 * clusterHostAndPorts[0] = 127.0.0.1:23679
@@ -69,12 +69,12 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	 *
 	 * @param clusterNodes must not be {@literal null}.
 	 */
-	public RedisClusterConfiguration(Collection<String> clusterNodes) {
-		initialize(new MapPropertySource("RedisClusterConfiguration", asMap(clusterNodes, -1)));
+	public ValkeyClusterConfiguration(Collection<String> clusterNodes) {
+		initialize(new MapPropertySource("ValkeyClusterConfiguration", asMap(clusterNodes, -1)));
 	}
 
 	/**
-	 * Creates a new {@link RedisClusterConfiguration} looking up configuration values from the given
+	 * Creates a new {@link ValkeyClusterConfiguration} looking up configuration values from the given
 	 * {@link PropertySource}.
 	 *
 	 * <pre class="code">
@@ -83,11 +83,11 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	 * </pre>
 	 *
 	 * @param propertySource must not be {@literal null}.
-	 * @deprecated since 3.3, use {@link RedisSentinelConfiguration#of(PropertySource)} instead. This constructor will be
+	 * @deprecated since 3.3, use {@link ValkeySentinelConfiguration#of(PropertySource)} instead. This constructor will be
 	 *             made private in the next major release.
 	 */
 	@Deprecated(since = "3.3")
-	public RedisClusterConfiguration(PropertySource<?> propertySource) {
+	public ValkeyClusterConfiguration(PropertySource<?> propertySource) {
 		initialize(propertySource);
 	}
 
@@ -108,7 +108,7 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	}
 
 	/**
-	 * Creates a new {@link RedisClusterConfiguration} looking up configuration values from the given
+	 * Creates a new {@link ValkeyClusterConfiguration} looking up configuration values from the given
 	 * {@link PropertySource}.
 	 *
 	 * <pre class="code">
@@ -117,17 +117,17 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	 * </pre>
 	 *
 	 * @param propertySource must not be {@literal null}.
-	 * @return a new {@link RedisClusterConfiguration} configured from the given {@link PropertySource}.
+	 * @return a new {@link ValkeyClusterConfiguration} configured from the given {@link PropertySource}.
 	 * @since 3.3
 	 */
-	public static RedisClusterConfiguration of(PropertySource<?> propertySource) {
-		return new RedisClusterConfiguration(propertySource);
+	public static ValkeyClusterConfiguration of(PropertySource<?> propertySource) {
+		return new ValkeyClusterConfiguration(propertySource);
 	}
 
 	private void appendClusterNodes(Set<String> hostAndPorts) {
 
 		for (String hostAndPort : hostAndPorts) {
-			addClusterNode(RedisNode.fromString(hostAndPort));
+			addClusterNode(ValkeyNode.fromString(hostAndPort));
 		}
 	}
 
@@ -136,19 +136,19 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	 *
 	 * @param nodes must not be {@literal null}.
 	 */
-	public void setClusterNodes(Iterable<RedisNode> nodes) {
+	public void setClusterNodes(Iterable<ValkeyNode> nodes) {
 
 		Assert.notNull(nodes, "Cannot set cluster nodes to null");
 
 		this.clusterNodes.clear();
 
-		for (RedisNode clusterNode : nodes) {
+		for (ValkeyNode clusterNode : nodes) {
 			addClusterNode(clusterNode);
 		}
 	}
 
 	@Override
-	public Set<RedisNode> getClusterNodes() {
+	public Set<ValkeyNode> getClusterNodes() {
 		return Collections.unmodifiableSet(clusterNodes);
 	}
 
@@ -157,7 +157,7 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	 *
 	 * @param node must not be {@literal null}.
 	 */
-	public void addClusterNode(RedisNode node) {
+	public void addClusterNode(ValkeyNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
@@ -165,18 +165,18 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	}
 
 	/**
-	 * @param host Redis cluster node host name or ip address.
-	 * @param port Redis cluster node port.
+	 * @param host Valkey cluster node host name or ip address.
+	 * @param port Valkey cluster node port.
 	 * @return this.
 	 */
-	public RedisClusterConfiguration clusterNode(String host, Integer port) {
-		return clusterNode(new RedisNode(host, port));
+	public ValkeyClusterConfiguration clusterNode(String host, Integer port) {
+		return clusterNode(new ValkeyNode(host, port));
 	}
 
 	/**
 	 * @return this.
 	 */
-	public RedisClusterConfiguration clusterNode(RedisNode node) {
+	public ValkeyClusterConfiguration clusterNode(ValkeyNode node) {
 
 		this.clusterNodes.add(node);
 
@@ -210,15 +210,15 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 	}
 
 	@Override
-	public void setPassword(RedisPassword password) {
+	public void setPassword(ValkeyPassword password) {
 
-		Assert.notNull(password, "RedisPassword must not be null");
+		Assert.notNull(password, "ValkeyPassword must not be null");
 
 		this.password = password;
 	}
 
 	@Override
-	public RedisPassword getPassword() {
+	public ValkeyPassword getPassword() {
 		return password;
 	}
 
@@ -229,7 +229,7 @@ public class RedisClusterConfiguration implements RedisConfiguration, ClusterCon
 			return true;
 		}
 
-		if (!(obj instanceof RedisClusterConfiguration that)) {
+		if (!(obj instanceof ValkeyClusterConfiguration that)) {
 			return false;
 		}
 

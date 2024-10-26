@@ -32,38 +32,38 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of {@link RedisTypeMapper} allowing configuration of the key to lookup and store type
+ * Default implementation of {@link ValkeyTypeMapper} allowing configuration of the key to lookup and store type
  * information via {@link BucketPropertyPath} in buckets. The key defaults to {@link #DEFAULT_TYPE_KEY}. Actual
  * type-to-{@code byte[]} conversion and back is done in {@link BucketTypeAliasAccessor}.
  *
  * @author Mark Paluch
  * @since 2.1
  */
-public class DefaultRedisTypeMapper extends DefaultTypeMapper<BucketPropertyPath> implements RedisTypeMapper {
+public class DefaultValkeyTypeMapper extends DefaultTypeMapper<BucketPropertyPath> implements ValkeyTypeMapper {
 
 	public static final String DEFAULT_TYPE_KEY = "_class";
 
 	private final @Nullable String typeKey;
 
 	/**
-	 * Create a new {@link DefaultRedisTypeMapper} using {@link #DEFAULT_TYPE_KEY} to exchange type hints.
+	 * Create a new {@link DefaultValkeyTypeMapper} using {@link #DEFAULT_TYPE_KEY} to exchange type hints.
 	 */
-	public DefaultRedisTypeMapper() {
+	public DefaultValkeyTypeMapper() {
 		this(DEFAULT_TYPE_KEY);
 	}
 
 	/**
-	 * Create a new {@link DefaultRedisTypeMapper} given {@code typeKey} to exchange type hints. Does not consider type
+	 * Create a new {@link DefaultValkeyTypeMapper} given {@code typeKey} to exchange type hints. Does not consider type
 	 * hints if {@code typeKey} is {@literal null}.
 	 *
 	 * @param typeKey the type key can be {@literal null} to skip type hinting.
 	 */
-	public DefaultRedisTypeMapper(@Nullable String typeKey) {
+	public DefaultValkeyTypeMapper(@Nullable String typeKey) {
 		this(typeKey, Collections.singletonList(new SimpleTypeInformationMapper()));
 	}
 
 	/**
-	 * Create a new {@link DefaultRedisTypeMapper} given {@code typeKey} to exchange type hints and
+	 * Create a new {@link DefaultValkeyTypeMapper} given {@code typeKey} to exchange type hints and
 	 * {@link MappingContext}. Does not consider type hints if {@code typeKey} is {@literal null}. {@link MappingContext}
 	 * is used to obtain entity-based aliases
 	 *
@@ -71,25 +71,25 @@ public class DefaultRedisTypeMapper extends DefaultTypeMapper<BucketPropertyPath
 	 * @param mappingContext must not be {@literal null}.
 	 * @see org.springframework.data.annotation.TypeAlias
 	 */
-	public DefaultRedisTypeMapper(@Nullable String typeKey,
+	public DefaultValkeyTypeMapper(@Nullable String typeKey,
 			MappingContext<? extends PersistentEntity<?, ?>, ?> mappingContext) {
 		this(typeKey, new BucketTypeAliasAccessor(typeKey, getConversionService()), mappingContext,
 				Collections.singletonList(new SimpleTypeInformationMapper()));
 	}
 
 	/**
-	 * Create a new {@link DefaultRedisTypeMapper} given {@code typeKey} to exchange type hints and {@link List} of
+	 * Create a new {@link DefaultValkeyTypeMapper} given {@code typeKey} to exchange type hints and {@link List} of
 	 * {@link TypeInformationMapper}. Does not consider type hints if {@code typeKey} is {@literal null}.
 	 * {@link MappingContext} is used to obtain entity-based aliases
 	 *
 	 * @param typeKey the type key can be {@literal null} to skip type hinting.
 	 * @param mappers must not be {@literal null}.
 	 */
-	public DefaultRedisTypeMapper(@Nullable String typeKey, List<? extends TypeInformationMapper> mappers) {
+	public DefaultValkeyTypeMapper(@Nullable String typeKey, List<? extends TypeInformationMapper> mappers) {
 		this(typeKey, new BucketTypeAliasAccessor(typeKey, getConversionService()), null, mappers);
 	}
 
-	private DefaultRedisTypeMapper(@Nullable String typeKey, TypeAliasAccessor<BucketPropertyPath> accessor,
+	private DefaultValkeyTypeMapper(@Nullable String typeKey, TypeAliasAccessor<BucketPropertyPath> accessor,
 			@Nullable MappingContext<? extends PersistentEntity<?, ?>, ?> mappingContext,
 			List<? extends TypeInformationMapper> mappers) {
 
@@ -101,7 +101,7 @@ public class DefaultRedisTypeMapper extends DefaultTypeMapper<BucketPropertyPath
 	private static GenericConversionService getConversionService() {
 
 		GenericConversionService conversionService = new GenericConversionService();
-		new RedisCustomConversions().registerConvertersIn(conversionService);
+		new ValkeyCustomConversions().registerConvertersIn(conversionService);
 
 		return conversionService;
 	}

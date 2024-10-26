@@ -15,48 +15,48 @@
  */
 package org.springframework.data.redis.core;
 
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.StringValkeyConnection;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
- * String-focused extension of RedisTemplate. Since most operations against Redis are String based, this class provides
- * a dedicated class that minimizes configuration of its more generic {@link RedisTemplate template} especially in terms
+ * String-focused extension of ValkeyTemplate. Since most operations against Valkey are String based, this class provides
+ * a dedicated class that minimizes configuration of its more generic {@link ValkeyTemplate template} especially in terms
  * of serializers.
  * <p>
- * Note that this template exposes the {@link RedisConnection} used by the {@link RedisCallback} as a
- * {@link StringRedisConnection}.
+ * Note that this template exposes the {@link ValkeyConnection} used by the {@link ValkeyCallback} as a
+ * {@link StringValkeyConnection}.
  *
  * @author Costin Leau
  * @author Mark Paluch
  */
-public class StringRedisTemplate extends RedisTemplate<String, String> {
+public class StringValkeyTemplate extends ValkeyTemplate<String, String> {
 
 	/**
-	 * Constructs a new <code>StringRedisTemplate</code> instance. {@link #setConnectionFactory(RedisConnectionFactory)}
+	 * Constructs a new <code>StringValkeyTemplate</code> instance. {@link #setConnectionFactory(ValkeyConnectionFactory)}
 	 * and {@link #afterPropertiesSet()} still need to be called.
 	 */
-	public StringRedisTemplate() {
-		setKeySerializer(RedisSerializer.string());
-		setValueSerializer(RedisSerializer.string());
-		setHashKeySerializer(RedisSerializer.string());
-		setHashValueSerializer(RedisSerializer.string());
+	public StringValkeyTemplate() {
+		setKeySerializer(ValkeySerializer.string());
+		setValueSerializer(ValkeySerializer.string());
+		setHashKeySerializer(ValkeySerializer.string());
+		setHashValueSerializer(ValkeySerializer.string());
 	}
 
 	/**
-	 * Constructs a new <code>StringRedisTemplate</code> instance ready to be used.
+	 * Constructs a new <code>StringValkeyTemplate</code> instance ready to be used.
 	 *
 	 * @param connectionFactory connection factory for creating new connections
 	 */
-	public StringRedisTemplate(RedisConnectionFactory connectionFactory) {
+	public StringValkeyTemplate(ValkeyConnectionFactory connectionFactory) {
 		this();
 		setConnectionFactory(connectionFactory);
 		afterPropertiesSet();
 	}
 
-	protected RedisConnection preProcessConnection(RedisConnection connection, boolean existingConnection) {
-		return new DefaultStringRedisConnection(connection);
+	protected ValkeyConnection preProcessConnection(ValkeyConnection connection, boolean existingConnection) {
+		return new DefaultStringValkeyConnection(connection);
 	}
 }

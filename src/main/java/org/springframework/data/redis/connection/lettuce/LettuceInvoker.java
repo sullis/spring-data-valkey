@@ -15,8 +15,8 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
+import io.lettuce.core.ValkeyFuture;
+import io.lettuce.core.cluster.api.async.ValkeyClusterAsyncCommands;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +32,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Utility for functional invocation of {@link RedisClusterAsyncCommands Lettuce methods}. Typically used to express the
+ * Utility for functional invocation of {@link ValkeyClusterAsyncCommands Lettuce methods}. Typically used to express the
  * method call as method reference and passing method arguments through one of the {@code just} or {@code from} methods.
  * <p>
  * {@code just} methods record the method call and evaluate the method result immediately. {@code from} methods allows
@@ -43,13 +43,13 @@ import org.springframework.util.Assert;
  * <pre class="code">
  * LettuceInvoker invoker = …;
  *
- * Long result = invoker.just(RedisGeoAsyncCommands::geoadd, key, point.getX(), point.getY(), member);
+ * Long result = invoker.just(ValkeyGeoAsyncCommands::geoadd, key, point.getX(), point.getY(), member);
  *
- * List&lt;byte[]&gt; result = invoker.fromMany(RedisGeoAsyncCommands::geohash, key, members)
+ * List&lt;byte[]&gt; result = invoker.fromMany(ValkeyGeoAsyncCommands::geohash, key, members)
  * 				.toList(it -> it.getValueOrElse(null));
  * </pre>
  * <p>
- * The actual translation from {@link RedisFuture} is delegated to {@link Synchronizer} which can either await
+ * The actual translation from {@link ValkeyFuture} is delegated to {@link Synchronizer} which can either await
  * completion or record the future along {@link Converter} for further processing.
  *
  * @author Mark Paluch
@@ -58,10 +58,10 @@ import org.springframework.util.Assert;
  */
 class LettuceInvoker {
 
-	private final RedisClusterAsyncCommands<byte[], byte[]> connection;
+	private final ValkeyClusterAsyncCommands<byte[], byte[]> connection;
 	private final Synchronizer synchronizer;
 
-	LettuceInvoker(RedisClusterAsyncCommands<byte[], byte[]> connection, Synchronizer synchronizer) {
+	LettuceInvoker(ValkeyClusterAsyncCommands<byte[], byte[]> connection, Synchronizer synchronizer) {
 
 		this.connection = connection;
 		this.synchronizer = synchronizer;
@@ -446,7 +446,7 @@ class LettuceInvoker {
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 0 arguments.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 0 arguments.
 	 *
 	 * @param <R>
 	 */
@@ -454,15 +454,15 @@ class LettuceInvoker {
 	interface ConnectionFunction0<R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection);
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 1 argument.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 1 argument.
 	 *
 	 * @param <T1>
 	 * @param <R>
@@ -471,16 +471,16 @@ class LettuceInvoker {
 	interface ConnectionFunction1<T1, R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 * @param t1 first argument.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection, T1 t1);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection, T1 t1);
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 2 arguments.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 2 arguments.
 	 *
 	 * @param <T1>
 	 * @param <T2>
@@ -490,17 +490,17 @@ class LettuceInvoker {
 	interface ConnectionFunction2<T1, T2, R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 * @param t1 first argument.
 		 * @param t2 second argument.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2);
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 3 arguments.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 3 arguments.
 	 *
 	 * @param <T1>
 	 * @param <T2>
@@ -511,18 +511,18 @@ class LettuceInvoker {
 	interface ConnectionFunction3<T1, T2, T3, R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 * @param t1 first argument.
 		 * @param t2 second argument.
 		 * @param t3 third argument.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3);
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 4 arguments.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 4 arguments.
 	 *
 	 * @param <T1>
 	 * @param <T2>
@@ -534,7 +534,7 @@ class LettuceInvoker {
 	interface ConnectionFunction4<T1, T2, T3, T4, R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 * @param t1 first argument.
@@ -542,11 +542,11 @@ class LettuceInvoker {
 		 * @param t3 third argument.
 		 * @param t4 fourth argument.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3, T4 t4);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3, T4 t4);
 	}
 
 	/**
-	 * A function accepting {@link RedisClusterAsyncCommands} with 5 arguments.
+	 * A function accepting {@link ValkeyClusterAsyncCommands} with 5 arguments.
 	 *
 	 * @param <T1>
 	 * @param <T2>
@@ -559,7 +559,7 @@ class LettuceInvoker {
 	interface ConnectionFunction5<T1, T2, T3, T4, T5, R> {
 
 		/**
-		 * Apply this function to the arguments and return a {@link RedisFuture}.
+		 * Apply this function to the arguments and return a {@link ValkeyFuture}.
 		 *
 		 * @param connection the connection in use. Never {@literal null}.
 		 * @param t1 first argument.
@@ -568,15 +568,15 @@ class LettuceInvoker {
 		 * @param t4 fourth argument.
 		 * @param t5 fifth argument.
 		 */
-		RedisFuture<R> apply(RedisClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
+		ValkeyFuture<R> apply(ValkeyClusterAsyncCommands<byte[], byte[]> connection, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
 	}
 
 	static class DefaultSingleInvocationSpec<S> implements SingleInvocationSpec<S> {
 
-		private final Supplier<RedisFuture<S>> parent;
+		private final Supplier<ValkeyFuture<S>> parent;
 		private final Synchronizer synchronizer;
 
-		public DefaultSingleInvocationSpec(Supplier<RedisFuture<S>> parent, Synchronizer synchronizer) {
+		public DefaultSingleInvocationSpec(Supplier<ValkeyFuture<S>> parent, Synchronizer synchronizer) {
 			this.parent = parent;
 			this.synchronizer = synchronizer;
 		}
@@ -601,10 +601,10 @@ class LettuceInvoker {
 
 	static class DefaultManyInvocationSpec<S> implements ManyInvocationSpec<S> {
 
-		private final Supplier<RedisFuture<Collection<S>>> parent;
+		private final Supplier<ValkeyFuture<Collection<S>>> parent;
 		private final Synchronizer synchronizer;
 
-		public DefaultManyInvocationSpec(Supplier<RedisFuture<? extends Collection<S>>> parent, Synchronizer synchronizer) {
+		public DefaultManyInvocationSpec(Supplier<ValkeyFuture<? extends Collection<S>>> parent, Synchronizer synchronizer) {
 
 			this.parent = (Supplier) parent;
 			this.synchronizer = synchronizer;
@@ -654,20 +654,20 @@ class LettuceInvoker {
 	}
 
 	/**
-	 * Interface to define a synchronization function to evaluate {@link RedisFuture}.
+	 * Interface to define a synchronization function to evaluate {@link ValkeyFuture}.
 	 */
 	@FunctionalInterface
 	interface Synchronizer {
 
 		@Nullable
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		default <I, T> T invoke(Supplier<RedisFuture<I>> futureSupplier) {
+		default <I, T> T invoke(Supplier<ValkeyFuture<I>> futureSupplier) {
 			return (T) doInvoke((Supplier) futureSupplier, Converters.identityConverter(), () -> null);
 		}
 
 		@Nullable
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		default <I, T> T invoke(Supplier<RedisFuture<I>> futureSupplier, Converter<I, T> converter,
+		default <I, T> T invoke(Supplier<ValkeyFuture<I>> futureSupplier, Converter<I, T> converter,
 				Supplier<T> nullDefault) {
 
 			return (T) doInvoke((Supplier) futureSupplier, (Converter<Object, Object>) converter,
@@ -675,7 +675,7 @@ class LettuceInvoker {
 		}
 
 		@Nullable
-		Object doInvoke(Supplier<RedisFuture<Object>> futureSupplier, Converter<Object, Object> converter,
+		Object doInvoke(Supplier<ValkeyFuture<Object>> futureSupplier, Converter<Object, Object> converter,
 				Supplier<Object> nullDefault);
 	}
 }

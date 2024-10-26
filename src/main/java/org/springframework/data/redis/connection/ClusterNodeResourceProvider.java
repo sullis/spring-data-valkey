@@ -17,7 +17,7 @@ package org.springframework.data.redis.connection;
 
 /**
  * {@link ClusterNodeResourceProvider} provides access to low level client api to directly execute operations against a
- * Redis instance.
+ * Valkey instance.
  *
  * @author Christoph Strobl
  * @since 1.7
@@ -31,7 +31,7 @@ public interface ClusterNodeResourceProvider {
 	 * @return never {@literal null}.
 	 * @throws org.springframework.dao.DataAccessResourceFailureException if node is not known to the cluster.
 	 */
-	<S> S getResourceForSpecificNode(RedisClusterNode node);
+	<S> S getResourceForSpecificNode(ValkeyClusterNode node);
 
 	/**
 	 * Return the resource object for the given node. This can mean free up resources or return elements back to a pool.
@@ -39,6 +39,6 @@ public interface ClusterNodeResourceProvider {
 	 * @param node must not be {@literal null}.
 	 * @param resource must not be {@literal null}.
 	 */
-	void returnResourceForSpecificNode(RedisClusterNode node, Object resource);
+	void returnResourceForSpecificNode(ValkeyClusterNode node, Object resource);
 
 }

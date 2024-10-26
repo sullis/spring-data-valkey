@@ -16,27 +16,27 @@
 package org.springframework.data.redis.connection;
 
 /**
- * Provides access to {@link RedisClusterCommands} and the segregated command interfaces.
+ * Provides access to {@link ValkeyClusterCommands} and the segregated command interfaces.
  *
  * @author Mark Paluch
  * @since 3.0
  */
-public interface RedisClusterCommandsProvider extends RedisCommandsProvider {
+public interface ValkeyClusterCommandsProvider extends ValkeyCommandsProvider {
 
 	/**
-	 * Get {@link RedisGeoCommands}.
+	 * Get {@link ValkeyGeoCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisClusterCommands clusterCommands();
+	ValkeyClusterCommands clusterCommands();
 
 	/**
-	 * Get {@link RedisServerCommands}.
+	 * Get {@link ValkeyServerCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisClusterServerCommands serverCommands();
+	ValkeyClusterServerCommands serverCommands();
 
 }

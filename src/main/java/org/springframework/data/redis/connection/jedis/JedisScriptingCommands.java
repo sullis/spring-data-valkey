@@ -20,7 +20,7 @@ import redis.clients.jedis.commands.ScriptingKeyPipelineBinaryCommands;
 
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisScriptingCommands;
+import org.springframework.data.redis.connection.ValkeyScriptingCommands;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.util.Assert;
 
@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * @author Ivan Kripakov
  * @since 2.0
  */
-class JedisScriptingCommands implements RedisScriptingCommands {
+class JedisScriptingCommands implements ValkeyScriptingCommands {
 
 	private static final byte[] SAMPLE_KEY = new byte[0];
 	private final JedisConnection connection;

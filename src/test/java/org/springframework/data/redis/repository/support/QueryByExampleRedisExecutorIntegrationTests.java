@@ -37,48 +37,48 @@ import org.springframework.data.keyvalue.core.KeyValueTemplate;
 import org.springframework.data.keyvalue.repository.support.SimpleKeyValueRepository;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyHash;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyKeyValueTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.repository.core.MappingRedisEntityInformation;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.repository.core.MappingValkeyEntityInformation;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.repository.query.FluentQuery;
 
 /**
- * Integration tests for {@link QueryByExampleRedisExecutor}.
+ * Integration tests for {@link QueryByExampleValkeyExecutor}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author John Blum
  */
-class QueryByExampleRedisExecutorIntegrationTests {
+class QueryByExampleValkeyExecutorIntegrationTests {
 
 	private static JedisConnectionFactory connectionFactory;
-	private RedisMappingContext mappingContext = new RedisMappingContext();
-	private RedisKeyValueTemplate kvTemplate;
+	private ValkeyMappingContext mappingContext = new ValkeyMappingContext();
+	private ValkeyKeyValueTemplate kvTemplate;
 
 	private Person walt, hank, gus;
 
 	@BeforeAll
 	static void beforeAll() {
-		connectionFactory = JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+		connectionFactory = JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 	}
 
 	@BeforeEach
 	void before() {
 
-		RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 		template.afterPropertiesSet();
 
-		kvTemplate = new RedisKeyValueTemplate(new RedisKeyValueAdapter(template, mappingContext), mappingContext);
+		kvTemplate = new ValkeyKeyValueTemplate(new ValkeyKeyValueAdapter(template, mappingContext), mappingContext);
 
 		SimpleKeyValueRepository<Person, String> repository = new SimpleKeyValueRepository<>(
-				getEntityInformation(Person.class), new KeyValueTemplate(new RedisKeyValueAdapter(template)));
+				getEntityInformation(Person.class), new KeyValueTemplate(new ValkeyKeyValueAdapter(template)));
 		repository.deleteAll();
 
 		walt = new Person("Walter", "White");
@@ -96,7 +96,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldFindOneByExample() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Optional<Person> result = executor.findOne(Example.of(walt));
@@ -107,7 +107,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldThrowExceptionWhenFindOneByExampleReturnsNonUniqueResult() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -120,7 +120,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldNotFindOneByExample() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Optional<Person> result = executor.findOne(Example.of(new Person("Skyler", "White")));
@@ -130,7 +130,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605, GH-2880
 	void shouldFindAllByExample() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -143,7 +143,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldNotSupportFindAllOrdered() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -156,7 +156,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldFindAllPagedByExample() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -170,7 +170,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldCountCorrectly() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -185,7 +185,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // DATAREDIS-605
 	void shouldReportExistenceCorrectly() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -200,7 +200,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindFirst() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -214,7 +214,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindFirstAsDto() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -227,7 +227,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindOne() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -242,7 +242,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindAll() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -256,7 +256,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindPage() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -270,7 +270,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldFindStream() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -283,7 +283,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldCount() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -295,7 +295,7 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	@Test // GH-2150
 	void findByShouldExists() {
 
-		QueryByExampleRedisExecutor<Person> executor = new QueryByExampleRedisExecutor<>(getEntityInformation(Person.class),
+		QueryByExampleValkeyExecutor<Person> executor = new QueryByExampleValkeyExecutor<>(getEntityInformation(Person.class),
 				kvTemplate);
 
 		Person person = new Person();
@@ -305,12 +305,12 @@ class QueryByExampleRedisExecutorIntegrationTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> MappingRedisEntityInformation<T, String> getEntityInformation(Class<T> entityClass) {
-		return new MappingRedisEntityInformation<>(
-				(RedisPersistentEntity) mappingContext.getRequiredPersistentEntity(entityClass));
+	private <T> MappingValkeyEntityInformation<T, String> getEntityInformation(Class<T> entityClass) {
+		return new MappingValkeyEntityInformation<>(
+				(ValkeyPersistentEntity) mappingContext.getRequiredPersistentEntity(entityClass));
 	}
 
-	@RedisHash("persons")
+	@ValkeyHash("persons")
 	static class Person {
 
 		private @Id String id;

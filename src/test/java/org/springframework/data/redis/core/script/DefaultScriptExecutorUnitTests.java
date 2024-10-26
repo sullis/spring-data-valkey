@@ -24,11 +24,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 
 /**
  * @author Christoph Strobl
@@ -36,11 +36,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @ExtendWith(MockitoExtension.class)
 class DefaultScriptExecutorUnitTests {
 
-	private final DefaultRedisScript<String> SCRIPT = new DefaultRedisScript<>("return KEYS[0]", String.class);
+	private final DefaultValkeyScript<String> SCRIPT = new DefaultValkeyScript<>("return KEYS[0]", String.class);
 
-	private StringRedisTemplate template;
-	private @Mock RedisConnection redisConnectionMock;
-	private @Mock RedisConnectionFactory connectionFactoryMock;
+	private StringValkeyTemplate template;
+	private @Mock ValkeyConnection redisConnectionMock;
+	private @Mock ValkeyConnectionFactory connectionFactoryMock;
 
 	private DefaultScriptExecutor<String> executor;
 
@@ -48,7 +48,7 @@ class DefaultScriptExecutorUnitTests {
 	void setUp() {
 
 		when(connectionFactoryMock.getConnection()).thenReturn(redisConnectionMock);
-		template = spy(new StringRedisTemplate(connectionFactoryMock));
+		template = spy(new StringValkeyTemplate(connectionFactoryMock));
 		template.afterPropertiesSet();
 
 		executor = new DefaultScriptExecutor<>(template);
@@ -78,7 +78,7 @@ class DefaultScriptExecutorUnitTests {
 	void excuteShouldUseEvalInCaseNoSha1PresentForGivenScript() {
 
 		when(redisConnectionMock.evalSha(anyString(), any(ReturnType.class), anyInt())).thenThrow(
-				new RedisSystemException("NOSCRIPT No matching script; Please use EVAL.", new Exception()));
+				new ValkeySystemException("NOSCRIPT No matching script; Please use EVAL.", new Exception()));
 
 		executor.execute(SCRIPT, null);
 
@@ -86,7 +86,7 @@ class DefaultScriptExecutorUnitTests {
 	}
 
 	@Test // DATAREDIS-347
-	void excuteShouldThrowExceptionInCaseEvalShaFailsWithOtherThanRedisSystemException() {
+	void excuteShouldThrowExceptionInCaseEvalShaFailsWithOtherThanValkeySystemException() {
 
 		when(redisConnectionMock.evalSha(anyString(), any(ReturnType.class), anyInt())).thenThrow(
 				new UnsupportedOperationException("NOSCRIPT No matching script; Please use EVAL.", new Exception()));
@@ -98,8 +98,8 @@ class DefaultScriptExecutorUnitTests {
 	void excuteShouldThrowExceptionInCaseEvalShaFailsWithAlthoughTheScriptExists() {
 
 		when(redisConnectionMock.evalSha(anyString(), any(ReturnType.class), anyInt())).thenThrow(
-				new RedisSystemException("Found Script but could not execute it.", new Exception()));
+				new ValkeySystemException("Found Script but could not execute it.", new Exception()));
 
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> executor.execute(SCRIPT, null));
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> executor.execute(SCRIPT, null));
 	}
 }

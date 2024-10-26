@@ -31,14 +31,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.test.condition.EnabledIfLongRunningTest;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Base test class for PubSub integration tests
@@ -53,9 +53,9 @@ public class PubSubTests<T> {
 
 	private static final String CHANNEL = "pubsub::test";
 
-	protected RedisMessageListenerContainer container;
+	protected ValkeyMessageListenerContainer container;
 	protected ObjectFactory<T> factory;
-	@SuppressWarnings("rawtypes") protected RedisTemplate template;
+	@SuppressWarnings("rawtypes") protected ValkeyTemplate template;
 
 	private final BlockingDeque<Object> bag = new LinkedBlockingDeque<>(99);
 
@@ -69,7 +69,7 @@ public class PubSubTests<T> {
 	private final MessageListenerAdapter adapter = new MessageListenerAdapter(handler);
 
 	@SuppressWarnings("rawtypes")
-	public PubSubTests(ObjectFactory<T> factory, RedisTemplate template) {
+	public PubSubTests(ObjectFactory<T> factory, ValkeyTemplate template) {
 		this.factory = factory;
 		this.template = template;
 	}
@@ -85,7 +85,7 @@ public class PubSubTests<T> {
 		adapter.setSerializer(template.getValueSerializer());
 		adapter.afterPropertiesSet();
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(template.getConnectionFactory());
 		container.setBeanName("container");
 		container.addMessageListener(adapter, Arrays.asList(new ChannelTopic(CHANNEL)));
@@ -107,7 +107,7 @@ public class PubSubTests<T> {
 		return factory.instance();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainerSubscribe() {
 		T payload1 = getT();
 		T payload2 = getT();
@@ -118,7 +118,7 @@ public class PubSubTests<T> {
 		await().atMost(Duration.ofSeconds(2)).until(() -> bag.contains(payload1) && bag.contains(payload2));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testMessageBatch() throws Exception {
 
 		int COUNT = 10;
@@ -131,7 +131,7 @@ public class PubSubTests<T> {
 		}
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@EnabledIfLongRunningTest
 	void testContainerUnsubscribe() throws Exception {
 		T payload1 = getT();
@@ -144,7 +144,7 @@ public class PubSubTests<T> {
 		assertThat(bag.poll(200, TimeUnit.MILLISECONDS)).isNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testStartNoListeners() {
 		container.removeMessageListener(adapter, new ChannelTopic(CHANNEL));
 		container.stop();
@@ -152,7 +152,7 @@ public class PubSubTests<T> {
 		container.start();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-251, GH-964
+	@ParameterizedValkeyTest // DATAREDIS-251, GH-964
 	void testStartListenersToNoSpecificChannelTest() {
 
 		assumeThat(isClusterAware(template.getConnectionFactory())).isFalse();
@@ -168,12 +168,12 @@ public class PubSubTests<T> {
 		await().atMost(Duration.ofSeconds(2)).until(() -> bag.contains(payload));
 	}
 
-	private static boolean isClusterAware(RedisConnectionFactory connectionFactory) {
+	private static boolean isClusterAware(ValkeyConnectionFactory connectionFactory) {
 
 		if (connectionFactory instanceof LettuceConnectionFactory lettuce) {
 			return lettuce.isClusterAware();
 		} else if (connectionFactory instanceof JedisConnectionFactory jedis) {
-			return jedis.isRedisClusterAware();
+			return jedis.isValkeyClusterAware();
 		}
 		return false;
 	}

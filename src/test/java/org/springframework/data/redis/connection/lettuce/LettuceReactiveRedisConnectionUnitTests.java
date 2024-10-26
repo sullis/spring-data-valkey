@@ -18,11 +18,11 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.lettuce.core.RedisConnectionException;
+import io.lettuce.core.ValkeyConnectionException;
 import io.lettuce.core.XAddArgs;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.reactive.RedisReactiveCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.reactive.ValkeyReactiveCommands;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,23 +41,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.ReactiveStreamCommands.AddStreamRecord;
 import org.springframework.data.redis.connection.stream.ByteBufferRecord;
 import org.springframework.data.redis.connection.stream.MapRecord;
 
 /**
- * Unit tests for {@link LettuceReactiveRedisConnection}.
+ * Unit tests for {@link LettuceReactiveValkeyConnection}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class LettuceReactiveRedisConnectionUnitTests {
+class LettuceReactiveValkeyConnectionUnitTests {
 
-	@Mock(answer = Answers.RETURNS_MOCKS) StatefulRedisConnection<ByteBuffer, ByteBuffer> sharedConnection;
+	@Mock(answer = Answers.RETURNS_MOCKS) StatefulValkeyConnection<ByteBuffer, ByteBuffer> sharedConnection;
 
-	@Mock RedisReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
+	@Mock ValkeyReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
 	@Mock LettuceConnectionProvider connectionProvider;
 
 	@BeforeEach
@@ -70,7 +70,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720
 	void shouldLazilyInitializeConnection() {
 
-		new LettuceReactiveRedisConnection(connectionProvider);
+		new LettuceReactiveValkeyConnection(connectionProvider);
 
 		verifyNoInteractions(connectionProvider);
 	}
@@ -78,7 +78,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldExecuteUsingConnectionProvider() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		connection.execute(cmd -> Mono.just("foo")).as(StepVerifier::create).expectNext("foo").verifyComplete();
 
@@ -88,7 +88,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldExecuteDedicatedUsingConnectionProvider() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		connection.executeDedicated(cmd -> Mono.just("foo")).as(StepVerifier::create).expectNext("foo").verifyComplete();
 
@@ -98,7 +98,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720
 	void shouldExecuteOnSharedConnection() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(sharedConnection,
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(sharedConnection,
 				connectionProvider);
 
 		connection.execute(cmd -> Mono.just("foo")).as(StepVerifier::create).expectNext("foo").verifyComplete();
@@ -109,7 +109,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldExecuteDedicatedWithSharedConnection() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(sharedConnection,
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(sharedConnection,
 				connectionProvider);
 
 		connection.executeDedicated(cmd -> Mono.just("foo")).as(StepVerifier::create).expectNext("foo").verifyComplete();
@@ -120,7 +120,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldOperateOnDedicatedConnection() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		connection.getConnection().as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
@@ -130,7 +130,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldCloseOnlyDedicatedConnection() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(sharedConnection,
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(sharedConnection,
 				connectionProvider);
 
 		connection.getConnection().as(StepVerifier::create).expectNextCount(1).verifyComplete();
@@ -145,7 +145,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldCloseConnectionOnlyOnce() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		connection.getConnection().as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
@@ -163,7 +163,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 		reset(connectionProvider);
 		when(connectionProvider.getConnectionAsync(any())).thenReturn(connectionFuture);
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		CompletableFuture<StatefulConnection<ByteBuffer, ByteBuffer>> first = (CompletableFuture) connection.getConnection()
 				.toFuture();
@@ -189,17 +189,17 @@ class LettuceReactiveRedisConnectionUnitTests {
 
 		reset(connectionProvider);
 		when(connectionProvider.getConnectionAsync(any()))
-				.thenReturn(LettuceFutureUtils.failed(new RedisConnectionException("something went wrong")));
+				.thenReturn(LettuceFutureUtils.failed(new ValkeyConnectionException("something went wrong")));
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
-		connection.getConnection().as(StepVerifier::create).expectError(RedisConnectionFailureException.class).verify();
+		connection.getConnection().as(StepVerifier::create).expectError(ValkeyConnectionFailureException.class).verify();
 	}
 
 	@Test // DATAREDIS-720, DATAREDIS-721
 	void shouldRejectCommandsAfterClose() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 		connection.close();
 
 		connection.getConnection().as(StepVerifier::create).expectError(IllegalStateException.class).verify();
@@ -208,7 +208,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-659, DATAREDIS-708
 	void bgReWriteAofShouldRespondCorrectly() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		when(reactiveCommands.bgrewriteaof()).thenReturn(Mono.just("OK"));
 
@@ -218,7 +218,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-659, DATAREDIS-667, DATAREDIS-708
 	void bgSaveShouldRespondCorrectly() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		when(reactiveCommands.bgsave()).thenReturn(Mono.just("OK"));
 
@@ -228,7 +228,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // DATAREDIS-1122
 	void xaddShouldHonorMaxlen() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		ArgumentCaptor<XAddArgs> args = ArgumentCaptor.forClass(XAddArgs.class);
 		when(reactiveCommands.xadd(any(ByteBuffer.class), args.capture(), anyMap())).thenReturn(Mono.just("1-1"));
@@ -245,7 +245,7 @@ class LettuceReactiveRedisConnectionUnitTests {
 	@Test // GH-2047
 	void xaddShouldHonorNoMkStream() {
 
-		LettuceReactiveRedisConnection connection = new LettuceReactiveRedisConnection(connectionProvider);
+		LettuceReactiveValkeyConnection connection = new LettuceReactiveValkeyConnection(connectionProvider);
 
 		ArgumentCaptor<XAddArgs> args = ArgumentCaptor.forClass(XAddArgs.class);
 		when(reactiveCommands.xadd(any(ByteBuffer.class), args.capture(), anyMap())).thenReturn(Mono.just("1-1"));

@@ -21,16 +21,16 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisServerCommands;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyServerCommands;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base {@link MessageListener} implementation for listening to Redis keyspace notifications.
+ * Base {@link MessageListener} implementation for listening to Valkey keyspace notifications.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -40,7 +40,7 @@ public abstract class KeyspaceEventMessageListener implements MessageListener, I
 
 	private static final Topic TOPIC_ALL_KEYEVENTS = new PatternTopic("__keyevent@*");
 
-	private final RedisMessageListenerContainer listenerContainer;
+	private final ValkeyMessageListenerContainer listenerContainer;
 
 	private @Nullable String keyspaceNotificationsConfigParameter = "EA";
 
@@ -49,9 +49,9 @@ public abstract class KeyspaceEventMessageListener implements MessageListener, I
 	 *
 	 * @param listenerContainer must not be {@literal null}.
 	 */
-	public KeyspaceEventMessageListener(RedisMessageListenerContainer listenerContainer) {
+	public KeyspaceEventMessageListener(ValkeyMessageListenerContainer listenerContainer) {
 
-		Assert.notNull(listenerContainer, "RedisMessageListenerContainer to run in must not be null");
+		Assert.notNull(listenerContainer, "ValkeyMessageListenerContainer to run in must not be null");
 		this.listenerContainer = listenerContainer;
 	}
 
@@ -98,13 +98,13 @@ public abstract class KeyspaceEventMessageListener implements MessageListener, I
 	 */
 	public void init() {
 
-		RedisConnectionFactory connectionFactory = listenerContainer.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = listenerContainer.getConnectionFactory();
 
 		if (StringUtils.hasText(keyspaceNotificationsConfigParameter) && connectionFactory != null) {
 
-			try (RedisConnection connection = connectionFactory.getConnection()) {
+			try (ValkeyConnection connection = connectionFactory.getConnection()) {
 
-				RedisServerCommands commands = connection.serverCommands();
+				ValkeyServerCommands commands = connection.serverCommands();
 				Properties config = commands.getConfig("notify-keyspace-events");
 
 				if (!StringUtils.hasText(config.getProperty("notify-keyspace-events"))) {
@@ -121,7 +121,7 @@ public abstract class KeyspaceEventMessageListener implements MessageListener, I
 	 *
 	 * @param container never {@literal null}.
 	 */
-	protected void doRegister(RedisMessageListenerContainer container) {
+	protected void doRegister(ValkeyMessageListenerContainer container) {
 		listenerContainer.addMessageListener(this, TOPIC_ALL_KEYEVENTS);
 	}
 

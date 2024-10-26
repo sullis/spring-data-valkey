@@ -25,7 +25,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * Redis <a href="https://redis.io/commands/#scripting">Scripting</a> commands executed using reactive infrastructure.
+ * Valkey <a href="https://redis.io/commands/#scripting">Scripting</a> commands executed using reactive infrastructure.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -36,14 +36,14 @@ public interface ReactiveScriptingCommands {
 	/**
 	 * Flush lua script cache.
 	 *
-	 * @see <a href="https://redis.io/commands/script-flush">Redis Documentation: SCRIPT FLUSH</a>
+	 * @see <a href="https://redis.io/commands/script-flush">Valkey Documentation: SCRIPT FLUSH</a>
 	 */
 	Mono<String> scriptFlush();
 
 	/**
 	 * Kill current lua script execution.
 	 *
-	 * @see <a href="https://redis.io/commands/script-kill">Redis Documentation: SCRIPT KILL</a>
+	 * @see <a href="https://redis.io/commands/script-kill">Valkey Documentation: SCRIPT KILL</a>
 	 */
 	Mono<String> scriptKill();
 
@@ -53,7 +53,7 @@ public interface ReactiveScriptingCommands {
 	 *
 	 * @param script must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/script-load">Redis Documentation: SCRIPT LOAD</a>
+	 * @see <a href="https://redis.io/commands/script-load">Valkey Documentation: SCRIPT LOAD</a>
 	 */
 	Mono<String> scriptLoad(ByteBuffer script);
 
@@ -74,7 +74,7 @@ public interface ReactiveScriptingCommands {
 	 *
 	 * @param scriptShas must not be {@literal null}.
 	 * @return {@link Flux} emitting one entry per scriptSha in given {@link List}.
-	 * @see <a href="https://redis.io/commands/script-exists">Redis Documentation: SCRIPT EXISTS</a>
+	 * @see <a href="https://redis.io/commands/script-exists">Valkey Documentation: SCRIPT EXISTS</a>
 	 */
 	Flux<Boolean> scriptExists(List<String> scriptShas);
 
@@ -87,7 +87,7 @@ public interface ReactiveScriptingCommands {
 	 * @param numKeys
 	 * @param keysAndArgs must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/eval">Redis Documentation: EVAL</a>
+	 * @see <a href="https://redis.io/commands/eval">Valkey Documentation: EVAL</a>
 	 */
 	<T> Flux<T> eval(ByteBuffer script, ReturnType returnType, int numKeys, ByteBuffer... keysAndArgs);
 
@@ -100,7 +100,7 @@ public interface ReactiveScriptingCommands {
 	 * @param numKeys
 	 * @param keysAndArgs must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/evalsha">Redis Documentation: EVALSHA</a>
+	 * @see <a href="https://redis.io/commands/evalsha">Valkey Documentation: EVALSHA</a>
 	 */
 	<T> Flux<T> evalSha(String scriptSha, ReturnType returnType, int numKeys, ByteBuffer... keysAndArgs);
 }

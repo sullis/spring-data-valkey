@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce.observability;
 
-import io.lettuce.core.protocol.RedisCommand;
+import io.lettuce.core.protocol.ValkeyCommand;
 import io.lettuce.core.tracing.Tracing.Endpoint;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.transport.Kind;
@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 @Deprecated(since = "3.4", forRemoval = true)
 public class LettuceObservationContext extends SenderContext<Object> {
 
-	private volatile @Nullable RedisCommand<?, ?, ?> command;
+	private volatile @Nullable ValkeyCommand<?, ?, ?> command;
 
 	private volatile @Nullable Endpoint endpoint;
 
@@ -43,9 +43,9 @@ public class LettuceObservationContext extends SenderContext<Object> {
 		setRemoteServiceName(serviceName);
 	}
 
-	public RedisCommand<?, ?, ?> getRequiredCommand() {
+	public ValkeyCommand<?, ?, ?> getRequiredCommand() {
 
-		RedisCommand<?, ?, ?> local = command;
+		ValkeyCommand<?, ?, ?> local = command;
 
 		if (local == null) {
 			throw new IllegalArgumentException("LettuceObservationContext is not associated with a Command");
@@ -54,7 +54,7 @@ public class LettuceObservationContext extends SenderContext<Object> {
 		return local;
 	}
 
-	public void setCommand(RedisCommand<?, ?, ?> command) {
+	public void setCommand(ValkeyCommand<?, ?, ?> command) {
 		this.command = command;
 	}
 

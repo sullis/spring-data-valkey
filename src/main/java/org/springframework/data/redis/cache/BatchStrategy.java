@@ -15,10 +15,10 @@
  */
 package org.springframework.data.redis.cache;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 
 /**
- * A {@link BatchStrategy} to be used with {@link RedisCacheWriter}.
+ * A {@link BatchStrategy} to be used with {@link ValkeyCacheWriter}.
  * <p>
  * Mainly used to clear the cache.
  * <p>
@@ -39,6 +39,6 @@ public interface BatchStrategy {
 	 * @param pattern The pattern for the keys to remove. Must not be {@literal null}.
 	 * @return number of removed keys.
 	 */
-	long cleanCache(RedisConnection connection, String name, byte[] pattern);
+	long cleanCache(ValkeyConnection connection, String name, byte[] pattern);
 
 }

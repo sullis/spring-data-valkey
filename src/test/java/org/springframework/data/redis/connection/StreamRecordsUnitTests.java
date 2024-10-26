@@ -30,8 +30,8 @@ import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
  * Unit tests for {@link StreamRecords}.
@@ -47,12 +47,12 @@ class StreamRecordsUnitTests {
 	private static final String STRING_VAL = "string-val";
 	private static final DummyObject OBJECT_VAL = new DummyObject();
 
-	private static final Jackson2JsonRedisSerializer<DummyObject> JSON_REDIS_SERIALIZER = new Jackson2JsonRedisSerializer<>(
+	private static final Jackson2JsonValkeySerializer<DummyObject> JSON_REDIS_SERIALIZER = new Jackson2JsonValkeySerializer<>(
 			DummyObject.class);
 
-	private static final byte[] SERIALIZED_STRING_VAL = RedisSerializer.string().serialize(STRING_VAL);
-	private static final byte[] SERIALIZED_STRING_MAP_KEY = RedisSerializer.string().serialize(STRING_MAP_KEY);
-	private static final byte[] SERIALIZED_STRING_STREAM_KEY = RedisSerializer.string().serialize(STRING_STREAM_KEY);
+	private static final byte[] SERIALIZED_STRING_VAL = ValkeySerializer.string().serialize(STRING_VAL);
+	private static final byte[] SERIALIZED_STRING_MAP_KEY = ValkeySerializer.string().serialize(STRING_MAP_KEY);
+	private static final byte[] SERIALIZED_STRING_STREAM_KEY = ValkeySerializer.string().serialize(STRING_STREAM_KEY);
 	private static final byte[] SERIALIZED_JSON_OBJECT_VAL = JSON_REDIS_SERIALIZER.serialize(OBJECT_VAL);
 
 	private static class DummyObject implements Serializable {
@@ -95,7 +95,7 @@ class StreamRecordsUnitTests {
 		MapRecord<String, String, String> source = Record.of(Collections.singletonMap(STRING_MAP_KEY, STRING_VAL))
 				.withId(RECORD_ID).withStreamKey(STRING_STREAM_KEY);
 
-		ByteRecord target = source.serialize(RedisSerializer.string());
+		ByteRecord target = source.serialize(ValkeySerializer.string());
 
 		assertThat(target.getId()).isEqualTo(RECORD_ID);
 		assertThat(target.getStream()).isEqualTo(SERIALIZED_STRING_STREAM_KEY);
@@ -109,7 +109,7 @@ class StreamRecordsUnitTests {
 		MapRecord<String, String, DummyObject> source = Record.of(Collections.singletonMap(STRING_MAP_KEY, OBJECT_VAL))
 				.withId(RECORD_ID).withStreamKey(STRING_STREAM_KEY);
 
-		ByteRecord target = source.serialize(RedisSerializer.string(), RedisSerializer.string(), JSON_REDIS_SERIALIZER);
+		ByteRecord target = source.serialize(ValkeySerializer.string(), ValkeySerializer.string(), JSON_REDIS_SERIALIZER);
 
 		assertThat(target.getId()).isEqualTo(RECORD_ID);
 		assertThat(target.getStream()).isEqualTo(SERIALIZED_STRING_STREAM_KEY);
@@ -123,7 +123,7 @@ class StreamRecordsUnitTests {
 		ByteRecord source = StreamRecords.newRecord().in(SERIALIZED_STRING_STREAM_KEY).withId(RECORD_ID)
 				.ofBytes(Collections.singletonMap(SERIALIZED_STRING_MAP_KEY, SERIALIZED_STRING_VAL));
 
-		MapRecord<String, String, String> target = source.deserialize(RedisSerializer.string());
+		MapRecord<String, String, String> target = source.deserialize(ValkeySerializer.string());
 
 		assertThat(target.getId()).isEqualTo(RECORD_ID);
 		assertThat(target.getStream()).isEqualTo(STRING_STREAM_KEY);

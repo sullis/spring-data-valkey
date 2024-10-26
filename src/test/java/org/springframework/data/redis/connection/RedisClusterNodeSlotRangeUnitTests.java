@@ -25,19 +25,19 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RedisClusterNode.SlotRange}.
+ * Unit tests for {@link ValkeyClusterNode.SlotRange}.
  *
  * @author John Blum
  * @see org.junit.jupiter.api.Test
- * @see org.springframework.data.redis.connection.RedisClusterNode.SlotRange
+ * @see org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange
  * @since 3.2.0
  */
-public class RedisClusterNodeSlotRangeUnitTests {
+public class ValkeyClusterNodeSlotRangeUnitTests {
 
 	@Test // GH-2525
 	public void containsFromLowerToUpperBoundSlotsOnly() {
 
-		RedisClusterNode.SlotRange slotRange = new RedisClusterNode.SlotRange(25, 75);
+		ValkeyClusterNode.SlotRange slotRange = new ValkeyClusterNode.SlotRange(25, 75);
 
 		IntStream.range(0, 100).forEach(slot ->
 			assertThat(slotRange.contains(slot)).isEqualTo(slot >= 25 && slot <= 75));
@@ -48,7 +48,7 @@ public class RedisClusterNodeSlotRangeUnitTests {
 
 		Set<Integer> slots = Set.of(1, 2, 4, 8, 16, 32, 64);
 
-		RedisClusterNode.SlotRange slotRange = new RedisClusterNode.SlotRange(slots);
+		ValkeyClusterNode.SlotRange slotRange = new ValkeyClusterNode.SlotRange(slots);
 
 		IntStream.range(0, 100).forEach(slot ->
 			assertThat(slotRange.contains(slot)).isEqualTo(slots.contains(slot)));
@@ -57,7 +57,7 @@ public class RedisClusterNodeSlotRangeUnitTests {
 	@Test // GH-2525
 	public void emptySlotRange() {
 
-		RedisClusterNode.SlotRange slotRange = RedisClusterNode.SlotRange.empty();
+		ValkeyClusterNode.SlotRange slotRange = ValkeyClusterNode.SlotRange.empty();
 
 		assertThat(slotRange).isNotNull();
 		assertThat(slotRange.getSlots()).isEmpty();
@@ -67,26 +67,26 @@ public class RedisClusterNodeSlotRangeUnitTests {
 	@Test // GH-2525
 	public void slotRangeSlotsAreCorrect() {
 
-		assertThat(new RedisClusterNode.SlotRange(4, 6).getSlots())
+		assertThat(new ValkeyClusterNode.SlotRange(4, 6).getSlots())
 			.containsExactlyInAnyOrder(4, 5, 6);
 
-		assertThat(new RedisClusterNode.SlotRange(Arrays.asList(1, 2, 3, 5, 7)).getSlots())
+		assertThat(new ValkeyClusterNode.SlotRange(Arrays.asList(1, 2, 3, 5, 7)).getSlots())
 			.containsExactlyInAnyOrder(1, 2, 3, 5, 7);
 	}
 
 	@Test // GH-2525
 	public void slotRangeSlotsArrayIsCorrectIsCorrect() {
 
-		assertThat(new RedisClusterNode.SlotRange(4, 6).getSlotsArray())
+		assertThat(new ValkeyClusterNode.SlotRange(4, 6).getSlotsArray())
 			.containsExactly(4, 5, 6);
 
-		assertThat(new RedisClusterNode.SlotRange(Arrays.asList(1, 2, 3, 5, 7)).getSlotsArray())
+		assertThat(new ValkeyClusterNode.SlotRange(Arrays.asList(1, 2, 3, 5, 7)).getSlotsArray())
 			.containsExactly(1, 2, 3, 5, 7);
 	}
 
 	@Test // GH-2525
 	public void toStringListsSlots() {
-		assertThat(new RedisClusterNode.SlotRange(List.of(1, 2, 4, 8, 16, 32, 64)))
+		assertThat(new ValkeyClusterNode.SlotRange(List.of(1, 2, 4, 8, 16, 32, 64)))
 			.hasToString("[1, 2, 4, 8, 16, 32, 64]");
 	}
 }

@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.AbstractTransactionalTestBase;
 import org.springframework.data.redis.connection.jedis.JedisTransactionalConnectionStarvationTest.PooledJedisContextConfiguration;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,7 +40,7 @@ public class JedisTransactionalConnectionStarvationTest extends AbstractTransact
 
 	private static final int MAX_CONNECTIONS = 5;
 
-	@Autowired StringRedisTemplate template;
+	@Autowired StringValkeyTemplate template;
 
 	void tryOperations(int numOperationsToTry) {
 
@@ -76,7 +76,7 @@ public class JedisTransactionalConnectionStarvationTest extends AbstractTransact
 	}
 
 	@Configuration
-	public static class PooledJedisContextConfiguration extends RedisContextConfiguration {
+	public static class PooledJedisContextConfiguration extends ValkeyContextConfiguration {
 
 		@Bean
 		public JedisConnectionFactory redisConnectionFactory() {

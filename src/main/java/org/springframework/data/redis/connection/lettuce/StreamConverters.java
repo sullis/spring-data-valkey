@@ -25,7 +25,7 @@ import java.time.Duration;
 import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.redis.connection.RedisStreamCommands.XClaimOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XClaimOptions;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.PendingMessagesSummary;
@@ -34,7 +34,7 @@ import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 
 /**
- * Converters for Redis Stream-specific types.
+ * Converters for Valkey Stream-specific types.
  * <p>
  * Converters typically convert between value objects/argument objects retaining the actual types of values (i.e. no
  * serialization/deserialization happens here).

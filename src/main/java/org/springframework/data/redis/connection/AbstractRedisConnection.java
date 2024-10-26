@@ -33,22 +33,22 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 1.4
  */
-public abstract class AbstractRedisConnection implements RedisConnection {
+public abstract class AbstractValkeyConnection implements ValkeyConnection {
 
 	private final Log LOGGER = LogFactory.getLog(getClass());
 
-	private @Nullable RedisSentinelConfiguration sentinelConfiguration;
-	private final Map<RedisNode, RedisSentinelConnection> connectionCache = new ConcurrentHashMap<>();
+	private @Nullable ValkeySentinelConfiguration sentinelConfiguration;
+	private final Map<ValkeyNode, ValkeySentinelConnection> connectionCache = new ConcurrentHashMap<>();
 
 	@Override
-	public RedisSentinelConnection getSentinelConnection() {
+	public ValkeySentinelConnection getSentinelConnection() {
 
-		if (!hasRedisSentinelConfigured()) {
+		if (!hasValkeySentinelConfigured()) {
 			throw new InvalidDataAccessResourceUsageException("No sentinels configured.");
 		}
 
-		RedisNode node = selectActiveSentinel();
-		RedisSentinelConnection connection = connectionCache.get(node);
+		ValkeyNode node = selectActiveSentinel();
+		ValkeySentinelConnection connection = connectionCache.get(node);
 		if (connection == null || !connection.isOpen()) {
 			connection = getSentinelConnection(node);
 			connectionCache.putIfAbsent(node, connection);
@@ -56,19 +56,19 @@ public abstract class AbstractRedisConnection implements RedisConnection {
 		return connection;
 	}
 
-	public void setSentinelConfiguration(RedisSentinelConfiguration sentinelConfiguration) {
+	public void setSentinelConfiguration(ValkeySentinelConfiguration sentinelConfiguration) {
 		this.sentinelConfiguration = sentinelConfiguration;
 	}
 
-	public boolean hasRedisSentinelConfigured() {
+	public boolean hasValkeySentinelConfigured() {
 		return this.sentinelConfiguration != null;
 	}
 
-	private RedisNode selectActiveSentinel() {
+	private ValkeyNode selectActiveSentinel() {
 
-		Assert.state(hasRedisSentinelConfigured(), "Sentinel configuration missing");
+		Assert.state(hasValkeySentinelConfigured(), "Sentinel configuration missing");
 
-		for (RedisNode node : this.sentinelConfiguration.getSentinels()) {
+		for (ValkeyNode node : this.sentinelConfiguration.getSentinels()) {
 			if (isActive(node)) {
 				return node;
 			}
@@ -83,17 +83,17 @@ public abstract class AbstractRedisConnection implements RedisConnection {
 	 * @param node
 	 * @return
 	 */
-	protected boolean isActive(RedisNode node) {
+	protected boolean isActive(ValkeyNode node) {
 		return false;
 	}
 
 	/**
-	 * Get {@link RedisSentinelCommands} connected to given node.
+	 * Get {@link ValkeySentinelCommands} connected to given node.
 	 *
 	 * @param sentinel
 	 * @return
 	 */
-	protected RedisSentinelConnection getSentinelConnection(RedisNode sentinel) {
+	protected ValkeySentinelConnection getSentinelConnection(ValkeyNode sentinel) {
 		throw new UnsupportedOperationException("Sentinel is not supported by this client.");
 	}
 
@@ -104,9 +104,9 @@ public abstract class AbstractRedisConnection implements RedisConnection {
 			return;
 		}
 
-		for (RedisNode node : connectionCache.keySet()) {
+		for (ValkeyNode node : connectionCache.keySet()) {
 
-			RedisSentinelConnection connection = connectionCache.remove(node);
+			ValkeySentinelConnection connection = connectionCache.remove(node);
 
 			if (!connection.isOpen()) {
 				continue;

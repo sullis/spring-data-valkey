@@ -28,13 +28,13 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Costin Leau
@@ -47,8 +47,8 @@ public abstract class CollectionTestParams {
 	public static Collection<Object[]> testParams() {
 
 		OxmSerializer serializer = XstreamOxmSerializerSingleton.getInstance();
-		Jackson2JsonRedisSerializer<Person> jackson2JsonSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
-		StringRedisSerializer stringSerializer = StringRedisSerializer.UTF_8;
+		Jackson2JsonValkeySerializer<Person> jackson2JsonSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
+		StringValkeySerializer stringSerializer = StringValkeySerializer.UTF_8;
 
 		// create Jedis Factory
 		ObjectFactory<String> stringFactory = new StringObjectFactory();
@@ -57,30 +57,30 @@ public abstract class CollectionTestParams {
 		ObjectFactory<byte[]> rawFactory = new RawObjectFactory();
 
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		RedisTemplate<String, String> stringTemplate = new StringRedisTemplate(jedisConnFactory);
-		RedisTemplate<String, Person> personTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> stringTemplate = new StringValkeyTemplate(jedisConnFactory);
+		ValkeyTemplate<String, Person> personTemplate = new ValkeyTemplate<>();
 		personTemplate.setConnectionFactory(jedisConnFactory);
 		personTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, String> xstreamStringTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> xstreamStringTemplate = new ValkeyTemplate<>();
 		xstreamStringTemplate.setConnectionFactory(jedisConnFactory);
 		xstreamStringTemplate.setDefaultSerializer(serializer);
 		xstreamStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> xstreamPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> xstreamPersonTemplate = new ValkeyTemplate<>();
 		xstreamPersonTemplate.setConnectionFactory(jedisConnFactory);
 		xstreamPersonTemplate.setValueSerializer(serializer);
 		xstreamPersonTemplate.afterPropertiesSet();
 
 		// jackson2
-		RedisTemplate<String, Person> jackson2JsonPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		jackson2JsonPersonTemplate.setConnectionFactory(jedisConnFactory);
 		jackson2JsonPersonTemplate.setValueSerializer(jackson2JsonSerializer);
 		jackson2JsonPersonTemplate.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> rawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplate = new ValkeyTemplate<>();
 		rawTemplate.setConnectionFactory(jedisConnFactory);
 		rawTemplate.setEnableDefaultSerializer(false);
 		rawTemplate.setKeySerializer(stringSerializer);
@@ -88,29 +88,29 @@ public abstract class CollectionTestParams {
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		RedisTemplate<String, String> stringTemplateLtc = new StringRedisTemplate(lettuceConnFactory);
-		RedisTemplate<String, Person> personTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, String> stringTemplateLtc = new StringValkeyTemplate(lettuceConnFactory);
+		ValkeyTemplate<String, Person> personTemplateLtc = new ValkeyTemplate<>();
 		personTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		personTemplateLtc.afterPropertiesSet();
 
-		RedisTemplate<String, Person> xstreamStringTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> xstreamStringTemplateLtc = new ValkeyTemplate<>();
 		xstreamStringTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		xstreamStringTemplateLtc.setDefaultSerializer(serializer);
 		xstreamStringTemplateLtc.afterPropertiesSet();
 
-		RedisTemplate<String, Person> xstreamPersonTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> xstreamPersonTemplateLtc = new ValkeyTemplate<>();
 		xstreamPersonTemplateLtc.setValueSerializer(serializer);
 		xstreamPersonTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		xstreamPersonTemplateLtc.afterPropertiesSet();
 
-		RedisTemplate<String, Person> jackson2JsonPersonTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jackson2JsonPersonTemplateLtc = new ValkeyTemplate<>();
 		jackson2JsonPersonTemplateLtc.setValueSerializer(jackson2JsonSerializer);
 		jackson2JsonPersonTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		jackson2JsonPersonTemplateLtc.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> rawTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplateLtc = new ValkeyTemplate<>();
 		rawTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		rawTemplateLtc.setEnableDefaultSerializer(false);
 		rawTemplateLtc.setKeySerializer(stringSerializer);

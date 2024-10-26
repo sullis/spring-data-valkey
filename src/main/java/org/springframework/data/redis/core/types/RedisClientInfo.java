@@ -24,12 +24,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link RedisClientInfo} provides general and statistical information about client connections.
+ * {@link ValkeyClientInfo} provides general and statistical information about client connections.
  *
  * @author Christoph Strobl
  * @since 1.3
  */
-public class RedisClientInfo {
+public class ValkeyClientInfo {
 
 	public enum INFO {
 
@@ -50,11 +50,11 @@ public class RedisClientInfo {
 	private final Properties clientProperties;
 
 	/**
-	 * Create {@link RedisClientInfo} from {@link Properties}.
+	 * Create {@link ValkeyClientInfo} from {@link Properties}.
 	 *
 	 * @param properties must not be {@literal null}.
 	 */
-	public RedisClientInfo(Properties properties) {
+	public ValkeyClientInfo(Properties properties) {
 
 		Assert.notNull(properties, "Cannot initialize client information for given 'null' properties");
 
@@ -255,7 +255,7 @@ public class RedisClientInfo {
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		RedisClientInfo that = (RedisClientInfo) o;
+		ValkeyClientInfo that = (ValkeyClientInfo) o;
 
 		return ObjectUtils.nullSafeEquals(clientProperties, that.clientProperties);
 	}
@@ -265,9 +265,9 @@ public class RedisClientInfo {
 		return ObjectUtils.nullSafeHashCode(clientProperties);
 	}
 
-	public static class RedisClientInfoBuilder {
+	public static class ValkeyClientInfoBuilder {
 
-		public static RedisClientInfo fromString(String source) {
+		public static ValkeyClientInfo fromString(String source) {
 
 			Assert.notNull(source, "Cannot read client properties from 'null'");
 			Properties properties = new Properties();
@@ -276,7 +276,7 @@ public class RedisClientInfo {
 			} catch (IOException ex) {
 				throw new IllegalArgumentException("Properties could not be loaded from String '%s'".formatted(source), ex);
 			}
-			return new RedisClientInfo(properties);
+			return new ValkeyClientInfo(properties);
 		}
 	}
 }

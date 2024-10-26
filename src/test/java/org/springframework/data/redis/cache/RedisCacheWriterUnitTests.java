@@ -33,11 +33,11 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RedisCacheWriter}.
+ * Unit tests for {@link ValkeyCacheWriter}.
  *
  * @author John Blum
  */
-class RedisCacheWriterUnitTests {
+class ValkeyCacheWriterUnitTests {
 
 	@Test // GH-2351
 	void defaultGetWithNameKeyAndTtlCallsGetWithNameAndKeyDiscardingTtl() {
@@ -47,7 +47,7 @@ class RedisCacheWriterUnitTests {
 
 		Duration thirtyMinutes = Duration.ofMinutes(30);
 
-		RedisCacheWriter cacheWriter = mock(RedisCacheWriter.class);
+		ValkeyCacheWriter cacheWriter = mock(ValkeyCacheWriter.class);
 
 		doCallRealMethod().when(cacheWriter).get(anyString(), any(), any());
 		doReturn(value).when(cacheWriter).get(anyString(), any());
@@ -65,7 +65,7 @@ class RedisCacheWriterUnitTests {
 		byte[] key = "TestKey".getBytes();
 		byte[] value = "TestValue".getBytes();
 
-		RedisCacheWriter cacheWriter = mock(RedisCacheWriter.class);
+		ValkeyCacheWriter cacheWriter = mock(ValkeyCacheWriter.class);
 
 		doCallRealMethod().when(cacheWriter).retrieve(anyString(), any());
 		doReturn(CompletableFuture.completedFuture(value)).when(cacheWriter).retrieve(anyString(), any(), any());

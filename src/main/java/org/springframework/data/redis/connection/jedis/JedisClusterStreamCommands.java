@@ -32,7 +32,7 @@ import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisStreamCommands;
+import org.springframework.data.redis.connection.ValkeyStreamCommands;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -50,7 +50,7 @@ import org.springframework.util.StringUtils;
  * @author Dengliming
  * @since 2.3
  */
-class JedisClusterStreamCommands implements RedisStreamCommands {
+class JedisClusterStreamCommands implements ValkeyStreamCommands {
 
 	private final JedisClusterConnection connection;
 

@@ -16,13 +16,13 @@
 package org.springframework.data.redis.core.index;
 
 /**
- * {@link PathBasedRedisIndexDefinition} for including property values in a secondary index. <br />
- * Uses Redis {@literal SET} for storage. <br />
+ * {@link PathBasedValkeyIndexDefinition} for including property values in a secondary index. <br />
+ * Uses Valkey {@literal SET} for storage. <br />
  *
  * @author Christoph Strobl
  * @since 1.7
  */
-public class SimpleIndexDefinition extends RedisIndexDefinition implements PathBasedRedisIndexDefinition {
+public class SimpleIndexDefinition extends ValkeyIndexDefinition implements PathBasedValkeyIndexDefinition {
 
 	/**
 	 * Creates new {@link SimpleIndexDefinition}.

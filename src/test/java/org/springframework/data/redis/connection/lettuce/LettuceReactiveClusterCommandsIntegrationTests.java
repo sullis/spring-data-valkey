@@ -24,10 +24,10 @@ import java.nio.ByteBuffer;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.redis.connection.ReactiveClusterCommands;
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 
 /**
- * Integration tests for {@link LettuceReactiveRedisClusterConnection} via {@link ReactiveClusterCommands}.
+ * Integration tests for {@link LettuceReactiveValkeyClusterConnection} via {@link ReactiveClusterCommands}.
  * <p>
  * Some assertions check against node 1 and node 4 (ports 7379/7382) as sometimes a failover happens and node 4 becomes
  * the master node.
@@ -62,7 +62,7 @@ class LettuceReactiveClusterCommandsIntegrationTests extends LettuceReactiveClus
 	@Test // DATAREDIS-1150
 	void clusterGetReplicasShouldReturnNodes() {
 
-		connection.clusterGetNodes().filter(RedisClusterNode::isMaster)
+		connection.clusterGetNodes().filter(ValkeyClusterNode::isMaster)
 				.filter(node -> (node.getPort() == 7379 || node.getPort() == 7382))
 				.flatMap(it -> connection.clusterGetReplicas(it)) //
 				.collectList() //

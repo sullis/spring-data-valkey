@@ -16,30 +16,30 @@
 package org.springframework.data.redis.core;
 
 import org.mockito.Mockito;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
- * Test extension to {@link RedisTemplate} to use a Mockito mocked {@link RedisConnection}.
+ * Test extension to {@link ValkeyTemplate} to use a Mockito mocked {@link ValkeyConnection}.
  *
  * @author Christoph Strobl
  */
-public class ConnectionMockingRedisTemplate<K, V> extends RedisTemplate<K, V> {
+public class ConnectionMockingValkeyTemplate<K, V> extends ValkeyTemplate<K, V> {
 
-	private final RedisConnection connectionMock;
+	private final ValkeyConnection connectionMock;
 
-	private ConnectionMockingRedisTemplate() {
+	private ConnectionMockingValkeyTemplate() {
 
-		connectionMock = Mockito.mock(RedisConnection.class);
+		connectionMock = Mockito.mock(ValkeyConnection.class);
 
-		RedisConnectionFactory connectionFactory = Mockito.mock(RedisConnectionFactory.class);
+		ValkeyConnectionFactory connectionFactory = Mockito.mock(ValkeyConnectionFactory.class);
 		Mockito.when(connectionFactory.getConnection()).thenReturn(connectionMock);
 
 		setConnectionFactory(connectionFactory);
 	}
 
-	static <K, V> ConnectionMockingRedisTemplate<K, V> template() {
+	static <K, V> ConnectionMockingValkeyTemplate<K, V> template() {
 		return builder().build();
 	}
 
@@ -47,27 +47,27 @@ public class ConnectionMockingRedisTemplate<K, V> extends RedisTemplate<K, V> {
 		return new MockTemplateBuilder();
 	}
 
-	public RedisConnection verify() {
+	public ValkeyConnection verify() {
 		return Mockito.verify(connectionMock);
 	}
 
 	public byte[] serializeKey(K key) {
-		return ((RedisSerializer<K>) getKeySerializer()).serialize(key);
+		return ((ValkeySerializer<K>) getKeySerializer()).serialize(key);
 	}
 
-	public RedisConnection never() {
+	public ValkeyConnection never() {
 		return Mockito.verify(connectionMock, Mockito.never());
 	}
 
-	public RedisConnection doReturn(Object o) {
+	public ValkeyConnection doReturn(Object o) {
 		return Mockito.doReturn(o).when(connectionMock);
 	}
 
 	public static class MockTemplateBuilder {
 
-		private ConnectionMockingRedisTemplate template = new ConnectionMockingRedisTemplate();
+		private ConnectionMockingValkeyTemplate template = new ConnectionMockingValkeyTemplate();
 
-		public <K, V> ConnectionMockingRedisTemplate<K, V> build() {
+		public <K, V> ConnectionMockingValkeyTemplate<K, V> build() {
 
 			template.afterPropertiesSet();
 			return template;

@@ -22,10 +22,10 @@ import java.util.Set;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 
 /**
- * Basic utility to help with the destruction of {@link RedisConnectionFactory} inside JUnit 4 tests. Simply add the
+ * Basic utility to help with the destruction of {@link ValkeyConnectionFactory} inside JUnit 4 tests. Simply add the
  * factory during setup and then call {@link #cleanUp()} through the {@code @AfterClass} method.
  *
  * @author Costin Leau
@@ -35,7 +35,7 @@ public abstract class ConnectionFactoryTracker {
 
 	private static Set<Object> connFactories = new LinkedHashSet<>();
 
-	public static void add(RedisConnectionFactory factory) {
+	public static void add(ValkeyConnectionFactory factory) {
 
 		if (factory instanceof Managed) {
 			throw new UnsupportedOperationException("Cannot track managed resource");

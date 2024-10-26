@@ -38,7 +38,7 @@ import org.springframework.util.ErrorHandler;
 
 
 /**
- * {@link Task} that invokes a {@link BiFunction read function} to poll on a Redis Stream.
+ * {@link Task} that invokes a {@link BiFunction read function} to poll on a Valkey Stream.
  *
  * @author Mark Paluch
  * @see 2.2

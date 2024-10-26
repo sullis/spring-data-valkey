@@ -19,7 +19,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link IndexedData} implementation indicating storage of data within a Redis Set.
+ * {@link IndexedData} implementation indicating storage of data within a Valkey Set.
  *
  * @author Christoph Strobl
  * @author Rob Winch

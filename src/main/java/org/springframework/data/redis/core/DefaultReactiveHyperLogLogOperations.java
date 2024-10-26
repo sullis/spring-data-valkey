@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.ReactiveHyperLogLogCommands;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.util.Assert;
 
 /**
@@ -35,11 +35,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveHyperLogLogOperations<K, V> implements ReactiveHyperLogLogOperations<K, V> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, V> serializationContext;
 
-	DefaultReactiveHyperLogLogOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, V> serializationContext) {
+	DefaultReactiveHyperLogLogOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, V> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;

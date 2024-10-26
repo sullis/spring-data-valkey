@@ -29,9 +29,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Redis connection using reactive infrastructure declaring entry points for reactive command execution.
+ * Valkey connection using reactive infrastructure declaring entry points for reactive command execution.
  * <p>
- * {@link ReactiveRedisConnection} is typically implemented by a stateful object that requires to be {@link #close()
+ * {@link ReactiveValkeyConnection} is typically implemented by a stateful object that requires to be {@link #close()
  * closed} once it is no longer required.
  * <p>
  * Commands can be either executed by passing plain arguments like {@code key}, {@code value} or wrapped inside a
@@ -39,7 +39,7 @@ import org.springframework.util.ObjectUtils;
  * {@link Command}. Commands are executed at the time their emission.
  * <p>
  * Arguments are binary-safe by using {@link ByteBuffer} arguments. Expect {@link ByteBuffer} to be consumed by
- * {@link ReactiveRedisConnection} invocation or during execution. Any {@link ByteBuffer} used as method parameter
+ * {@link ReactiveValkeyConnection} invocation or during execution. Any {@link ByteBuffer} used as method parameter
  * should not be altered after invocation.
  *
  * @author Christoph Strobl
@@ -49,7 +49,7 @@ import org.springframework.util.ObjectUtils;
  * @see CommandResponse
  * @see KeyCommand
  */
-public interface ReactiveRedisConnection extends Closeable {
+public interface ReactiveValkeyConnection extends Closeable {
 
 	@Override
 	default void close() {
@@ -160,12 +160,12 @@ public interface ReactiveRedisConnection extends Closeable {
 	 * Test connection.
 	 *
 	 * @return {@link Mono} wrapping server response message - usually {@literal PONG}.
-	 * @see <a href="https://redis.io/commands/ping">Redis Documentation: PING</a>
+	 * @see <a href="https://redis.io/commands/ping">Valkey Documentation: PING</a>
 	 */
 	Mono<String> ping();
 
 	/**
-	 * Base interface for Redis commands executed with a reactive infrastructure.
+	 * Base interface for Valkey commands executed with a reactive infrastructure.
 	 *
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
@@ -349,7 +349,7 @@ public interface ReactiveRedisConnection extends Closeable {
 		}
 
 		/**
-		 * @return {@literal true} if the response is present. An absent {@link CommandResponse} maps to Redis
+		 * @return {@literal true} if the response is present. An absent {@link CommandResponse} maps to Valkey
 		 *         {@literal (nil)}.
 		 */
 		public boolean isPresent() {
@@ -388,7 +388,7 @@ public interface ReactiveRedisConnection extends Closeable {
 		}
 
 		public String toString() {
-			return "ReactiveRedisConnection.CommandResponse(input=" + this.getInput() + ", output=" + this.getOutput() + ")";
+			return "ReactiveValkeyConnection.CommandResponse(input=" + this.getInput() + ", output=" + this.getOutput() + ")";
 		}
 	}
 

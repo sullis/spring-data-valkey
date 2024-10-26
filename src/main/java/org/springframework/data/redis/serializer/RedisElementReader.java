@@ -21,7 +21,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Strategy interface that specifies a deserializer that can deserialize a binary element representation stored in Redis
+ * Strategy interface that specifies a deserializer that can deserialize a binary element representation stored in Valkey
  * into an object.
  *
  * @author Mark Paluch
@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 @FunctionalInterface
-public interface RedisElementReader<T> {
+public interface ValkeyElementReader<T> {
 
 	/**
 	 * Deserialize a {@link ByteBuffer} into the according type.
@@ -41,14 +41,14 @@ public interface RedisElementReader<T> {
 	T read(ByteBuffer buffer);
 
 	/**
-	 * Create new {@link RedisElementReader} using given {@link RedisSerializer}.
+	 * Create new {@link ValkeyElementReader} using given {@link ValkeySerializer}.
 	 *
 	 * @param serializer must not be {@literal null}.
-	 * @return new instance of {@link RedisElementReader}.
+	 * @return new instance of {@link ValkeyElementReader}.
 	 */
-	static <T> RedisElementReader<T> from(RedisSerializer<T> serializer) {
+	static <T> ValkeyElementReader<T> from(ValkeySerializer<T> serializer) {
 
 		Assert.notNull(serializer, "Serializer must not be null");
-		return new DefaultRedisElementReader<>(serializer);
+		return new DefaultValkeyElementReader<>(serializer);
 	}
 }

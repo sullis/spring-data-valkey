@@ -30,44 +30,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.data.redis.ConnectionFactoryTracker;
 import org.springframework.data.redis.connection.AbstractConnectionIntegrationTests;
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.connection.RedisServer;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.connection.ValkeyServer;
+import org.springframework.data.redis.connection.StringValkeyConnection;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
-import org.springframework.data.redis.test.extension.RedisSentinel;
+import org.springframework.data.redis.test.extension.ValkeySentinel;
 
 /**
- * Integration tests for Lettuce and Redis Sentinel interaction.
+ * Integration tests for Lettuce and Valkey Sentinel interaction.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
 @ExtendWith(LettuceConnectionFactoryExtension.class)
-@EnabledOnRedisSentinelAvailable
+@EnabledOnValkeySentinelAvailable
 public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrationTests {
 
 	private static final String MASTER_NAME = "mymaster";
-	private static final RedisServer SENTINEL_0 = new RedisServer("127.0.0.1", 26379);
-	private static final RedisServer SENTINEL_1 = new RedisServer("127.0.0.1", 26380);
+	private static final ValkeyServer SENTINEL_0 = new ValkeyServer("127.0.0.1", 26379);
+	private static final ValkeyServer SENTINEL_1 = new ValkeyServer("127.0.0.1", 26380);
 
-	private static final RedisServer REPLICA_0 = new RedisServer("127.0.0.1", 6380);
-	private static final RedisServer REPLICA_1 = new RedisServer("127.0.0.1", 6381);
+	private static final ValkeyServer REPLICA_0 = new ValkeyServer("127.0.0.1", 6380);
+	private static final ValkeyServer REPLICA_1 = new ValkeyServer("127.0.0.1", 6381);
 
-	private static final RedisSentinelConfiguration SENTINEL_CONFIG;
+	private static final ValkeySentinelConfiguration SENTINEL_CONFIG;
 	static {
 
-		SENTINEL_CONFIG = new RedisSentinelConfiguration() //
+		SENTINEL_CONFIG = new ValkeySentinelConfiguration() //
 				.master(MASTER_NAME).sentinel(SENTINEL_0).sentinel(SENTINEL_1);
 
 		SENTINEL_CONFIG.setDatabase(5);
 	}
 
-	public LettuceSentinelIntegrationTests(@RedisSentinel LettuceConnectionFactory connectionFactory) {
+	public LettuceSentinelIntegrationTests(@ValkeySentinel LettuceConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
@@ -99,7 +99,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 	@Test // DATAREDIS-348
 	void shouldReadMastersCorrectly() {
 
-		List<RedisServer> servers = (List<RedisServer>) connectionFactory.getSentinelConnection().masters();
+		List<ValkeyServer> servers = (List<ValkeyServer>) connectionFactory.getSentinelConnection().masters();
 		assertThat(servers.size()).isEqualTo(1);
 		assertThat(servers.get(0).getName()).isEqualTo(MASTER_NAME);
 	}
@@ -107,7 +107,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 	@Test // DATAREDIS-842, DATAREDIS-973
 	void shouldUseSpecifiedDatabase() {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 
 		connection.flushAll();
 		connection.set("foo".getBytes(), "bar".getBytes());
@@ -121,7 +121,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		try(RedisConnection directConnection = connectionFactory.getConnection()) {
+		try(ValkeyConnection directConnection = connectionFactory.getConnection()) {
 
 			assertThat(directConnection.exists("foo".getBytes())).isFalse();
 			directConnection.select(0);
@@ -137,7 +137,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 	@Test // DATAREDIS-973
 	void reactiveShouldUseSpecifiedDatabase() {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 
 		connection.flushAll();
 		connection.set("foo".getBytes(), "bar".getBytes());
@@ -150,7 +150,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		try(LettuceReactiveRedisConnection reactiveConnection = connectionFactory.getReactiveConnection()) {
+		try(LettuceReactiveValkeyConnection reactiveConnection = connectionFactory.getReactiveConnection()) {
 
 			reactiveConnection.keyCommands().exists(ByteBuffer.wrap("foo".getBytes())) //
 					.as(StepVerifier::create) //
@@ -167,12 +167,12 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 	// DATAREDIS-348
 	void shouldReadReplicasOfMastersCorrectly() {
 
-		RedisSentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
+		ValkeySentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
 
-		List<RedisServer> servers = (List<RedisServer>) sentinelConnection.masters();
+		List<ValkeyServer> servers = (List<ValkeyServer>) sentinelConnection.masters();
 		assertThat(servers.size()).isEqualTo(1);
 
-		Collection<RedisServer> replicas = sentinelConnection.replicas(servers.get(0));
+		Collection<ValkeyServer> replicas = sentinelConnection.replicas(servers.get(0));
 		assertThat(replicas).containsAnyOf(REPLICA_0, REPLICA_1);
 	}
 
@@ -186,7 +186,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connection = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connection = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -205,7 +205,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connection = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connection = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 			assertThat(connection.getClientName()).isEqualTo("clientName");
@@ -223,7 +223,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connection = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connection = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -242,7 +242,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connection = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connection = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -262,7 +262,7 @@ public class LettuceSentinelIntegrationTests extends AbstractConnectionIntegrati
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try(RedisConnection connection = factory.getConnection()) {
+		try(ValkeyConnection connection = factory.getConnection()) {
 
 			assertThat(connection.ping()).isEqualTo("PONG");
 			assertThat(connection.info().getProperty("role")).isEqualTo("slave");

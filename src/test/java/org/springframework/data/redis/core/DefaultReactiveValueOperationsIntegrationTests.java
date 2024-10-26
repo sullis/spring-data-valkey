@@ -37,14 +37,14 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.core.ReactiveOperationsTestParams.Fixture;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration tests for {@link DefaultReactiveValueOperations}.
@@ -57,13 +57,13 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @SuppressWarnings("unchecked")
 public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
-	private final ReactiveRedisTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> redisTemplate;
 	private final ReactiveValueOperations<K, V> valueOperations;
 
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 
-	private final RedisSerializer<?> serializer;
+	private final ValkeySerializer<?> serializer;
 
 	public static Collection<Fixture<?, ?>> testParams() {
 		return ReactiveOperationsTestParams.testParams();
@@ -81,13 +81,13 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		RedisConnectionFactory connectionFactory = (RedisConnectionFactory) redisTemplate.getConnectionFactory();
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void set() {
 
 		K key = keyFactory.instance();
@@ -98,7 +98,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key).as(StepVerifier::create).expectNext(value).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void setWithExpiry() {
 
 		K key = keyFactory.instance();
@@ -115,7 +115,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				.verify();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-779
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-779
 	void setIfAbsent() {
 
 		K key = keyFactory.instance();
@@ -126,7 +126,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.setIfAbsent(key, value).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-782
+	@ParameterizedValkeyTest // DATAREDIS-782
 	void setIfAbsentWithExpiry() {
 
 		K key = keyFactory.instance();
@@ -146,7 +146,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-779
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-779
 	void setIfPresent() {
 
 		K key = keyFactory.instance();
@@ -162,7 +162,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key).as(StepVerifier::create).expectNext(laterValue).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-782
+	@ParameterizedValkeyTest // DATAREDIS-782
 	void setIfPresentWithExpiry() {
 
 		K key = keyFactory.instance();
@@ -186,7 +186,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void multiSet() {
 
 		K key1 = keyFactory.instance();
@@ -204,7 +204,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key2).as(StepVerifier::create).expectNext(value2).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void multiSetIfAbsent() {
 
 		K key1 = keyFactory.instance();
@@ -225,7 +225,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key2).as(StepVerifier::create).expectNextCount(0).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void get() {
 
 		K key = keyFactory.instance();
@@ -238,7 +238,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key).as(StepVerifier::create).expectNext(value).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // GH-2050
+	@ParameterizedValkeyTest // GH-2050
 	@EnabledOnCommand("GETEX")
 	void getAndExpire() {
 
@@ -254,7 +254,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				.assertNext(actual -> assertThat(actual).isGreaterThan(Duration.ZERO)).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // GH-2050
+	@ParameterizedValkeyTest // GH-2050
 	@EnabledOnCommand("GETDEL")
 	void getAndDelete() {
 
@@ -268,7 +268,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		redisTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // GH-2050
+	@ParameterizedValkeyTest // GH-2050
 	@EnabledOnCommand("GETEX")
 	void getAndPersist() {
 
@@ -282,7 +282,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		redisTemplate.getExpire(key).as(StepVerifier::create).expectNext(Duration.ZERO).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void getAndSet() {
 
 		K key = keyFactory.instance();
@@ -298,7 +298,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key).as(StepVerifier::create).expectNext(nextValue).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void multiGet() {
 
 		K key1 = keyFactory.instance();
@@ -318,10 +318,10 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				.expectNext(Arrays.asList(value2, value1, absentValue)).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void append() {
 
-		assumeTrue(serializer instanceof StringRedisSerializer);
+		assumeTrue(serializer instanceof StringValkeySerializer);
 
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
@@ -333,10 +333,10 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key).as(StepVerifier::create).expectNext((V) (value + "foo")).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void getRange() {
 
-		assumeTrue(serializer instanceof StringRedisSerializer);
+		assumeTrue(serializer instanceof StringValkeySerializer);
 
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
@@ -348,10 +348,10 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.get(key, 1, 4).as(StepVerifier::create).expectNext(substring).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void setRange() {
 
-		assumeTrue(serializer instanceof StringRedisSerializer);
+		assumeTrue(serializer instanceof StringValkeySerializer);
 
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
@@ -368,10 +368,10 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void size() {
 
-		assumeTrue(serializer instanceof StringRedisSerializer);
+		assumeTrue(serializer instanceof StringValkeySerializer);
 
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
@@ -381,7 +381,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				.verify();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void setBit() {
 
 		K key = keyFactory.instance();
@@ -390,7 +390,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.setBit(key, 2, true).as(StepVerifier::create).expectNext(false).expectComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void getBit() {
 
 		K key = keyFactory.instance();
@@ -400,7 +400,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.getBit(key, 1).as(StepVerifier::create).expectNext(false).expectComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-562
+	@ParameterizedValkeyTest // DATAREDIS-562
 	void bitField() {
 
 		K key = keyFactory.instance();
@@ -419,7 +419,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 				.expectNext(Collections.singletonList(null)).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void delete() {
 
 		K key = keyFactory.instance();
@@ -432,7 +432,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.size(key).as(StepVerifier::create).expectNext(0L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-784
+	@ParameterizedValkeyTest // DATAREDIS-784
 	void increment() {
 
 		K key = keyFactory.instance();
@@ -442,7 +442,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.increment(key).as(StepVerifier::create).expectNext(2L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-784
+	@ParameterizedValkeyTest // DATAREDIS-784
 	void incrementByLongDelta() {
 
 		K key = keyFactory.instance();
@@ -454,7 +454,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.increment(key, 1L).as(StepVerifier::create).expectNext(0L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-784
+	@ParameterizedValkeyTest // DATAREDIS-784
 	@DisabledOnOs(value = MAC, architectures = "aarch64")
 	void incrementByFloatDelta() {
 
@@ -467,7 +467,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.increment(key, 0.2).as(StepVerifier::create).expectNext(0.0).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-784
+	@ParameterizedValkeyTest // DATAREDIS-784
 	void decrement() {
 
 		K key = keyFactory.instance();
@@ -477,7 +477,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.decrement(key).as(StepVerifier::create).expectNext(-2L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-784
+	@ParameterizedValkeyTest // DATAREDIS-784
 	void decrementByLongDelta() {
 
 		K key = keyFactory.instance();

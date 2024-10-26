@@ -23,7 +23,7 @@ import redis.clients.jedis.params.LPosParams;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisListCommands;
+import org.springframework.data.redis.connection.ValkeyListCommands;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * @author dengliming
  * @since 2.0
  */
-class JedisListCommands implements RedisListCommands {
+class JedisListCommands implements ValkeyListCommands {
 
 	private final JedisConnection connection;
 

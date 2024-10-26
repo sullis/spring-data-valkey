@@ -19,12 +19,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisKeyExpiredEvent;
+import org.springframework.data.redis.core.ValkeyKeyExpiredEvent;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link MessageListener} publishing {@link RedisKeyExpiredEvent}s via {@link ApplicationEventPublisher} by listening
- * to Redis keyspace notifications for key expirations.
+ * {@link MessageListener} publishing {@link ValkeyKeyExpiredEvent}s via {@link ApplicationEventPublisher} by listening
+ * to Valkey keyspace notifications for key expirations.
  *
  * @author Christoph Strobl
  * @since 1.7
@@ -41,7 +41,7 @@ public class KeyExpirationEventMessageListener extends KeyspaceEventMessageListe
 	 *
 	 * @param listenerContainer must not be {@literal null}.
 	 */
-	public KeyExpirationEventMessageListener(RedisMessageListenerContainer listenerContainer) {
+	public KeyExpirationEventMessageListener(ValkeyMessageListenerContainer listenerContainer) {
 		super(listenerContainer);
 	}
 
@@ -51,13 +51,13 @@ public class KeyExpirationEventMessageListener extends KeyspaceEventMessageListe
 	}
 
 	@Override
-	protected void doRegister(RedisMessageListenerContainer listenerContainer) {
+	protected void doRegister(ValkeyMessageListenerContainer listenerContainer) {
 		listenerContainer.addMessageListener(this, KEYEVENT_EXPIRED_TOPIC);
 	}
 
 	@Override
 	protected void doHandleMessage(Message message) {
-		publishEvent(new RedisKeyExpiredEvent(message.getBody()));
+		publishEvent(new ValkeyKeyExpiredEvent(message.getBody()));
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class KeyExpirationEventMessageListener extends KeyspaceEventMessageListe
 	 *
 	 * @param event can be {@literal null}.
 	 */
-	protected void publishEvent(RedisKeyExpiredEvent event) {
+	protected void publishEvent(ValkeyKeyExpiredEvent event) {
 
 		if (publisher != null) {
 			this.publisher.publishEvent(event);

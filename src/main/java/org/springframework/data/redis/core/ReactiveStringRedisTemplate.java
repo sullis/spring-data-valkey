@@ -15,53 +15,53 @@
  */
 package org.springframework.data.redis.core;
 
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 
 /**
- * {@link java.lang.String String-focused} extension of {@link ReactiveRedisTemplate}. As most operations against Redis
+ * {@link java.lang.String String-focused} extension of {@link ReactiveValkeyTemplate}. As most operations against Valkey
  * are {@link String} based, this class provides a dedicated arrangement that minimizes configuration of its more
- * generic {@link ReactiveRedisTemplate template} especially in terms of the used {@link RedisSerializationContext}.
+ * generic {@link ReactiveValkeyTemplate template} especially in terms of the used {@link ValkeySerializationContext}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.1
  */
-public class ReactiveStringRedisTemplate extends ReactiveRedisTemplate<String, String> {
+public class ReactiveStringValkeyTemplate extends ReactiveValkeyTemplate<String, String> {
 
 	/**
-	 * Creates new {@link ReactiveRedisTemplate} using given {@link ReactiveRedisConnectionFactory} applying default
+	 * Creates new {@link ReactiveValkeyTemplate} using given {@link ReactiveValkeyConnectionFactory} applying default
 	 * {@link String} serialization.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
-	 * @see RedisSerializationContext#string()
+	 * @see ValkeySerializationContext#string()
 	 */
-	public ReactiveStringRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
-		this(connectionFactory, RedisSerializationContext.string());
+	public ReactiveStringValkeyTemplate(ReactiveValkeyConnectionFactory connectionFactory) {
+		this(connectionFactory, ValkeySerializationContext.string());
 	}
 
 	/**
-	 * Creates new {@link ReactiveRedisTemplate} using given {@link ReactiveRedisConnectionFactory} and
-	 * {@link RedisSerializationContext}.
+	 * Creates new {@link ReactiveValkeyTemplate} using given {@link ReactiveValkeyConnectionFactory} and
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param serializationContext must not be {@literal null}.
 	 */
-	public ReactiveStringRedisTemplate(ReactiveRedisConnectionFactory connectionFactory,
-			RedisSerializationContext<String, String> serializationContext) {
+	public ReactiveStringValkeyTemplate(ReactiveValkeyConnectionFactory connectionFactory,
+			ValkeySerializationContext<String, String> serializationContext) {
 		super(connectionFactory, serializationContext);
 	}
 
 	/**
-	 * Creates new {@link ReactiveRedisTemplate} using given {@link ReactiveRedisConnectionFactory} and
-	 * {@link RedisSerializationContext}.
+	 * Creates new {@link ReactiveValkeyTemplate} using given {@link ReactiveValkeyConnectionFactory} and
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param serializationContext must not be {@literal null}.
 	 * @param exposeConnection flag indicating to expose the connection used.
 	 */
-	public ReactiveStringRedisTemplate(ReactiveRedisConnectionFactory connectionFactory,
-			RedisSerializationContext<String, String> serializationContext, boolean exposeConnection) {
+	public ReactiveStringValkeyTemplate(ReactiveValkeyConnectionFactory connectionFactory,
+			ValkeySerializationContext<String, String> serializationContext, boolean exposeConnection) {
 		super(connectionFactory, serializationContext, exposeConnection);
 	}
 }

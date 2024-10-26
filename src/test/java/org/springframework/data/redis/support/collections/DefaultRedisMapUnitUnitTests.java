@@ -31,20 +31,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.BoundHashOperations;
 
 /**
- * Unit tests for {@link DefaultRedisMap}.
+ * Unit tests for {@link DefaultValkeyMap}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
-class DefaultRedisMapUnitUnitTests {
+class DefaultValkeyMapUnitUnitTests {
 
 	@Mock BoundHashOperations<String, String, String> operationsMock;
 
-	private DefaultRedisMap<String, String> map;
+	private DefaultValkeyMap<String, String> map;
 
 	@BeforeEach
 	void before() {
-		map = new DefaultRedisMap<>(operationsMock);
+		map = new DefaultValkeyMap<>(operationsMock);
 	}
 
 	@Test // DATAREDIS-803

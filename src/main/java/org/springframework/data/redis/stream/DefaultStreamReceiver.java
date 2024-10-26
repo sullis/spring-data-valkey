@@ -37,7 +37,7 @@ import org.reactivestreams.Subscription;
 
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.stream.ByteBufferRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -45,9 +45,9 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveValkeyTemplate;
 import org.springframework.data.redis.core.ReactiveStreamOperations;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 
 /**
  * Default implementation of {@link StreamReceiver}.
@@ -59,24 +59,24 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 class DefaultStreamReceiver<K, V extends Record<K, ?>> implements StreamReceiver<K, V> {
 
 	private final Log logger = LogFactory.getLog(getClass());
-	private final ReactiveRedisTemplate<K, ?> template;
+	private final ReactiveValkeyTemplate<K, ?> template;
 	private final ReactiveStreamOperations<K, Object, Object> streamOperations;
 	private final StreamReadOptions readOptions;
 	private final StreamReceiverOptions<K, V> receiverOptions;
 
 	/**
-	 * Create a new {@link DefaultStreamReceiver} given {@link ReactiveRedisConnectionFactory} and
+	 * Create a new {@link DefaultStreamReceiver} given {@link ReactiveValkeyConnectionFactory} and
 	 * {@link org.springframework.data.redis.stream.StreamReceiver.StreamReceiverOptions}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param options must not be {@literal null}.
 	 */
 	@SuppressWarnings("unchecked")
-	DefaultStreamReceiver(ReactiveRedisConnectionFactory connectionFactory, StreamReceiverOptions<K, V> options) {
+	DefaultStreamReceiver(ReactiveValkeyConnectionFactory connectionFactory, StreamReceiverOptions<K, V> options) {
 
 		receiverOptions = options;
 
-		RedisSerializationContext<K, Object> serializationContext = RedisSerializationContext
+		ValkeySerializationContext<K, Object> serializationContext = ValkeySerializationContext
 				.<K, Object> newSerializationContext(options.getKeySerializer()) //
 				.key(options.getKeySerializer()).hashKey(options.getHashKeySerializer())
 				.hashValue(options.getHashValueSerializer()).build();
@@ -91,7 +91,7 @@ class DefaultStreamReceiver<K, V extends Record<K, ?>> implements StreamReceiver
 		}
 
 		this.readOptions = readOptions;
-		this.template = new ReactiveRedisTemplate(connectionFactory, serializationContext);
+		this.template = new ReactiveValkeyTemplate(connectionFactory, serializationContext);
 
 		if (options.hasHashMapper()) {
 			this.streamOperations = this.template.opsForStream(options.getRequiredHashMapper());
@@ -108,7 +108,7 @@ class DefaultStreamReceiver<K, V extends Record<K, ?>> implements StreamReceiver
 			logger.debug("receive(%s)".formatted(streamOffset));
 		}
 
-		RedisSerializationContext.SerializationPair<K> keySerializer = template.getSerializationContext()
+		ValkeySerializationContext.SerializationPair<K> keySerializer = template.getSerializationContext()
 				.getKeySerializationPair();
 		ByteBuffer rawKey = keySerializer.write(streamOffset.getKey());
 
@@ -166,7 +166,7 @@ class DefaultStreamReceiver<K, V extends Record<K, ?>> implements StreamReceiver
 	private Function<ReadOffset, Flux<ByteBufferRecord>> getConsumeReadFunction(K key, Consumer consumer,
 			StreamReadOptions readOptions) {
 
-		RedisSerializationContext.SerializationPair<K> keySerializer = template.getSerializationContext()
+		ValkeySerializationContext.SerializationPair<K> keySerializer = template.getSerializationContext()
 				.getKeySerializationPair();
 		ByteBuffer rawKey = keySerializer.write(key);
 
@@ -191,7 +191,7 @@ class DefaultStreamReceiver<K, V extends Record<K, ?>> implements StreamReceiver
 	}
 
 	/**
-	 * A stateful Redis Stream subscription.
+	 * A stateful Valkey Stream subscription.
 	 */
 	class StreamSubscription {
 

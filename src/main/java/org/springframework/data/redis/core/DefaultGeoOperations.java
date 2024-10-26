@@ -25,9 +25,9 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoReference.GeoMemberReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
@@ -47,7 +47,7 @@ class DefaultGeoOperations<K, M> extends AbstractOperations<K, M> implements Geo
 	 *
 	 * @param template must not be {@literal null}.
 	 */
-	DefaultGeoOperations(RedisTemplate<K, M> template) {
+	DefaultGeoOperations(ValkeyTemplate<K, M> template) {
 		super(template);
 	}
 
@@ -192,7 +192,7 @@ class DefaultGeoOperations<K, M> extends AbstractOperations<K, M> implements Geo
 
 	@Override
 	public GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference,
-			GeoShape geoPredicate, RedisGeoCommands.GeoSearchCommandArgs args) {
+			GeoShape geoPredicate, ValkeyGeoCommands.GeoSearchCommandArgs args) {
 
 		byte[] rawKey = rawKey(key);
 		GeoReference<byte[]> rawMember = getGeoReference(reference);
@@ -205,7 +205,7 @@ class DefaultGeoOperations<K, M> extends AbstractOperations<K, M> implements Geo
 
 	@Override
 	public Long searchAndStore(K key, K destKey, GeoReference<M> reference,
-			GeoShape geoPredicate, RedisGeoCommands.GeoSearchStoreCommandArgs args) {
+			GeoShape geoPredicate, ValkeyGeoCommands.GeoSearchStoreCommandArgs args) {
 
 		byte[] rawKey = rawKey(key);
 		byte[] rawDestKey = rawKey(destKey);

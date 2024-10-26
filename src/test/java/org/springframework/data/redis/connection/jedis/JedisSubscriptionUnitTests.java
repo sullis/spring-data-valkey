@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisInvalidSubscriptionException;
+import org.springframework.data.redis.connection.ValkeyInvalidSubscriptionException;
 
 /**
  * Unit test of {@link JedisSubscription}
@@ -163,7 +163,7 @@ class JedisSubscriptionUnitTests {
 		subscription.unsubscribe();
 		assertThat(subscription.isAlive()).isFalse();
 
-		assertThatExceptionOfType(RedisInvalidSubscriptionException.class)
+		assertThatExceptionOfType(ValkeyInvalidSubscriptionException.class)
 				.isThrownBy(() -> subscription.subscribe(new byte[][] { "s".getBytes() }));
 	}
 
@@ -279,7 +279,7 @@ class JedisSubscriptionUnitTests {
 		subscription.unsubscribe();
 		assertThat(subscription.isAlive()).isFalse();
 
-		assertThatExceptionOfType(RedisInvalidSubscriptionException.class)
+		assertThatExceptionOfType(ValkeyInvalidSubscriptionException.class)
 				.isThrownBy(() -> subscription.pSubscribe(new byte[][] { "s*".getBytes() }));
 	}
 

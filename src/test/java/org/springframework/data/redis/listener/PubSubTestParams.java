@@ -26,11 +26,11 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Costin Leau
@@ -45,28 +45,28 @@ public class PubSubTestParams {
 		ObjectFactory<Person> personFactory = new PersonObjectFactory();
 
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getNewConnectionFactory(RedisStanalone.class);
+				.getNewConnectionFactory(ValkeyStanalone.class);
 
 		jedisConnFactory.afterPropertiesSet();
 
-		RedisTemplate<String, String> stringTemplate = new StringRedisTemplate(jedisConnFactory);
-		RedisTemplate<String, Person> personTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> stringTemplate = new StringValkeyTemplate(jedisConnFactory);
+		ValkeyTemplate<String, Person> personTemplate = new ValkeyTemplate<>();
 		personTemplate.setConnectionFactory(jedisConnFactory);
 		personTemplate.afterPropertiesSet();
-		RedisTemplate<byte[], byte[]> rawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplate = new ValkeyTemplate<>();
 		rawTemplate.setEnableDefaultSerializer(false);
 		rawTemplate.setConnectionFactory(jedisConnFactory);
 		rawTemplate.afterPropertiesSet();
 
 		// add Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		RedisTemplate<String, String> stringTemplateLtc = new StringRedisTemplate(lettuceConnFactory);
-		RedisTemplate<String, Person> personTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, String> stringTemplateLtc = new StringValkeyTemplate(lettuceConnFactory);
+		ValkeyTemplate<String, Person> personTemplateLtc = new ValkeyTemplate<>();
 		personTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		personTemplateLtc.afterPropertiesSet();
-		RedisTemplate<byte[], byte[]> rawTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplateLtc = new ValkeyTemplate<>();
 		rawTemplateLtc.setEnableDefaultSerializer(false);
 		rawTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		rawTemplateLtc.afterPropertiesSet();
@@ -81,15 +81,15 @@ public class PubSubTestParams {
 
 			// add Jedis
 			JedisConnectionFactory jedisClusterFactory = JedisConnectionFactoryExtension
-					.getNewConnectionFactory(RedisCluster.class);
+					.getNewConnectionFactory(ValkeyCluster.class);
 
-			RedisTemplate<String, String> jedisClusterStringTemplate = new StringRedisTemplate(jedisClusterFactory);
+			ValkeyTemplate<String, String> jedisClusterStringTemplate = new StringValkeyTemplate(jedisClusterFactory);
 
 			// add Lettuce
 			LettuceConnectionFactory lettuceClusterFactory = LettuceConnectionFactoryExtension
-					.getConnectionFactory(RedisCluster.class);
+					.getConnectionFactory(ValkeyCluster.class);
 
-			RedisTemplate<String, String> lettuceClusterStringTemplate = new StringRedisTemplate(lettuceClusterFactory);
+			ValkeyTemplate<String, String> lettuceClusterStringTemplate = new StringValkeyTemplate(lettuceClusterFactory);
 
 			parameters.add(new Object[] { stringFactory, jedisClusterStringTemplate });
 			parameters.add(new Object[] { stringFactory, lettuceClusterStringTemplate });
@@ -99,6 +99,6 @@ public class PubSubTestParams {
 	}
 
 	private static boolean clusterAvailable() {
-		return RedisDetector.isClusterAvailable();
+		return ValkeyDetector.isClusterAvailable();
 	}
 }

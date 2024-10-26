@@ -30,27 +30,27 @@ import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
 
 /**
- * Unit tests for {@link DefaultRedisTypeMapper}.
+ * Unit tests for {@link DefaultValkeyTypeMapper}.
  *
  * @author Mark Paluch
  */
-class DefaultRedisTypeMapperUnitTests {
+class DefaultValkeyTypeMapperUnitTests {
 
 	private GenericConversionService conversionService;
 	private ConfigurableTypeInformationMapper configurableTypeInformationMapper;
 	private SimpleTypeInformationMapper simpleTypeInformationMapper;
-	private DefaultRedisTypeMapper typeMapper;
+	private DefaultValkeyTypeMapper typeMapper;
 
 	@BeforeEach
 	void setUp() {
 
 		conversionService = new GenericConversionService();
-		new RedisCustomConversions().registerConvertersIn(conversionService);
+		new ValkeyCustomConversions().registerConvertersIn(conversionService);
 
 		configurableTypeInformationMapper = new ConfigurableTypeInformationMapper(singletonMap(String.class, "1"));
 		simpleTypeInformationMapper = new SimpleTypeInformationMapper();
 
-		typeMapper = new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY);
+		typeMapper = new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY);
 	}
 
 	@Test // DATAREDIS-543
@@ -62,14 +62,14 @@ class DefaultRedisTypeMapperUnitTests {
 	void defaultInstanceReadsClasses() {
 
 		Bucket bucket = Bucket
-				.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, String.class.getName()));
+				.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, String.class.getName()));
 		readsTypeFromField(bucket, String.class);
 	}
 
 	@Test // DATAREDIS-543
 	void writesMapKeyForType() {
 
-		typeMapper = new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY,
+		typeMapper = new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY,
 				Collections.singletonList(configurableTypeInformationMapper));
 
 		writesTypeToField(new Bucket(), String.class, "1");
@@ -79,7 +79,7 @@ class DefaultRedisTypeMapperUnitTests {
 	@Test // DATAREDIS-543
 	void writesClassNamesForUnmappedValuesIfConfigured() {
 
-		typeMapper = new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY,
+		typeMapper = new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY,
 				Arrays.asList(configurableTypeInformationMapper, simpleTypeInformationMapper));
 
 		writesTypeToField(new Bucket(), String.class, "1");
@@ -89,55 +89,55 @@ class DefaultRedisTypeMapperUnitTests {
 	@Test // DATAREDIS-543
 	void readsTypeForMapKey() {
 
-		typeMapper = new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY,
+		typeMapper = new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY,
 				Collections.singletonList(configurableTypeInformationMapper));
 
-		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, "1")),
+		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, "1")),
 				String.class);
-		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, "unmapped")),
+		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, "unmapped")),
 				null);
 	}
 
 	@Test // DATAREDIS-543
 	void readsTypeLoadingClassesForUnmappedTypesIfConfigured() {
 
-		typeMapper = new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY,
+		typeMapper = new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY,
 				Arrays.asList(configurableTypeInformationMapper, simpleTypeInformationMapper));
 
-		readsTypeFromField(new Bucket(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, "1".getBytes())), String.class);
+		readsTypeFromField(new Bucket(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, "1".getBytes())), String.class);
 		readsTypeFromField(
-				new Bucket(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, Object.class.getName().getBytes())),
+				new Bucket(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, Object.class.getName().getBytes())),
 				Object.class);
 	}
 
 	@Test // DATAREDIS-543
 	void addsFullyQualifiedClassNameUnderDefaultKeyByDefault() {
-		writesTypeToField(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, new Bucket(), String.class);
+		writesTypeToField(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, new Bucket(), String.class);
 	}
 
 	@Test // DATAREDIS-543
 	void writesTypeToCustomFieldIfConfigured() {
-		typeMapper = new DefaultRedisTypeMapper("_custom");
+		typeMapper = new DefaultValkeyTypeMapper("_custom");
 		writesTypeToField("_custom", new Bucket(), String.class);
 	}
 
 	@Test // DATAREDIS-543
 	void doesNotWriteTypeInformationInCaseKeyIsSetToNull() {
-		typeMapper = new DefaultRedisTypeMapper(null);
+		typeMapper = new DefaultValkeyTypeMapper(null);
 		writesTypeToField(null, new Bucket(), String.class);
 	}
 
 	@Test // DATAREDIS-543
 	void readsTypeFromDefaultKeyByDefault() {
 		readsTypeFromField(
-				Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, String.class.getName())),
+				Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, String.class.getName())),
 				String.class);
 	}
 
 	@Test // DATAREDIS-543
 	void readsTypeFromCustomFieldConfigured() {
 
-		typeMapper = new DefaultRedisTypeMapper("_custom");
+		typeMapper = new DefaultValkeyTypeMapper("_custom");
 		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap("_custom", String.class.getName())), String.class);
 	}
 
@@ -150,37 +150,37 @@ class DefaultRedisTypeMapperUnitTests {
 	void returnsNullIfNoTypeInfoInBucket() {
 
 		readsTypeFromField(new Bucket(), null);
-		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, "")), null);
+		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, "")), null);
 	}
 
 	@Test // DATAREDIS-543
 	void returnsNullIfClassCannotBeLoaded() {
 
-		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, "fooBar")),
+		readsTypeFromField(Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, "fooBar")),
 				null);
 	}
 
 	@Test // DATAREDIS-543
 	void returnsNullIfTypeKeySetToNull() {
 
-		typeMapper = new DefaultRedisTypeMapper(null);
+		typeMapper = new DefaultValkeyTypeMapper(null);
 		readsTypeFromField(
-				Bucket.newBucketFromStringMap(singletonMap(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, String.class.getName())),
+				Bucket.newBucketFromStringMap(singletonMap(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, String.class.getName())),
 				null);
 	}
 
 	@Test // DATAREDIS-543
 	void returnsCorrectTypeKey() {
 
-		assertThat(typeMapper.isTypeKey(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY)).isTrue();
+		assertThat(typeMapper.isTypeKey(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY)).isTrue();
 
-		typeMapper = new DefaultRedisTypeMapper("_custom");
+		typeMapper = new DefaultValkeyTypeMapper("_custom");
 		assertThat(typeMapper.isTypeKey("_custom")).isTrue();
-		assertThat(typeMapper.isTypeKey(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY)).isFalse();
+		assertThat(typeMapper.isTypeKey(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY)).isFalse();
 
-		typeMapper = new DefaultRedisTypeMapper(null);
+		typeMapper = new DefaultValkeyTypeMapper(null);
 		assertThat(typeMapper.isTypeKey("_custom")).isFalse();
-		assertThat(typeMapper.isTypeKey(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY)).isFalse();
+		assertThat(typeMapper.isTypeKey(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY)).isFalse();
 	}
 
 	private void readsTypeFromField(Bucket bucket, @Nullable Class<?> type) {
@@ -217,8 +217,8 @@ class DefaultRedisTypeMapperUnitTests {
 
 			byte[] expected = value instanceof Class javaClass ? javaClass.getName().getBytes() : value.toString().getBytes();
 
-			assertThat(bucket.asMap()).containsKey(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY);
-			assertThat(bucket.get(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY)).isEqualTo(expected);
+			assertThat(bucket.asMap()).containsKey(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY);
+			assertThat(bucket.get(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY)).isEqualTo(expected);
 		}
 	}
 }

@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.jedis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.commands.PipelineBinaryCommands;
 
-import org.springframework.data.redis.connection.RedisHyperLogLogCommands;
+import org.springframework.data.redis.connection.ValkeyHyperLogLogCommands;
 import org.springframework.util.Assert;
 
 /**
@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class JedisHyperLogLogCommands implements RedisHyperLogLogCommands {
+class JedisHyperLogLogCommands implements ValkeyHyperLogLogCommands {
 
 	private final JedisConnection connection;
 

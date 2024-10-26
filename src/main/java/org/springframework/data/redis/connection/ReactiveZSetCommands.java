@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection;
 
-import static org.springframework.data.redis.connection.ReactiveRedisConnection.*;
+import static org.springframework.data.redis.connection.ReactiveValkeyConnection.*;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +35,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs.Flag;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs.Flag;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
@@ -46,7 +46,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Redis Sorted Set commands executed using reactive infrastructure.
+ * Valkey Sorted Set commands executed using reactive infrastructure.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -59,7 +59,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZADD} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	class ZAddCommand extends KeyCommand {
 
@@ -262,7 +262,7 @@ public interface ReactiveZSetCommands {
 	 * @param score must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	default Mono<Long> zAdd(ByteBuffer key, Double score, ByteBuffer value) {
 
@@ -280,7 +280,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param tuples must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	default Mono<Long> zAdd(ByteBuffer key, Collection<? extends Tuple> tuples) {
 
@@ -296,7 +296,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	Flux<NumericResponse<ZAddCommand, Number>> zAdd(Publisher<ZAddCommand> commands);
 
@@ -304,7 +304,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZREM} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	class ZRemCommand extends KeyCommand {
 
@@ -370,7 +370,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	default Mono<Long> zRem(ByteBuffer key, ByteBuffer value) {
 
@@ -385,7 +385,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	default Mono<Long> zRem(ByteBuffer key, Collection<ByteBuffer> values) {
 
@@ -400,7 +400,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	Flux<NumericResponse<ZRemCommand, Long>> zRem(Publisher<ZRemCommand> commands);
 
@@ -408,7 +408,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZINCRBY} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
 	 */
 	class ZIncrByCommand extends KeyCommand {
 
@@ -486,7 +486,7 @@ public interface ReactiveZSetCommands {
 	 * @param increment must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
 	 */
 	default Mono<Double> zIncrBy(ByteBuffer key, Number increment, ByteBuffer value) {
 
@@ -504,7 +504,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
 	 */
 	Flux<NumericResponse<ZIncrByCommand, Double>> zIncrBy(Publisher<ZIncrByCommand> commands);
 
@@ -513,7 +513,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	class ZRandMemberCommand extends KeyCommand {
 
@@ -571,7 +571,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	default Mono<ByteBuffer> zRandMember(ByteBuffer key) {
 		return zRandMember(Mono.just(ZRandMemberCommand.singleValue().from(key))).flatMap(CommandResponse::getOutput)
@@ -588,7 +588,7 @@ public interface ReactiveZSetCommands {
 	 *          absolute value of the specified count.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	default Flux<ByteBuffer> zRandMember(ByteBuffer key, long count) {
 		return zRandMember(Mono.just(ZRandMemberCommand.valueCount(count).from(key))).flatMap(CommandResponse::getOutput);
@@ -600,7 +600,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<CommandResponse<ZRandMemberCommand, Flux<ByteBuffer>>> zRandMember(Publisher<ZRandMemberCommand> commands);
 
@@ -610,7 +610,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	default Mono<Tuple> zRandMemberWithScore(ByteBuffer key) {
 		return zRandMemberWithScore(Mono.just(ZRandMemberCommand.singleValue().from(key)))
@@ -627,7 +627,7 @@ public interface ReactiveZSetCommands {
 	 *          absolute value of the specified count.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	default Flux<Tuple> zRandMemberWithScore(ByteBuffer key, long count) {
 		return zRandMemberWithScore(Mono.just(ZRandMemberCommand.valueCount(count).from(key)))
@@ -640,7 +640,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<CommandResponse<ZRandMemberCommand, Flux<Tuple>>> zRandMemberWithScore(Publisher<ZRandMemberCommand> commands);
 
@@ -648,8 +648,8 @@ public interface ReactiveZSetCommands {
 	 * {@code ZRANK}/{@literal ZREVRANK} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
 	 */
 	class ZRankCommand extends KeyCommand {
 
@@ -725,7 +725,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
 	 */
 	default Mono<Long> zRank(ByteBuffer key, ByteBuffer value) {
 
@@ -741,7 +741,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
 	 */
 	default Mono<Long> zRevRank(ByteBuffer key, ByteBuffer value) {
 
@@ -758,8 +758,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
 	 */
 	Flux<NumericResponse<ZRankCommand, Long>> zRank(Publisher<ZRankCommand> commands);
 
@@ -767,8 +767,8 @@ public interface ReactiveZSetCommands {
 	 * {@code ZRANGE}/{@literal ZREVRANGE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	class ZRangeCommand extends KeyCommand {
 
@@ -864,7 +864,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	default Flux<ByteBuffer> zRange(ByteBuffer key, Range<Long> range) {
 
@@ -881,7 +881,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	default Flux<Tuple> zRangeWithScores(ByteBuffer key, Range<Long> range) {
 
@@ -897,7 +897,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	default Flux<ByteBuffer> zRevRange(ByteBuffer key, Range<Long> range) {
 
@@ -913,7 +913,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	default Flux<Tuple> zRevRangeWithScores(ByteBuffer key, Range<Long> range) {
 
@@ -928,8 +928,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	Flux<CommandResponse<ZRangeCommand, Flux<Tuple>>> zRange(Publisher<ZRangeCommand> commands);
 
@@ -938,7 +938,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	class ZRangeStoreCommand extends KeyCommand {
 
@@ -1088,7 +1088,7 @@ public interface ReactiveZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> zRangeStoreByScore(ByteBuffer srcKey, ByteBuffer destKey, Range<Double> range, Limit limit) {
 
@@ -1110,7 +1110,7 @@ public interface ReactiveZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> zRangeStoreByLex(ByteBuffer srcKey, ByteBuffer destKey, Range<String> range, Limit limit) {
 
@@ -1132,7 +1132,7 @@ public interface ReactiveZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> zRangeStoreRevByScore(ByteBuffer srcKey, ByteBuffer destKey, Range<Double> range, Limit limit) {
 
@@ -1154,7 +1154,7 @@ public interface ReactiveZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> zRangeStoreRevByLex(ByteBuffer srcKey, ByteBuffer destKey, Range<String> range, Limit limit) {
 
@@ -1173,7 +1173,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	Flux<CommandResponse<ZRangeStoreCommand, Mono<Long>>> zRangeStore(Publisher<ZRangeStoreCommand> commands);
 
@@ -1181,8 +1181,8 @@ public interface ReactiveZSetCommands {
 	 * {@literal ZRANGEBYSCORE}/{@literal ZREVRANGEBYSCORE}.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	class ZRangeByScoreCommand extends KeyCommand {
 
@@ -1300,7 +1300,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	default Flux<ByteBuffer> zRangeByScore(ByteBuffer key, Range<Double> range) {
 
@@ -1319,7 +1319,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	default Flux<ByteBuffer> zRangeByScore(ByteBuffer key, Range<Double> range, Limit limit) {
 
@@ -1338,7 +1338,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	default Flux<Tuple> zRangeByScoreWithScores(ByteBuffer key, Range<Double> range) {
 
@@ -1356,7 +1356,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	default Flux<Tuple> zRangeByScoreWithScores(ByteBuffer key, Range<Double> range, Limit limit) {
 
@@ -1374,7 +1374,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	default Flux<ByteBuffer> zRevRangeByScore(ByteBuffer key, Range<Double> range) {
 
@@ -1392,7 +1392,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	default Flux<ByteBuffer> zRevRangeByScore(ByteBuffer key, Range<Double> range, Limit limit) {
 
@@ -1411,7 +1411,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	default Flux<Tuple> zRevRangeByScoreWithScores(ByteBuffer key, Range<Double> range) {
 
@@ -1429,7 +1429,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	default Flux<Tuple> zRevRangeByScoreWithScores(ByteBuffer key, Range<Double> range, Limit limit) {
 
@@ -1447,8 +1447,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	Flux<CommandResponse<ZRangeByScoreCommand, Flux<Tuple>>> zRangeByScore(Publisher<ZRangeByScoreCommand> commands);
 
@@ -1459,7 +1459,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return the {@link Flux} emitting the raw {@link Tuple tuples} one by one.
 	 * @throws IllegalArgumentException when key is {@literal null}.
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<Tuple> zScan(ByteBuffer key) {
@@ -1474,7 +1474,7 @@ public interface ReactiveZSetCommands {
 	 * @param options must not be {@literal null}. Use {@link ScanOptions#NONE} instead.
 	 * @return the {@link Flux} emitting the raw {@link Tuple tuples} one by one.
 	 * @throws IllegalArgumentException when one of the required arguments is {@literal null}.
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<Tuple> zScan(ByteBuffer key, ScanOptions options) {
@@ -1489,7 +1489,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 * @since 2.1
 	 */
 	Flux<CommandResponse<KeyCommand, Flux<Tuple>>> zScan(Publisher<KeyScanCommand> commands);
@@ -1498,7 +1498,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZCOUNT} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	class ZCountCommand extends KeyCommand {
 
@@ -1552,7 +1552,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	default Mono<Long> zCount(ByteBuffer key, Range<Double> range) {
 
@@ -1569,7 +1569,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	Flux<NumericResponse<ZCountCommand, Long>> zCount(Publisher<ZCountCommand> commands);
 
@@ -1578,7 +1578,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Andrey Shlykov
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	class ZLexCountCommand extends KeyCommand {
 
@@ -1631,7 +1631,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	default Mono<Long> zLexCount(ByteBuffer key, Range<String> range) {
 		return zLexCount(Mono.just(ZLexCountCommand.stringsWithin(range).forKey(key))).next()
@@ -1645,7 +1645,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	Flux<NumericResponse<ZLexCountCommand, Long>> zLexCount(Publisher<ZLexCountCommand> commands);
 
@@ -1661,8 +1661,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 */
 	class ZPopCommand extends KeyCommand {
 
@@ -1735,8 +1735,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/bzpopmin">Redis Documentation: BZPOPMIN</a>
-	 * @see <a href="https://redis.io/commands/bzpopmax">Redis Documentation: BZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/bzpopmin">Valkey Documentation: BZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/bzpopmax">Valkey Documentation: BZPOPMAX</a>
 	 */
 	class BZPopCommand extends KeyCommand {
 
@@ -1853,7 +1853,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 */
 	default Mono<Tuple> zPopMin(ByteBuffer key) {
 		return zPop(Mono.just(ZPopCommand.min().from(key))).map(CommandResponse::getOutput).flatMap(Flux::next).next();
@@ -1866,7 +1866,7 @@ public interface ReactiveZSetCommands {
 	 * @param count number of elements to pop.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 */
 	default Flux<Tuple> zPopMin(ByteBuffer key, long count) {
 		return zPop(Mono.just(ZPopCommand.min().from(key).count(count))).map(CommandResponse::getOutput)
@@ -1882,7 +1882,7 @@ public interface ReactiveZSetCommands {
 	 * @return
 	 * @throws IllegalArgumentException if the timeout is {@literal null} or negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/bzpopmin">Redis Documentation: BZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/bzpopmin">Valkey Documentation: BZPOPMIN</a>
 	 */
 	default Mono<Tuple> bZPopMin(ByteBuffer key, Duration timeout) {
 
@@ -1899,7 +1899,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 */
 	default Mono<Tuple> zPopMax(ByteBuffer key) {
 		return zPop(Mono.just(ZPopCommand.max().from(key))).map(CommandResponse::getOutput).flatMap(Flux::next).next();
@@ -1912,7 +1912,7 @@ public interface ReactiveZSetCommands {
 	 * @param count number of elements to pop.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 */
 	default Flux<Tuple> zPopMax(ByteBuffer key, long count) {
 		return zPop(Mono.just(ZPopCommand.max().from(key).count(count))).map(CommandResponse::getOutput)
@@ -1928,7 +1928,7 @@ public interface ReactiveZSetCommands {
 	 * @return
 	 * @throws IllegalArgumentException if the timeout is {@literal null} or negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/bzpopmax">Redis Documentation: BZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/bzpopmax">Valkey Documentation: BZPOPMAX</a>
 	 */
 	default Mono<Tuple> bZPopMax(ByteBuffer key, Duration timeout) {
 
@@ -1944,8 +1944,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 */
 	Flux<CommandResponse<ZPopCommand, Flux<Tuple>>> zPop(Publisher<ZPopCommand> commands);
 
@@ -1954,8 +1954,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 */
 	Flux<CommandResponse<BZPopCommand, Flux<Tuple>>> bZPop(Publisher<BZPopCommand> commands);
 
@@ -1964,7 +1964,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcard">Redis Documentation: ZCARD</a>
+	 * @see <a href="https://redis.io/commands/zcard">Valkey Documentation: ZCARD</a>
 	 */
 	default Mono<Long> zCard(ByteBuffer key) {
 
@@ -1978,7 +1978,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcard">Redis Documentation: ZCARD</a>
+	 * @see <a href="https://redis.io/commands/zcard">Valkey Documentation: ZCARD</a>
 	 */
 	Flux<NumericResponse<KeyCommand, Long>> zCard(Publisher<KeyCommand> commands);
 
@@ -1986,7 +1986,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZSCORE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
 	 */
 	class ZScoreCommand extends KeyCommand {
 
@@ -2038,7 +2038,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
 	 */
 	default Mono<Double> zScore(ByteBuffer key, ByteBuffer value) {
 
@@ -2054,7 +2054,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
 	 */
 	Flux<NumericResponse<ZScoreCommand, Double>> zScore(Publisher<ZScoreCommand> commands);
 
@@ -2063,7 +2063,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
 	 */
 	class ZMScoreCommand extends KeyCommand {
 
@@ -2130,7 +2130,7 @@ public interface ReactiveZSetCommands {
 	 * @param values must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
 	 */
 	default Mono<List<Double>> zMScore(ByteBuffer key, Collection<ByteBuffer> values) {
 
@@ -2147,7 +2147,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
 	 */
 	Flux<MultiValueResponse<ZMScoreCommand, Double>> zMScore(Publisher<ZMScoreCommand> commands);
 
@@ -2155,7 +2155,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZREMRANGEBYRANK} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	class ZRemRangeByRankCommand extends KeyCommand {
 
@@ -2206,7 +2206,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	default Mono<Long> zRemRangeByRank(ByteBuffer key, Range<Long> range) {
 
@@ -2222,7 +2222,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	Flux<NumericResponse<ZRemRangeByRankCommand, Long>> zRemRangeByRank(Publisher<ZRemRangeByRankCommand> commands);
 
@@ -2230,7 +2230,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZREMRANGEBYSCORE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	class ZRemRangeByScoreCommand extends KeyCommand {
 
@@ -2279,7 +2279,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	default Mono<Long> zRemRangeByScore(ByteBuffer key, Range<Double> range) {
 
@@ -2295,7 +2295,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	Flux<NumericResponse<ZRemRangeByScoreCommand, Long>> zRemRangeByScore(Publisher<ZRemRangeByScoreCommand> commands);
 
@@ -2304,7 +2304,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Christoph Strobl
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebylex">Redis Documentation: ZREMRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zremrangebylex">Valkey Documentation: ZREMRANGEBYLEX</a>
 	 */
 	class ZRemRangeByLexCommand extends KeyCommand {
 
@@ -2354,7 +2354,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return a {@link Mono} emitting the number of removed elements.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebylex">Redis Documentation: ZREMRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zremrangebylex">Valkey Documentation: ZREMRANGEBYLEX</a>
 	 */
 	default Mono<Long> zRemRangeByLex(ByteBuffer key, Range<String> range) {
 
@@ -2371,7 +2371,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebylex">Redis Documentation: ZREMRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zremrangebylex">Valkey Documentation: ZREMRANGEBYLEX</a>
 	 */
 	Flux<NumericResponse<ZRemRangeByLexCommand, Long>> zRemRangeByLex(Publisher<ZRemRangeByLexCommand> commands);
 
@@ -2380,7 +2380,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	class ZDiffCommand implements Command {
 
@@ -2423,7 +2423,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	default Flux<ByteBuffer> zDiff(List<ByteBuffer> sets) {
 		return zDiff(Mono.just(ZDiffCommand.sets(sets))).flatMap(CommandResponse::getOutput);
@@ -2435,7 +2435,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	Flux<CommandResponse<ZDiffCommand, Flux<ByteBuffer>>> zDiff(Publisher<? extends ZDiffCommand> commands);
 
@@ -2445,7 +2445,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	default Flux<Tuple> zDiffWithScores(List<ByteBuffer> sets) {
 		return zDiffWithScores(Mono.just(ZDiffCommand.sets(sets))).flatMap(CommandResponse::getOutput);
@@ -2457,7 +2457,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	Flux<CommandResponse<ZDiffCommand, Flux<Tuple>>> zDiffWithScores(Publisher<? extends ZDiffCommand> commands);
 
@@ -2466,7 +2466,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	class ZDiffStoreCommand extends KeyCommand {
 
@@ -2521,7 +2521,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	default Mono<Long> zDiffStore(ByteBuffer destinationKey, List<ByteBuffer> sets) {
 
@@ -2538,7 +2538,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	Flux<NumericResponse<ZDiffStoreCommand, Long>> zDiffStore(Publisher<ZDiffStoreCommand> commands);
 
@@ -2548,8 +2548,8 @@ public interface ReactiveZSetCommands {
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	class ZAggregateCommand implements Command {
 
@@ -2644,8 +2644,8 @@ public interface ReactiveZSetCommands {
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	class ZAggregateStoreCommand extends KeyCommand {
 
@@ -2750,7 +2750,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<ByteBuffer> zInter(List<ByteBuffer> sets) {
 
@@ -2765,7 +2765,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	Flux<CommandResponse<ZAggregateCommand, Flux<ByteBuffer>>> zInter(Publisher<? extends ZAggregateCommand> commands);
 
@@ -2775,7 +2775,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<Tuple> zInterWithScores(List<ByteBuffer> sets) {
 		return zInterWithScores(sets, Collections.emptyList());
@@ -2788,7 +2788,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<Tuple> zInterWithScores(List<ByteBuffer> sets, List<Double> weights) {
 		return zInterWithScores(sets, weights, null);
@@ -2801,7 +2801,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<Tuple> zInterWithScores(List<ByteBuffer> sets, Weights weights) {
 		return zInterWithScores(sets, weights, null);
@@ -2815,7 +2815,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<Tuple> zInterWithScores(List<ByteBuffer> sets, List<Double> weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -2835,7 +2835,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<Tuple> zInterWithScores(List<ByteBuffer> sets, Weights weights, @Nullable Aggregate aggregateFunction) {
 
@@ -2852,7 +2852,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	Flux<CommandResponse<ZAggregateCommand, Flux<Tuple>>> zInterWithScores(
 			Publisher<? extends ZAggregateCommand> commands);
@@ -2861,7 +2861,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZINTERSTORE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	class ZInterStoreCommand extends ZAggregateStoreCommand {
 
@@ -2939,7 +2939,7 @@ public interface ReactiveZSetCommands {
 	 * @param destinationKey must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> zInterStore(ByteBuffer destinationKey, List<ByteBuffer> sets) {
 		return zInterStore(destinationKey, sets, Collections.emptyList());
@@ -2953,7 +2953,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @param weights must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> zInterStore(ByteBuffer destinationKey, List<ByteBuffer> sets, List<Double> weights) {
 		return zInterStore(destinationKey, sets, weights, null);
@@ -2968,7 +2968,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> zInterStore(ByteBuffer destinationKey, List<ByteBuffer> sets, Weights weights) {
 		return zInterStore(destinationKey, sets, weights, null);
@@ -2983,7 +2983,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> zInterStore(ByteBuffer destinationKey, List<ByteBuffer> sets, List<Double> weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -3006,7 +3006,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> zInterStore(ByteBuffer destinationKey, List<ByteBuffer> sets, Weights weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -3025,7 +3025,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	Flux<NumericResponse<ZAggregateStoreCommand, Long>> zInterStore(Publisher<? extends ZAggregateStoreCommand> commands);
 
@@ -3035,7 +3035,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<ByteBuffer> zUnion(List<ByteBuffer> sets) {
 
@@ -3050,7 +3050,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<Tuple> zUnionWithScores(List<ByteBuffer> sets) {
 		return zUnionWithScores(sets, Collections.emptyList());
@@ -3063,7 +3063,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<Tuple> zUnionWithScores(List<ByteBuffer> sets, List<Double> weights) {
 		return zUnionWithScores(sets, weights, null);
@@ -3076,7 +3076,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<Tuple> zUnionWithScores(List<ByteBuffer> sets, Weights weights) {
 		return zUnionWithScores(sets, weights, null);
@@ -3090,7 +3090,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<Tuple> zUnionWithScores(List<ByteBuffer> sets, List<Double> weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -3110,7 +3110,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<Tuple> zUnionWithScores(List<ByteBuffer> sets, Weights weights, @Nullable Aggregate aggregateFunction) {
 
@@ -3127,7 +3127,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	Flux<CommandResponse<ZAggregateCommand, Flux<Tuple>>> zUnionWithScores(
 			Publisher<? extends ZAggregateCommand> commands);
@@ -3138,7 +3138,7 @@ public interface ReactiveZSetCommands {
 	 * @param commands
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	Flux<CommandResponse<ZAggregateCommand, Flux<ByteBuffer>>> zUnion(Publisher<? extends ZAggregateCommand> commands);
 
@@ -3146,7 +3146,7 @@ public interface ReactiveZSetCommands {
 	 * {@code ZUNIONSTORE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	class ZUnionStoreCommand extends ZAggregateStoreCommand {
 
@@ -3224,7 +3224,7 @@ public interface ReactiveZSetCommands {
 	 * @param destinationKey must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> zUnionStore(ByteBuffer destinationKey, List<ByteBuffer> sets) {
 		return zUnionStore(destinationKey, sets, Collections.emptyList());
@@ -3238,7 +3238,7 @@ public interface ReactiveZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @param weights must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> zUnionStore(ByteBuffer destinationKey, List<ByteBuffer> sets, List<Double> weights) {
 		return zUnionStore(destinationKey, sets, weights, null);
@@ -3253,7 +3253,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> zUnionStore(ByteBuffer destinationKey, List<ByteBuffer> sets, Weights weights) {
 		return zUnionStore(destinationKey, sets, weights, null);
@@ -3268,7 +3268,7 @@ public interface ReactiveZSetCommands {
 	 * @param weights can be {@literal null}.
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> zUnionStore(ByteBuffer destinationKey, List<ByteBuffer> sets, List<Double> weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -3290,7 +3290,7 @@ public interface ReactiveZSetCommands {
 	 * @param aggregateFunction can be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> zUnionStore(ByteBuffer destinationKey, List<ByteBuffer> sets, Weights weights,
 			@Nullable Aggregate aggregateFunction) {
@@ -3309,7 +3309,7 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	Flux<NumericResponse<ZAggregateStoreCommand, Long>> zUnionStore(Publisher<? extends ZAggregateStoreCommand> commands);
 
@@ -3317,8 +3317,8 @@ public interface ReactiveZSetCommands {
 	 * {@code ZRANGEBYLEX}/{@literal ZREVRANGEBYLEX} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	class ZRangeByLexCommand extends KeyCommand {
 
@@ -3415,7 +3415,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	default Flux<ByteBuffer> zRangeByLex(ByteBuffer key, Range<String> range) {
 		return zRangeByLex(key, range, Limit.unlimited());
@@ -3429,7 +3429,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit can be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	default Flux<ByteBuffer> zRangeByLex(ByteBuffer key, Range<String> range, Limit limit) {
 
@@ -3446,7 +3446,7 @@ public interface ReactiveZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	default Flux<ByteBuffer> zRevRangeByLex(ByteBuffer key, Range<String> range) {
 		return zRevRangeByLex(key, range, Limit.unlimited());
@@ -3460,7 +3460,7 @@ public interface ReactiveZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	default Flux<ByteBuffer> zRevRangeByLex(ByteBuffer key, Range<String> range, Limit limit) {
 
@@ -3478,8 +3478,8 @@ public interface ReactiveZSetCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	Flux<CommandResponse<ZRangeByLexCommand, Flux<ByteBuffer>>> zRangeByLex(Publisher<ZRangeByLexCommand> commands);
 

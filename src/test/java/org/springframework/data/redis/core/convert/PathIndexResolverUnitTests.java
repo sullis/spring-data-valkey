@@ -40,7 +40,7 @@ import org.springframework.data.redis.core.index.GeoIndexed;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.data.redis.core.index.SimpleIndexDefinition;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.data.util.TypeInformation;
 
 /**
@@ -61,7 +61,7 @@ class PathIndexResolverUnitTests {
 
 		indexConfig = new IndexConfiguration();
 		this.indexResolver = new PathIndexResolver(
-				new RedisMappingContext(new MappingConfiguration(indexConfig, new KeyspaceConfiguration())));
+				new ValkeyMappingContext(new MappingConfiguration(indexConfig, new KeyspaceConfiguration())));
 	}
 
 	@Test // DATAREDIS-425

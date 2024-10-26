@@ -31,25 +31,25 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.ExceptionTranslationStrategy;
 import org.springframework.data.redis.FallbackExceptionTranslationStrategy;
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.AbstractRedisConnection;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.AbstractValkeyConnection;
 import org.springframework.data.redis.connection.FutureResult;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisHashCommands;
-import org.springframework.data.redis.connection.RedisHyperLogLogCommands;
-import org.springframework.data.redis.connection.RedisKeyCommands;
-import org.springframework.data.redis.connection.RedisListCommands;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisPipelineException;
-import org.springframework.data.redis.connection.RedisScriptingCommands;
-import org.springframework.data.redis.connection.RedisServerCommands;
-import org.springframework.data.redis.connection.RedisSetCommands;
-import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.connection.RedisSubscribedConnectionException;
-import org.springframework.data.redis.connection.RedisZSetCommands;
+import org.springframework.data.redis.connection.ValkeyCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyHashCommands;
+import org.springframework.data.redis.connection.ValkeyHyperLogLogCommands;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
+import org.springframework.data.redis.connection.ValkeyListCommands;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeyPipelineException;
+import org.springframework.data.redis.connection.ValkeyScriptingCommands;
+import org.springframework.data.redis.connection.ValkeyServerCommands;
+import org.springframework.data.redis.connection.ValkeySetCommands;
+import org.springframework.data.redis.connection.ValkeyStreamCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
+import org.springframework.data.redis.connection.ValkeySubscribedConnectionException;
+import org.springframework.data.redis.connection.ValkeyZSetCommands;
 import org.springframework.data.redis.connection.Subscription;
 import org.springframework.data.redis.connection.convert.TransactionResultConverter;
 import org.springframework.data.redis.connection.jedis.JedisInvoker.ResponseCommands;
@@ -75,7 +75,7 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.util.Pool;
 
 /**
- * {@code RedisConnection} implementation on top of <a href="https://github.com/redis/jedis">Jedis</a> library.
+ * {@code ValkeyConnection} implementation on top of <a href="https://github.com/redis/jedis">Jedis</a> library.
  * <p>
  * This class is not Thread-safe and instances should not be shared across threads.
  *
@@ -94,7 +94,7 @@ import redis.clients.jedis.util.Pool;
  * @author John Blum
  * @see redis.clients.jedis.Jedis
  */
-public class JedisConnection extends AbstractRedisConnection {
+public class JedisConnection extends AbstractValkeyConnection {
 
 	private static final ExceptionTranslationStrategy EXCEPTION_TRANSLATION =
 			new FallbackExceptionTranslationStrategy(JedisExceptionConverter.INSTANCE);
@@ -151,8 +151,8 @@ public class JedisConnection extends AbstractRedisConnection {
 	 * Constructs a new <{@link JedisConnection} backed by a Jedis {@link Pool}.
 	 *
 	 * @param jedis {@link Jedis} client.
-	 * @param pool {@link Pool} of Redis connections; can be null, if no pool is used.
-	 * @param dbIndex {@link Integer index} of the Redis database to use.
+	 * @param pool {@link Pool} of Valkey connections; can be null, if no pool is used.
+	 * @param dbIndex {@link Integer index} of the Valkey database to use.
 	 */
 	public JedisConnection(Jedis jedis, Pool<Jedis> pool, int dbIndex) {
 		this(jedis, pool, dbIndex, null);
@@ -162,8 +162,8 @@ public class JedisConnection extends AbstractRedisConnection {
 	 * Constructs a new <{@link JedisConnection} backed by a Jedis {@link Pool}.
 	 *
 	 * @param jedis {@link Jedis} client.
-	 * @param pool {@link Pool} of Redis connections; can be null, if no pool is used.
-	 * @param dbIndex {@link Integer index} of the Redis database to use.
+	 * @param pool {@link Pool} of Valkey connections; can be null, if no pool is used.
+	 * @param dbIndex {@link Integer index} of the Valkey database to use.
 	 * @param clientName {@link String name} given to this client; can be {@literal null}.
 	 * @since 1.8
 	 */
@@ -175,9 +175,9 @@ public class JedisConnection extends AbstractRedisConnection {
 	 * Constructs a new <{@link JedisConnection} backed by a Jedis {@link Pool}.
 	 *
 	 * @param jedis {@link Jedis} client.
-	 * @param pool {@link Pool} of Redis connections; can be null, if no pool is used.
-	 * @param nodeConfig {@literal Redis Node} configuration
-	 * @param sentinelConfig {@literal Redis Sentinel} configuration
+	 * @param pool {@link Pool} of Valkey connections; can be null, if no pool is used.
+	 * @param nodeConfig {@literal Valkey Node} configuration
+	 * @param sentinelConfig {@literal Valkey Sentinel} configuration
 	 * @since 2.5
 	 */
 	protected JedisConnection(Jedis jedis, @Nullable Pool<Jedis> pool, JedisClientConfig nodeConfig,
@@ -237,66 +237,66 @@ public class JedisConnection extends AbstractRedisConnection {
 
 	protected DataAccessException convertJedisAccessException(Exception cause) {
 		DataAccessException exception = EXCEPTION_TRANSLATION.translate(cause);
-		return exception != null ? exception : new RedisSystemException(cause.getMessage(), cause);
+		return exception != null ? exception : new ValkeySystemException(cause.getMessage(), cause);
 	}
 
 	@Override
-	public RedisCommands commands() {
+	public ValkeyCommands commands() {
 		return this;
 	}
 
 	@Override
-	public RedisGeoCommands geoCommands() {
+	public ValkeyGeoCommands geoCommands() {
 		return geoCommands;
 	}
 
 	@Override
-	public RedisHashCommands hashCommands() {
+	public ValkeyHashCommands hashCommands() {
 		return hashCommands;
 	}
 
 	@Override
-	public RedisHyperLogLogCommands hyperLogLogCommands() {
+	public ValkeyHyperLogLogCommands hyperLogLogCommands() {
 		return hllCommands;
 	}
 
 	@Override
-	public RedisKeyCommands keyCommands() {
+	public ValkeyKeyCommands keyCommands() {
 		return keyCommands;
 	}
 
 	@Override
-	public RedisListCommands listCommands() {
+	public ValkeyListCommands listCommands() {
 		return listCommands;
 	}
 
 	@Override
-	public RedisSetCommands setCommands() {
+	public ValkeySetCommands setCommands() {
 		return setCommands;
 	}
 
 	@Override
-	public RedisStreamCommands streamCommands() {
+	public ValkeyStreamCommands streamCommands() {
 		return streamCommands;
 	}
 
 	@Override
-	public RedisStringCommands stringCommands() {
+	public ValkeyStringCommands stringCommands() {
 		return stringCommands;
 	}
 
 	@Override
-	public RedisZSetCommands zSetCommands() {
+	public ValkeyZSetCommands zSetCommands() {
 		return zSetCommands;
 	}
 
 	@Override
-	public RedisScriptingCommands scriptingCommands() {
+	public ValkeyScriptingCommands scriptingCommands() {
 		return scriptingCommands;
 	}
 
 	@Override
-	public RedisServerCommands serverCommands() {
+	public ValkeyServerCommands serverCommands() {
 		return serverCommands;
 	}
 
@@ -428,7 +428,7 @@ public class JedisConnection extends AbstractRedisConnection {
 		}
 
 		if (cause != null) {
-			throw new RedisPipelineException(cause, results);
+			throw new ValkeyPipelineException(cause, results);
 		}
 
 		return results;
@@ -627,7 +627,7 @@ public class JedisConnection extends AbstractRedisConnection {
 	public void pSubscribe(MessageListener listener, byte[]... patterns) {
 
 		if (isSubscribed()) {
-			throw new RedisSubscribedConnectionException(
+			throw new ValkeySubscribedConnectionException(
 					"Connection already subscribed; use the connection Subscription to cancel or add new channels");
 		}
 
@@ -648,7 +648,7 @@ public class JedisConnection extends AbstractRedisConnection {
 	public void subscribe(MessageListener listener, byte[]... channels) {
 
 		if (isSubscribed()) {
-			throw new RedisSubscribedConnectionException(
+			throw new ValkeySubscribedConnectionException(
 					"Connection already subscribed; use the connection Subscription to cancel or add new channels");
 		}
 
@@ -676,7 +676,7 @@ public class JedisConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	protected boolean isActive(RedisNode node) {
+	protected boolean isActive(ValkeyNode node) {
 
 		Jedis verification = null;
 
@@ -695,11 +695,11 @@ public class JedisConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	protected JedisSentinelConnection getSentinelConnection(RedisNode sentinel) {
+	protected JedisSentinelConnection getSentinelConnection(ValkeyNode sentinel) {
 		return new JedisSentinelConnection(getJedis(sentinel));
 	}
 
-	protected Jedis getJedis(RedisNode node) {
+	protected Jedis getJedis(ValkeyNode node) {
 		return new Jedis(new HostAndPort(node.getHost(), node.getPort()), this.sentinelConfig);
 	}
 

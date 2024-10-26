@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * Base test class for integration tests that execute each operation of a Connection while a pipeline is open, verifying
  * that the operations return null and the proper values are returned when closing the pipeline.
  * <p>
- * Pipelined results are generally native to the provider and not transformed by our {@link RedisConnection}, so this
+ * Pipelined results are generally native to the provider and not transformed by our {@link ValkeyConnection}, so this
  * test overrides {@link AbstractConnectionIntegrationTests} when result types are different
  *
  * @author Jennifer Hickey
@@ -64,7 +64,7 @@ abstract public class AbstractConnectionPipelineIntegrationTests extends Abstrac
 	@Test
 	public void testExecWithoutMulti() {
 		connection.exec();
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
@@ -76,13 +76,13 @@ abstract public class AbstractConnectionPipelineIntegrationTests extends Abstrac
 		// Try to do a list op on a value
 		connection.lPop("foo");
 		connection.exec();
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
 	@Test
 	public void exceptionExecuteNative() {
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(() -> {
 			connection.execute("set", "foo");
 			getResults();
 		});
@@ -92,21 +92,21 @@ abstract public class AbstractConnectionPipelineIntegrationTests extends Abstrac
 	@Test
 	public void testEvalShaNotFound() {
 		connection.evalSha("somefakesha", ReturnType.VALUE, 2, "key1", "key2");
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
 	@Test
 	public void testEvalReturnSingleError() {
 		connection.eval("return redis.call('expire','foo')", ReturnType.BOOLEAN, 0);
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
 	@Test
 	public void testRestoreBadData() {
 		connection.restore("testing".getBytes(), 0, "foo".getBytes());
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ abstract public class AbstractConnectionPipelineIntegrationTests extends Abstrac
 		List<Object> results = getResults();
 		initConnection();
 		connection.restore("testing".getBytes(), 0, (byte[]) results.get(1));
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Override
@@ -129,7 +129,7 @@ abstract public class AbstractConnectionPipelineIntegrationTests extends Abstrac
 	@Test
 	public void testEvalShaArrayError() {
 		connection.evalSha("notasha", ReturnType.MULTI, 1, "key1", "arg1");
-		assertThatExceptionOfType(RedisPipelineException.class).isThrownBy(this::getResults);
+		assertThatExceptionOfType(ValkeyPipelineException.class).isThrownBy(this::getResults);
 	}
 
 	@Test

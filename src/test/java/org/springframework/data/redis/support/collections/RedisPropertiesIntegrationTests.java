@@ -36,13 +36,13 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.extension.RedisStanalone;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Costin Leau
@@ -50,39 +50,39 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
+public class ValkeyPropertiesIntegrationTests extends ValkeyMapIntegrationTests {
 
 	private Properties defaults = new Properties();
-	private RedisProperties props;
+	private ValkeyProperties props;
 
 	/**
-	 * Constructs a new <code>RedisPropertiesTests</code> instance.
+	 * Constructs a new <code>ValkeyPropertiesTests</code> instance.
 	 *
 	 * @param keyFactory
 	 * @param valueFactory
 	 * @param template
 	 */
-	public RedisPropertiesIntegrationTests(ObjectFactory<Object> keyFactory, ObjectFactory<Object> valueFactory,
-			RedisTemplate template) {
+	public ValkeyPropertiesIntegrationTests(ObjectFactory<Object> keyFactory, ObjectFactory<Object> valueFactory,
+			ValkeyTemplate template) {
 		super(keyFactory, valueFactory, template);
 	}
 
-	RedisMap<Object, Object> createMap() {
+	ValkeyMap<Object, Object> createMap() {
 		String redisName = getClass().getSimpleName();
-		props = new RedisProperties(defaults, redisName, new StringRedisTemplate(template.getConnectionFactory()));
+		props = new ValkeyProperties(defaults, redisName, new StringValkeyTemplate(template.getConnectionFactory()));
 		return props;
 	}
 
-	protected RedisStore copyStore(RedisStore store) {
-		return new RedisProperties(store.getKey(), store.getOperations());
+	protected ValkeyStore copyStore(ValkeyStore store) {
+		return new ValkeyProperties(store.getKey(), store.getOperations());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testGetOperations() {
-		assertThat(map.getOperations() instanceof StringRedisTemplate).isTrue();
+		assertThat(map.getOperations() instanceof StringValkeyTemplate).isTrue();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPropertiesLoad() throws Exception {
 		InputStream stream = getClass()
 				.getResourceAsStream("/org/springframework/data/redis/support/collections/props.properties");
@@ -103,7 +103,7 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		assertThat(props.size()).isEqualTo(size + 3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPropertiesSave() throws Exception {
 		props.setProperty("x", "y");
 		props.setProperty("a", "b");
@@ -112,7 +112,7 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		props.store(writer, "no-comment");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGetProperty() throws Exception {
 		String property = props.getProperty("a");
 		assertThat(property).isNull();
@@ -120,19 +120,19 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		assertThat(props.getProperty("a")).isEqualTo("x");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGetPropertyDefault() throws Exception {
 		assertThat(props.getProperty("a", "x")).isEqualTo("x");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testSetProperty() throws Exception {
 		assertThat(props.getProperty("a")).isNull();
 		defaults.setProperty("a", "x");
 		assertThat(props.getProperty("a")).isEqualTo("x");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPropertiesList() throws Exception {
 		defaults.setProperty("a", "b");
 		props.setProperty("x", "y");
@@ -140,7 +140,7 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		props.list(new PrintWriter(wr));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPropertyNames() throws Exception {
 		String key1 = "foo";
 		String key2 = "x";
@@ -161,13 +161,13 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		assertThat(names.hasMoreElements()).isFalse();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDefaultInit() throws Exception {
-		RedisProperties redisProperties = new RedisProperties("foo", template);
+		ValkeyProperties redisProperties = new ValkeyProperties("foo", template);
 		redisProperties.propertyNames();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testStringPropertyNames() throws Exception {
 		String key1 = "foo";
 		String key2 = "x";
@@ -185,7 +185,7 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		assertThat(keys.contains(key3)).isTrue();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Override
 	public void testScanWorksCorrectly() {
 		assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> super.testScanWorksCorrectly());
@@ -195,8 +195,8 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 	public static Collection<Object[]> testParams() {
 
 		OxmSerializer serializer = XstreamOxmSerializerSingleton.getInstance();
-		Jackson2JsonRedisSerializer<Person> jackson2JsonSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
-		Jackson2JsonRedisSerializer<String> jackson2JsonStringSerializer = new Jackson2JsonRedisSerializer<>(
+		Jackson2JsonValkeySerializer<Person> jackson2JsonSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
+		Jackson2JsonValkeySerializer<String> jackson2JsonStringSerializer = new Jackson2JsonValkeySerializer<>(
 				String.class);
 
 		// create Jedis Factory
@@ -205,16 +205,16 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 		ObjectFactory<String> doubleFactory = new DoubleAsStringObjectFactory();
 
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		RedisTemplate<String, String> genericTemplate = new StringRedisTemplate(jedisConnFactory);
+		ValkeyTemplate<String, String> genericTemplate = new StringValkeyTemplate(jedisConnFactory);
 
-		RedisTemplate<String, String> xstreamGenericTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> xstreamGenericTemplate = new ValkeyTemplate<>();
 		xstreamGenericTemplate.setConnectionFactory(jedisConnFactory);
 		xstreamGenericTemplate.setDefaultSerializer(serializer);
 		xstreamGenericTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> jackson2JsonPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		jackson2JsonPersonTemplate.setConnectionFactory(jedisConnFactory);
 		jackson2JsonPersonTemplate.setDefaultSerializer(jackson2JsonSerializer);
 		jackson2JsonPersonTemplate.setHashKeySerializer(jackson2JsonSerializer);
@@ -223,15 +223,15 @@ public class RedisPropertiesIntegrationTests extends RedisMapIntegrationTests {
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class, false);
+				.getConnectionFactory(ValkeyStanalone.class, false);
 
-		RedisTemplate<String, String> genericTemplateLtc = new StringRedisTemplate(lettuceConnFactory);
-		RedisTemplate<String, Person> xGenericTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, String> genericTemplateLtc = new StringValkeyTemplate(lettuceConnFactory);
+		ValkeyTemplate<String, Person> xGenericTemplateLtc = new ValkeyTemplate<>();
 		xGenericTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		xGenericTemplateLtc.setDefaultSerializer(serializer);
 		xGenericTemplateLtc.afterPropertiesSet();
 
-		RedisTemplate<String, Person> jackson2JsonPersonTemplateLtc = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jackson2JsonPersonTemplateLtc = new ValkeyTemplate<>();
 		jackson2JsonPersonTemplateLtc.setConnectionFactory(lettuceConnFactory);
 		jackson2JsonPersonTemplateLtc.setDefaultSerializer(jackson2JsonSerializer);
 		jackson2JsonPersonTemplateLtc.setHashKeySerializer(jackson2JsonSerializer);

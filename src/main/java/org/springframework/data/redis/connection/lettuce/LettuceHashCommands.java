@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.lettuce;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.MapScanCursor;
 import io.lettuce.core.ScanArgs;
-import io.lettuce.core.api.async.RedisHashAsyncCommands;
+import io.lettuce.core.api.async.ValkeyHashAsyncCommands;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisHashCommands;
+import org.springframework.data.redis.connection.ValkeyHashCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.Cursor.CursorId;
@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class LettuceHashCommands implements RedisHashCommands {
+class LettuceHashCommands implements ValkeyHashCommands {
 
 	private final LettuceConnection connection;
 
@@ -56,7 +56,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(field, "Field must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hset, key, field, value);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hset, key, field, value);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(field, "Field must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hsetnx, key, field, value);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hsetnx, key, field, value);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(fields, "Fields must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hdel, key, fields);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hdel, key, fields);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(field, "Fields must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hexists, key, field);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hexists, key, field);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(field, "Field must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hget, key, field);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hget, key, field);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hgetall, key);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hgetall, key);
 	}
 
 	@Nullable
@@ -110,7 +110,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hrandfield, key);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hrandfield, key);
 	}
 
 	@Nullable
@@ -119,7 +119,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisHashAsyncCommands::hrandfieldWithvalues, key)
+		return connection.invoke().from(ValkeyHashAsyncCommands::hrandfieldWithvalues, key)
 				.get(LettuceHashCommands::toEntry);
 	}
 
@@ -129,7 +129,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hrandfield, key, count);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hrandfield, key, count);
 	}
 
 	@Nullable
@@ -138,7 +138,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisHashAsyncCommands::hrandfieldWithvalues, key, count)
+		return connection.invoke().fromMany(ValkeyHashAsyncCommands::hrandfieldWithvalues, key, count)
 				.toList(LettuceHashCommands::toEntry);
 	}
 
@@ -148,7 +148,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(field, "Field must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hincrby, key, field, delta);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hincrby, key, field, delta);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(field, "Field must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hincrbyfloat, key, field, delta);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hincrbyfloat, key, field, delta);
 	}
 
 	@Override
@@ -165,7 +165,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisHashAsyncCommands::hkeys, key).toSet();
+		return connection.invoke().fromMany(ValkeyHashAsyncCommands::hkeys, key).toSet();
 	}
 
 	@Override
@@ -173,7 +173,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hlen, key);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hlen, key);
 	}
 
 	@Override
@@ -182,7 +182,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(fields, "Fields must not be null");
 
-		return connection.invoke().fromMany(RedisHashAsyncCommands::hmget, key, fields)
+		return connection.invoke().fromMany(ValkeyHashAsyncCommands::hmget, key, fields)
 				.toList(source -> source.getValueOrElse(null));
 	}
 
@@ -192,7 +192,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(hashes, "Hashes must not be null");
 
-		connection.invokeStatus().just(RedisHashAsyncCommands::hmset, key, hashes);
+		connection.invokeStatus().just(ValkeyHashAsyncCommands::hmset, key, hashes);
 	}
 
 	@Override
@@ -200,7 +200,7 @@ class LettuceHashCommands implements RedisHashCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hvals, key);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hvals, key);
 	}
 
 	@Override
@@ -232,7 +232,7 @@ class LettuceHashCommands implements RedisHashCommands {
 				io.lettuce.core.ScanCursor scanCursor = connection.getScanCursor(cursorId);
 				ScanArgs scanArgs = LettuceConverters.toScanArgs(options);
 
-				MapScanCursor<byte[], byte[]> mapScanCursor = connection.invoke().just(RedisHashAsyncCommands::hscan, key,
+				MapScanCursor<byte[], byte[]> mapScanCursor = connection.invoke().just(ValkeyHashAsyncCommands::hscan, key,
 						scanCursor, scanArgs);
 				String nextCursorId = mapScanCursor.getCursor();
 
@@ -255,7 +255,7 @@ class LettuceHashCommands implements RedisHashCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(field, "Field must not be null");
 
-		return connection.invoke().just(RedisHashAsyncCommands::hstrlen, key, field);
+		return connection.invoke().just(ValkeyHashAsyncCommands::hstrlen, key, field);
 	}
 
 	@Nullable

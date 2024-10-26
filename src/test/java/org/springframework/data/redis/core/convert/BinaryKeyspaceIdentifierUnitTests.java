@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.data.redis.core.convert.MappingRedisConverter.BinaryKeyspaceIdentifier;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter.BinaryKeyspaceIdentifier;
 
 /**
  * Unit tests for {@link BinaryKeyspaceIdentifier}.

@@ -18,18 +18,18 @@ package org.springframework.data.redis.connection;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 
 /**
- * Thread-safe factory of Redis connections.
+ * Thread-safe factory of Valkey connections.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author John Blum
  */
-public interface RedisConnectionFactory extends PersistenceExceptionTranslator {
+public interface ValkeyConnectionFactory extends PersistenceExceptionTranslator {
 
 	/**
 	 * Specifies if pipelined results should be converted to the expected data type.
 	 * <p>
-	 * If {@literal false}, results of {@link RedisConnection#closePipeline()} and {@link RedisConnection#exec()} will be
+	 * If {@literal false}, results of {@link ValkeyConnection#closePipeline()} and {@link ValkeyConnection#exec()} will be
 	 * of the type returned by the underlying driver. This method is mostly for backwards compatibility with
 	 * {@literal 1.0}. It is generally always a good idea to allow results to be converted and deserialized. In fact, this
 	 * is now the default behavior.
@@ -39,32 +39,32 @@ public interface RedisConnectionFactory extends PersistenceExceptionTranslator {
 	boolean getConvertPipelineAndTxResults();
 
 	/**
-	 * Returns a suitable {@link RedisConnection connection} for interacting with Redis.
+	 * Returns a suitable {@link ValkeyConnection connection} for interacting with Valkey.
 	 *
-	 * @return {@link RedisConnection connection} for interacting with Redis.
+	 * @return {@link ValkeyConnection connection} for interacting with Valkey.
 	 * @throws IllegalStateException if the connection factory requires initialization and the factory has not yet been
 	 *           initialized.
 	 */
-	RedisConnection getConnection();
+	ValkeyConnection getConnection();
 
 	/**
-	 * Returns a suitable {@link RedisClusterConnection connection} for interacting with Redis Cluster.
+	 * Returns a suitable {@link ValkeyClusterConnection connection} for interacting with Valkey Cluster.
 	 *
-	 * @return a {@link RedisClusterConnection connection} for interacting with Redis Cluster.
+	 * @return a {@link ValkeyClusterConnection connection} for interacting with Valkey Cluster.
 	 * @throws IllegalStateException if the connection factory requires initialization and the factory has not yet been
 	 *           initialized.
 	 * @since 1.7
 	 */
-	RedisClusterConnection getClusterConnection();
+	ValkeyClusterConnection getClusterConnection();
 
 	/**
-	 * Returns a suitable {@link RedisSentinelConnection connection} for interacting with Redis Sentinel.
+	 * Returns a suitable {@link ValkeySentinelConnection connection} for interacting with Valkey Sentinel.
 	 *
-	 * @return a {@link RedisSentinelConnection connection} for interacting with Redis Sentinel.
+	 * @return a {@link ValkeySentinelConnection connection} for interacting with Valkey Sentinel.
 	 * @throws IllegalStateException if the connection factory requires initialization and the factory has not yet been
 	 *           initialized.
 	 * @since 1.4
 	 */
-	RedisSentinelConnection getSentinelConnection();
+	ValkeySentinelConnection getSentinelConnection();
 
 }

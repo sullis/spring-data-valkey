@@ -367,7 +367,7 @@ public class BitFieldSubCommands implements Iterable<BitFieldSubCommand> {
 	/**
 	 * Offset used inside a {@link BitFieldSubCommand}. Can be zero or type based. See
 	 * <a href="https://redis.io/commands/bitfield#bits-and-positional-offsets">Bits and positional offsets</a> in the
-	 * Redis reference.
+	 * Valkey reference.
 	 *
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
@@ -419,7 +419,7 @@ public class BitFieldSubCommands implements Iterable<BitFieldSubCommand> {
 		}
 
 		/**
-		 * @return the Redis Command representation
+		 * @return the Valkey Command representation
 		 */
 		public String asString() {
 			return (isZeroBased() ? "" : "#") + getValue();
@@ -454,7 +454,7 @@ public class BitFieldSubCommands implements Iterable<BitFieldSubCommand> {
 	}
 
 	/**
-	 * The actual Redis bitfield type representation for signed and unsigned integers used with
+	 * The actual Valkey bitfield type representation for signed and unsigned integers used with
 	 * {@link BitFieldSubCommand}.
 	 *
 	 * @author Christoph Strobl
@@ -533,7 +533,7 @@ public class BitFieldSubCommands implements Iterable<BitFieldSubCommand> {
 		}
 
 		/**
-		 * Get the Redis Command representation.
+		 * Get the Valkey Command representation.
 		 *
 		 * @return
 		 */

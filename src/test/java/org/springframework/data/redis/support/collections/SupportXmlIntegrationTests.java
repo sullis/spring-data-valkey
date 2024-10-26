@@ -31,8 +31,8 @@ class SupportXmlIntegrationTests {
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
 				"/org/springframework/data/redis/support/collections/container.xml");
 
-		RedisList list = ctx.getBean("non-existing", RedisList.class);
-		RedisProperties props = ctx.getBean("props", RedisProperties.class);
+		ValkeyList list = ctx.getBean("non-existing", ValkeyList.class);
+		ValkeyProperties props = ctx.getBean("props", ValkeyProperties.class);
 		Map map = ctx.getBean("map", Map.class);
 
 		ctx.close();

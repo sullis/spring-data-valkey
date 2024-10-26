@@ -23,13 +23,13 @@ import java.nio.ByteBuffer;
 
 import org.reactivestreams.Publisher;
 
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.ByteBufferResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyScanCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.ByteBufferResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyScanCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.connection.ReactiveSetCommands;
 import org.springframework.util.Assert;
 
@@ -40,14 +40,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveSetCommands implements ReactiveSetCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveSetCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveSetCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveSetCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -269,7 +269,7 @@ class LettuceReactiveSetCommands implements ReactiveSetCommands {
 		}));
 	}
 
-	protected LettuceReactiveRedisConnection getConnection() {
+	protected LettuceReactiveValkeyConnection getConnection() {
 		return connection;
 	}
 }

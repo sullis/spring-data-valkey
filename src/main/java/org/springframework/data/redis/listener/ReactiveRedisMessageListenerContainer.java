@@ -36,25 +36,25 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ReactivePubSubCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveSubscription;
 import org.springframework.data.redis.connection.ReactiveSubscription.ChannelMessage;
 import org.springframework.data.redis.connection.ReactiveSubscription.Message;
 import org.springframework.data.redis.connection.ReactiveSubscription.PatternMessage;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.util.ByteArrayWrapper;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Container providing a stream of {@link ChannelMessage} for messages received via Redis Pub/Sub listeners. The stream
- * is infinite and registers Redis subscriptions. Handles the low level details of listening, converting and message
+ * Container providing a stream of {@link ChannelMessage} for messages received via Valkey Pub/Sub listeners. The stream
+ * is infinite and registers Valkey subscriptions. Handles the low level details of listening, converting and message
  * dispatching.
  * <p>
  * Note the container allocates a single connection when it is created and releases the connection on
@@ -69,22 +69,22 @@ import org.springframework.util.ObjectUtils;
  * @see ReactiveSubscription
  * @see ReactivePubSubCommands
  */
-public class ReactiveRedisMessageListenerContainer implements DisposableBean {
+public class ReactiveValkeyMessageListenerContainer implements DisposableBean {
 
 	private final SerializationPair<String> stringSerializationPair = SerializationPair
-			.fromSerializer(RedisSerializer.string());
+			.fromSerializer(ValkeySerializer.string());
 	private final Map<ReactiveSubscription, Subscribers> subscriptions = new ConcurrentHashMap<>();
 
-	private volatile @Nullable ReactiveRedisConnection connection;
+	private volatile @Nullable ReactiveValkeyConnection connection;
 
 	/**
-	 * Create a new {@link ReactiveRedisMessageListenerContainer} given {@link ReactiveRedisConnectionFactory}.
+	 * Create a new {@link ReactiveValkeyMessageListenerContainer} given {@link ReactiveValkeyConnectionFactory}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 */
-	public ReactiveRedisMessageListenerContainer(ReactiveRedisConnectionFactory connectionFactory) {
+	public ReactiveValkeyMessageListenerContainer(ReactiveValkeyConnectionFactory connectionFactory) {
 
-		Assert.notNull(connectionFactory, "ReactiveRedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ReactiveValkeyConnectionFactory must not be null");
 		this.connection = connectionFactory.getReactiveConnection();
 	}
 
@@ -106,7 +106,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 			return Mono.empty();
 		}
 
-		ReactiveRedisConnection connection = getRequiredConnection();
+		ReactiveValkeyConnection connection = getRequiredConnection();
 
 		Flux<Void> terminationSignals = null;
 		while (!subscriptions.isEmpty()) {
@@ -141,7 +141,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 
 	/**
 	 * Subscribe to one or more {@link ChannelTopic}s and receive a stream of {@link ChannelMessage}. Messages and channel
-	 * names are treated as {@link String}. The message stream subscribes lazily to the Redis channels and unsubscribes if
+	 * names are treated as {@link String}. The message stream subscribes lazily to the Valkey channels and unsubscribes if
 	 * the {@link org.reactivestreams.Subscription} is {@link org.reactivestreams.Subscription#cancel() cancelled}.
 	 *
 	 * @param channelTopics the channels to subscribe.
@@ -160,7 +160,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	/**
 	 * Subscribe to one or more {@link ChannelTopic}s and receive a stream of {@link ChannelMessage} once the returned
 	 * {@link Mono} completes. Messages and channel names are treated as {@link String}. The message stream subscribes
-	 * lazily to the Redis channels and unsubscribes if the inner {@link org.reactivestreams.Subscription} is
+	 * lazily to the Valkey channels and unsubscribes if the inner {@link org.reactivestreams.Subscription} is
 	 * {@link org.reactivestreams.Subscription#cancel() cancelled}.
 	 * <p>
 	 * The returned {@link Mono} completes once the connection has been subscribed to the given {@link Topic topics}. Note
@@ -181,7 +181,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 
 	/**
 	 * Subscribe to one or more {@link PatternTopic}s and receive a stream of {@link PatternMessage}. Messages, pattern,
-	 * and channel names are treated as {@link String}. The message stream subscribes lazily to the Redis channels and
+	 * and channel names are treated as {@link String}. The message stream subscribes lazily to the Valkey channels and
 	 * unsubscribes if the {@link org.reactivestreams.Subscription} is {@link org.reactivestreams.Subscription#cancel()
 	 * cancelled}.
 	 *
@@ -203,7 +203,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	/**
 	 * Subscribe to one or more {@link PatternTopic}s and receive a stream of {@link PatternMessage} once the returned
 	 * {@link Mono} completes. Messages, pattern, and channel names are treated as {@link String}. The message stream
-	 * subscribes lazily to the Redis channels and unsubscribes if the inner {@link org.reactivestreams.Subscription} is
+	 * subscribes lazily to the Valkey channels and unsubscribes if the inner {@link org.reactivestreams.Subscription} is
 	 * {@link org.reactivestreams.Subscription#cancel() cancelled}.
 	 * <p>
 	 * The returned {@link Mono} completes once the connection has been subscribed to the given {@link Topic topics}. Note
@@ -227,7 +227,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	/**
 	 * Subscribe to one or more {@link Topic}s and receive a stream of {@link ChannelMessage}. The stream may contain
 	 * {@link PatternMessage} if subscribed to patterns. Messages, and channel names are serialized/deserialized using the
-	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Redis
+	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Valkey
 	 * channels and unsubscribes if the {@link org.reactivestreams.Subscription} is
 	 * {@link org.reactivestreams.Subscription#cancel() cancelled}.
 	 *
@@ -246,7 +246,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	/**
 	 * Subscribe to one or more {@link Topic}s and receive a stream of {@link ChannelMessage}. The stream may contain
 	 * {@link PatternMessage} if subscribed to patterns. Messages, and channel names are serialized/deserialized using the
-	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Redis
+	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Valkey
 	 * channels and unsubscribes if the {@link org.reactivestreams.Subscription} is
 	 * {@link org.reactivestreams.Subscription#cancel() cancelled}.
 	 *
@@ -263,7 +263,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	/**
 	 * Subscribe to one or more {@link Topic}s and receive a stream of {@link ChannelMessage}. The stream may contain
 	 * {@link PatternMessage} if subscribed to patterns. Messages, and channel names are serialized/deserialized using the
-	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Redis
+	 * given {@code channelSerializer} and {@code messageSerializer}. The message stream subscribes lazily to the Valkey
 	 * channels and unsubscribes if the {@link org.reactivestreams.Subscription} is
 	 * {@link org.reactivestreams.Subscription#cancel() cancelled}. {@link SubscriptionListener} is notified upon
 	 * subscription/unsubscription and can be used for synchronization.
@@ -420,7 +420,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 	private void verifyConnection() {
 
 		if (!isActive()) {
-			throw new IllegalStateException("ReactiveRedisMessageListenerContainer is already disposed");
+			throw new IllegalStateException("ReactiveValkeyMessageListenerContainer is already disposed");
 		}
 	}
 
@@ -437,8 +437,8 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 				.toArray(ByteBuffer[]::new);
 	}
 
-	private <C, B> Message<C, B> readMessage(RedisElementReader<C> channelSerializer,
-			RedisElementReader<B> messageSerializer, Message<ByteBuffer, ByteBuffer> message) {
+	private <C, B> Message<C, B> readMessage(ValkeyElementReader<C> channelSerializer,
+			ValkeyElementReader<B> messageSerializer, Message<ByteBuffer, ByteBuffer> message) {
 
 		if (message instanceof PatternMessage<?, ?, ?>) {
 
@@ -457,9 +457,9 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 		return new ChannelMessage<>(channel, body);
 	}
 
-	private ReactiveRedisConnection getRequiredConnection() {
+	private ReactiveValkeyConnection getRequiredConnection() {
 
-		ReactiveRedisConnection connection = this.connection;
+		ReactiveValkeyConnection connection = this.connection;
 
 		if (connection == null) {
 			throw new IllegalStateException("Connection no longer available");
@@ -468,7 +468,7 @@ public class ReactiveRedisMessageListenerContainer implements DisposableBean {
 		return connection;
 	}
 
-	private static <C> C read(RedisElementReader<C> reader, ByteBuffer buffer) {
+	private static <C> C read(ValkeyElementReader<C> reader, ByteBuffer buffer) {
 
 		try {
 			buffer.mark();

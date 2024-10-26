@@ -21,214 +21,214 @@ import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.redis.connection.DataType
-import org.springframework.data.redis.connection.ReactiveRedisConnection
+import org.springframework.data.redis.connection.ReactiveValkeyConnection
 import org.springframework.data.redis.connection.ReactiveSubscription.Message
-import org.springframework.data.redis.core.script.RedisScript
+import org.springframework.data.redis.core.script.ValkeyScript
 import org.springframework.data.redis.listener.Topic
-import org.springframework.data.redis.serializer.RedisElementReader
-import org.springframework.data.redis.serializer.RedisElementWriter
+import org.springframework.data.redis.serializer.ValkeyElementReader
+import org.springframework.data.redis.serializer.ValkeyElementWriter
 import java.time.Duration
 import java.time.Instant
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.execute].
+ * Coroutines variant of [ReactiveValkeyOperations.execute].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any, T : Any> ReactiveRedisOperations<K, V>.executeAsFlow(action: (ReactiveRedisConnection) -> Flow<T>): Flow<T> {
+fun <K : Any, V : Any, T : Any> ReactiveValkeyOperations<K, V>.executeAsFlow(action: (ReactiveValkeyConnection) -> Flow<T>): Flow<T> {
 	return execute { action(it).asPublisher() }.asFlow()
 }
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.execute].
+ * Coroutines variant of [ReactiveValkeyOperations.execute].
  *
  * @author Mark Paluch
  * @since 2.6
  */
-fun <K : Any, V : Any, T : Any> ReactiveRedisOperations<K, V>.executeInSessionAsFlow(
-	action: (ReactiveRedisOperations<K, V>) -> Flow<T>
+fun <K : Any, V : Any, T : Any> ReactiveValkeyOperations<K, V>.executeInSessionAsFlow(
+	action: (ReactiveValkeyOperations<K, V>) -> Flow<T>
 ): Flow<T> =
 	executeInSession { action(it).asPublisher() }.asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.execute].
+ * Coroutines variant of [ReactiveValkeyOperations.execute].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any, T : Any> ReactiveRedisOperations<K, V>.executeAsFlow(
-	script: RedisScript<T>,
+fun <K : Any, V : Any, T : Any> ReactiveValkeyOperations<K, V>.executeAsFlow(
+	script: ValkeyScript<T>,
 	keys: List<K> = emptyList(),
 	args: List<*> = emptyList<Any>()
 ): Flow<T> =
 	execute(script, keys, args).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.execute].
+ * Coroutines variant of [ReactiveValkeyOperations.execute].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any, T : Any> ReactiveRedisOperations<K, V>.executeAsFlow(script: RedisScript<T>, keys: List<K> = emptyList(), args: List<*> = emptyList<Any>(), argsWriter: RedisElementWriter<*>, resultReader: RedisElementReader<T>): Flow<T> =
+fun <K : Any, V : Any, T : Any> ReactiveValkeyOperations<K, V>.executeAsFlow(script: ValkeyScript<T>, keys: List<K> = emptyList(), args: List<*> = emptyList<Any>(), argsWriter: ValkeyElementWriter<*>, resultReader: ValkeyElementReader<T>): Flow<T> =
 		execute(script, keys, args, argsWriter, resultReader).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.convertAndSend].
+ * Coroutines variant of [ReactiveValkeyOperations.convertAndSend].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.sendAndAwait(destination: String, message: V): Long =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.sendAndAwait(destination: String, message: V): Long =
 		convertAndSend(destination, message).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.listenToChannel].
+ * Coroutines variant of [ReactiveValkeyOperations.listenToChannel].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.listenToChannelAsFlow(vararg channels: String): Flow<Message<String, V>> =
+fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.listenToChannelAsFlow(vararg channels: String): Flow<Message<String, V>> =
 		listenToChannel(*channels).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.listenToPattern].
+ * Coroutines variant of [ReactiveValkeyOperations.listenToPattern].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.listenToPatternAsFlow(vararg patterns: String): Flow<Message<String, V>> =
+fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.listenToPatternAsFlow(vararg patterns: String): Flow<Message<String, V>> =
 		listenToPattern(*patterns).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.listenTo].
+ * Coroutines variant of [ReactiveValkeyOperations.listenTo].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.listenToAsFlow(vararg topics: Topic): Flow<Message<String, V>> =
+fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.listenToAsFlow(vararg topics: Topic): Flow<Message<String, V>> =
 		listenTo(*topics).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.hasKey].
+ * Coroutines variant of [ReactiveValkeyOperations.hasKey].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.hasKeyAndAwait(key: K): Boolean =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.hasKeyAndAwait(key: K): Boolean =
 		hasKey(key).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.type].
+ * Coroutines variant of [ReactiveValkeyOperations.type].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.typeAndAwait(key: K): DataType =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.typeAndAwait(key: K): DataType =
 		type(key).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.keys].
+ * Coroutines variant of [ReactiveValkeyOperations.keys].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.keysAsFlow(pattern: K): Flow<K> =
+fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.keysAsFlow(pattern: K): Flow<K> =
 		keys(pattern).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.scan].
+ * Coroutines variant of [ReactiveValkeyOperations.scan].
  *
  * @author Sebastien Deleuze
  * @since 2.2
  */
-fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.scanAsFlow(options: ScanOptions = ScanOptions.NONE): Flow<K> =
+fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.scanAsFlow(options: ScanOptions = ScanOptions.NONE): Flow<K> =
 		scan(options).asFlow()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.randomKey].
+ * Coroutines variant of [ReactiveValkeyOperations.randomKey].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.randomKeyAndAwait(): K? =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.randomKeyAndAwait(): K? =
 		randomKey().awaitFirstOrNull()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.rename].
+ * Coroutines variant of [ReactiveValkeyOperations.rename].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.renameAndAwait(oldKey: K, newKey: K): Boolean =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.renameAndAwait(oldKey: K, newKey: K): Boolean =
 		rename(oldKey, newKey).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.renameIfAbsent].
+ * Coroutines variant of [ReactiveValkeyOperations.renameIfAbsent].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.renameIfAbsentAndAwait(oldKey: K, newKey: K): Boolean =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.renameIfAbsentAndAwait(oldKey: K, newKey: K): Boolean =
 		renameIfAbsent(oldKey, newKey).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.delete].
+ * Coroutines variant of [ReactiveValkeyOperations.delete].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.deleteAndAwait(vararg key: K): Long =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.deleteAndAwait(vararg key: K): Long =
 		delete(*key).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.unlink].
+ * Coroutines variant of [ReactiveValkeyOperations.unlink].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.unlinkAndAwait(vararg key: K): Long =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.unlinkAndAwait(vararg key: K): Long =
 		unlink(*key).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.expire].
+ * Coroutines variant of [ReactiveValkeyOperations.expire].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.expireAndAwait(key: K, timeout: Duration): Boolean =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.expireAndAwait(key: K, timeout: Duration): Boolean =
 		expire(key, timeout).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.expireAt].
+ * Coroutines variant of [ReactiveValkeyOperations.expireAt].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.expireAtAndAwait(key: K, expireAt: Instant): Boolean = expireAt(key, expireAt).awaitSingle()
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.expireAtAndAwait(key: K, expireAt: Instant): Boolean = expireAt(key, expireAt).awaitSingle()
 
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.persist].
+ * Coroutines variant of [ReactiveValkeyOperations.persist].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.persistAndAwait(key: K): Boolean =
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.persistAndAwait(key: K): Boolean =
 		persist(key).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.move].
+ * Coroutines variant of [ReactiveValkeyOperations.move].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.moveAndAwait(key: K, dbIndex: Int): Boolean = move(key, dbIndex).awaitSingle()
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.moveAndAwait(key: K, dbIndex: Int): Boolean = move(key, dbIndex).awaitSingle()
 
 /**
- * Coroutines variant of [ReactiveRedisOperations.getExpire].
+ * Coroutines variant of [ReactiveValkeyOperations.getExpire].
  *
  * @author Mark Paluch
  * @since 2.2
  */
-suspend fun <K : Any, V : Any> ReactiveRedisOperations<K, V>.getExpireAndAwait(key: K): Duration? = getExpire(key).awaitFirstOrNull()
+suspend fun <K : Any, V : Any> ReactiveValkeyOperations<K, V>.getExpireAndAwait(key: K): Duration? = getExpire(key).awaitFirstOrNull()

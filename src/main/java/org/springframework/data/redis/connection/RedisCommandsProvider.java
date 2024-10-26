@@ -16,106 +16,106 @@
 package org.springframework.data.redis.connection;
 
 /**
- * Provides access to {@link RedisCommands} and the segregated command interfaces.
+ * Provides access to {@link ValkeyCommands} and the segregated command interfaces.
  *
  * @author Mark Paluch
  * @since 3.0
  */
-public interface RedisCommandsProvider {
+public interface ValkeyCommandsProvider {
 
 	/**
-	 * Get {@link RedisCommands}.
+	 * Get {@link ValkeyCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 3.0
 	 */
-	RedisCommands commands();
+	ValkeyCommands commands();
 
 	/**
-	 * Get {@link RedisGeoCommands}.
+	 * Get {@link ValkeyGeoCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisGeoCommands geoCommands();
+	ValkeyGeoCommands geoCommands();
 
 	/**
-	 * Get {@link RedisHashCommands}.
+	 * Get {@link ValkeyHashCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisHashCommands hashCommands();
+	ValkeyHashCommands hashCommands();
 
 	/**
-	 * Get {@link RedisHyperLogLogCommands}.
+	 * Get {@link ValkeyHyperLogLogCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisHyperLogLogCommands hyperLogLogCommands();
+	ValkeyHyperLogLogCommands hyperLogLogCommands();
 
 	/**
-	 * Get {@link RedisKeyCommands}.
+	 * Get {@link ValkeyKeyCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisKeyCommands keyCommands();
+	ValkeyKeyCommands keyCommands();
 
 	/**
-	 * Get {@link RedisListCommands}.
+	 * Get {@link ValkeyListCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisListCommands listCommands();
+	ValkeyListCommands listCommands();
 
 	/**
-	 * Get {@link RedisSetCommands}.
+	 * Get {@link ValkeySetCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisSetCommands setCommands();
+	ValkeySetCommands setCommands();
 
 	/**
-	 * Get {@link RedisScriptingCommands}.
+	 * Get {@link ValkeyScriptingCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisScriptingCommands scriptingCommands();
+	ValkeyScriptingCommands scriptingCommands();
 
 	/**
-	 * Get {@link RedisServerCommands}.
+	 * Get {@link ValkeyServerCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisServerCommands serverCommands();
+	ValkeyServerCommands serverCommands();
 
 	/**
-	 * Get {@link RedisStreamCommands}.
+	 * Get {@link ValkeyStreamCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.2
 	 */
-	RedisStreamCommands streamCommands();
+	ValkeyStreamCommands streamCommands();
 
 	/**
-	 * Get {@link RedisStringCommands}.
+	 * Get {@link ValkeyStringCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisStringCommands stringCommands();
+	ValkeyStringCommands stringCommands();
 
 	/**
-	 * Get {@link RedisZSetCommands}.
+	 * Get {@link ValkeyZSetCommands}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.0
 	 */
-	RedisZSetCommands zSetCommands();
+	ValkeyZSetCommands zSetCommands();
 }

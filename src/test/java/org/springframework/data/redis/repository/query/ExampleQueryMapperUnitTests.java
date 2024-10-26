@@ -34,8 +34,8 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.redis.core.convert.PathIndexResolver;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.repository.query.RedisOperationChain.PathAndValue;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.repository.query.ValkeyOperationChain.PathAndValue;
 
 /**
  * Unit tests for {@link ExampleQueryMapper}.
@@ -46,7 +46,7 @@ import org.springframework.data.redis.repository.query.RedisOperationChain.PathA
  */
 public class ExampleQueryMapperUnitTests {
 
-	private RedisMappingContext mappingContext = new RedisMappingContext();
+	private ValkeyMappingContext mappingContext = new ValkeyMappingContext();
 	private ExampleQueryMapper mapper = new ExampleQueryMapper(mappingContext, new PathIndexResolver(mappingContext));
 
 	@Test // DATAREDIS-605
@@ -83,7 +83,7 @@ public class ExampleQueryMapperUnitTests {
 		person.setGender(Gender.MALE);
 		person.setAge(50);
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person));
 
 		assertThat(operationChain.getOrSismember()).isEmpty();
 		assertThat(operationChain.getSismember()).contains(new PathAndValue("firstname", "Walter"),
@@ -96,7 +96,7 @@ public class ExampleQueryMapperUnitTests {
 		Person person = new Person();
 		person.setLastname("Foo");
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person));
 
 		assertThat(operationChain.getOrSismember()).isEmpty();
 		assertThat(operationChain.getSismember()).isEmpty();
@@ -108,7 +108,7 @@ public class ExampleQueryMapperUnitTests {
 		Person person = new Person();
 		person.setLastname("Foo");
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person, ExampleMatcher.matchingAny()));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person, ExampleMatcher.matchingAny()));
 
 		assertThat(operationChain.getOrSismember()).containsOnly(new PathAndValue("lastname", "Foo"));
 		assertThat(operationChain.getSismember()).isEmpty();
@@ -122,7 +122,7 @@ public class ExampleQueryMapperUnitTests {
 		person.setGender(Gender.MALE);
 		person.setAge(50);
 
-		RedisOperationChain operationChain = mapper
+		ValkeyOperationChain operationChain = mapper
 				.getMappedExample(Example.of(person, ExampleMatcher.matching().withIgnorePaths("gender", "age")));
 
 		assertThat(operationChain.getOrSismember()).isEmpty();
@@ -139,7 +139,7 @@ public class ExampleQueryMapperUnitTests {
 
 		person.setSpecies(species);
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person));
 
 		assertThat(operationChain.getOrSismember()).isEmpty();
 		assertThat(operationChain.getSismember())
@@ -153,7 +153,7 @@ public class ExampleQueryMapperUnitTests {
 		person.setNicknames(Arrays.asList("Heisenberg"));
 		person.setPhysicalAttributes(Collections.singletonMap("healthy", "no"));
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person));
 
 		assertThat(operationChain.getOrSismember()).isEmpty();
 		assertThat(operationChain.getSismember()).isEmpty();
@@ -167,7 +167,7 @@ public class ExampleQueryMapperUnitTests {
 		person.setGender(Gender.MALE);
 		person.setAge(50);
 
-		RedisOperationChain operationChain = mapper.getMappedExample(Example.of(person, ExampleMatcher.matchingAny()));
+		ValkeyOperationChain operationChain = mapper.getMappedExample(Example.of(person, ExampleMatcher.matchingAny()));
 
 		assertThat(operationChain.getSismember()).isEmpty();
 		assertThat(operationChain.getOrSismember()).contains(new PathAndValue("firstname", "Walter"),
@@ -183,7 +183,7 @@ public class ExampleQueryMapperUnitTests {
 		Example<Person> example = Example.of(person,
 				ExampleMatcher.matching().withTransformer("firstname", v -> v.map(s -> s.toString().toUpperCase())));
 
-		RedisOperationChain operationChain = mapper.getMappedExample(example);
+		ValkeyOperationChain operationChain = mapper.getMappedExample(example);
 
 		assertThat(operationChain.getSismember()).contains(new PathAndValue("firstname", "WALTER"));
 	}

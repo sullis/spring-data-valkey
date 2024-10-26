@@ -28,7 +28,7 @@ import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of {@link RedisScript}. Delegates to an underlying {@link ScriptSource} to retrieve script
+ * Default implementation of {@link ValkeyScript}. Delegates to an underlying {@link ScriptSource} to retrieve script
  * text and detect if script has been modified (and thus should have SHA1 re-calculated). This class is best used as a
  * Singleton to avoid re-calculation of SHA1 on every script execution.
  *
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * @param <T> The script result type. Should be one of Long, Boolean, List, or deserialized value type. Can be null if
  *          the script returns a throw-away status (i.e "OK")
  */
-public class DefaultRedisScript<T> implements RedisScript<T>, InitializingBean {
+public class DefaultValkeyScript<T> implements ValkeyScript<T>, InitializingBean {
 
 	private @Nullable Class<T> resultType;
 
@@ -48,27 +48,27 @@ public class DefaultRedisScript<T> implements RedisScript<T>, InitializingBean {
 	private @Nullable String sha1;
 
 	/**
-	 * Creates a new {@link DefaultRedisScript}
+	 * Creates a new {@link DefaultValkeyScript}
 	 */
-	public DefaultRedisScript() {}
+	public DefaultValkeyScript() {}
 
 	/**
-	 * Creates a new {@link DefaultRedisScript}
+	 * Creates a new {@link DefaultValkeyScript}
 	 *
 	 * @param script must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public DefaultRedisScript(String script) {
+	public DefaultValkeyScript(String script) {
 		this(script, null);
 	}
 
 	/**
-	 * Creates a new {@link DefaultRedisScript}
+	 * Creates a new {@link DefaultValkeyScript}
 	 *
 	 * @param script must not be {@literal null}.
 	 * @param resultType can be {@literal null}.
 	 */
-	public DefaultRedisScript(String script, @Nullable Class<T> resultType) {
+	public DefaultValkeyScript(String script, @Nullable Class<T> resultType) {
 
 		this.setScriptText(script);
 		this.resultType = resultType;

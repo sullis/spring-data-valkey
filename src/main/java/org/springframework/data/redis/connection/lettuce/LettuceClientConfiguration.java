@@ -17,7 +17,7 @@ package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SslVerifyMode;
 import io.lettuce.core.TimeoutOptions;
 import io.lettuce.core.resource.ClientResources;
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Redis client configuration for lettuce. This configuration provides optional configuration elements such as
+ * Valkey client configuration for lettuce. This configuration provides optional configuration elements such as
  * {@link ClientResources} and {@link ClientOptions} specific to Lettuce client features.
  * <p>
  * Providing optional elements allows a more specific configuration of the client:
@@ -53,9 +53,9 @@ import org.springframework.util.ObjectUtils;
  * @author Yanming Zhou
  * @author Zhian Chen
  * @since 2.0
- * @see org.springframework.data.redis.connection.RedisStandaloneConfiguration
- * @see org.springframework.data.redis.connection.RedisSentinelConfiguration
- * @see org.springframework.data.redis.connection.RedisClusterConfiguration
+ * @see org.springframework.data.redis.connection.ValkeyStandaloneConfiguration
+ * @see org.springframework.data.redis.connection.ValkeySentinelConfiguration
+ * @see org.springframework.data.redis.connection.ValkeyClusterConfiguration
  */
 public interface LettuceClientConfiguration {
 
@@ -105,10 +105,10 @@ public interface LettuceClientConfiguration {
 	Optional<ReadFrom> getReadFrom();
 
 	/**
-	 * @return the optional {@link RedisCredentialsProviderFactory}.
+	 * @return the optional {@link ValkeyCredentialsProviderFactory}.
 	 * @since 3.0
 	 */
-	Optional<RedisCredentialsProviderFactory> getRedisCredentialsProviderFactory();
+	Optional<ValkeyCredentialsProviderFactory> getValkeyCredentialsProviderFactory();
 
 	/**
 	 * @return the timeout.
@@ -117,14 +117,14 @@ public interface LettuceClientConfiguration {
 
 	/**
 	 * @return the shutdown timeout used to close the client.
-	 * @see io.lettuce.core.AbstractRedisClient#shutdown(long, long, TimeUnit)
+	 * @see io.lettuce.core.AbstractValkeyClient#shutdown(long, long, TimeUnit)
 	 */
 	Duration getShutdownTimeout();
 
 	/**
 	 * @return the shutdown quiet period used to close the client.
 	 * @since 2.2
-	 * @see io.lettuce.core.AbstractRedisClient#shutdown(long, long, TimeUnit)
+	 * @see io.lettuce.core.AbstractValkeyClient#shutdown(long, long, TimeUnit)
 	 */
 	Duration getShutdownQuietPeriod();
 
@@ -182,27 +182,27 @@ public interface LettuceClientConfiguration {
 		ClientOptions clientOptions = ClientOptions.builder().timeoutOptions(TimeoutOptions.enabled()).build();
 		@Nullable String clientName;
 		@Nullable ReadFrom readFrom;
-		@Nullable RedisCredentialsProviderFactory redisCredentialsProviderFactory;
-		Duration timeout = Duration.ofSeconds(RedisURI.DEFAULT_TIMEOUT);
+		@Nullable ValkeyCredentialsProviderFactory redisCredentialsProviderFactory;
+		Duration timeout = Duration.ofSeconds(ValkeyURI.DEFAULT_TIMEOUT);
 		Duration shutdownTimeout = Duration.ofMillis(100);
 		Duration shutdownQuietPeriod = Duration.ZERO;
 
 		LettuceClientConfigurationBuilder() {}
 
 		/**
-		 * Apply SSL settings, command timeout, and client name from a {@link RedisURI}.
+		 * Apply SSL settings, command timeout, and client name from a {@link ValkeyURI}.
 		 *
 		 * @param redisUri the connection URI.
 		 * @return {@literal this} builder.
 		 * @since 2.5.3
 		 */
-		public LettuceClientConfigurationBuilder apply(RedisURI redisUri) {
+		public LettuceClientConfigurationBuilder apply(ValkeyURI redisUri) {
 
 			this.useSsl = redisUri.isSsl();
 			this.verifyMode = redisUri.getVerifyMode();
 			this.startTls = redisUri.isStartTls();
 
-			if (!redisUri.getTimeout().equals(RedisURI.DEFAULT_TIMEOUT_DURATION)) {
+			if (!redisUri.getTimeout().equals(ValkeyURI.DEFAULT_TIMEOUT_DURATION)) {
 				this.timeout = redisUri.getTimeout();
 			}
 
@@ -271,7 +271,7 @@ public interface LettuceClientConfiguration {
 		}
 
 		/**
-		 * Configure a {@link RedisCredentialsProviderFactory} to obtain {@link io.lettuce.core.RedisCredentialsProvider}
+		 * Configure a {@link ValkeyCredentialsProviderFactory} to obtain {@link io.lettuce.core.ValkeyCredentialsProvider}
 		 * instances to support credential rotation.
 		 *
 		 * @param redisCredentialsProviderFactory must not be {@literal null}.
@@ -280,9 +280,9 @@ public interface LettuceClientConfiguration {
 		 * @since 3.0
 		 */
 		public LettuceClientConfigurationBuilder redisCredentialsProviderFactory(
-				RedisCredentialsProviderFactory redisCredentialsProviderFactory) {
+				ValkeyCredentialsProviderFactory redisCredentialsProviderFactory) {
 
-			Assert.notNull(redisCredentialsProviderFactory, "RedisCredentialsProviderFactory must not be null");
+			Assert.notNull(redisCredentialsProviderFactory, "ValkeyCredentialsProviderFactory must not be null");
 
 			this.redisCredentialsProviderFactory = redisCredentialsProviderFactory;
 			return this;

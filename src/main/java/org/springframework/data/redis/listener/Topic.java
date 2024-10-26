@@ -16,7 +16,7 @@
 package org.springframework.data.redis.listener;
 
 /**
- * Topic for a Redis message. Acts a high-level abstraction on top of Redis low-level channels or patterns.
+ * Topic for a Valkey message. Acts a high-level abstraction on top of Valkey low-level channels or patterns.
  *
  * @author Costin Leau
  */

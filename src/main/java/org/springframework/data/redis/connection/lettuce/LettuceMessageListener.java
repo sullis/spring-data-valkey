@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.pubsub.RedisPubSubListener;
+import io.lettuce.core.pubsub.ValkeyPubSubListener;
 
 import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.connection.MessageListener;
@@ -23,12 +23,12 @@ import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.util.Assert;
 
 /**
- * MessageListener wrapper around Lettuce {@link RedisPubSubListener}.
+ * MessageListener wrapper around Lettuce {@link ValkeyPubSubListener}.
  *
  * @author Costin Leau
  * @author Mark Paluch
  */
-class LettuceMessageListener implements RedisPubSubListener<byte[], byte[]> {
+class LettuceMessageListener implements ValkeyPubSubListener<byte[], byte[]> {
 
 	private final MessageListener listener;
 	private final SubscriptionListener subscriptionListener;

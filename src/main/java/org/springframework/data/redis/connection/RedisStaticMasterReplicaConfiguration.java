@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisConfiguration.StaticMasterReplicaConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.StaticMasterReplicaConfiguration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Configuration class used for setting up {@link RedisConnection} via {@link RedisConnectionFactory} using the provided
+ * Configuration class used for setting up {@link ValkeyConnection} via {@link ValkeyConnectionFactory} using the provided
  * Master / Replica configuration to nodes know to not change address. Eg. when connecting to
  * <a href="https://aws.amazon.com/documentation/elasticache/">AWS ElastiCache with Read Replicas</a>. <br/>
  * Please also note that a Master/Replica connection cannot be used for Pub/Sub operations.
@@ -35,21 +35,21 @@ import org.springframework.util.ObjectUtils;
  * @author Tamer Soliman
  * @since 2.1
  */
-public class RedisStaticMasterReplicaConfiguration implements RedisConfiguration, StaticMasterReplicaConfiguration {
+public class ValkeyStaticMasterReplicaConfiguration implements ValkeyConfiguration, StaticMasterReplicaConfiguration {
 
 	private static final int DEFAULT_PORT = 6379;
 
-	private List<RedisStandaloneConfiguration> nodes = new ArrayList<>();
+	private List<ValkeyStandaloneConfiguration> nodes = new ArrayList<>();
 	private int database;
 	private @Nullable String username = null;
-	private RedisPassword password = RedisPassword.none();
+	private ValkeyPassword password = ValkeyPassword.none();
 
 	/**
 	 * Create a new {@link StaticMasterReplicaConfiguration} given {@code hostName}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 */
-	public RedisStaticMasterReplicaConfiguration(String hostName) {
+	public ValkeyStaticMasterReplicaConfiguration(String hostName) {
 		this(hostName, DEFAULT_PORT);
 	}
 
@@ -59,28 +59,28 @@ public class RedisStaticMasterReplicaConfiguration implements RedisConfiguration
 	 * @param hostName must not be {@literal null} or empty.
 	 * @param port a valid TCP port (1-65535).
 	 */
-	public RedisStaticMasterReplicaConfiguration(String hostName, int port) {
+	public ValkeyStaticMasterReplicaConfiguration(String hostName, int port) {
 		addNode(hostName, port);
 	}
 
 	/**
-	 * Add a {@link RedisStandaloneConfiguration node} to the list of nodes given {@code hostName}.
+	 * Add a {@link ValkeyStandaloneConfiguration node} to the list of nodes given {@code hostName}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 * @param port a valid TCP port (1-65535).
 	 */
 	public void addNode(String hostName, int port) {
-		addNode(new RedisStandaloneConfiguration(hostName, port));
+		addNode(new ValkeyStandaloneConfiguration(hostName, port));
 	}
 
 	/**
-	 * Add a {@link RedisStandaloneConfiguration node} to the list of nodes.
+	 * Add a {@link ValkeyStandaloneConfiguration node} to the list of nodes.
 	 *
 	 * @param node must not be {@literal null}.
 	 */
-	private void addNode(RedisStandaloneConfiguration node) {
+	private void addNode(ValkeyStandaloneConfiguration node) {
 
-		Assert.notNull(node, "RedisStandaloneConfiguration must not be null");
+		Assert.notNull(node, "ValkeyStandaloneConfiguration must not be null");
 
 		node.setPassword(password);
 		node.setDatabase(database);
@@ -88,23 +88,23 @@ public class RedisStaticMasterReplicaConfiguration implements RedisConfiguration
 	}
 
 	/**
-	 * Add a {@link RedisStandaloneConfiguration node} to the list of nodes given {@code hostName}.
+	 * Add a {@link ValkeyStandaloneConfiguration node} to the list of nodes given {@code hostName}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 * @return {@code this} {@link StaticMasterReplicaConfiguration}.
 	 */
-	public RedisStaticMasterReplicaConfiguration node(String hostName) {
+	public ValkeyStaticMasterReplicaConfiguration node(String hostName) {
 		return node(hostName, DEFAULT_PORT);
 	}
 
 	/**
-	 * Add a {@link RedisStandaloneConfiguration node} to the list of nodes given {@code hostName} and {@code port}.
+	 * Add a {@link ValkeyStandaloneConfiguration node} to the list of nodes given {@code hostName} and {@code port}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 * @param port a valid TCP port (1-65535).
 	 * @return {@code this} {@link StaticMasterReplicaConfiguration}.
 	 */
-	public RedisStaticMasterReplicaConfiguration node(String hostName, int port) {
+	public ValkeyStaticMasterReplicaConfiguration node(String hostName, int port) {
 
 		addNode(hostName, port);
 		return this;
@@ -136,21 +136,21 @@ public class RedisStaticMasterReplicaConfiguration implements RedisConfiguration
 	}
 
 	@Override
-	public RedisPassword getPassword() {
+	public ValkeyPassword getPassword() {
 		return password;
 	}
 
 	@Override
-	public void setPassword(RedisPassword password) {
+	public void setPassword(ValkeyPassword password) {
 
-		Assert.notNull(password, "RedisPassword must not be null");
+		Assert.notNull(password, "ValkeyPassword must not be null");
 
 		this.password = password;
 		this.nodes.forEach(it -> it.setPassword(password));
 	}
 
 	@Override
-	public List<RedisStandaloneConfiguration> getNodes() {
+	public List<ValkeyStandaloneConfiguration> getNodes() {
 		return Collections.unmodifiableList(nodes);
 	}
 
@@ -159,7 +159,7 @@ public class RedisStaticMasterReplicaConfiguration implements RedisConfiguration
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RedisStaticMasterReplicaConfiguration that)) {
+		if (!(o instanceof ValkeyStaticMasterReplicaConfiguration that)) {
 			return false;
 		}
 		if (database != that.database) {

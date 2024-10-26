@@ -28,38 +28,38 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.function.Try;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 
 /**
- * {@link ExecutionCondition} for {@link EnabledOnRedisDriverCondition @EnabledOnRedisDriver}.
+ * {@link ExecutionCondition} for {@link EnabledOnValkeyDriverCondition @EnabledOnValkeyDriver}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
- * @see EnabledOnRedisDriver
+ * @see EnabledOnValkeyDriver
  */
-class EnabledOnRedisDriverCondition implements ExecutionCondition {
+class EnabledOnValkeyDriverCondition implements ExecutionCondition {
 
-	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled("@EnabledOnRedisDriver is not present");
+	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled("@EnabledOnValkeyDriver is not present");
 
 	@Override
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
 
-		Optional<EnabledOnRedisDriver> optional = AnnotationUtils.findAnnotation(context.getElement(),
-				EnabledOnRedisDriver.class);
+		Optional<EnabledOnValkeyDriver> optional = AnnotationUtils.findAnnotation(context.getElement(),
+				EnabledOnValkeyDriver.class);
 
 		if (!optional.isPresent()) {
 			return ENABLED_BY_DEFAULT;
 		}
 
-		EnabledOnRedisDriver annotation = optional.get();
+		EnabledOnValkeyDriver annotation = optional.get();
 		Class<?> testClass = context.getRequiredTestClass();
 
 		List<Field> annotatedFields = AnnotationUtils.findAnnotatedFields(testClass,
-				EnabledOnRedisDriver.DriverQualifier.class, it -> RedisConnectionFactory.class.isAssignableFrom(it.getType()));
+				EnabledOnValkeyDriver.DriverQualifier.class, it -> ValkeyConnectionFactory.class.isAssignableFrom(it.getType()));
 
 		if (annotatedFields.isEmpty()) {
 			throw new IllegalStateException(
-					"@EnabledOnRedisDriver requires a field of type \"RedisConnectionFactory\" annotated with @DriverQualifier");
+					"@EnabledOnValkeyDriver requires a field of type \"ValkeyConnectionFactory\" annotated with @DriverQualifier");
 		}
 
 		if (context.getTestInstance().isEmpty()) {
@@ -70,11 +70,11 @@ class EnabledOnRedisDriverCondition implements ExecutionCondition {
 
 			Try<Object> fieldValue = ReflectionUtils.tryToReadFieldValue(field, context.getRequiredTestInstance());
 
-			RedisConnectionFactory value = (RedisConnectionFactory) fieldValue
+			ValkeyConnectionFactory value = (ValkeyConnectionFactory) fieldValue
 					.getOrThrow(e -> new IllegalStateException("Cannot read field " + field, e));
 
 			boolean foundMatch = false;
-			for (RedisDriver redisDriver : annotation.value()) {
+			for (ValkeyDriver redisDriver : annotation.value()) {
 				if (redisDriver.matches(value)) {
 					foundMatch = true;
 				}
@@ -90,9 +90,9 @@ class EnabledOnRedisDriverCondition implements ExecutionCondition {
 
 	}
 
-	private static String formatUnsupportedDriver(RedisConnectionFactory value) {
+	private static String formatUnsupportedDriver(ValkeyConnectionFactory value) {
 
-		for (RedisDriver redisDriver : RedisDriver.values()) {
+		for (ValkeyDriver redisDriver : ValkeyDriver.values()) {
 			if (redisDriver.matches(value)) {
 				return redisDriver.toString();
 			}

@@ -17,15 +17,15 @@ package org.springframework.data.redis.core.convert;
 
 import java.util.Map;
 
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.convert.BinaryConverters.StringToBytesConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link ReferenceResolver} using {@link RedisKeyValueAdapter} to read raw data.
+ * {@link ReferenceResolver} using {@link ValkeyKeyValueAdapter} to read raw data.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -33,15 +33,15 @@ import org.springframework.util.Assert;
  */
 public class ReferenceResolverImpl implements ReferenceResolver {
 
-	private final RedisOperations<?, ?> redisOps;
+	private final ValkeyOperations<?, ?> redisOps;
 	private final StringToBytesConverter converter;
 
 	/**
 	 * @param redisOperations must not be {@literal null}.
 	 */
-	public ReferenceResolverImpl(RedisOperations<?, ?> redisOperations) {
+	public ReferenceResolverImpl(ValkeyOperations<?, ?> redisOperations) {
 
-		Assert.notNull(redisOperations, "RedisOperations must not be null");
+		Assert.notNull(redisOperations, "ValkeyOperations must not be null");
 
 		this.redisOps = redisOperations;
 		this.converter = new StringToBytesConverter();
@@ -53,6 +53,6 @@ public class ReferenceResolverImpl implements ReferenceResolver {
 
 		byte[] key = converter.convert(keyspace + ":" + id);
 
-		return redisOps.execute((RedisCallback<Map<byte[], byte[]>>) connection -> connection.hGetAll(key));
+		return redisOps.execute((ValkeyCallback<Map<byte[], byte[]>>) connection -> connection.hGetAll(key));
 	}
 }

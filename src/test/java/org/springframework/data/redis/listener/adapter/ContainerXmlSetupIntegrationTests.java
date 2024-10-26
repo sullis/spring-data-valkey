@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.test.condition.EnabledOnRedisAvailable;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyAvailable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -31,11 +31,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author Jennifer Hickey
  */
 @ExtendWith(SpringExtension.class)
-@EnabledOnRedisAvailable
+@EnabledOnValkeyAvailable
 @ContextConfiguration("/org/springframework/data/redis/listener/container.xml")
 class ContainerXmlSetupIntegrationTests {
 
-	@Autowired RedisMessageListenerContainer container;
+	@Autowired ValkeyMessageListenerContainer container;
 
 	@Test
 	void testContainerSetup() {

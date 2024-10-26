@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.core.RedisKeyExpiredEvent;
+import org.springframework.data.redis.core.ValkeyKeyExpiredEvent;
 
 /**
  * @author Christoph Strobl
@@ -41,7 +41,7 @@ class KeyExpirationEventMessageListenerUnitTests {
 	private static final String MESSAGE_BODY = "body";
 	private static final Message MESSAGE = new DefaultMessage(MESSAGE_CHANNEL.getBytes(), MESSAGE_BODY.getBytes());
 
-	@Mock RedisMessageListenerContainer containerMock;
+	@Mock ValkeyMessageListenerContainer containerMock;
 	@Mock ApplicationEventPublisher publisherMock;
 	KeyExpirationEventMessageListener listener;
 
@@ -60,7 +60,7 @@ class KeyExpirationEventMessageListenerUnitTests {
 		ArgumentCaptor<ApplicationEvent> captor = ArgumentCaptor.forClass(ApplicationEvent.class);
 
 		verify(publisherMock, times(1)).publishEvent(captor.capture());
-		assertThat(captor.getValue()).isInstanceOf(RedisKeyExpiredEvent.class);
+		assertThat(captor.getValue()).isInstanceOf(ValkeyKeyExpiredEvent.class);
 		assertThat((byte[]) captor.getValue().getSource()).isEqualTo(MESSAGE_BODY.getBytes());
 	}
 

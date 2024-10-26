@@ -27,17 +27,17 @@ import org.springframework.data.redis.Person;
 import org.springframework.data.redis.PersonObjectFactory;
 import org.springframework.data.redis.RawObjectFactory;
 import org.springframework.data.redis.StringObjectFactory;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * Parameters for testing implementations of {@link AbstractOperations}
@@ -53,13 +53,13 @@ abstract public class AbstractOperationsTestParams {
 	public static Collection<Object[]> testParams() {
 
 		List<Object[]> params = new ArrayList<>();
-		params.addAll(testParams(LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class)));
-		params.addAll(testParams(JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class)));
+		params.addAll(testParams(LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class)));
+		params.addAll(testParams(JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class)));
 		return params;
 	}
 
 	// DATAREDIS-241
-	public static Collection<Object[]> testParams(RedisConnectionFactory connectionFactory) {
+	public static Collection<Object[]> testParams(ValkeyConnectionFactory connectionFactory) {
 
 		ObjectFactory<String> stringFactory = new StringObjectFactory();
 		ObjectFactory<Long> longFactory = new LongObjectFactory();
@@ -67,50 +67,50 @@ abstract public class AbstractOperationsTestParams {
 		ObjectFactory<byte[]> rawFactory = new RawObjectFactory();
 		ObjectFactory<Person> personFactory = new PersonObjectFactory();
 
-		RedisTemplate<String, String> stringTemplate = new StringRedisTemplate();
+		ValkeyTemplate<String, String> stringTemplate = new StringValkeyTemplate();
 		stringTemplate.setConnectionFactory(connectionFactory);
 		stringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Long> longTemplate = new RedisTemplate<>();
-		longTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, Long> longTemplate = new ValkeyTemplate<>();
+		longTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
 		longTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		longTemplate.setConnectionFactory(connectionFactory);
 		longTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Double> doubleTemplate = new RedisTemplate<>();
-		doubleTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, Double> doubleTemplate = new ValkeyTemplate<>();
+		doubleTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
 		doubleTemplate.setValueSerializer(new GenericToStringSerializer<>(Double.class));
 		doubleTemplate.setConnectionFactory(connectionFactory);
 		doubleTemplate.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> rawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplate = new ValkeyTemplate<>();
 		rawTemplate.setEnableDefaultSerializer(false);
 		rawTemplate.setConnectionFactory(connectionFactory);
 		rawTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> personTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> personTemplate = new ValkeyTemplate<>();
 		personTemplate.setConnectionFactory(connectionFactory);
 		personTemplate.afterPropertiesSet();
 
 		OxmSerializer serializer = XstreamOxmSerializerSingleton.getInstance();
-		RedisTemplate<String, String> xstreamStringTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> xstreamStringTemplate = new ValkeyTemplate<>();
 		xstreamStringTemplate.setConnectionFactory(connectionFactory);
 		xstreamStringTemplate.setDefaultSerializer(serializer);
 		xstreamStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> xstreamPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> xstreamPersonTemplate = new ValkeyTemplate<>();
 		xstreamPersonTemplate.setConnectionFactory(connectionFactory);
 		xstreamPersonTemplate.setValueSerializer(serializer);
 		xstreamPersonTemplate.afterPropertiesSet();
 
-		Jackson2JsonRedisSerializer<Person> jackson2JsonSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
-		RedisTemplate<String, Person> jackson2JsonPersonTemplate = new RedisTemplate<>();
+		Jackson2JsonValkeySerializer<Person> jackson2JsonSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
+		ValkeyTemplate<String, Person> jackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		jackson2JsonPersonTemplate.setConnectionFactory(connectionFactory);
 		jackson2JsonPersonTemplate.setValueSerializer(jackson2JsonSerializer);
 		jackson2JsonPersonTemplate.afterPropertiesSet();
 
-		GenericJackson2JsonRedisSerializer genericJackson2JsonSerializer = new GenericJackson2JsonRedisSerializer();
-		RedisTemplate<String, Person> genericJackson2JsonPersonTemplate = new RedisTemplate<>();
+		GenericJackson2JsonValkeySerializer genericJackson2JsonSerializer = new GenericJackson2JsonValkeySerializer();
+		ValkeyTemplate<String, Person> genericJackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		genericJackson2JsonPersonTemplate.setConnectionFactory(connectionFactory);
 		genericJackson2JsonPersonTemplate.setValueSerializer(genericJackson2JsonSerializer);
 		genericJackson2JsonPersonTemplate.afterPropertiesSet();

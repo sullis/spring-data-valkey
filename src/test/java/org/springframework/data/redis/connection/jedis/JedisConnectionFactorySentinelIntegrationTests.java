@@ -21,10 +21,10 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
 import org.springframework.lang.Nullable;
 
 /**
@@ -35,10 +35,10 @@ import org.springframework.lang.Nullable;
  * @author Mark Paluch
  * @author Ajith Kumar
  */
-@EnabledOnRedisSentinelAvailable
+@EnabledOnValkeySentinelAvailable
 class JedisConnectionFactorySentinelIntegrationTests {
 
-	private static final RedisSentinelConfiguration SENTINEL_CONFIG = new RedisSentinelConfiguration().master("mymaster")
+	private static final ValkeySentinelConfiguration SENTINEL_CONFIG = new ValkeySentinelConfiguration().master("mymaster")
 			.sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380);
 	private @Nullable JedisConnectionFactory factory;
 
@@ -53,7 +53,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 	@Test // GH-2103
 	void shouldConnectDataNodeCorrectly() {
 
-		RedisSentinelConfiguration configuration = new RedisSentinelConfiguration().master("mymaster")
+		ValkeySentinelConfiguration configuration = new ValkeySentinelConfiguration().master("mymaster")
 				.sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380);
 		configuration.setDatabase(5);
 
@@ -61,7 +61,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 
 			connection.serverCommands().flushAll();
 			connection.stringCommands().set("key5".getBytes(), "value5".getBytes());
@@ -74,7 +74,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 	@Test // GH-2103
 	void shouldConnectSentinelNodeCorrectly() throws IOException {
 
-		RedisSentinelConfiguration configuration = new RedisSentinelConfiguration().master("mymaster")
+		ValkeySentinelConfiguration configuration = new ValkeySentinelConfiguration().master("mymaster")
 				.sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380);
 		configuration.setDatabase(5);
 
@@ -82,7 +82,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisSentinelConnection sentinelConnection = factory.getSentinelConnection()) {
+		try (ValkeySentinelConnection sentinelConnection = factory.getSentinelConnection()) {
 			assertThat(sentinelConnection.masters()).isNotNull();
 		}
 	}
@@ -98,7 +98,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 
 			assertThat(factory.getUsePool()).isTrue();
 			assertThat(connection.getClientName()).isEqualTo("clientName");
@@ -112,7 +112,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 			assertThat(connection.ping()).isEqualTo("PONG");
 		}
 	}
@@ -125,7 +125,7 @@ class JedisConnectionFactorySentinelIntegrationTests {
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 			assertThat(connection.serverCommands().getClientName()).isEqualTo("clientName");
 		}
 	}
@@ -133,14 +133,14 @@ class JedisConnectionFactorySentinelIntegrationTests {
 	@Test // DATAREDIS-1127
 	void shouldNotFailOnFirstSentinelDown() throws IOException {
 
-		RedisSentinelConfiguration oneDownSentinelConfig = new RedisSentinelConfiguration().master("mymaster")
+		ValkeySentinelConfiguration oneDownSentinelConfig = new ValkeySentinelConfiguration().master("mymaster")
 				.sentinel("127.0.0.1", 1).sentinel("127.0.0.1", 26379);
 
 		factory = new JedisConnectionFactory(oneDownSentinelConfig);
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisSentinelConnection sentinelConnection = factory.getSentinelConnection()) {
+		try (ValkeySentinelConnection sentinelConnection = factory.getSentinelConnection()) {
 			assertThat(sentinelConnection.isOpen()).isTrue();
 		}
 	}

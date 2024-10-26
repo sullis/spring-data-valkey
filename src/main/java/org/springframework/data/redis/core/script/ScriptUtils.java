@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.NonTransientDataAccessException;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 
 /**
@@ -36,7 +36,7 @@ class ScriptUtils {
 	private ScriptUtils() {}
 
 	/**
-	 * Deserialize {@code result} using {@link RedisSerializer} to the serializer type. Collection types and intermediate
+	 * Deserialize {@code result} using {@link ValkeySerializer} to the serializer type. Collection types and intermediate
 	 * collection elements are deserialized recursivly.
 	 *
 	 * @param resultSerializer must not be {@literal null}.
@@ -44,7 +44,7 @@ class ScriptUtils {
 	 * @return the deserialized result.
 	 */
 	@SuppressWarnings({ "unchecked" })
-	static <T> T deserializeResult(RedisSerializer<T> resultSerializer, Object result) {
+	static <T> T deserializeResult(ValkeySerializer<T> resultSerializer, Object result) {
 
 		if (result instanceof byte[] resultBytes) {
 			return resultSerializer.deserialize(resultBytes);
@@ -65,7 +65,7 @@ class ScriptUtils {
 	}
 
 	/**
-	 * Deserialize {@code result} using {@link RedisElementReader} to the reader type. Collection types and intermediate
+	 * Deserialize {@code result} using {@link ValkeyElementReader} to the reader type. Collection types and intermediate
 	 * collection elements are deserialized recursively.
 	 *
 	 * @param reader must not be {@literal null}.
@@ -74,7 +74,7 @@ class ScriptUtils {
 	 */
 	@Nullable
 	@SuppressWarnings({ "unchecked" })
-	static <T> T deserializeResult(RedisElementReader<T> reader, Object result) {
+	static <T> T deserializeResult(ValkeyElementReader<T> reader, Object result) {
 
 		if (result instanceof ByteBuffer byteBuffer) {
 			return reader.read(byteBuffer);

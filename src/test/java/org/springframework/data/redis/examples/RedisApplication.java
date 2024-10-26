@@ -19,21 +19,21 @@ package org.springframework.data.redis.examples;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
-public class RedisApplication {
+public class ValkeyApplication {
 
-	private static final Log LOG = LogFactory.getLog(RedisApplication.class);
+	private static final Log LOG = LogFactory.getLog(ValkeyApplication.class);
 
 	public static void main(String[] args) {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
 		connectionFactory.afterPropertiesSet();
 
-		RedisTemplate<String, String> template = new RedisTemplate<>();
+		ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactory);
-		template.setDefaultSerializer(StringRedisSerializer.UTF_8);
+		template.setDefaultSerializer(StringValkeySerializer.UTF_8);
 		template.afterPropertiesSet();
 
 		template.opsForValue().set("foo", "bar");

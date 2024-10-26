@@ -19,28 +19,28 @@ package org.springframework.data.redis.connection;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 
 /**
- * Thread-safe factory of reactive Redis connections.
+ * Thread-safe factory of reactive Valkey connections.
  *
  * @author Mark Paluch
  * @since 2.0
  * @see reactor.core.publisher.Mono
  * @see reactor.core.publisher.Flux
- * @see ReactiveRedisConnection
- * @see ReactiveRedisClusterConnection
+ * @see ReactiveValkeyConnection
+ * @see ReactiveValkeyClusterConnection
  */
-public interface ReactiveRedisConnectionFactory extends PersistenceExceptionTranslator {
+public interface ReactiveValkeyConnectionFactory extends PersistenceExceptionTranslator {
 
 	/**
-	 * @return a reactive Redis connection.
+	 * @return a reactive Valkey connection.
 	 * @throws IllegalStateException if the connection factory requires initialization and the factory was not yet
 	 *           initialized.
 	 */
-	ReactiveRedisConnection getReactiveConnection();
+	ReactiveValkeyConnection getReactiveConnection();
 
 	/**
-	 * @return a reactive Redis Cluster connection.
+	 * @return a reactive Valkey Cluster connection.
 	 * @throws IllegalStateException if the connection factory requires initialization and the factory was not yet
 	 *           initialized.
 	 */
-	ReactiveRedisClusterConnection getReactiveClusterConnection();
+	ReactiveValkeyClusterConnection getReactiveClusterConnection();
 }

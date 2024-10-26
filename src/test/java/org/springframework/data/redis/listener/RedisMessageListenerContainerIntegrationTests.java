@@ -32,37 +32,37 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
- * Integration tests for {@link RedisMessageListenerContainer}.
+ * Integration tests for {@link ValkeyMessageListenerContainer}.
  *
  * @author Mark Paluch
  */
 @MethodSource("testParams")
-class RedisMessageListenerContainerIntegrationTests {
+class ValkeyMessageListenerContainerIntegrationTests {
 
-	private RedisConnectionFactory connectionFactory;
-	private RedisMessageListenerContainer container;
+	private ValkeyConnectionFactory connectionFactory;
+	private ValkeyMessageListenerContainer container;
 
-	public RedisMessageListenerContainerIntegrationTests(RedisConnectionFactory connectionFactory) {
+	public ValkeyMessageListenerContainerIntegrationTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
 	@BeforeEach
 	void setUp() {
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setRecoveryInterval(100);
 		container.setConnectionFactory(connectionFactory);
 		container.setBeanName("container");
@@ -73,11 +73,11 @@ class RedisMessageListenerContainerIntegrationTests {
 
 		// Jedis
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		return Arrays.asList(new Object[][] { { jedisConnFactory }, { lettuceConnFactory } });
 	}
@@ -87,7 +87,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void notifiesChannelSubscriptionState() throws Exception {
 
 		AtomicReference<String> onSubscribe = new AtomicReference<>();
@@ -127,7 +127,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		assertThat(onUnsubscribe).hasValue("a");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void notifiesPatternSubscriptionState() throws Exception {
 
 		AtomicReference<String> onPsubscribe = new AtomicReference<>();
@@ -167,7 +167,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		assertThat(onPunsubscribe).hasValue("a");
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void repeatedSubscribeShouldNotifyOnlyOnce() throws Exception {
 
 		AtomicInteger subscriptions1 = new AtomicInteger();
@@ -203,7 +203,7 @@ class RedisMessageListenerContainerIntegrationTests {
 
 		container.start();
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.publish("a".getBytes(), "hello".getBytes());
 		}
 
@@ -215,7 +215,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		assertThat(subscriptions1.get() + subscriptions2.get()).isGreaterThan(0);
 	}
 
-	@ParameterizedRedisTest // GH-964
+	@ParameterizedValkeyTest // GH-964
 	void subscribeAfterStart() throws Exception {
 
 		AtomicInteger subscriptions1 = new AtomicInteger();
@@ -251,7 +251,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		container.addMessageListener(listener1, new PatternTopic("a"));
 		container.addMessageListener(listener2, new PatternTopic("a"));
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.publish("a".getBytes(), "hello".getBytes());
 		}
 
@@ -263,7 +263,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		assertThat(subscriptions1.get() + subscriptions2.get()).isGreaterThan(0);
 	}
 
-	@ParameterizedRedisTest // GH-964
+	@ParameterizedValkeyTest // GH-964
 	void multipleStarts() throws Exception {
 
 		AtomicInteger subscriptions = new AtomicInteger();
@@ -290,7 +290,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		await().untilAtomic(subscriptions, Matchers.is(2));
 		assertThat(subscriptions.get()).isEqualTo(2);
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.publish("a".getBytes(), "hello".getBytes());
 		}
 
@@ -298,7 +298,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // GH-964
+	@ParameterizedValkeyTest // GH-964
 	void shouldRegisterChannelsAndTopics() throws Exception {
 
 		AtomicInteger subscriptions = new AtomicInteger();
@@ -343,7 +343,7 @@ class RedisMessageListenerContainerIntegrationTests {
 		await().untilAtomic(subscriptions, Matchers.is(4));
 		assertThat(subscriptions.get()).isEqualTo(4);
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.publish("a-pattern-1".getBytes(), "pattern".getBytes());
 			connection.publish("a-channel-0".getBytes(), "channel".getBytes());
 		}

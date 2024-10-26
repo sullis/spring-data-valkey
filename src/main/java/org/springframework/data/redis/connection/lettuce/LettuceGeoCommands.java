@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.lettuce;
 import io.lettuce.core.GeoArgs;
 import io.lettuce.core.GeoSearch;
 import io.lettuce.core.GeoWithin;
-import io.lettuce.core.api.async.RedisGeoAsyncCommands;
+import io.lettuce.core.api.async.ValkeyGeoAsyncCommands;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
 import org.springframework.lang.Nullable;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class LettuceGeoCommands implements RedisGeoCommands {
+class LettuceGeoCommands implements ValkeyGeoCommands {
 
 	private final LettuceConnection connection;
 
@@ -59,7 +59,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		Assert.notNull(point, "Point must not be null");
 		Assert.notNull(member, "Member must not be null");
 
-		return connection.invoke().just(RedisGeoAsyncCommands::geoadd, key, point.getX(), point.getY(), member);
+		return connection.invoke().just(ValkeyGeoAsyncCommands::geoadd, key, point.getX(), point.getY(), member);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		GeoArgs.Unit geoUnit = LettuceConverters.toGeoArgsUnit(metric);
 		Converter<Double, Distance> distanceConverter = LettuceConverters.distanceConverterForMetric(metric);
 
-		return connection.invoke().from(RedisGeoAsyncCommands::geodist, key, member1, member2, geoUnit)
+		return connection.invoke().from(ValkeyGeoAsyncCommands::geodist, key, member1, member2, geoUnit)
 				.get(distanceConverter);
 	}
 
@@ -128,7 +128,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		Assert.notNull(members, "Members must not be null");
 		Assert.noNullElements(members, "Members must not contain null");
 
-		return connection.invoke().fromMany(RedisGeoAsyncCommands::geohash, key, members)
+		return connection.invoke().fromMany(ValkeyGeoAsyncCommands::geohash, key, members)
 				.toList(it -> it.getValueOrElse(null));
 	}
 
@@ -139,7 +139,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		Assert.notNull(members, "Members must not be null");
 		Assert.noNullElements(members, "Members must not contain null");
 
-		return connection.invoke().fromMany(RedisGeoAsyncCommands::geopos, key, members)
+		return connection.invoke().fromMany(ValkeyGeoAsyncCommands::geopos, key, members)
 				.toList(LettuceConverters::geoCoordinatesToPoint);
 	}
 
@@ -191,7 +191,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		Converter<Set<byte[]>, GeoResults<GeoLocation<byte[]>>> converter = LettuceConverters
 				.bytesSetToGeoResultsConverter();
 
-		return connection.invoke().from(RedisGeoAsyncCommands::georadiusbymember, key, member, radius.getValue(), geoUnit)
+		return connection.invoke().from(ValkeyGeoAsyncCommands::georadiusbymember, key, member, radius.getValue(), geoUnit)
 				.get(converter);
 	}
 
@@ -210,7 +210,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 				.geoRadiusResponseToGeoResultsConverter(radius.getMetric());
 
 		return connection.invoke()
-				.from(RedisGeoAsyncCommands::georadiusbymember, key, member, radius.getValue(), geoUnit, geoArgs)
+				.from(ValkeyGeoAsyncCommands::georadiusbymember, key, member, radius.getValue(), geoUnit, geoArgs)
 				.get(geoResultsConverter);
 	}
 
@@ -232,7 +232,7 @@ class LettuceGeoCommands implements RedisGeoCommands {
 		GeoSearch.GeoPredicate lettucePredicate = LettuceConverters.toGeoPredicate(predicate);
 		GeoArgs geoArgs = LettuceConverters.toGeoArgs(args);
 
-		return connection.invoke().from(RedisGeoAsyncCommands::geosearch, key, ref, lettucePredicate, geoArgs)
+		return connection.invoke().from(ValkeyGeoAsyncCommands::geosearch, key, ref, lettucePredicate, geoArgs)
 				.get(LettuceConverters.geoRadiusResponseToGeoResultsConverter(predicate.getMetric()));
 	}
 

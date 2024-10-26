@@ -17,20 +17,20 @@ package org.springframework.data.redis.connection.lettuce;
 
 import static org.springframework.data.redis.connection.lettuce.LettuceConnection.*;
 
-import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.AbstractValkeyClient;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisConnectionException;
-import io.lettuce.core.RedisCredentialsProvider;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyConnectionException;
+import io.lettuce.core.ValkeyCredentialsProvider;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SslVerifyMode;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.codec.ValkeyCodec;
 import io.lettuce.core.resource.ClientResources;
 
 import java.nio.ByteBuffer;
@@ -59,11 +59,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.ExceptionTranslationStrategy;
 import org.springframework.data.redis.PassThroughExceptionTranslationStrategy;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.*;
-import org.springframework.data.redis.connection.RedisConfiguration.ClusterConfiguration;
-import org.springframework.data.redis.connection.RedisConfiguration.WithDatabaseIndex;
-import org.springframework.data.redis.connection.RedisConfiguration.WithPassword;
+import org.springframework.data.redis.connection.ValkeyConfiguration.ClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithDatabaseIndex;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithPassword;
 import org.springframework.data.util.Optionals;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -72,7 +72,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link RedisConnectionFactory Connection factory} creating <a href="https://lettuce.io/">Lettuce</a>-based
+ * {@link ValkeyConnectionFactory Connection factory} creating <a href="https://lettuce.io/">Lettuce</a>-based
  * connections.
  * <p>
  * This factory creates a new {@link LettuceConnection} on each call to {@link #getConnection()}. While multiple
@@ -90,11 +90,11 @@ import org.springframework.util.StringUtils;
  * {@link LettuceConnectionFactory} should be configured using an environmental configuration and the
  * {@link LettuceConnectionFactory client configuration}. Lettuce supports the following environmental configurations:
  * <ul>
- * <li>{@link RedisStandaloneConfiguration}</li>
- * <li>{@link RedisStaticMasterReplicaConfiguration}</li>
- * <li>{@link RedisSocketConfiguration}</li>
- * <li>{@link RedisSentinelConfiguration}</li>
- * <li>{@link RedisClusterConfiguration}</li>
+ * <li>{@link ValkeyStandaloneConfiguration}</li>
+ * <li>{@link ValkeyStaticMasterReplicaConfiguration}</li>
+ * <li>{@link ValkeySocketConfiguration}</li>
+ * <li>{@link ValkeySentinelConfiguration}</li>
+ * <li>{@link ValkeyClusterConfiguration}</li>
  * </ul>
  * <p>
  * This connection factory implements {@link InitializingBean} and {@link SmartLifecycle} for flexible lifecycle
@@ -117,7 +117,7 @@ import org.springframework.util.StringUtils;
  * @author John Blum
  * @author Zhian Chen
  */
-public class LettuceConnectionFactory implements RedisConnectionFactory, ReactiveRedisConnectionFactory,
+public class LettuceConnectionFactory implements ValkeyConnectionFactory, ReactiveValkeyConnectionFactory,
 		InitializingBean, DisposableBean, SmartLifecycle {
 
 	private static final ExceptionTranslationStrategy EXCEPTION_TRANSLATION = new PassThroughExceptionTranslationStrategy(
@@ -131,7 +131,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 	private boolean shareNativeConnection = true;
 	private boolean validateConnection = false;
-	private @Nullable AbstractRedisClient client;
+	private @Nullable AbstractValkeyClient client;
 
 	private final AtomicReference<State> state = new AtomicReference<>(State.CREATED);
 
@@ -150,9 +150,9 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 	private PipeliningFlushPolicy pipeliningFlushPolicy = PipeliningFlushPolicy.flushEachCommand();
 
-	private @Nullable RedisConfiguration configuration;
+	private @Nullable ValkeyConfiguration configuration;
 
-	private RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration("localhost", 6379);
+	private ValkeyStandaloneConfiguration standaloneConfig = new ValkeyStandaloneConfiguration("localhost", 6379);
 
 	private @Nullable SharedConnection<byte[]> connection;
 	private @Nullable SharedConnection<ByteBuffer> reactiveConnection;
@@ -175,7 +175,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * Constructs a new {@link LettuceConnectionFactory} instance with default settings.
 	 */
 	public LettuceConnectionFactory(String host, int port) {
-		this(new RedisStandaloneConfiguration(host, port), new MutableLettuceClientConfiguration());
+		this(new ValkeyStandaloneConfiguration(host, port), new MutableLettuceClientConfiguration());
 	}
 
 	/**
@@ -193,86 +193,86 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisSocketConfiguration}.
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeySocketConfiguration}.
 	 *
 	 * @param redisConfiguration must not be {@literal null}.
 	 * @since 2.1
 	 */
-	public LettuceConnectionFactory(RedisConfiguration redisConfiguration) {
+	public LettuceConnectionFactory(ValkeyConfiguration redisConfiguration) {
 		this(redisConfiguration, new MutableLettuceClientConfiguration());
 	}
 
 	/**
 	 * Constructs a new {@link LettuceConnectionFactory} instance using the given
-	 * {@link RedisStaticMasterReplicaConfiguration} and {@link LettuceClientConfiguration}.
+	 * {@link ValkeyStaticMasterReplicaConfiguration} and {@link LettuceClientConfiguration}.
 	 *
 	 * @param redisConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.1
 	 */
-	public LettuceConnectionFactory(RedisConfiguration redisConfiguration,
+	public LettuceConnectionFactory(ValkeyConfiguration redisConfiguration,
 			LettuceClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(redisConfiguration, "RedisConfiguration must not be null");
+		Assert.notNull(redisConfiguration, "ValkeyConfiguration must not be null");
 
 		this.configuration = redisConfiguration;
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisClusterConfiguration}
-	 * applied to create a {@link RedisClusterClient}.
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeyClusterConfiguration}
+	 * applied to create a {@link ValkeyClusterClient}.
 	 *
 	 * @param clusterConfiguration must not be {@literal null}.
 	 * @since 1.7
 	 */
-	public LettuceConnectionFactory(RedisClusterConfiguration clusterConfiguration) {
+	public LettuceConnectionFactory(ValkeyClusterConfiguration clusterConfiguration) {
 		this(clusterConfiguration, new MutableLettuceClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisClusterConfiguration} and
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeyClusterConfiguration} and
 	 * {@link LettuceClientConfiguration}.
 	 *
 	 * @param clusterConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public LettuceConnectionFactory(RedisClusterConfiguration clusterConfiguration,
+	public LettuceConnectionFactory(ValkeyClusterConfiguration clusterConfiguration,
 			LettuceClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(clusterConfiguration, "RedisClusterConfiguration must not be null");
+		Assert.notNull(clusterConfiguration, "ValkeyClusterConfiguration must not be null");
 
 		this.configuration = clusterConfiguration;
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisSentinelConfiguration}.
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeySentinelConfiguration}.
 	 *
 	 * @param sentinelConfiguration must not be {@literal null}.
 	 * @since 1.6
 	 */
-	public LettuceConnectionFactory(RedisSentinelConfiguration sentinelConfiguration) {
+	public LettuceConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration) {
 		this(sentinelConfiguration, new MutableLettuceClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisSentinelConfiguration} and
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeySentinelConfiguration} and
 	 * {@link LettuceClientConfiguration}.
 	 *
 	 * @param sentinelConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public LettuceConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
+	public LettuceConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration,
 			LettuceClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(sentinelConfiguration, "RedisSentinelConfiguration must not be null");
+		Assert.notNull(sentinelConfiguration, "ValkeySentinelConfiguration must not be null");
 
 		this.configuration = sentinelConfiguration;
 	}
@@ -280,76 +280,76 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	/**
 	 * Constructs a new {@link LettuceConnectionFactory} instance with default settings.
 	 */
-	public LettuceConnectionFactory(RedisStandaloneConfiguration configuration) {
+	public LettuceConnectionFactory(ValkeyStandaloneConfiguration configuration) {
 		this(configuration, new MutableLettuceClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link RedisStandaloneConfiguration} and
+	 * Constructs a new {@link LettuceConnectionFactory} instance using the given {@link ValkeyStandaloneConfiguration} and
 	 * {@link LettuceClientConfiguration}.
 	 *
 	 * @param standaloneConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public LettuceConnectionFactory(RedisStandaloneConfiguration standaloneConfiguration,
+	public LettuceConnectionFactory(ValkeyStandaloneConfiguration standaloneConfiguration,
 			LettuceClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(standaloneConfiguration, "RedisStandaloneConfiguration must not be null");
+		Assert.notNull(standaloneConfiguration, "ValkeyStandaloneConfiguration must not be null");
 
 		this.standaloneConfig = standaloneConfiguration;
 		this.configuration = this.standaloneConfig;
 	}
 
 	/**
-	 * Creates a {@link RedisConfiguration} based on a {@link String URI} according to the following:
+	 * Creates a {@link ValkeyConfiguration} based on a {@link String URI} according to the following:
 	 * <ul>
-	 * <li>If {@code redisUri} contains sentinels, a {@link RedisSentinelConfiguration} is returned</li>
-	 * <li>If {@code redisUri} has a configured socket a {@link RedisSocketConfiguration} is returned</li>
-	 * <li>Otherwise a {@link RedisStandaloneConfiguration} is returned</li>
+	 * <li>If {@code redisUri} contains sentinels, a {@link ValkeySentinelConfiguration} is returned</li>
+	 * <li>If {@code redisUri} has a configured socket a {@link ValkeySocketConfiguration} is returned</li>
+	 * <li>Otherwise a {@link ValkeyStandaloneConfiguration} is returned</li>
 	 * </ul>
 	 *
-	 * @param redisUri the connection URI in the format of a {@link RedisURI}.
-	 * @return an appropriate {@link RedisConfiguration} instance representing the Redis URI.
+	 * @param redisUri the connection URI in the format of a {@link ValkeyURI}.
+	 * @return an appropriate {@link ValkeyConfiguration} instance representing the Valkey URI.
 	 * @since 2.5.3
-	 * @see #createRedisConfiguration(RedisURI)
-	 * @see RedisURI
+	 * @see #createValkeyConfiguration(ValkeyURI)
+	 * @see ValkeyURI
 	 */
-	public static RedisConfiguration createRedisConfiguration(String redisUri) {
+	public static ValkeyConfiguration createValkeyConfiguration(String redisUri) {
 
-		Assert.hasText(redisUri, "RedisURI must not be null or empty");
+		Assert.hasText(redisUri, "ValkeyURI must not be null or empty");
 
-		return createRedisConfiguration(RedisURI.create(redisUri));
+		return createValkeyConfiguration(ValkeyURI.create(redisUri));
 	}
 
 	/**
-	 * Creates a {@link RedisConfiguration} based on a {@link RedisURI} according to the following:
+	 * Creates a {@link ValkeyConfiguration} based on a {@link ValkeyURI} according to the following:
 	 * <ul>
-	 * <li>If {@link RedisURI} contains sentinels, a {@link RedisSentinelConfiguration} is returned</li>
-	 * <li>If {@link RedisURI} has a configured socket a {@link RedisSocketConfiguration} is returned</li>
-	 * <li>Otherwise a {@link RedisStandaloneConfiguration} is returned</li>
+	 * <li>If {@link ValkeyURI} contains sentinels, a {@link ValkeySentinelConfiguration} is returned</li>
+	 * <li>If {@link ValkeyURI} has a configured socket a {@link ValkeySocketConfiguration} is returned</li>
+	 * <li>Otherwise a {@link ValkeyStandaloneConfiguration} is returned</li>
 	 * </ul>
 	 *
 	 * @param redisUri the connection URI.
-	 * @return an appropriate {@link RedisConfiguration} instance representing the Redis URI.
+	 * @return an appropriate {@link ValkeyConfiguration} instance representing the Valkey URI.
 	 * @since 2.5.3
-	 * @see RedisURI
+	 * @see ValkeyURI
 	 */
-	public static RedisConfiguration createRedisConfiguration(RedisURI redisUri) {
+	public static ValkeyConfiguration createValkeyConfiguration(ValkeyURI redisUri) {
 
-		Assert.notNull(redisUri, "RedisURI must not be null");
+		Assert.notNull(redisUri, "ValkeyURI must not be null");
 
 		if (!ObjectUtils.isEmpty(redisUri.getSentinels())) {
-			return LettuceConverters.createRedisSentinelConfiguration(redisUri);
+			return LettuceConverters.createValkeySentinelConfiguration(redisUri);
 		}
 
 		if (!ObjectUtils.isEmpty(redisUri.getSocket())) {
-			return LettuceConverters.createRedisSocketConfiguration(redisUri);
+			return LettuceConverters.createValkeySocketConfiguration(redisUri);
 		}
 
-		return LettuceConverters.createRedisStandaloneConfiguration(redisUri);
+		return LettuceConverters.createValkeyStandaloneConfiguration(redisUri);
 	}
 
 	ClusterCommandExecutor getRequiredClusterCommandExecutor() {
@@ -378,14 +378,14 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * @return the host.
 	 */
 	public String getHostName() {
-		return RedisConfiguration.getHostOrElse(configuration, standaloneConfig::getHostName);
+		return ValkeyConfiguration.getHostOrElse(configuration, standaloneConfig::getHostName);
 	}
 
 	/**
 	 * Sets the hostname.
 	 *
 	 * @param hostName the hostname to set.
-	 * @deprecated since 2.0, configure the hostname using {@link RedisStandaloneConfiguration}.
+	 * @deprecated since 2.0, configure the hostname using {@link ValkeyStandaloneConfiguration}.
 	 */
 	@Deprecated
 	public void setHostName(String hostName) {
@@ -398,14 +398,14 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * @return the port.
 	 */
 	public int getPort() {
-		return RedisConfiguration.getPortOrElse(configuration, standaloneConfig::getPort);
+		return ValkeyConfiguration.getPortOrElse(configuration, standaloneConfig::getPort);
 	}
 
 	/**
 	 * Sets the port.
 	 *
 	 * @param port the port to set.
-	 * @deprecated since 2.0, configure the port using {@link RedisStandaloneConfiguration}.
+	 * @deprecated since 2.0, configure the port using {@link ValkeyStandaloneConfiguration}.
 	 */
 	@Deprecated
 	public void setPort(int port) {
@@ -416,9 +416,9 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * Configures the flushing policy when using pipelining. If not set, defaults to
 	 * {@link PipeliningFlushPolicy#flushEachCommand() flush on each command}.
 	 *
-	 * @param pipeliningFlushPolicy the flushing policy to control when commands get written to the Redis connection.
+	 * @param pipeliningFlushPolicy the flushing policy to control when commands get written to the Valkey connection.
 	 * @see LettuceConnection#openPipeline()
-	 * @see StatefulRedisConnection#flushCommands()
+	 * @see StatefulValkeyConnection#flushCommands()
 	 * @since 2.3
 	 */
 	public void setPipeliningFlushPolicy(PipeliningFlushPolicy pipeliningFlushPolicy) {
@@ -561,7 +561,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 	/**
 	 * Indicates {@link #setShareNativeConnection(boolean) shared connections} should be eagerly initialized. Eager
-	 * initialization requires a running Redis instance during {@link #start() startup} to allow early validation of
+	 * initialization requires a running Valkey instance during {@link #start() startup} to allow early validation of
 	 * connection factory configuration. Eager initialization also prevents blocking connect while using reactive API and
 	 * is recommended for reactive API usage.
 	 *
@@ -590,23 +590,23 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * @return the database index.
 	 */
 	public int getDatabase() {
-		return RedisConfiguration.getDatabaseOrElse(configuration, standaloneConfig::getDatabase);
+		return ValkeyConfiguration.getDatabaseOrElse(configuration, standaloneConfig::getDatabase);
 	}
 
 	/**
 	 * Sets the index of the database used by this connection factory. Default is 0.
 	 *
 	 * @param index database index.
-	 * @deprecated since 3.2, configure the database index using {@link RedisStandaloneConfiguration},
-	 *             {@link RedisSocketConfiguration}, {@link RedisSentinelConfiguration}, or
-	 *             {@link RedisStaticMasterReplicaConfiguration}.
+	 * @deprecated since 3.2, configure the database index using {@link ValkeyStandaloneConfiguration},
+	 *             {@link ValkeySocketConfiguration}, {@link ValkeySentinelConfiguration}, or
+	 *             {@link ValkeyStaticMasterReplicaConfiguration}.
 	 */
 	@Deprecated
 	public void setDatabase(int index) {
 
 		Assert.isTrue(index >= 0, "invalid DB index (a positive index required)");
 
-		if (RedisConfiguration.isDatabaseIndexAware(configuration)) {
+		if (ValkeyConfiguration.isDatabaseIndexAware(configuration)) {
 			((WithDatabaseIndex) configuration).setDatabase(index);
 			return;
 		}
@@ -639,37 +639,37 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * Returns the native {@link AbstractRedisClient} used by this instance. The client is initialized as part of
+	 * Returns the native {@link AbstractValkeyClient} used by this instance. The client is initialized as part of
 	 * {@link #afterPropertiesSet() the bean initialization lifecycle} and only available when this connection factory is
 	 * initialized.
 	 * <p>
-	 * Depending on the configuration, the client can be either {@link RedisClient} or {@link RedisClusterClient}.
+	 * Depending on the configuration, the client can be either {@link ValkeyClient} or {@link ValkeyClusterClient}.
 	 *
-	 * @return the native {@link AbstractRedisClient}. Can be {@literal null} if not initialized.
+	 * @return the native {@link AbstractValkeyClient}. Can be {@literal null} if not initialized.
 	 * @since 2.5
 	 * @see #afterPropertiesSet()
 	 */
 	@Nullable
-	public AbstractRedisClient getNativeClient() {
+	public AbstractValkeyClient getNativeClient() {
 		assertStarted();
 		return this.client;
 	}
 
 	/**
-	 * Returns the native {@link AbstractRedisClient} used by this instance. The client is initialized as part of
+	 * Returns the native {@link AbstractValkeyClient} used by this instance. The client is initialized as part of
 	 * {@link #afterPropertiesSet() the bean initialization lifecycle} and only available when this connection factory is
 	 * initialized. Throws {@link IllegalStateException} if not yet initialized.
 	 * <p>
-	 * Depending on the configuration, the client can be either {@link RedisClient} or {@link RedisClusterClient}.
+	 * Depending on the configuration, the client can be either {@link ValkeyClient} or {@link ValkeyClusterClient}.
 	 *
-	 * @return the native {@link AbstractRedisClient}.
+	 * @return the native {@link AbstractValkeyClient}.
 	 * @since 2.5
 	 * @throws IllegalStateException if not yet initialized.
 	 * @see #getNativeClient()
 	 */
-	public AbstractRedisClient getRequiredNativeClient() {
+	public AbstractValkeyClient getRequiredNativeClient() {
 
-		AbstractRedisClient client = getNativeClient();
+		AbstractValkeyClient client = getNativeClient();
 
 		Assert.state(client != null, "Client not yet initialized; Did you forget to call initialize the bean");
 
@@ -677,44 +677,44 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@Nullable
-	private String getRedisUsername() {
-		return RedisConfiguration.getUsernameOrElse(configuration, standaloneConfig::getUsername);
+	private String getValkeyUsername() {
+		return ValkeyConfiguration.getUsernameOrElse(configuration, standaloneConfig::getUsername);
 	}
 
 	/**
-	 * Returns the password used for authenticating with the Redis server.
+	 * Returns the password used for authenticating with the Valkey server.
 	 *
 	 * @return password for authentication or {@literal null} if not set.
 	 */
 	@Nullable
 	public String getPassword() {
-		return getRedisPassword().map(String::new).orElse(null);
+		return getValkeyPassword().map(String::new).orElse(null);
 	}
 
-	private RedisPassword getRedisPassword() {
-		return RedisConfiguration.getPasswordOrElse(configuration, standaloneConfig::getPassword);
+	private ValkeyPassword getValkeyPassword() {
+		return ValkeyConfiguration.getPasswordOrElse(configuration, standaloneConfig::getPassword);
 	}
 
 	/**
-	 * Sets the password used for authenticating with the Redis server.
+	 * Sets the password used for authenticating with the Valkey server.
 	 *
 	 * @param password the password to set
-	 * @deprecated since 2.0, configure the password using {@link RedisStandaloneConfiguration},
-	 *             {@link RedisSentinelConfiguration} or {@link RedisClusterConfiguration}.
+	 * @deprecated since 2.0, configure the password using {@link ValkeyStandaloneConfiguration},
+	 *             {@link ValkeySentinelConfiguration} or {@link ValkeyClusterConfiguration}.
 	 */
 	@Deprecated
 	public void setPassword(String password) {
 
-		if (RedisConfiguration.isAuthenticationAware(configuration)) {
+		if (ValkeyConfiguration.isAuthenticationAware(configuration)) {
 			((WithPassword) configuration).setPassword(password);
 			return;
 		}
 
-		standaloneConfig.setPassword(RedisPassword.of(password));
+		standaloneConfig.setPassword(ValkeyPassword.of(password));
 	}
 
 	/**
-	 * Returns the shutdown timeout for shutting down the RedisClient (in milliseconds).
+	 * Returns the shutdown timeout for shutting down the ValkeyClient (in milliseconds).
 	 *
 	 * @return shutdown timeout.
 	 * @since 1.6
@@ -724,7 +724,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * Sets the shutdown timeout for shutting down the RedisClient (in milliseconds).
+	 * Sets the shutdown timeout for shutting down the ValkeyClient (in milliseconds).
 	 *
 	 * @param shutdownTimeout the shutdown timeout.
 	 * @since 1.6
@@ -770,38 +770,38 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * @return the {@link RedisStandaloneConfiguration}.
+	 * @return the {@link ValkeyStandaloneConfiguration}.
 	 * @since 2.0
 	 */
-	public RedisStandaloneConfiguration getStandaloneConfiguration() {
+	public ValkeyStandaloneConfiguration getStandaloneConfiguration() {
 		return this.standaloneConfig;
 	}
 
 	/**
-	 * @return the {@link RedisSocketConfiguration} or {@literal null} if not set.
+	 * @return the {@link ValkeySocketConfiguration} or {@literal null} if not set.
 	 * @since 2.1
 	 */
 	@Nullable
-	public RedisSocketConfiguration getSocketConfiguration() {
-		return isDomainSocketAware() ? (RedisSocketConfiguration) this.configuration : null;
+	public ValkeySocketConfiguration getSocketConfiguration() {
+		return isDomainSocketAware() ? (ValkeySocketConfiguration) this.configuration : null;
 	}
 
 	/**
-	 * @return the {@link RedisSentinelConfiguration}, may be {@literal null}.
+	 * @return the {@link ValkeySentinelConfiguration}, may be {@literal null}.
 	 * @since 2.0
 	 */
 	@Nullable
-	public RedisSentinelConfiguration getSentinelConfiguration() {
-		return isRedisSentinelAware() ? (RedisSentinelConfiguration) this.configuration : null;
+	public ValkeySentinelConfiguration getSentinelConfiguration() {
+		return isValkeySentinelAware() ? (ValkeySentinelConfiguration) this.configuration : null;
 	}
 
 	/**
-	 * @return the {@link RedisClusterConfiguration}, may be {@literal null}.
+	 * @return the {@link ValkeyClusterConfiguration}, may be {@literal null}.
 	 * @since 2.0
 	 */
 	@Nullable
-	public RedisClusterConfiguration getClusterConfiguration() {
-		return isClusterAware() ? (RedisClusterConfiguration) this.configuration : null;
+	public ValkeyClusterConfiguration getClusterConfiguration() {
+		return isClusterAware() ? (ValkeyClusterConfiguration) this.configuration : null;
 	}
 
 	@Override
@@ -832,7 +832,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * the containing ApplicationContext gets refreshed.
 	 * <p>
 	 * This connection factory defaults to early auto-startup during {@link #afterPropertiesSet()} and can potentially
-	 * create Redis connections early on in the lifecycle. See {@link #setEarlyStartup(boolean)} for delaying connection
+	 * create Valkey connections early on in the lifecycle. See {@link #setEarlyStartup(boolean)} for delaying connection
 	 * creation to the ApplicationContext refresh if auto-startup is enabled.
 	 *
 	 * @param autoStartup {@literal true} to automatically {@link #start()} the connection factory; {@literal false}
@@ -857,7 +857,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * Configure if this InitializingBean's component Lifecycle should get started early by {@link #afterPropertiesSet()}
 	 * at the time that the bean is initialized. The component defaults to auto-startup.
 	 * <p>
-	 * This method is related to {@link #setAutoStartup(boolean) auto-startup} and can be used to delay Redis client
+	 * This method is related to {@link #setAutoStartup(boolean) auto-startup} and can be used to delay Valkey client
 	 * startup until the ApplicationContext refresh. Disabling early startup does not disable auto-startup.
 	 *
 	 * @param earlyStartup {@literal true} to early {@link #start()} the component; {@literal false} otherwise.
@@ -893,35 +893,35 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * @return true when {@link RedisStaticMasterReplicaConfiguration} is present.
+	 * @return true when {@link ValkeyStaticMasterReplicaConfiguration} is present.
 	 * @since 2.1
 	 */
 	private boolean isStaticMasterReplicaAware() {
-		return RedisConfiguration.isStaticMasterReplicaConfiguration(this.configuration);
+		return ValkeyConfiguration.isStaticMasterReplicaConfiguration(this.configuration);
 	}
 
 	/**
-	 * @return true when {@link RedisSentinelConfiguration} is present.
+	 * @return true when {@link ValkeySentinelConfiguration} is present.
 	 * @since 1.5
 	 */
-	public boolean isRedisSentinelAware() {
-		return RedisConfiguration.isSentinelConfiguration(this.configuration);
+	public boolean isValkeySentinelAware() {
+		return ValkeyConfiguration.isSentinelConfiguration(this.configuration);
 	}
 
 	/**
-	 * @return true when {@link RedisSocketConfiguration} is present.
+	 * @return true when {@link ValkeySocketConfiguration} is present.
 	 * @since 2.1
 	 */
 	private boolean isDomainSocketAware() {
-		return RedisConfiguration.isDomainSocketConfiguration(this.configuration);
+		return ValkeyConfiguration.isDomainSocketConfiguration(this.configuration);
 	}
 
 	/**
-	 * @return true when {@link RedisClusterConfiguration} is present.
+	 * @return true when {@link ValkeyClusterConfiguration} is present.
 	 * @since 1.7
 	 */
 	public boolean isClusterAware() {
-		return RedisConfiguration.isClusterConfiguration(this.configuration);
+		return ValkeyConfiguration.isClusterConfiguration(this.configuration);
 	}
 
 	@Override
@@ -931,7 +931,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 		if (isCreatedOrStopped(current)) {
 
-			AbstractRedisClient client = createClient();
+			AbstractValkeyClient client = createClient();
 
 			this.client = client;
 
@@ -940,10 +940,10 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 			this.connectionProvider = connectionProvider;
 			this.reactiveConnectionProvider = new ExceptionTranslatingConnectionProvider(
-					createConnectionProvider(client, LettuceReactiveRedisConnection.CODEC));
+					createConnectionProvider(client, LettuceReactiveValkeyConnection.CODEC));
 
 			if (isClusterAware()) {
-				this.clusterCommandExecutor = createClusterCommandExecutor((RedisClusterClient) client, connectionProvider);
+				this.clusterCommandExecutor = createClusterCommandExecutor((ValkeyClusterClient) client, connectionProvider);
 			}
 
 			this.state.set(State.STARTED);
@@ -958,7 +958,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		return State.CREATED.equals(state) || State.STOPPED.equals(state);
 	}
 
-	private ClusterCommandExecutor createClusterCommandExecutor(RedisClusterClient client,
+	private ClusterCommandExecutor createClusterCommandExecutor(ValkeyClusterClient client,
 			LettuceConnectionProvider connectionProvider) {
 
 		return new ClusterCommandExecutor(new LettuceClusterTopologyProvider(client),
@@ -1044,7 +1044,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@Override
-	public RedisConnection getConnection() {
+	public ValkeyConnection getConnection() {
 
 		assertStarted();
 
@@ -1061,7 +1061,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@Override
-	public RedisClusterConnection getClusterConnection() {
+	public ValkeyClusterConnection getClusterConnection() {
 
 		assertStarted();
 
@@ -1069,9 +1069,9 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 			throw new InvalidDataAccessApiUsageException("Cluster is not configured");
 		}
 
-		RedisClusterClient clusterClient = (RedisClusterClient) this.client;
+		ValkeyClusterClient clusterClient = (ValkeyClusterClient) this.client;
 
-		StatefulRedisClusterConnection<byte[], byte[]> sharedConnection = getSharedClusterConnection();
+		StatefulValkeyClusterConnection<byte[], byte[]> sharedConnection = getSharedClusterConnection();
 
 		LettuceClusterTopologyProvider topologyProvider = new LettuceClusterTopologyProvider(clusterClient);
 
@@ -1080,7 +1080,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@Override
-	public RedisSentinelConnection getSentinelConnection() {
+	public ValkeySentinelConnection getSentinelConnection() {
 
 		assertStarted();
 
@@ -1090,7 +1090,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	/**
 	 * Customization hook for {@link LettuceConnection} creation.
 	 *
-	 * @param sharedConnection the shared {@link StatefulRedisConnection} if {@link #getShareNativeConnection()} is
+	 * @param sharedConnection the shared {@link StatefulValkeyConnection} if {@link #getShareNativeConnection()} is
 	 *          {@literal true}; {@literal null} otherwise.
 	 * @param connectionProvider the {@link LettuceConnectionProvider} to release connections.
 	 * @param timeout command timeout in {@link TimeUnit#MILLISECONDS}.
@@ -1100,7 +1100,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * @since 2.2
 	 */
 	protected LettuceConnection doCreateLettuceConnection(
-			@Nullable StatefulRedisConnection<byte[], byte[]> sharedConnection, LettuceConnectionProvider connectionProvider,
+			@Nullable StatefulValkeyConnection<byte[], byte[]> sharedConnection, LettuceConnectionProvider connectionProvider,
 			long timeout, int database) {
 
 		LettuceConnection connection = new LettuceConnection(sharedConnection, connectionProvider, timeout, database);
@@ -1113,7 +1113,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	/**
 	 * Customization hook for {@link LettuceClusterConnection} creation.
 	 *
-	 * @param sharedConnection the shared {@link StatefulRedisConnection} if {@link #getShareNativeConnection()} is
+	 * @param sharedConnection the shared {@link StatefulValkeyConnection} if {@link #getShareNativeConnection()} is
 	 *          {@literal true}; {@literal null} otherwise.
 	 * @param connectionProvider the {@link LettuceConnectionProvider} to release connections.
 	 * @param topologyProvider the {@link ClusterTopologyProvider}.
@@ -1124,7 +1124,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	 * @since 2.2
 	 */
 	protected LettuceClusterConnection doCreateLettuceClusterConnection(
-			@Nullable StatefulRedisClusterConnection<byte[], byte[]> sharedConnection,
+			@Nullable StatefulValkeyClusterConnection<byte[], byte[]> sharedConnection,
 			LettuceConnectionProvider connectionProvider, ClusterTopologyProvider topologyProvider,
 			ClusterCommandExecutor clusterCommandExecutor, Duration commandTimeout) {
 
@@ -1137,7 +1137,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@Override
-	public LettuceReactiveRedisConnection getReactiveConnection() {
+	public LettuceReactiveValkeyConnection getReactiveConnection() {
 
 		assertStarted();
 
@@ -1146,12 +1146,12 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		}
 
 		return getShareNativeConnection()
-				? new LettuceReactiveRedisConnection(getSharedReactiveConnection(), reactiveConnectionProvider)
-				: new LettuceReactiveRedisConnection(reactiveConnectionProvider);
+				? new LettuceReactiveValkeyConnection(getSharedReactiveConnection(), reactiveConnectionProvider)
+				: new LettuceReactiveValkeyConnection(reactiveConnectionProvider);
 	}
 
 	@Override
-	public LettuceReactiveRedisClusterConnection getReactiveClusterConnection() {
+	public LettuceReactiveValkeyClusterConnection getReactiveClusterConnection() {
 
 		assertStarted();
 
@@ -1159,11 +1159,11 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 			throw new InvalidDataAccessApiUsageException("Cluster is not configured");
 		}
 
-		RedisClusterClient client = (RedisClusterClient) this.client;
+		ValkeyClusterClient client = (ValkeyClusterClient) this.client;
 
 		return getShareNativeConnection()
-				? new LettuceReactiveRedisClusterConnection(getSharedReactiveConnection(), reactiveConnectionProvider, client)
-				: new LettuceReactiveRedisClusterConnection(reactiveConnectionProvider, client);
+				? new LettuceReactiveValkeyClusterConnection(getSharedReactiveConnection(), reactiveConnectionProvider, client)
+				: new LettuceReactiveValkeyClusterConnection(reactiveConnectionProvider, client);
 	}
 
 	/**
@@ -1240,27 +1240,27 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 	/**
 	 * @return the shared connection using {@literal byte[]} encoding for imperative API use. {@literal null} if
-	 *         {@link #getShareNativeConnection() connection sharing} is disabled or when connected to Redis Cluster.
+	 *         {@link #getShareNativeConnection() connection sharing} is disabled or when connected to Valkey Cluster.
 	 */
 	@Nullable
-	protected StatefulRedisConnection<byte[], byte[]> getSharedConnection() {
+	protected StatefulValkeyConnection<byte[], byte[]> getSharedConnection() {
 
 		return shareNativeConnection && !isClusterAware()
-				? (StatefulRedisConnection<byte[], byte[]>) getOrCreateSharedConnection().getConnection()
+				? (StatefulValkeyConnection<byte[], byte[]>) getOrCreateSharedConnection().getConnection()
 				: null;
 	}
 
 	/**
 	 * @return the shared cluster connection using {@literal byte[]} encoding for imperative API use. {@literal null} if
-	 *         {@link #getShareNativeConnection() connection sharing} is disabled or when connected to Redis
+	 *         {@link #getShareNativeConnection() connection sharing} is disabled or when connected to Valkey
 	 *         Standalone/Sentinel/Master-Replica.
 	 * @since 2.5.7
 	 */
 	@Nullable
-	protected StatefulRedisClusterConnection<byte[], byte[]> getSharedClusterConnection() {
+	protected StatefulValkeyClusterConnection<byte[], byte[]> getSharedClusterConnection() {
 
 		return shareNativeConnection && isClusterAware()
-				? (StatefulRedisClusterConnection<byte[], byte[]>) getOrCreateSharedConnection().getConnection()
+				? (StatefulValkeyClusterConnection<byte[], byte[]>) getOrCreateSharedConnection().getConnection()
 				: null;
 	}
 
@@ -1274,7 +1274,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		return shareNativeConnection ? getOrCreateSharedReactiveConnection().getConnection() : null;
 	}
 
-	LettuceConnectionProvider createConnectionProvider(AbstractRedisClient client, RedisCodec<?, ?> codec) {
+	LettuceConnectionProvider createConnectionProvider(AbstractValkeyClient client, ValkeyCodec<?, ?> codec) {
 
 		LettuceConnectionProvider connectionProvider = doCreateConnectionProvider(client, codec);
 
@@ -1286,68 +1286,68 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * Create a {@link LettuceConnectionProvider} given {@link AbstractRedisClient} and {@link RedisCodec}. Configuration
+	 * Create a {@link LettuceConnectionProvider} given {@link AbstractValkeyClient} and {@link ValkeyCodec}. Configuration
 	 * of this connection factory specifies the type of the created connection provider. This method creates either a
-	 * {@link LettuceConnectionProvider} for either {@link RedisClient} or {@link RedisClusterClient}. Subclasses may
+	 * {@link LettuceConnectionProvider} for either {@link ValkeyClient} or {@link ValkeyClusterClient}. Subclasses may
 	 * override this method to decorate the connection provider.
 	 *
-	 * @param client either {@link RedisClient} or {@link RedisClusterClient}, must not be {@literal null}.
+	 * @param client either {@link ValkeyClient} or {@link ValkeyClusterClient}, must not be {@literal null}.
 	 * @param codec used for connection creation, must not be {@literal null}. By default, a {@code byte[]} codec.
 	 *          Reactive connections require a {@link java.nio.ByteBuffer} codec.
 	 * @return the connection provider.
 	 * @since 2.1
 	 */
-	protected LettuceConnectionProvider doCreateConnectionProvider(AbstractRedisClient client, RedisCodec<?, ?> codec) {
+	protected LettuceConnectionProvider doCreateConnectionProvider(AbstractValkeyClient client, ValkeyCodec<?, ?> codec) {
 
-		return isStaticMasterReplicaAware() ? createStaticMasterReplicaConnectionProvider((RedisClient) client, codec)
-				: isClusterAware() ? createClusterConnectionProvider((RedisClusterClient) client, codec)
-						: createStandaloneConnectionProvider((RedisClient) client, codec);
+		return isStaticMasterReplicaAware() ? createStaticMasterReplicaConnectionProvider((ValkeyClient) client, codec)
+				: isClusterAware() ? createClusterConnectionProvider((ValkeyClusterClient) client, codec)
+						: createStandaloneConnectionProvider((ValkeyClient) client, codec);
 	}
 
 	@SuppressWarnings("all")
-	private StaticMasterReplicaConnectionProvider createStaticMasterReplicaConnectionProvider(RedisClient client,
-			RedisCodec<?, ?> codec) {
+	private StaticMasterReplicaConnectionProvider createStaticMasterReplicaConnectionProvider(ValkeyClient client,
+			ValkeyCodec<?, ?> codec) {
 
-		List<RedisURI> nodes = ((RedisStaticMasterReplicaConfiguration) this.configuration).getNodes().stream()
-				.map(it -> createRedisURIAndApplySettings(it.getHostName(), it.getPort()))
+		List<ValkeyURI> nodes = ((ValkeyStaticMasterReplicaConfiguration) this.configuration).getNodes().stream()
+				.map(it -> createValkeyURIAndApplySettings(it.getHostName(), it.getPort()))
 				.peek(it -> it.setDatabase(getDatabase())).collect(Collectors.toList());
 
 		return new StaticMasterReplicaConnectionProvider(client, codec, nodes,
 				getClientConfiguration().getReadFrom().orElse(null));
 	}
 
-	private ClusterConnectionProvider createClusterConnectionProvider(RedisClusterClient client, RedisCodec<?, ?> codec) {
+	private ClusterConnectionProvider createClusterConnectionProvider(ValkeyClusterClient client, ValkeyCodec<?, ?> codec) {
 		return new ClusterConnectionProvider(client, codec, getClientConfiguration().getReadFrom().orElse(null));
 	}
 
-	private StandaloneConnectionProvider createStandaloneConnectionProvider(RedisClient client, RedisCodec<?, ?> codec) {
+	private StandaloneConnectionProvider createStandaloneConnectionProvider(ValkeyClient client, ValkeyCodec<?, ?> codec) {
 		return new StandaloneConnectionProvider(client, codec, getClientConfiguration().getReadFrom().orElse(null));
 	}
 
-	protected AbstractRedisClient createClient() {
+	protected AbstractValkeyClient createClient() {
 
 		return isStaticMasterReplicaAware() ? createStaticMasterReplicaClient()
-				: isRedisSentinelAware() ? createSentinelClient()
+				: isValkeySentinelAware() ? createSentinelClient()
 						: isClusterAware() ? createClusterClient() : createBasicClient();
 	}
 
-	private RedisClient createStaticMasterReplicaClient() {
+	private ValkeyClient createStaticMasterReplicaClient() {
 
-		RedisClient redisClient = this.clientConfiguration.getClientResources().map(RedisClient::create)
-				.orElseGet(RedisClient::create);
+		ValkeyClient redisClient = this.clientConfiguration.getClientResources().map(ValkeyClient::create)
+				.orElseGet(ValkeyClient::create);
 
 		this.clientConfiguration.getClientOptions().ifPresent(redisClient::setOptions);
 
 		return redisClient;
 	}
 
-	private RedisClient createSentinelClient() {
+	private ValkeyClient createSentinelClient() {
 
-		RedisURI redisURI = getSentinelRedisURI();
+		ValkeyURI redisURI = getSentinelValkeyURI();
 
-		RedisClient redisClient = this.clientConfiguration.getClientResources()
-				.map(clientResources -> RedisClient.create(clientResources, redisURI))
-				.orElseGet(() -> RedisClient.create(redisURI));
+		ValkeyClient redisClient = this.clientConfiguration.getClientResources()
+				.map(clientResources -> ValkeyClient.create(clientResources, redisURI))
+				.orElseGet(() -> ValkeyClient.create(redisURI));
 
 		this.clientConfiguration.getClientOptions().ifPresent(redisClient::setOptions);
 
@@ -1355,11 +1355,11 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@SuppressWarnings("all")
-	private RedisURI getSentinelRedisURI() {
+	private ValkeyURI getSentinelValkeyURI() {
 
-		RedisSentinelConfiguration sentinelConfiguration = (RedisSentinelConfiguration) this.configuration;
+		ValkeySentinelConfiguration sentinelConfiguration = (ValkeySentinelConfiguration) this.configuration;
 
-		RedisURI redisUri = LettuceConverters.sentinelConfigurationToRedisURI(sentinelConfiguration);
+		ValkeyURI redisUri = LettuceConverters.sentinelConfigurationToValkeyURI(sentinelConfiguration);
 
 		applyToAll(redisUri, it -> {
 
@@ -1373,12 +1373,12 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 		redisUri.setDatabase(getDatabase());
 
-		this.clientConfiguration.getRedisCredentialsProviderFactory().ifPresent(factory -> {
+		this.clientConfiguration.getValkeyCredentialsProviderFactory().ifPresent(factory -> {
 
 			redisUri.setCredentialsProvider(factory.createCredentialsProvider(this.configuration));
 
-			RedisCredentialsProvider sentinelCredentials = factory
-					.createSentinelCredentialsProvider((RedisSentinelConfiguration) this.configuration);
+			ValkeyCredentialsProvider sentinelCredentials = factory
+					.createSentinelCredentialsProvider((ValkeySentinelConfiguration) this.configuration);
 
 			redisUri.getSentinels().forEach(it -> it.setCredentialsProvider(sentinelCredentials));
 		});
@@ -1387,18 +1387,18 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@SuppressWarnings("all")
-	private RedisClusterClient createClusterClient() {
+	private ValkeyClusterClient createClusterClient() {
 
-		List<RedisURI> initialUris = new ArrayList<>();
+		List<ValkeyURI> initialUris = new ArrayList<>();
 
 		ClusterConfiguration clusterConfiguration = (ClusterConfiguration) this.configuration;
 
 		clusterConfiguration.getClusterNodes().stream()
-				.map(node -> createRedisURIAndApplySettings(node.getHost(), node.getPort())).forEach(initialUris::add);
+				.map(node -> createValkeyURIAndApplySettings(node.getHost(), node.getPort())).forEach(initialUris::add);
 
-		RedisClusterClient clusterClient = this.clientConfiguration.getClientResources()
-				.map(clientResources -> RedisClusterClient.create(clientResources, initialUris))
-				.orElseGet(() -> RedisClusterClient.create(initialUris));
+		ValkeyClusterClient clusterClient = this.clientConfiguration.getClientResources()
+				.map(clientResources -> ValkeyClusterClient.create(clientResources, initialUris))
+				.orElseGet(() -> ValkeyClusterClient.create(initialUris));
 
 		clusterClient.setOptions(getClusterClientOptions(clusterConfiguration));
 
@@ -1423,13 +1423,13 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	@SuppressWarnings("all")
-	private RedisClient createBasicClient() {
+	private ValkeyClient createBasicClient() {
 
-		RedisURI uri = isDomainSocketAware() ? createRedisSocketURIAndApplySettings(getSocketConfiguration().getSocket())
-				: createRedisURIAndApplySettings(getHostName(), getPort());
+		ValkeyURI uri = isDomainSocketAware() ? createValkeySocketURIAndApplySettings(getSocketConfiguration().getSocket())
+				: createValkeyURIAndApplySettings(getHostName(), getPort());
 
-		RedisClient redisClient = this.clientConfiguration.getClientResources()
-				.map(clientResources -> RedisClient.create(clientResources, uri)).orElseGet(() -> RedisClient.create(uri));
+		ValkeyClient redisClient = this.clientConfiguration.getClientResources()
+				.map(clientResources -> ValkeyClient.create(clientResources, uri)).orElseGet(() -> ValkeyClient.create(uri));
 
 		this.clientConfiguration.getClientOptions().ifPresent(redisClient::setOptions);
 
@@ -1453,15 +1453,15 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		}
 	}
 
-	private static void applyToAll(RedisURI source, Consumer<RedisURI> action) {
+	private static void applyToAll(ValkeyURI source, Consumer<ValkeyURI> action) {
 
 		action.accept(source);
 		source.getSentinels().forEach(action);
 	}
 
-	private RedisURI createRedisURIAndApplySettings(String host, int port) {
+	private ValkeyURI createValkeyURIAndApplySettings(String host, int port) {
 
-		RedisURI.Builder builder = RedisURI.Builder.redis(host, port);
+		ValkeyURI.Builder builder = ValkeyURI.Builder.redis(host, port);
 
 		applyAuthentication(builder);
 
@@ -1476,24 +1476,24 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		return builder.build();
 	}
 
-	private RedisURI createRedisSocketURIAndApplySettings(String socketPath) {
+	private ValkeyURI createValkeySocketURIAndApplySettings(String socketPath) {
 
-		return applyAuthentication(RedisURI.Builder.socket(socketPath))
+		return applyAuthentication(ValkeyURI.Builder.socket(socketPath))
 				.withTimeout(this.clientConfiguration.getCommandTimeout()).withDatabase(getDatabase()).build();
 	}
 
-	private RedisURI.Builder applyAuthentication(RedisURI.Builder builder) {
+	private ValkeyURI.Builder applyAuthentication(ValkeyURI.Builder builder) {
 
-		String username = getRedisUsername();
+		String username = getValkeyUsername();
 
 		if (StringUtils.hasText(username)) {
 			// See https://github.com/lettuce-io/lettuce-core/issues/1404
-			builder.withAuthentication(username, new String(getRedisPassword().toOptional().orElse(new char[0])));
+			builder.withAuthentication(username, new String(getValkeyPassword().toOptional().orElse(new char[0])));
 		} else {
-			getRedisPassword().toOptional().ifPresent(builder::withPassword);
+			getValkeyPassword().toOptional().ifPresent(builder::withPassword);
 		}
 
-		this.clientConfiguration.getRedisCredentialsProviderFactory()
+		this.clientConfiguration.getValkeyCredentialsProviderFactory()
 				.ifPresent(factory -> builder.withAuthentication(factory.createCredentialsProvider(this.configuration)));
 
 		return builder;
@@ -1615,11 +1615,11 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 				if (isOpen(connection)) {
 					try {
 
-						if (connection instanceof StatefulRedisConnection<?, ?> statefulConnection) {
+						if (connection instanceof StatefulValkeyConnection<?, ?> statefulConnection) {
 							statefulConnection.sync().ping();
 						}
 
-						if (connection instanceof StatefulRedisClusterConnection<?, ?> statefulClusterConnection) {
+						if (connection instanceof StatefulValkeyClusterConnection<?, ?> statefulClusterConnection) {
 							statefulClusterConnection.sync().ping();
 						}
 
@@ -1670,7 +1670,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 		private @Nullable ClientResources clientResources;
 
-		private Duration timeout = Duration.ofSeconds(RedisURI.DEFAULT_TIMEOUT);
+		private Duration timeout = Duration.ofSeconds(ValkeyURI.DEFAULT_TIMEOUT);
 		private Duration shutdownTimeout = Duration.ofMillis(100);
 
 		private @Nullable String clientName;
@@ -1727,7 +1727,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		}
 
 		@Override
-		public Optional<RedisCredentialsProviderFactory> getRedisCredentialsProviderFactory() {
+		public Optional<ValkeyCredentialsProviderFactory> getValkeyCredentialsProviderFactory() {
 			return Optional.empty();
 		}
 
@@ -1769,7 +1769,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 	}
 
 	/**
-	 * {@link LettuceConnectionProvider} that translates connection exceptions into {@link RedisConnectionException}.
+	 * {@link LettuceConnectionProvider} that translates connection exceptions into {@link ValkeyConnectionException}.
 	 */
 	private static class ExceptionTranslatingConnectionProvider
 			implements LettuceConnectionProvider, LettuceConnectionProvider.TargetAware, DisposableBean {
@@ -1791,7 +1791,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		}
 
 		@Override
-		public <T extends StatefulConnection<?, ?>> T getConnection(Class<T> connectionType, RedisURI redisURI) {
+		public <T extends StatefulConnection<?, ?>> T getConnection(Class<T> connectionType, ValkeyURI redisURI) {
 
 			try {
 				return ((TargetAware) delegate).getConnection(connectionType, redisURI);
@@ -1819,7 +1819,7 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 
 		@Override
 		public <T extends StatefulConnection<?, ?>> CompletionStage<T> getConnectionAsync(Class<T> connectionType,
-				RedisURI redisURI) {
+				ValkeyURI redisURI) {
 
 			CompletableFuture<T> future = new CompletableFuture<>();
 
@@ -1854,8 +1854,8 @@ public class LettuceConnectionFactory implements RedisConnectionFactory, Reactiv
 		}
 
 		private RuntimeException translateException(Throwable cause) {
-			return cause instanceof RedisConnectionFailureException connectionFailure ? connectionFailure
-					: new RedisConnectionFailureException("Unable to connect to Redis", cause);
+			return cause instanceof ValkeyConnectionFailureException connectionFailure ? connectionFailure
+					: new ValkeyConnectionFailureException("Unable to connect to Valkey", cause);
 		}
 	}
 }

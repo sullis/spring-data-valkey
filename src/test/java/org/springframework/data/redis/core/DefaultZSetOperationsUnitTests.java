@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 /**
@@ -35,12 +35,12 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 class DefaultZSetOperationsUnitTests {
 
 	DefaultZSetOperations zSetOperations;
-	ConnectionMockingRedisTemplate template;
+	ConnectionMockingValkeyTemplate template;
 
 	@BeforeEach
 	void beforeEach() {
 
-		template = ConnectionMockingRedisTemplate.template();
+		template = ConnectionMockingValkeyTemplate.template();
 		zSetOperations = new DefaultZSetOperations<>(template);
 	}
 

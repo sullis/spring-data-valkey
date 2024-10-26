@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ser.SerializerFactory;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
- * {@link RedisSerializer} that can read and write JSON using
+ * {@link ValkeySerializer} that can read and write JSON using
  * <a href="https://github.com/FasterXML/jackson-core">Jackson's</a> and
  * <a href="https://github.com/FasterXML/jackson-databind">Jackson Databind</a> {@link ObjectMapper}.
  * <p>
@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  * @author Mark Paluch
  * @since 1.2
  */
-public class Jackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
+public class Jackson2JsonValkeySerializer<T> implements ValkeySerializer<T> {
 
 	/**
 	 * @deprecated since 3.0 for removal.
@@ -58,31 +58,31 @@ public class Jackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
 	private final JacksonObjectWriter writer;
 
 	/**
-	 * Creates a new {@link Jackson2JsonRedisSerializer} for the given target {@link Class}.
+	 * Creates a new {@link Jackson2JsonValkeySerializer} for the given target {@link Class}.
 	 *
 	 * @param type must not be {@literal null}.
 	 */
-	public Jackson2JsonRedisSerializer(Class<T> type) {
+	public Jackson2JsonValkeySerializer(Class<T> type) {
 		this(new ObjectMapper(), type);
 	}
 
 	/**
-	 * Creates a new {@link Jackson2JsonRedisSerializer} for the given target {@link JavaType}.
+	 * Creates a new {@link Jackson2JsonValkeySerializer} for the given target {@link JavaType}.
 	 *
 	 * @param javaType must not be {@literal null}.
 	 */
-	public Jackson2JsonRedisSerializer(JavaType javaType) {
+	public Jackson2JsonValkeySerializer(JavaType javaType) {
 		this(new ObjectMapper(), javaType);
 	}
 
 	/**
-	 * Creates a new {@link Jackson2JsonRedisSerializer} for the given target {@link Class}.
+	 * Creates a new {@link Jackson2JsonValkeySerializer} for the given target {@link Class}.
 	 *
 	 * @param mapper must not be {@literal null}.
 	 * @param type must not be {@literal null}.
 	 * @since 3.0
 	 */
-	public Jackson2JsonRedisSerializer(ObjectMapper mapper, Class<T> type) {
+	public Jackson2JsonValkeySerializer(ObjectMapper mapper, Class<T> type) {
 
 		Assert.notNull(mapper, "ObjectMapper must not be null");
 		Assert.notNull(type, "Java type must not be null");
@@ -94,18 +94,18 @@ public class Jackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
 	}
 
 	/**
-	 * Creates a new {@link Jackson2JsonRedisSerializer} for the given target {@link JavaType}.
+	 * Creates a new {@link Jackson2JsonValkeySerializer} for the given target {@link JavaType}.
 	 *
 	 * @param mapper must not be {@literal null}.
 	 * @param javaType must not be {@literal null}.
 	 * @since 3.0
 	 */
-	public Jackson2JsonRedisSerializer(ObjectMapper mapper, JavaType javaType) {
+	public Jackson2JsonValkeySerializer(ObjectMapper mapper, JavaType javaType) {
 		this(mapper, javaType, JacksonObjectReader.create(), JacksonObjectWriter.create());
 	}
 
 	/**
-	 * Creates a new {@link Jackson2JsonRedisSerializer} for the given target {@link JavaType}.
+	 * Creates a new {@link Jackson2JsonValkeySerializer} for the given target {@link JavaType}.
 	 *
 	 * @param mapper must not be {@literal null}.
 	 * @param javaType must not be {@literal null}.
@@ -113,7 +113,7 @@ public class Jackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
 	 * @param writer the {@link JacksonObjectWriter} function to write objects using {@link ObjectMapper}.
 	 * @since 3.0
 	 */
-	public Jackson2JsonRedisSerializer(ObjectMapper mapper, JavaType javaType, JacksonObjectReader reader,
+	public Jackson2JsonValkeySerializer(ObjectMapper mapper, JavaType javaType, JacksonObjectReader reader,
 			JacksonObjectWriter writer) {
 
 		Assert.notNull(mapper, "ObjectMapper must not be null!");
@@ -135,7 +135,7 @@ public class Jackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
 	 * specific types. The other option for refining the serialization process is to use Jackson's provided annotations on
 	 * the types to be serialized, in which case a custom-configured ObjectMapper is unnecessary.
 	 *
-	 * @deprecated since 3.0, use {@link #Jackson2JsonRedisSerializer(ObjectMapper, Class) constructor creation} to
+	 * @deprecated since 3.0, use {@link #Jackson2JsonValkeySerializer(ObjectMapper, Class) constructor creation} to
 	 *             configure the object mapper.
 	 */
 	@Deprecated(since = "3.0", forRemoval = true)

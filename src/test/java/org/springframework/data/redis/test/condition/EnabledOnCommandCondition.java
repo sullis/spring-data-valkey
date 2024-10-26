@@ -17,7 +17,7 @@ package org.springframework.data.redis.test.condition;
 
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.*;
 
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ import org.springframework.data.redis.test.extension.LettuceExtension;
 class EnabledOnCommandCondition implements ExecutionCondition {
 
 	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled("@EnabledOnCommand is not present");
-	private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(RedisConditions.class);
+	private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ValkeyConditions.class);
 
 	private final LettuceExtension lettuceExtension = new LettuceExtension();
 
@@ -54,16 +54,16 @@ class EnabledOnCommandCondition implements ExecutionCondition {
 		String command = optional.get().value();
 
 		ExtensionContext.Store store = context.getRoot().getStore(NAMESPACE);
-		RedisConditions conditions = store.getOrComputeIfAbsent(RedisConditions.class, ignore -> {
+		ValkeyConditions conditions = store.getOrComputeIfAbsent(ValkeyConditions.class, ignore -> {
 
-			try (StatefulRedisConnection connection = lettuceExtension.resolve(context, StatefulRedisConnection.class)) {
-				return RedisConditions.of(connection);
+			try (StatefulValkeyConnection connection = lettuceExtension.resolve(context, StatefulValkeyConnection.class)) {
+				return ValkeyConditions.of(connection);
 			}
-		}, RedisConditions.class);
+		}, ValkeyConditions.class);
 
 		boolean hasCommand = conditions.hasCommand(command);
 		return hasCommand ? enabled("Enabled on command " + command)
-				: disabled("Disabled, command " + command + " not available on Redis version " + conditions.getRedisVersion());
+				: disabled("Disabled, command " + command + " not available on Valkey version " + conditions.getValkeyVersion());
 	}
 
 }

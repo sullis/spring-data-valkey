@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Enumeration of the Redis data types.
+ * Enumeration of the Valkey data types.
  *
  * @author Costin Leau
  * @author Mark Paluch

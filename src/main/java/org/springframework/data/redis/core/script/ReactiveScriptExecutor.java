@@ -22,16 +22,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
- * Executes {@link RedisScript}s using reactive infrastructure.
+ * Executes {@link ValkeyScript}s using reactive infrastructure.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
@@ -42,66 +42,66 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public interface ReactiveScriptExecutor<K> {
 
 	/**
-	 * Execute the given {@link RedisScript}
+	 * Execute the given {@link ValkeyScript}
 	 *
 	 * @param script must not be {@literal null}.
-	 * @return the return value of the script or {@link Flux#empty()} if {@link RedisScript#getResultType()} is
+	 * @return the return value of the script or {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script) {
+	default <T> Flux<T> execute(ValkeyScript<T> script) {
 		return execute(script, Collections.emptyList());
 	}
 
 	/**
-	 * Execute the given {@link RedisScript}
+	 * Execute the given {@link ValkeyScript}
 	 *
 	 * @param script must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
-	 * @return the return value of the script or {@link Flux#empty()} if {@link RedisScript#getResultType()} is
+	 * @return the return value of the script or {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script, List<K> keys) {
+	default <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys) {
 		return execute(script, keys, Collections.emptyList());
 	}
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script The script to execute. Must not be {@literal null}.
 	 * @param keys any keys that need to be passed to the script. Must not be {@literal null}.
 	 * @param args any args that need to be passed to the script. Can be {@literal empty}.
-	 * @return The return value of the script or {@link Flux#empty()} if {@link RedisScript#getResultType()} is
+	 * @return The return value of the script or {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 * @since 3.4
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script, List<K> keys, Object... args) {
+	default <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, Object... args) {
 		return execute(script, keys, Arrays.asList(args));
 	}
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script The script to execute. Must not be {@literal null}.
 	 * @param keys any keys that need to be passed to the script. Must not be {@literal null}.
 	 * @param args any args that need to be passed to the script. Can be {@literal empty}.
-	 * @return The return value of the script or {@link Flux#empty()} if {@link RedisScript#getResultType()} is
+	 * @return The return value of the script or {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	<T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args);
+	<T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args);
 
 	/**
-	 * Executes the given {@link RedisScript}, using the provided {@link RedisSerializer}s to serialize the script
+	 * Executes the given {@link ValkeyScript}, using the provided {@link ValkeySerializer}s to serialize the script
 	 * arguments and result.
 	 *
 	 * @param script The script to execute. must not be {@literal null}.
 	 * @param keys any keys that need to be passed to the script.
 	 * @param args any args that need to be passed to the script.
-	 * @param argsWriter The {@link RedisElementWriter} to use for serializing args. Must not be {@literal null}.
-	 * @param resultReader The {@link RedisElementReader} to use for serializing the script return value. Must not be
+	 * @param argsWriter The {@link ValkeyElementWriter} to use for serializing args. Must not be {@literal null}.
+	 * @param resultReader The {@link ValkeyElementReader} to use for serializing the script return value. Must not be
 	 *          {@literal null}.
-	 * @return The return value of the script or {@link Flux#empty()} if {@link RedisScript#getResultType()} is
+	 * @return The return value of the script or {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	<T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args, RedisElementWriter<?> argsWriter,
-			RedisElementReader<T> resultReader);
+	<T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args, ValkeyElementWriter<?> argsWriter,
+			ValkeyElementReader<T> resultReader);
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Christoph Strobl
@@ -32,12 +32,12 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @MethodSource("testParams")
 public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 
-	private final RedisTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> redisTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final HyperLogLogOperations<K, V> hyperLogLogOps;
 
-	public DefaultHyperLogLogOperationsIntegrationTests(RedisTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultHyperLogLogOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -52,13 +52,13 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-308
+	@ParameterizedValkeyTest // DATAREDIS-308
 	@SuppressWarnings("unchecked")
 	void addShouldAddDistinctValuesCorrectly() {
 
@@ -70,7 +70,7 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 		assertThat(hyperLogLogOps.add(key, v1, v2, v3)).isEqualTo(1L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-308
+	@ParameterizedValkeyTest // DATAREDIS-308
 	@SuppressWarnings("unchecked")
 	void addShouldNotAddExistingValuesCorrectly() {
 
@@ -83,7 +83,7 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 		assertThat(hyperLogLogOps.add(key, v2)).isEqualTo(0L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-308
+	@ParameterizedValkeyTest // DATAREDIS-308
 	@SuppressWarnings("unchecked")
 	void sizeShouldCountValuesCorrectly() {
 
@@ -96,7 +96,7 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 		assertThat(hyperLogLogOps.size(key)).isEqualTo(3L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-308
+	@ParameterizedValkeyTest // DATAREDIS-308
 	@SuppressWarnings("unchecked")
 	void sizeShouldCountValuesOfMultipleKeysCorrectly() {
 
@@ -114,7 +114,7 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 		assertThat(hyperLogLogOps.size(key, key2)).isGreaterThan(3L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-308
+	@ParameterizedValkeyTest // DATAREDIS-308
 	@SuppressWarnings("unchecked")
 	void unionShouldMergeValuesOfMultipleKeysCorrectly() throws InterruptedException {
 

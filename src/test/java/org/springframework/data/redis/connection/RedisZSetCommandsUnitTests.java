@@ -18,14 +18,14 @@ package org.springframework.data.redis.connection;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs;
 
 /**
- * Unit tests for {@link RedisZSetCommands}.
+ * Unit tests for {@link ValkeyZSetCommands}.
  *
  * @author Mark Paluch
  */
-class RedisZSetCommandsUnitTests {
+class ValkeyZSetCommandsUnitTests {
 
 	@Test // GH-2588
 	void zAddArgsShouldReportEmpty() {

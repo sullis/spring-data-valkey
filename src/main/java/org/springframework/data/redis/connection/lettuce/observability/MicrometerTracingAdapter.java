@@ -16,7 +16,7 @@
 package org.springframework.data.redis.connection.lettuce.observability;
 
 import io.lettuce.core.protocol.CompleteableCommand;
-import io.lettuce.core.protocol.RedisCommand;
+import io.lettuce.core.protocol.ValkeyCommand;
 import io.lettuce.core.tracing.TraceContext;
 import io.lettuce.core.tracing.TraceContextProvider;
 import io.lettuce.core.tracing.Tracer;
@@ -32,13 +32,13 @@ import java.net.SocketAddress;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.data.redis.connection.lettuce.observability.RedisObservation.HighCardinalityCommandKeyNames;
+import org.springframework.data.redis.connection.lettuce.observability.ValkeyObservation.HighCardinalityCommandKeyNames;
 import org.springframework.lang.Nullable;
 
 /**
  * {@link Tracing} adapter using Micrometer's {@link Observation}. This adapter integrates with Micrometer to propagate
  * observations into timers, distributed traces and any other registered handlers. Observations include a set of tags
- * capturing Redis runtime information.
+ * capturing Valkey runtime information.
  * <h3>Capturing full statements</h3> This adapter can capture full statements when enabling
  * {@code includeCommandArgsInSpanTags}. You should carefully consider the impact of this setting as all command
  * arguments will be captured in traces including these that may contain sensitive details.
@@ -135,7 +135,7 @@ public class MicrometerTracingAdapter implements Tracing {
 
 		private Observation createObservation(@Nullable TraceContext parentContext) {
 
-			return RedisObservation.REDIS_COMMAND_OBSERVATION.observation(observationRegistry, () -> {
+			return ValkeyObservation.REDIS_COMMAND_OBSERVATION.observation(observationRegistry, () -> {
 
 				LettuceObservationContext context = new LettuceObservationContext(serviceName);
 
@@ -163,7 +163,7 @@ public class MicrometerTracingAdapter implements Tracing {
 		public NoOpSpan() {}
 
 		@Override
-		public Tracer.Span start(RedisCommand<?, ?, ?> command) {
+		public Tracer.Span start(ValkeyCommand<?, ?, ?> command) {
 			return this;
 		}
 
@@ -203,14 +203,14 @@ public class MicrometerTracingAdapter implements Tracing {
 
 		private final Observation observation;
 
-		private @Nullable RedisCommand<?, ?, ?> command;
+		private @Nullable ValkeyCommand<?, ?, ?> command;
 
 		public MicrometerSpan(Observation observation) {
 			this.observation = observation;
 		}
 
 		@Override
-		public Span start(RedisCommand<?, ?, ?> command) {
+		public Span start(ValkeyCommand<?, ?, ?> command) {
 
 			((LettuceObservationContext) observation.getContext()).setCommand(command);
 

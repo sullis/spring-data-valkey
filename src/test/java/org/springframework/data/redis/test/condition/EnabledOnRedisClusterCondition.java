@@ -26,13 +26,13 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@link ExecutionCondition} for {@link EnabledOnRedisClusterCondition @EnabledOnRedisClusterAvailable}.
+ * {@link ExecutionCondition} for {@link EnabledOnValkeyClusterCondition @EnabledOnValkeyClusterAvailable}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
- * @see EnabledOnRedisClusterCondition
+ * @see EnabledOnValkeyClusterCondition
  */
-class EnabledOnRedisClusterCondition implements ExecutionCondition {
+class EnabledOnValkeyClusterCondition implements ExecutionCondition {
 
 	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled(
 			"@EnabledOnClusterAvailable is not present");
@@ -40,19 +40,19 @@ class EnabledOnRedisClusterCondition implements ExecutionCondition {
 	@Override
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
 
-		Optional<EnabledOnRedisClusterAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
-				EnabledOnRedisClusterAvailable.class);
+		Optional<EnabledOnValkeyClusterAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
+				EnabledOnValkeyClusterAvailable.class);
 
 		if (!optional.isPresent()) {
 			return ENABLED_BY_DEFAULT;
 		}
 
-		if (RedisDetector.isClusterAvailable()) {
-			return enabled("Connection successful to Redis Cluster at %s:%d".formatted(SettingsUtils.getHost(),
+		if (ValkeyDetector.isClusterAvailable()) {
+			return enabled("Connection successful to Valkey Cluster at %s:%d".formatted(SettingsUtils.getHost(),
 					SettingsUtils.getClusterPort()));
 		}
 
-		return disabled("Cannot connect to Redis Cluster at %s:%d".formatted(SettingsUtils.getHost(),
+		return disabled("Cannot connect to Valkey Cluster at %s:%d".formatted(SettingsUtils.getHost(),
 				SettingsUtils.getClusterPort()));
 	}
 

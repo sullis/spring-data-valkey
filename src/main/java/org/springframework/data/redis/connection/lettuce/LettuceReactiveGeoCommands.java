@@ -35,11 +35,11 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.ReactiveGeoCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
 import org.springframework.util.Assert;
 
 /**
@@ -49,14 +49,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveGeoCommands implements ReactiveGeoCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveGeoCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveGeoCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveGeoCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 		this.connection = connection;
@@ -95,7 +95,7 @@ class LettuceReactiveGeoCommands implements ReactiveGeoCommands {
 			Assert.notNull(command.getTo(), "To member must not be null");
 
 			Metric metric = command.getMetric().isPresent() ? command.getMetric().get()
-					: RedisGeoCommands.DistanceUnit.METERS;
+					: ValkeyGeoCommands.DistanceUnit.METERS;
 
 			GeoArgs.Unit geoUnit = LettuceConverters.toGeoArgsUnit(metric);
 			Converter<Double, Distance> distanceConverter = LettuceConverters.distanceConverterForMetric(metric);
@@ -216,7 +216,7 @@ class LettuceReactiveGeoCommands implements ReactiveGeoCommands {
 			Assert.notNull(command.getArgs(), "Command args must not be null");
 
 			GeoArgs geoArgs = command.getArgs().map(LettuceConverters::toGeoArgs).orElseGet(GeoArgs::new);
-			Boolean storeDist = command.getArgs().map(RedisGeoCommands.GeoSearchStoreCommandArgs::isStoreDistance)
+			Boolean storeDist = command.getArgs().map(ValkeyGeoCommands.GeoSearchStoreCommandArgs::isStoreDistance)
 					.orElse(false);
 			GeoSearch.GeoRef<ByteBuffer> ref = LettuceConverters.toGeoRef(command.getReference());
 			GeoSearch.GeoPredicate predicate = LettuceConverters.toGeoPredicate(command.getShape());

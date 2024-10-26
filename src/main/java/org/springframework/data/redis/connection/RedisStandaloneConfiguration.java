@@ -15,24 +15,24 @@
  */
 package org.springframework.data.redis.connection;
 
-import org.springframework.data.redis.connection.RedisConfiguration.WithDatabaseIndex;
-import org.springframework.data.redis.connection.RedisConfiguration.WithHostAndPort;
-import org.springframework.data.redis.connection.RedisConfiguration.WithPassword;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithDatabaseIndex;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithHostAndPort;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithPassword;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Configuration class used to set up a {@link RedisConnection} with {@link RedisConnectionFactory} for connecting
- * to a single node <a href="https://redis.io/">Redis</a> instance.
+ * Configuration class used to set up a {@link ValkeyConnection} with {@link ValkeyConnectionFactory} for connecting
+ * to a single node <a href="https://redis.io/">Valkey</a> instance.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author John Blum
  * @since 2.0
  */
-public class RedisStandaloneConfiguration
-		implements RedisConfiguration, WithHostAndPort, WithPassword, WithDatabaseIndex {
+public class ValkeyStandaloneConfiguration
+		implements ValkeyConfiguration, WithHostAndPort, WithPassword, WithDatabaseIndex {
 
 	private static final int DEFAULT_PORT = 6379;
 
@@ -41,32 +41,32 @@ public class RedisStandaloneConfiguration
 	private int database;
 	private int port = DEFAULT_PORT;
 
-	private RedisPassword password = RedisPassword.none();
+	private ValkeyPassword password = ValkeyPassword.none();
 
 	private String hostName = DEFAULT_HOST;
 	private @Nullable String username = null;
 
 	/**
-	 * Create a new default {@link RedisStandaloneConfiguration}.
+	 * Create a new default {@link ValkeyStandaloneConfiguration}.
 	 */
-	public RedisStandaloneConfiguration() {}
+	public ValkeyStandaloneConfiguration() {}
 
 	/**
-	 * Create a new {@link RedisStandaloneConfiguration} given {@code hostName}.
+	 * Create a new {@link ValkeyStandaloneConfiguration} given {@code hostName}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 */
-	public RedisStandaloneConfiguration(String hostName) {
+	public ValkeyStandaloneConfiguration(String hostName) {
 		this(hostName, DEFAULT_PORT);
 	}
 
 	/**
-	 * Create a new {@link RedisStandaloneConfiguration} given {@code hostName} and {@code port}.
+	 * Create a new {@link ValkeyStandaloneConfiguration} given {@code hostName} and {@code port}.
 	 *
 	 * @param hostName must not be {@literal null} or empty.
 	 * @param port a valid TCP port (1-65535).
 	 */
-	public RedisStandaloneConfiguration(String hostName, int port) {
+	public ValkeyStandaloneConfiguration(String hostName, int port) {
 
 		Assert.hasText(hostName, "Host name must not be null or empty");
 		Assert.isTrue(port >= 1 && port <= 65535,
@@ -120,14 +120,14 @@ public class RedisStandaloneConfiguration
 	}
 
 	@Override
-	public RedisPassword getPassword() {
+	public ValkeyPassword getPassword() {
 		return password;
 	}
 
 	@Override
-	public void setPassword(RedisPassword password) {
+	public void setPassword(ValkeyPassword password) {
 
-		Assert.notNull(password, "RedisPassword must not be null");
+		Assert.notNull(password, "ValkeyPassword must not be null");
 
 		this.password = password;
 	}
@@ -137,7 +137,7 @@ public class RedisStandaloneConfiguration
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RedisStandaloneConfiguration that)) {
+		if (!(o instanceof ValkeyStandaloneConfiguration that)) {
 			return false;
 		}
 		if (port != that.port) {

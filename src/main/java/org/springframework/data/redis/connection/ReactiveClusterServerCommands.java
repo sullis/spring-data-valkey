@@ -20,11 +20,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.Properties;
 
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 
 /**
- * Redis Server commands executed in cluster environment using reactive infrastructure.
+ * Valkey Server commands executed in cluster environment using reactive infrastructure.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -39,20 +39,20 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#bgReWriteAof()
+	 * @see ValkeyServerCommands#bgReWriteAof()
 	 */
-	Mono<String> bgReWriteAof(RedisClusterNode node);
+	Mono<String> bgReWriteAof(ValkeyClusterNode node);
 
 	/**
 	 * Start background saving of db on server.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} indicating command received by server. Operation success needs to be checked via
-	 *         {@link #lastSave(RedisClusterNode)}.
+	 *         {@link #lastSave(ValkeyClusterNode)}.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#bgSave()
+	 * @see ValkeyServerCommands#bgSave()
 	 */
-	Mono<String> bgSave(RedisClusterNode node);
+	Mono<String> bgSave(ValkeyClusterNode node);
 
 	/**
 	 * Get time unix timestamp of last successful {@link #bgSave()} operation in seconds.
@@ -60,9 +60,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} wrapping unix timestamp.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#lastSave()
+	 * @see ValkeyServerCommands#lastSave()
 	 */
-	Mono<Long> lastSave(RedisClusterNode node);
+	Mono<Long> lastSave(ValkeyClusterNode node);
 
 	/**
 	 * Synchronous save current db snapshot on server.
@@ -70,9 +70,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#save()
+	 * @see ValkeyServerCommands#save()
 	 */
-	Mono<String> save(RedisClusterNode node);
+	Mono<String> save(ValkeyClusterNode node);
 
 	/**
 	 * Get the total number of available keys in currently selected database.
@@ -80,18 +80,18 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} wrapping number of keys.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#dbSize()
+	 * @see ValkeyServerCommands#dbSize()
 	 */
-	Mono<Long> dbSize(RedisClusterNode node);
+	Mono<Long> dbSize(ValkeyClusterNode node);
 
 	/**
 	 * Delete all keys of the currently selected database.
 	 *
 	 * @param node must not be {@literal null}. {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#flushDb()
+	 * @see ValkeyServerCommands#flushDb()
 	 */
-	Mono<String> flushDb(RedisClusterNode node);
+	Mono<String> flushDb(ValkeyClusterNode node);
 
 	/**
 	 * Delete all keys of the currently selected database using the specified {@link FlushOption}.
@@ -99,10 +99,10 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}. {@link Mono} indicating command completion.
 	 * @param option
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#flushDb(FlushOption)
+	 * @see ValkeyServerCommands#flushDb(FlushOption)
 	 * @since 2.7
 	 */
-	Mono<String> flushDb(RedisClusterNode node, FlushOption option);
+	Mono<String> flushDb(ValkeyClusterNode node, FlushOption option);
 
 	/**
 	 * Delete all <b>all keys</b> from <b>all databases</b>.
@@ -110,9 +110,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#flushAll()
+	 * @see ValkeyServerCommands#flushAll()
 	 */
-	Mono<String> flushAll(RedisClusterNode node);
+	Mono<String> flushAll(ValkeyClusterNode node);
 
 	/**
 	 * Delete all <b>all keys</b> from <b>all databases</b> using the specified {@link FlushOption}.
@@ -121,10 +121,10 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param option
 	 * @return {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#flushAll(FlushOption)
+	 * @see ValkeyServerCommands#flushAll(FlushOption)
 	 * @since 2.7
 	 */
-	Mono<String> flushAll(RedisClusterNode node, FlushOption option);
+	Mono<String> flushAll(ValkeyClusterNode node, FlushOption option);
 
 	/**
 	 * Load {@literal default} server information like
@@ -137,9 +137,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} wrapping server information.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#info()
+	 * @see ValkeyServerCommands#info()
 	 */
-	Mono<Properties> info(RedisClusterNode node);
+	Mono<Properties> info(ValkeyClusterNode node);
 
 	/**
 	 * Load server information for given {@code selection}.
@@ -149,9 +149,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @return {@link Mono} wrapping server information of given {@code section}.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
 	 * @throws IllegalArgumentException when section is {@literal null} or {@literal empty}.
-	 * @see RedisServerCommands#info(String)
+	 * @see ValkeyServerCommands#info(String)
 	 */
-	Mono<Properties> info(RedisClusterNode node, String section);
+	Mono<Properties> info(ValkeyClusterNode node, String section);
 
 	/**
 	 * Load configuration parameters for given {@code pattern} from server.
@@ -161,9 +161,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @return {@link Mono} wrapping configuration parameters matching given {@code pattern}.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
 	 * @throws IllegalArgumentException when {@code pattern} is {@literal null} or {@literal empty}.
-	 * @see RedisServerCommands#getConfig(String)
+	 * @see ValkeyServerCommands#getConfig(String)
 	 */
-	Mono<Properties> getConfig(RedisClusterNode node, String pattern);
+	Mono<Properties> getConfig(ValkeyClusterNode node, String pattern);
 
 	/**
 	 * Set server configuration for {@code param} to {@code value}.
@@ -173,9 +173,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param value must not be {@literal null} nor {@literal empty}.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
 	 * @throws IllegalArgumentException when {@code pattern} / {@code value} is {@literal null} or {@literal empty}.
-	 * @see RedisServerCommands#setConfig(String, String)
+	 * @see ValkeyServerCommands#setConfig(String, String)
 	 */
-	Mono<String> setConfig(RedisClusterNode node, String param, String value);
+	Mono<String> setConfig(ValkeyClusterNode node, String param, String value);
 
 	/**
 	 * Reset statistic counters on server. <br>
@@ -184,9 +184,9 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} indicating command completion.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#resetConfigStats()
+	 * @see ValkeyServerCommands#resetConfigStats()
 	 */
-	Mono<String> resetConfigStats(RedisClusterNode node);
+	Mono<String> resetConfigStats(ValkeyClusterNode node);
 
 	/**
 	 * Request server timestamp using {@code TIME} command.
@@ -194,17 +194,17 @@ public interface ReactiveClusterServerCommands extends ReactiveServerCommands {
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} wrapping current server time in milliseconds.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#time()
+	 * @see ValkeyServerCommands#time()
 	 */
-	Mono<Long> time(RedisClusterNode node);
+	Mono<Long> time(ValkeyClusterNode node);
 
 	/**
 	 * Request information and statistics about connected clients.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @return {@link Flux} emitting {@link RedisClientInfo} objects.
+	 * @return {@link Flux} emitting {@link ValkeyClientInfo} objects.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisServerCommands#getClientList()
+	 * @see ValkeyServerCommands#getClientList()
 	 */
-	Flux<RedisClientInfo> getClientList(RedisClusterNode node);
+	Flux<ValkeyClientInfo> getClientList(ValkeyClusterNode node);
 }

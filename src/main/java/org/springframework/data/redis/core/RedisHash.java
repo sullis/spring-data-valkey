@@ -27,7 +27,7 @@ import org.springframework.data.annotation.Persistent;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
 /**
- * {@link RedisHash} marks Objects as aggregate roots to be stored in a Redis hash.
+ * {@link ValkeyHash} marks Objects as aggregate roots to be stored in a Valkey hash.
  *
  * @author Christoph Strobl
  * @since 1.7
@@ -38,7 +38,7 @@ import org.springframework.data.keyvalue.annotation.KeySpace;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE })
 @KeySpace
-public @interface RedisHash {
+public @interface ValkeyHash {
 
 	/**
 	 * The prefix to distinguish between domain types.

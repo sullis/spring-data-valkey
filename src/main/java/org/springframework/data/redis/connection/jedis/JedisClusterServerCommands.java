@@ -29,12 +29,12 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.MultiNodeResult;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.NodeResult;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterServerCommands;
-import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterServerCommands;
+import org.springframework.data.redis.connection.ValkeyNode;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.jedis.JedisClusterConnection.JedisClusterCommandCallback;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -44,7 +44,7 @@ import org.springframework.util.CollectionUtils;
  * @author Dennis Neufeld
  * @since 2.0
  */
-class JedisClusterServerCommands implements RedisClusterServerCommands {
+class JedisClusterServerCommands implements ValkeyClusterServerCommands {
 
 	private final JedisClusterConnection connection;
 
@@ -53,7 +53,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void bgReWriteAof(RedisClusterNode node) {
+	public void bgReWriteAof(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::bgrewriteaof, node);
 	}
 
@@ -70,7 +70,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void bgSave(RedisClusterNode node) {
+	public void bgSave(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::bgsave, node);
 	}
 
@@ -88,7 +88,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Long lastSave(RedisClusterNode node) {
+	public Long lastSave(ValkeyClusterNode node) {
 		return executeCommandOnSingleNode(Jedis::lastsave, node).getValue();
 	}
 
@@ -98,7 +98,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void save(RedisClusterNode node) {
+	public void save(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::save, node);
 	}
 
@@ -119,7 +119,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Long dbSize(RedisClusterNode node) {
+	public Long dbSize(ValkeyClusterNode node) {
 		return executeCommandOnSingleNode(Jedis::dbSize, node).getValue();
 	}
 
@@ -134,12 +134,12 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node) {
+	public void flushDb(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::flushDB, node);
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node, FlushOption option) {
+	public void flushDb(ValkeyClusterNode node, FlushOption option) {
 		executeCommandOnSingleNode(it -> it.flushDB(JedisConverters.toFlushMode(option)), node);
 	}
 
@@ -156,12 +156,12 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void flushAll(RedisClusterNode node) {
+	public void flushAll(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::flushAll, node);
 	}
 
 	@Override
-	public void flushAll(RedisClusterNode node, FlushOption option) {
+	public void flushAll(ValkeyClusterNode node, FlushOption option) {
 		executeCommandOnSingleNode(it -> it.flushAll(JedisConverters.toFlushMode(option)), node);
 	}
 
@@ -185,7 +185,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Properties info(RedisClusterNode node) {
+	public Properties info(ValkeyClusterNode node) {
 		return JedisConverters.toProperties(executeCommandOnSingleNode(Jedis::info, node).getValue());
 	}
 
@@ -211,7 +211,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Properties info(RedisClusterNode node, String section) {
+	public Properties info(ValkeyClusterNode node, String section) {
 
 		Assert.notNull(section, "Section must not be null");
 
@@ -227,7 +227,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void shutdown(RedisClusterNode node) {
+	public void shutdown(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(jedis -> {
 			jedis.shutdown();
 			return null;
@@ -273,7 +273,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Properties getConfig(RedisClusterNode node, String pattern) {
+	public Properties getConfig(ValkeyClusterNode node, String pattern) {
 
 		Assert.notNull(pattern, "Pattern must not be null");
 
@@ -295,7 +295,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void setConfig(RedisClusterNode node, String param, String value) {
+	public void setConfig(ValkeyClusterNode node, String param, String value) {
 
 		Assert.notNull(param, "Parameter must not be null");
 		Assert.notNull(value, "Value must not be null");
@@ -316,12 +316,12 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void resetConfigStats(RedisClusterNode node) {
+	public void resetConfigStats(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::configResetStat, node);
 	}
 
 	@Override
-	public void rewriteConfig(RedisClusterNode node) {
+	public void rewriteConfig(ValkeyClusterNode node) {
 		executeCommandOnSingleNode(Jedis::configRewrite, node);
 	}
 
@@ -335,7 +335,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public Long time(RedisClusterNode node, TimeUnit timeUnit) {
+	public Long time(ValkeyClusterNode node, TimeUnit timeUnit) {
 
 		return convertListOfStringToTime(
 				connection.getClusterCommandExecutor()
@@ -365,23 +365,23 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList() {
+	public List<ValkeyClientInfo> getClientList() {
 
 		Collection<String> map = connection.getClusterCommandExecutor()
 				.executeCommandOnAllNodes((JedisClusterCommandCallback<String>) Jedis::clientList).resultsAsList();
 
-		ArrayList<RedisClientInfo> result = new ArrayList<>();
+		ArrayList<ValkeyClientInfo> result = new ArrayList<>();
 		for (String infos : map) {
-			result.addAll(JedisConverters.toListOfRedisClientInformation(infos));
+			result.addAll(JedisConverters.toListOfValkeyClientInformation(infos));
 		}
 		return result;
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList(RedisClusterNode node) {
+	public List<ValkeyClientInfo> getClientList(ValkeyClusterNode node) {
 
 		return JedisConverters
-				.toListOfRedisClientInformation(executeCommandOnSingleNode(Jedis::clientList, node).getValue());
+				.toListOfValkeyClientInformation(executeCommandOnSingleNode(Jedis::clientList, node).getValue());
 	}
 
 	@Override
@@ -397,18 +397,18 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option) {
 		migrate(key, target, dbIndex, option, Long.MAX_VALUE);
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
 
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(target, "Target node must not be null");
 		int timeoutToUse = timeout <= Integer.MAX_VALUE ? (int) timeout : Integer.MAX_VALUE;
 
-		RedisClusterNode node = connection.getTopologyProvider().getTopology().lookup(target.getHost(), target.getPort());
+		ValkeyClusterNode node = connection.getTopologyProvider().getTopology().lookup(target.getHost(), target.getPort());
 
 		executeCommandOnSingleNode(client -> client.migrate(target.getHost(), target.getPort(), key, dbIndex, timeoutToUse),
 				node);
@@ -423,7 +423,7 @@ class JedisClusterServerCommands implements RedisClusterServerCommands {
 		return Converters.toTimeMillis(serverTimeInformation.get(0), serverTimeInformation.get(1), timeUnit);
 	}
 
-	private <T> NodeResult<T> executeCommandOnSingleNode(JedisClusterCommandCallback<T> cmd, RedisClusterNode node) {
+	private <T> NodeResult<T> executeCommandOnSingleNode(JedisClusterCommandCallback<T> cmd, ValkeyClusterNode node) {
 		return connection.getClusterCommandExecutor().executeCommandOnSingleNode(cmd, node);
 	}
 

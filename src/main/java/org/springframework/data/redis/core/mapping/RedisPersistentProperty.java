@@ -25,12 +25,12 @@ import org.springframework.data.mapping.model.Property;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 /**
- * Redis specific {@link PersistentProperty} implementation.
+ * Valkey specific {@link PersistentProperty} implementation.
  *
  * @author Christoph Strobl
  * @since 1.7
  */
-public class RedisPersistentProperty extends KeyValuePersistentProperty<RedisPersistentProperty> {
+public class ValkeyPersistentProperty extends KeyValuePersistentProperty<ValkeyPersistentProperty> {
 
 	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<>();
 
@@ -39,13 +39,13 @@ public class RedisPersistentProperty extends KeyValuePersistentProperty<RedisPer
 	}
 
 	/**
-	 * Creates new {@link RedisPersistentProperty}.
+	 * Creates new {@link ValkeyPersistentProperty}.
 	 *
 	 * @param property
 	 * @param owner
 	 * @param simpleTypeHolder
 	 */
-	public RedisPersistentProperty(Property property, PersistentEntity<?, RedisPersistentProperty> owner,
+	public ValkeyPersistentProperty(Property property, PersistentEntity<?, ValkeyPersistentProperty> owner,
 			SimpleTypeHolder simpleTypeHolder) {
 		super(property, owner, simpleTypeHolder);
 	}

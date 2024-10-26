@@ -30,31 +30,31 @@ import org.springframework.util.Assert;
  * @author Christoph Strobl
  * @author John Blum
  * @since 2.0
- * @see RedisElementWriter
- * @see RedisElementReader
+ * @see ValkeyElementWriter
+ * @see ValkeyElementReader
  */
-public interface RedisSerializationContext<K, V> {
+public interface ValkeySerializationContext<K, V> {
 
 	/**
-	 * Creates a new {@link RedisSerializationContextBuilder}.
+	 * Creates a new {@link ValkeySerializationContextBuilder}.
 	 *
 	 * @param <K> expected key type.
 	 * @param <V> expected value type.
-	 * @return a new {@link RedisSerializationContextBuilder}.
+	 * @return a new {@link ValkeySerializationContextBuilder}.
 	 */
-	static <K, V> RedisSerializationContextBuilder<K, V> newSerializationContext() {
-		return new DefaultRedisSerializationContext.DefaultRedisSerializationContextBuilder<>();
+	static <K, V> ValkeySerializationContextBuilder<K, V> newSerializationContext() {
+		return new DefaultValkeySerializationContext.DefaultValkeySerializationContextBuilder<>();
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContextBuilder} using a given default {@link RedisSerializer}.
+	 * Creates a new {@link ValkeySerializationContextBuilder} using a given default {@link ValkeySerializer}.
 	 *
 	 * @param defaultSerializer must not be {@literal null}.
 	 * @param <K> expected key type.
 	 * @param <V> expected value type.
-	 * @return a new {@link RedisSerializationContextBuilder}.
+	 * @return a new {@link ValkeySerializationContextBuilder}.
 	 */
-	static <K, V> RedisSerializationContextBuilder<K, V> newSerializationContext(RedisSerializer<?> defaultSerializer) {
+	static <K, V> ValkeySerializationContextBuilder<K, V> newSerializationContext(ValkeySerializer<?> defaultSerializer) {
 
 		Assert.notNull(defaultSerializer, "DefaultSerializer must not be null");
 
@@ -62,110 +62,110 @@ public interface RedisSerializationContext<K, V> {
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContextBuilder} using a given default {@link SerializationPair}.
+	 * Creates a new {@link ValkeySerializationContextBuilder} using a given default {@link SerializationPair}.
 	 *
 	 * @param serializationPair must not be {@literal null}.
 	 * @param <K> expected key type.
 	 * @param <V> expected value type.
-	 * @return a new {@link RedisSerializationContextBuilder}.
+	 * @return a new {@link ValkeySerializationContextBuilder}.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static <K, V> RedisSerializationContextBuilder<K, V> newSerializationContext(SerializationPair<?> serializationPair) {
+	static <K, V> ValkeySerializationContextBuilder<K, V> newSerializationContext(SerializationPair<?> serializationPair) {
 
 		Assert.notNull(serializationPair, "SerializationPair must not be null");
 
-		return new DefaultRedisSerializationContext.DefaultRedisSerializationContextBuilder() //
+		return new DefaultValkeySerializationContext.DefaultValkeySerializationContextBuilder() //
 				.key(serializationPair).value(serializationPair) //
 				.hashKey(serializationPair).hashValue(serializationPair);
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link RedisSerializer#byteArray() byte[]} serialization
+	 * Creates a new {@link ValkeySerializationContext} using a {@link ValkeySerializer#byteArray() byte[]} serialization
 	 * pair.
 	 *
-	 * @return new instance of {@link RedisSerializationContext}.
+	 * @return new instance of {@link ValkeySerializationContext}.
 	 * @deprecated since 2.2. Please use {@link #byteArray()} instead.
 	 */
 	@Deprecated
-	static RedisSerializationContext<byte[], byte[]> raw() {
+	static ValkeySerializationContext<byte[], byte[]> raw() {
 		return byteArray();
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link RedisSerializer#byteArray() byte[]} serialization.
+	 * Creates a new {@link ValkeySerializationContext} using a {@link ValkeySerializer#byteArray() byte[]} serialization.
 	 *
-	 * @return new instance of {@link RedisSerializationContext}.
+	 * @return new instance of {@link ValkeySerializationContext}.
 	 * @since 2.2
 	 */
-	static RedisSerializationContext<byte[], byte[]> byteArray() {
-		return just(RedisSerializerToSerializationPairAdapter.byteArray());
+	static ValkeySerializationContext<byte[], byte[]> byteArray() {
+		return just(ValkeySerializerToSerializationPairAdapter.byteArray());
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link SerializationPair#byteBuffer() ByteBuffer}
+	 * Creates a new {@link ValkeySerializationContext} using a {@link SerializationPair#byteBuffer() ByteBuffer}
 	 * serialization.
 	 *
-	 * @return new instance of {@link RedisSerializationContext}.
+	 * @return new instance of {@link ValkeySerializationContext}.
 	 * @since 2.2
 	 */
-	static RedisSerializationContext<ByteBuffer, ByteBuffer> byteBuffer() {
-		return just(RedisSerializerToSerializationPairAdapter.byteBuffer());
+	static ValkeySerializationContext<ByteBuffer, ByteBuffer> byteBuffer() {
+		return just(ValkeySerializerToSerializationPairAdapter.byteBuffer());
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link JdkSerializationRedisSerializer}.
+	 * Creates a new {@link ValkeySerializationContext} using a {@link JdkSerializationValkeySerializer}.
 	 *
-	 * @return a new {@link RedisSerializationContext} using JDK Serializaton.
+	 * @return a new {@link ValkeySerializationContext} using JDK Serializaton.
 	 * @since 2.1
 	 */
-	static RedisSerializationContext<Object, Object> java() {
-		return fromSerializer(RedisSerializer.java());
+	static ValkeySerializationContext<Object, Object> java() {
+		return fromSerializer(ValkeySerializer.java());
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link JdkSerializationRedisSerializer} with given
-	 * {@link ClassLoader} to resolves {@link Class type} of the keys and values stored in Redis.
+	 * Creates a new {@link ValkeySerializationContext} using a {@link JdkSerializationValkeySerializer} with given
+	 * {@link ClassLoader} to resolves {@link Class type} of the keys and values stored in Valkey.
 	 *
-	 * @param classLoader {@link ClassLoader} used to resolve {@link Class types} of keys and value stored in Redis
+	 * @param classLoader {@link ClassLoader} used to resolve {@link Class types} of keys and value stored in Valkey
 	 * during deserialization; can be {@literal null}.
-	 * @return a new {@link RedisSerializationContext} using JDK Serializaton.
+	 * @return a new {@link ValkeySerializationContext} using JDK Serializaton.
 	 * @since 2.1
 	 */
-	static RedisSerializationContext<Object, Object> java(ClassLoader classLoader) {
-		return fromSerializer(RedisSerializer.java(classLoader));
+	static ValkeySerializationContext<Object, Object> java(ClassLoader classLoader) {
+		return fromSerializer(ValkeySerializer.java(classLoader));
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using a {@link StringRedisSerializer}.
+	 * Creates a new {@link ValkeySerializationContext} using a {@link StringValkeySerializer}.
 	 *
-	 * @return a new {@link RedisSerializationContext} using a {@link StringRedisSerializer}.
+	 * @return a new {@link ValkeySerializationContext} using a {@link StringValkeySerializer}.
 	 */
-	static RedisSerializationContext<String, String> string() {
-		return fromSerializer(RedisSerializer.string());
+	static ValkeySerializationContext<String, String> string() {
+		return fromSerializer(ValkeySerializer.string());
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using the given {@link RedisSerializer}.
+	 * Creates a new {@link ValkeySerializationContext} using the given {@link ValkeySerializer}.
 	 *
-	 * @param <T> {@link Class Type} of {@link Object} being de/serialized by the {@link RedisSerializer}.
-	 * @param serializer {@link RedisSerializer} used to de/serialize keys and value stored in Redis;
+	 * @param <T> {@link Class Type} of {@link Object} being de/serialized by the {@link ValkeySerializer}.
+	 * @param serializer {@link ValkeySerializer} used to de/serialize keys and value stored in Valkey;
 	 * must not be {@literal null}.
-	 * @return a new {@link RedisSerializationContext} using the given {@link RedisSerializer}.
+	 * @return a new {@link ValkeySerializationContext} using the given {@link ValkeySerializer}.
 	 */
-	static <T> RedisSerializationContext<T, T> fromSerializer(RedisSerializer<T> serializer) {
+	static <T> ValkeySerializationContext<T, T> fromSerializer(ValkeySerializer<T> serializer) {
 		return just(SerializationPair.fromSerializer(serializer));
 	}
 
 	/**
-	 * Creates a new {@link RedisSerializationContext} using the given {@link SerializationPair}.
+	 * Creates a new {@link ValkeySerializationContext} using the given {@link SerializationPair}.
 	 *
 	 * @param <T> {@link Class Type} of {@link Object} de/serialized by the {@link SerializationPair}.
-	 * @param serializationPair {@link SerializationPair} used to de/serialize keys and values stored in Redis;
+	 * @param serializationPair {@link SerializationPair} used to de/serialize keys and values stored in Valkey;
 	 * must not be {@literal null}.
-	 * @return a new {@link RedisSerializationContext} using the given {@link SerializationPair}.
+	 * @return a new {@link ValkeySerializationContext} using the given {@link SerializationPair}.
 	 */
-	static <T> RedisSerializationContext<T, T> just(SerializationPair<T> serializationPair) {
-		return RedisSerializationContext.<T, T> newSerializationContext(serializationPair).build();
+	static <T> ValkeySerializationContext<T, T> just(SerializationPair<T> serializationPair) {
+		return ValkeySerializationContext.<T, T> newSerializationContext(serializationPair).build();
 	}
 
 	/**
@@ -202,30 +202,30 @@ public interface RedisSerializationContext<K, V> {
 	interface SerializationPair<T> {
 
 		/**
-		 * Creates a {@link SerializationPair} adapter given {@link RedisSerializer}.
+		 * Creates a {@link SerializationPair} adapter given {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
-		 * @return a {@link SerializationPair} adapter for {@link RedisSerializer}.
+		 * @return a {@link SerializationPair} adapter for {@link ValkeySerializer}.
 		 */
-		static <T> SerializationPair<T> fromSerializer(RedisSerializer<T> serializer) {
+		static <T> SerializationPair<T> fromSerializer(ValkeySerializer<T> serializer) {
 
-			Assert.notNull(serializer, "RedisSerializer must not be null");
+			Assert.notNull(serializer, "ValkeySerializer must not be null");
 
-			return new RedisSerializerToSerializationPairAdapter<>(serializer);
+			return new ValkeySerializerToSerializationPairAdapter<>(serializer);
 		}
 
 		/**
-		 * Creates a {@link SerializationPair} adapter given {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Creates a {@link SerializationPair} adapter given {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
-		 * @return a {@link SerializationPair} encapsulating {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * @return a {@link SerializationPair} encapsulating {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 */
-		static <T> SerializationPair<T> just(RedisElementReader<? extends T> reader,
-				RedisElementWriter<? extends T> writer) {
+		static <T> SerializationPair<T> just(ValkeyElementReader<? extends T> reader,
+				ValkeyElementWriter<? extends T> writer) {
 
-			Assert.notNull(reader, "RedisElementReader must not be null");
-			Assert.notNull(writer, "RedisElementWriter must not be null");
+			Assert.notNull(reader, "ValkeyElementReader must not be null");
+			Assert.notNull(writer, "ValkeyElementWriter must not be null");
 
 			return new DefaultSerializationPair<>(reader, writer);
 		}
@@ -238,7 +238,7 @@ public interface RedisSerializationContext<K, V> {
 		 */
 		@Deprecated
 		static <T> SerializationPair<T> raw() {
-			return RedisSerializerToSerializationPairAdapter.raw();
+			return ValkeySerializerToSerializationPairAdapter.raw();
 		}
 
 		/**
@@ -248,7 +248,7 @@ public interface RedisSerializationContext<K, V> {
 		 * @since 2.2
 		 */
 		static SerializationPair<byte[]> byteArray() {
-			return RedisSerializerToSerializationPairAdapter.byteArray();
+			return ValkeySerializerToSerializationPairAdapter.byteArray();
 		}
 
 		/**
@@ -258,13 +258,13 @@ public interface RedisSerializationContext<K, V> {
 		 * @since 2.2
 		 */
 		static SerializationPair<ByteBuffer> byteBuffer() {
-			return RedisSerializerToSerializationPairAdapter.byteBuffer();
+			return ValkeySerializerToSerializationPairAdapter.byteBuffer();
 		}
 
 		/**
-		 * @return the {@link RedisElementReader}.
+		 * @return the {@link ValkeyElementReader}.
 		 */
-		RedisElementReader<T> getReader();
+		ValkeyElementReader<T> getReader();
 
 		/**
 		 * Deserialize a {@link ByteBuffer} into the according type.
@@ -278,9 +278,9 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * @return the {@link RedisElementWriter}.
+		 * @return the {@link ValkeyElementWriter}.
 		 */
-		RedisElementWriter<T> getWriter();
+		ValkeyElementWriter<T> getWriter();
 
 		/**
 		 * Serialize the given {@code element} to its {@link ByteBuffer} representation.
@@ -294,12 +294,12 @@ public interface RedisSerializationContext<K, V> {
 	}
 
 	/**
-	 * Builder for {@link RedisSerializationContext}.
+	 * Builder for {@link ValkeySerializationContext}.
 	 *
 	 * @author Mark Paluch
 	 * @author Christoph Strobl
 	 */
-	interface RedisSerializationContextBuilder<K, V> {
+	interface ValkeySerializationContextBuilder<K, V> {
 
 		/**
 		 * Set the key {@link SerializationPair}.
@@ -307,16 +307,16 @@ public interface RedisSerializationContext<K, V> {
 		 * @param pair must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		RedisSerializationContextBuilder<K, V> key(SerializationPair<K> pair);
+		ValkeySerializationContextBuilder<K, V> key(SerializationPair<K> pair);
 
 		/**
-		 * Set the key {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Set the key {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> key(RedisElementReader<K> reader, RedisElementWriter<K> writer) {
+		default ValkeySerializationContextBuilder<K, V> key(ValkeyElementReader<K> reader, ValkeyElementWriter<K> writer) {
 
 			key(SerializationPair.just(reader, writer));
 
@@ -324,12 +324,12 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Set the key {@link SerializationPair} given a {@link RedisSerializer}.
+		 * Set the key {@link SerializationPair} given a {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> key(RedisSerializer<K> serializer) {
+		default ValkeySerializationContextBuilder<K, V> key(ValkeySerializer<K> serializer) {
 
 			key(SerializationPair.fromSerializer(serializer));
 
@@ -342,16 +342,16 @@ public interface RedisSerializationContext<K, V> {
 		 * @param pair must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		RedisSerializationContextBuilder<K, V> value(SerializationPair<V> pair);
+		ValkeySerializationContextBuilder<K, V> value(SerializationPair<V> pair);
 
 		/**
-		 * Set the value {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Set the value {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> value(RedisElementReader<V> reader, RedisElementWriter<V> writer) {
+		default ValkeySerializationContextBuilder<K, V> value(ValkeyElementReader<V> reader, ValkeyElementWriter<V> writer) {
 
 			value(SerializationPair.just(reader, writer));
 
@@ -359,12 +359,12 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Set the value {@link SerializationPair} given a {@link RedisSerializer}.
+		 * Set the value {@link SerializationPair} given a {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> value(RedisSerializer<V> serializer) {
+		default ValkeySerializationContextBuilder<K, V> value(ValkeySerializer<V> serializer) {
 
 			value(SerializationPair.fromSerializer(serializer));
 
@@ -377,17 +377,17 @@ public interface RedisSerializationContext<K, V> {
 		 * @param pair must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		RedisSerializationContextBuilder<K, V> hashKey(SerializationPair<?> pair);
+		ValkeySerializationContextBuilder<K, V> hashKey(SerializationPair<?> pair);
 
 		/**
-		 * Set the hash key {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Set the hash key {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> hashKey(RedisElementReader<?> reader,
-				RedisElementWriter<?> writer) {
+		default ValkeySerializationContextBuilder<K, V> hashKey(ValkeyElementReader<?> reader,
+				ValkeyElementWriter<?> writer) {
 
 			hashKey(SerializationPair.just(reader, writer));
 
@@ -395,12 +395,12 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Set the hash key {@link SerializationPair} given a {@link RedisSerializer}.
+		 * Set the hash key {@link SerializationPair} given a {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> hashKey(RedisSerializer<?> serializer) {
+		default ValkeySerializationContextBuilder<K, V> hashKey(ValkeySerializer<?> serializer) {
 
 			hashKey(SerializationPair.fromSerializer(serializer));
 
@@ -413,17 +413,17 @@ public interface RedisSerializationContext<K, V> {
 		 * @param pair must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		RedisSerializationContextBuilder<K, V> hashValue(SerializationPair<?> pair);
+		ValkeySerializationContextBuilder<K, V> hashValue(SerializationPair<?> pair);
 
 		/**
-		 * Set the hash value {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Set the hash value {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> hashValue(RedisElementReader<?> reader,
-				RedisElementWriter<?> writer) {
+		default ValkeySerializationContextBuilder<K, V> hashValue(ValkeyElementReader<?> reader,
+				ValkeyElementWriter<?> writer) {
 
 			hashValue(SerializationPair.just(reader, writer));
 
@@ -431,12 +431,12 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Set the hash value {@link SerializationPair} given a {@link RedisSerializer}.
+		 * Set the hash value {@link SerializationPair} given a {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> hashValue(RedisSerializer<?> serializer) {
+		default ValkeySerializationContextBuilder<K, V> hashValue(ValkeySerializer<?> serializer) {
 
 			hashValue(SerializationPair.fromSerializer(serializer));
 
@@ -449,17 +449,17 @@ public interface RedisSerializationContext<K, V> {
 		 * @param pair must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		RedisSerializationContextBuilder<K, V> string(SerializationPair<String> pair);
+		ValkeySerializationContextBuilder<K, V> string(SerializationPair<String> pair);
 
 		/**
-		 * Set the string {@link RedisElementReader} and {@link RedisElementWriter}.
+		 * Set the string {@link ValkeyElementReader} and {@link ValkeyElementWriter}.
 		 *
 		 * @param reader must not be {@literal null}.
 		 * @param writer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> string(RedisElementReader<String> reader,
-				RedisElementWriter<String> writer) {
+		default ValkeySerializationContextBuilder<K, V> string(ValkeyElementReader<String> reader,
+				ValkeyElementWriter<String> writer) {
 
 			string(SerializationPair.just(reader, writer));
 
@@ -467,12 +467,12 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Set the string {@link SerializationPair} given a {@link RedisSerializer}.
+		 * Set the string {@link SerializationPair} given a {@link ValkeySerializer}.
 		 *
 		 * @param serializer must not be {@literal null}.
 		 * @return {@literal this} builder.
 		 */
-		default RedisSerializationContextBuilder<K, V> string(RedisSerializer<String> serializer) {
+		default ValkeySerializationContextBuilder<K, V> string(ValkeySerializer<String> serializer) {
 
 			string(SerializationPair.fromSerializer(serializer));
 
@@ -480,11 +480,11 @@ public interface RedisSerializationContext<K, V> {
 		}
 
 		/**
-		 * Builds a {@link RedisSerializationContext}.
+		 * Builds a {@link ValkeySerializationContext}.
 		 *
-		 * @return the {@link RedisSerializationContext}.
+		 * @return the {@link ValkeySerializationContext}.
 		 */
-		RedisSerializationContext<K, V> build();
+		ValkeySerializationContext<K, V> build();
 
 	}
 }

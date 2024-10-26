@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * @author Mark Paluch
  */
-public class OxmSerializer implements InitializingBean, RedisSerializer<Object> {
+public class OxmSerializer implements InitializingBean, ValkeySerializer<Object> {
 
 	private @Nullable Marshaller marshaller;
 	private @Nullable Unmarshaller unmarshaller;

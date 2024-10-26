@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@code @RedisStanalone} is used to qualify a connection resource to point to Redis Standalone.
+ * {@code @ValkeyStanalone} is used to qualify a connection resource to point to Valkey Standalone.
  *
  * @author Mark Paluch
  * @see SettingsUtils#getPort()
@@ -34,5 +34,5 @@ import org.springframework.data.redis.SettingsUtils;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface RedisStanalone {
+public @interface ValkeyStanalone {
 }

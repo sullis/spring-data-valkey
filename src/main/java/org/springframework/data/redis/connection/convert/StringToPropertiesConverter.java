@@ -19,7 +19,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 
 /**
  * Converts Strings to {@link Properties}
@@ -36,7 +36,7 @@ public class StringToPropertiesConverter implements Converter<String, Properties
 		try (StringReader stringReader = new StringReader(source)) {
 			info.load(stringReader);
 		} catch (Exception ex) {
-			throw new RedisSystemException("Cannot read Redis info", ex);
+			throw new ValkeySystemException("Cannot read Valkey info", ex);
 		}
 		return info;
 	}

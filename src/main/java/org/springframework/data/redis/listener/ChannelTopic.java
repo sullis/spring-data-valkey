@@ -18,7 +18,7 @@ package org.springframework.data.redis.listener;
 import org.springframework.util.Assert;
 
 /**
- * {@link Topic Channel Topic} implementation mapping to a Redis channel.
+ * {@link Topic Channel Topic} implementation mapping to a Valkey channel.
  *
  * @author Costin Leau
  * @author Mark Paluch
@@ -40,7 +40,7 @@ public class ChannelTopic extends AbstractTopic {
 	/**
 	 * Create a new {@link ChannelTopic} for channel subscriptions.
 	 *
-	 * @param channelName {@link String name} of the Redis channel; must not be {@literal null}.
+	 * @param channelName {@link String name} of the Valkey channel; must not be {@literal null}.
 	 * @return the {@link ChannelTopic} for the given {@code channelName}.
 	 * @since 2.1
 	 */

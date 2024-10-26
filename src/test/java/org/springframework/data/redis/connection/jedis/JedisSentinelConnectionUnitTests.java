@@ -26,9 +26,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisNode.RedisNodeBuilder;
-import org.springframework.data.redis.connection.RedisServer;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeyNode.ValkeyNodeBuilder;
+import org.springframework.data.redis.connection.ValkeyServer;
 
 /**
  * @author Christoph Strobl
@@ -65,7 +65,7 @@ class JedisSentinelConnectionUnitTests {
 	@Test // DATAREDIS-330
 	void failoverShouldBeSentCorrectly() {
 
-		connection.failover(new RedisNodeBuilder().withName("mymaster").build());
+		connection.failover(new ValkeyNodeBuilder().withName("mymaster").build());
 		verify(jedisMock, times(1)).sentinelFailover(eq("mymaster"));
 	}
 
@@ -76,7 +76,7 @@ class JedisSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-330
 	void failoverShouldThrowExceptionIfMasterNodeNameIsEmpty() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.failover(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.failover(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-330
@@ -96,7 +96,7 @@ class JedisSentinelConnectionUnitTests {
 	@Test // DATAREDIS-330
 	void shouldReadReplicasCorrectlyWhenGivenNamedNode() {
 
-		connection.replicas(new RedisNodeBuilder().withName("mymaster").build());
+		connection.replicas(new ValkeyNodeBuilder().withName("mymaster").build());
 		verify(jedisMock, times(1)).sentinelReplicas(eq("mymaster"));
 	}
 
@@ -107,18 +107,18 @@ class JedisSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-330
 	void readReplicasShouldThrowExceptionWhenGivenNull() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas((RedisNode) null));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas((ValkeyNode) null));
 	}
 
 	@Test // DATAREDIS-330
 	void readReplicasShouldThrowExceptionWhenNodeWithoutName() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-330
 	void shouldRemoveMasterCorrectlyWhenGivenNamedNode() {
 
-		connection.remove(new RedisNodeBuilder().withName("mymaster").build());
+		connection.remove(new ValkeyNodeBuilder().withName("mymaster").build());
 		verify(jedisMock, times(1)).sentinelRemove(eq("mymaster"));
 	}
 
@@ -129,18 +129,18 @@ class JedisSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-330
 	void removeShouldThrowExceptionWhenGivenNull() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove((RedisNode) null));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove((ValkeyNode) null));
 	}
 
 	@Test // DATAREDIS-330
 	void removeShouldThrowExceptionWhenNodeWithoutName() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-330
 	void monitorShouldBeSentCorrectly() {
 
-		RedisServer server = new RedisServer("127.0.0.1", 6382);
+		ValkeyServer server = new ValkeyServer("127.0.0.1", 6382);
 		server.setName("anothermaster");
 		server.setQuorum(3L);
 

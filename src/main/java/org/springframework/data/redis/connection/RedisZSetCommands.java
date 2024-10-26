@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * ZSet(SortedSet)-specific commands supported by Redis.
+ * ZSet(SortedSet)-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -40,7 +40,7 @@ import org.springframework.util.ObjectUtils;
  * @author Andrey Shlykov
  * @author Shyngys Sapraliyev
  */
-public interface RedisZSetCommands {
+public interface ValkeyZSetCommands {
 
 	/**
 	 * {@link org.springframework.data.domain.Range} defines {@literal min} and {@literal max} values to retrieve from a
@@ -212,7 +212,7 @@ public interface RedisZSetCommands {
 	 * Looking of the {@code INCR} flag? Use the {@code ZINCRBY} operation instead.
 	 *
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	class ZAddArgs {
 
@@ -372,7 +372,7 @@ public interface RedisZSetCommands {
 	 * @param score the score.
 	 * @param value the value.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	@Nullable
 	default Boolean zAdd(byte[] key, double score, byte[] value) {
@@ -389,7 +389,7 @@ public interface RedisZSetCommands {
 	 * @param args must not be {@literal null} use {@link ZAddArgs#empty()} instead.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	@Nullable
 	Boolean zAdd(byte[] key, double score, byte[] value, ZAddArgs args);
@@ -400,7 +400,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param tuples must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	@Nullable
 	default Long zAdd(byte[] key, Set<Tuple> tuples) {
@@ -416,7 +416,7 @@ public interface RedisZSetCommands {
 	 * @param args must not be {@literal null} use {@link ZAddArgs#empty()} instead.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	Long zAdd(byte[] key, Set<Tuple> tuples, ZAddArgs args);
 
@@ -426,7 +426,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	@Nullable
 	Long zRem(byte[] key, byte[]... values);
@@ -438,7 +438,7 @@ public interface RedisZSetCommands {
 	 * @param increment
 	 * @param value the value.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
 	 */
 	@Nullable
 	Double zIncrBy(byte[] key, double increment, byte[] value);
@@ -449,7 +449,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	byte[] zRandMember(byte[] key);
@@ -464,7 +464,7 @@ public interface RedisZSetCommands {
 	 *          absolute value of the specified count.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	List<byte[]> zRandMember(byte[] key, long count);
@@ -475,7 +475,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	Tuple zRandMemberWithScore(byte[] key);
@@ -490,7 +490,7 @@ public interface RedisZSetCommands {
 	 *          absolute value of the specified count.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	@Nullable
 	List<Tuple> zRandMemberWithScore(byte[] key, long count);
@@ -501,7 +501,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value the value. Must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
 	 */
 	@Nullable
 	Long zRank(byte[] key, byte[] value);
@@ -512,7 +512,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value the value.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
 	 */
 	@Nullable
 	Long zRevRank(byte[] key, byte[] value);
@@ -525,7 +525,7 @@ public interface RedisZSetCommands {
 	 * @param end
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	@Nullable
 	Set<byte[]> zRange(byte[] key, long start, long end);
@@ -538,7 +538,7 @@ public interface RedisZSetCommands {
 	 * @param end
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	@Nullable
 	Set<Tuple> zRangeWithScores(byte[] key, long start, long end);
@@ -551,7 +551,7 @@ public interface RedisZSetCommands {
 	 * @param max
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRangeByScore(byte[] key, double min, double max) {
@@ -566,7 +566,7 @@ public interface RedisZSetCommands {
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRangeByScoreWithScores(byte[] key,
@@ -582,7 +582,7 @@ public interface RedisZSetCommands {
 	 * @param max
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRangeByScoreWithScores(byte[] key, double min, double max) {
@@ -600,7 +600,7 @@ public interface RedisZSetCommands {
 	 * @param count
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRangeByScore(byte[] key, double min, double max, long offset, long count) {
@@ -620,7 +620,7 @@ public interface RedisZSetCommands {
 	 * @param count
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRangeByScoreWithScores(byte[] key, double min, double max, long offset, long count) {
@@ -639,7 +639,7 @@ public interface RedisZSetCommands {
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Set<Tuple> zRangeByScoreWithScores(byte[] key, org.springframework.data.domain.Range<? extends Number> range,
@@ -653,7 +653,7 @@ public interface RedisZSetCommands {
 	 * @param end
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	@Nullable
 	Set<byte[]> zRevRange(byte[] key, long start, long end);
@@ -666,7 +666,7 @@ public interface RedisZSetCommands {
 	 * @param end
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	@Nullable
 	Set<Tuple> zRevRangeWithScores(byte[] key, long start, long end);
@@ -679,7 +679,7 @@ public interface RedisZSetCommands {
 	 * @param max
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRevRangeByScore(byte[] key, double min, double max) {
@@ -695,7 +695,7 @@ public interface RedisZSetCommands {
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRevRangeByScore(byte[] key, org.springframework.data.domain.Range<? extends Number> range) {
@@ -711,7 +711,7 @@ public interface RedisZSetCommands {
 	 * @param max
 	 * @return empty {@link Set} when key does not exists or no members in range. {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRevRangeByScoreWithScores(byte[] key, double min, double max) {
@@ -728,7 +728,7 @@ public interface RedisZSetCommands {
 	 * @param offset
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRevRangeByScore(byte[] key, double min, double max, long offset, long count) {
@@ -746,7 +746,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Set<byte[]> zRevRangeByScore(byte[] key, org.springframework.data.domain.Range<? extends Number> range,
@@ -762,7 +762,7 @@ public interface RedisZSetCommands {
 	 * @param offset
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRevRangeByScoreWithScores(byte[] key, double min, double max, long offset, long count) {
@@ -780,7 +780,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<Tuple> zRevRangeByScoreWithScores(byte[] key,
@@ -797,7 +797,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Set<Tuple> zRevRangeByScoreWithScores(byte[] key, org.springframework.data.domain.Range<? extends Number> range,
@@ -810,7 +810,7 @@ public interface RedisZSetCommands {
 	 * @param min
 	 * @param max
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	@Nullable
 	default Long zCount(byte[] key, double min, double max) {
@@ -824,7 +824,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	@Nullable
 	Long zCount(byte[] key, org.springframework.data.domain.Range<? extends Number> range);
@@ -837,7 +837,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	@Nullable
 	Long zLexCount(byte[] key, org.springframework.data.domain.Range<byte[]> range);
@@ -847,7 +847,7 @@ public interface RedisZSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -859,7 +859,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -873,7 +873,7 @@ public interface RedisZSetCommands {
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/bzpopmin">Redis Documentation: BZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/bzpopmin">Valkey Documentation: BZPOPMIN</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -884,7 +884,7 @@ public interface RedisZSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -896,7 +896,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return {@literal null} when the sorted set is empty or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -910,7 +910,7 @@ public interface RedisZSetCommands {
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/bzpopmax">Redis Documentation: BZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/bzpopmax">Valkey Documentation: BZPOPMAX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -921,7 +921,7 @@ public interface RedisZSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zcard">Redis Documentation: ZCARD</a>
+	 * @see <a href="https://redis.io/commands/zcard">Valkey Documentation: ZCARD</a>
 	 */
 	@Nullable
 	Long zCard(byte[] key);
@@ -932,7 +932,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value the value.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
 	 */
 	@Nullable
 	Double zScore(byte[] key, byte[] value);
@@ -943,7 +943,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values the values.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -956,7 +956,7 @@ public interface RedisZSetCommands {
 	 * @param start
 	 * @param end
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	@Nullable
 	Long zRemRange(byte[] key, long start, long end);
@@ -968,7 +968,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return the number of elements removed, or {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebylex">Redis Documentation: ZREMRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zremrangebylex">Valkey Documentation: ZREMRANGEBYLEX</a>
 	 */
 	Long zRemRangeByLex(byte[] key, org.springframework.data.domain.Range<byte[]> range);
 
@@ -979,7 +979,7 @@ public interface RedisZSetCommands {
 	 * @param min
 	 * @param max
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Long zRemRangeByScore(byte[] key, double min, double max) {
@@ -993,7 +993,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Long zRemRangeByScore(byte[] key, org.springframework.data.domain.Range<? extends Number> range);
@@ -1004,7 +1004,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	@Nullable
 	Set<byte[]> zDiff(byte[]... sets);
@@ -1015,7 +1015,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	@Nullable
 	Set<Tuple> zDiffWithScores(byte[]... sets);
@@ -1027,7 +1027,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	@Nullable
 	Long zDiffStore(byte[] destKey, byte[]... sets);
@@ -1038,7 +1038,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<byte[]> zInter(byte[]... sets);
@@ -1049,7 +1049,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<Tuple> zInterWithScores(byte[]... sets);
@@ -1062,7 +1062,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	default Set<Tuple> zInterWithScores(Aggregate aggregate, int[] weights, byte[]... sets) {
@@ -1077,7 +1077,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	@Nullable
 	Set<Tuple> zInterWithScores(Aggregate aggregate, Weights weights, byte[]... sets);
@@ -1088,7 +1088,7 @@ public interface RedisZSetCommands {
 	 * @param destKey must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	@Nullable
 	Long zInterStore(byte[] destKey, byte[]... sets);
@@ -1101,7 +1101,7 @@ public interface RedisZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	@Nullable
 	default Long zInterStore(byte[] destKey, Aggregate aggregate, int[] weights, byte[]... sets) {
@@ -1117,7 +1117,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	@Nullable
 	Long zInterStore(byte[] destKey, Aggregate aggregate, Weights weights, byte[]... sets);
@@ -1128,7 +1128,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<byte[]> zUnion(byte[]... sets);
@@ -1139,7 +1139,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<Tuple> zUnionWithScores(byte[]... sets);
@@ -1152,7 +1152,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	default Set<Tuple> zUnionWithScores(Aggregate aggregate, int[] weights, byte[]... sets) {
@@ -1167,7 +1167,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	@Nullable
 	Set<Tuple> zUnionWithScores(Aggregate aggregate, Weights weights, byte[]... sets);
@@ -1177,7 +1177,7 @@ public interface RedisZSetCommands {
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	@Nullable
 	Long zUnionStore(byte[] destKey, byte[]... sets);
@@ -1190,7 +1190,7 @@ public interface RedisZSetCommands {
 	 * @param weights must not be {@literal null}.
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	@Nullable
 	default Long zUnionStore(byte[] destKey, Aggregate aggregate, int[] weights, byte[]... sets) {
@@ -1206,7 +1206,7 @@ public interface RedisZSetCommands {
 	 * @param sets must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	@Nullable
 	Long zUnionStore(byte[] destKey, Aggregate aggregate, Weights weights, byte[]... sets);
@@ -1218,7 +1218,7 @@ public interface RedisZSetCommands {
 	 * @param options must not be {@literal null}.
 	 * @return
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 */
 	Cursor<Tuple> zScan(byte[] key, ScanOptions options);
 
@@ -1230,7 +1230,7 @@ public interface RedisZSetCommands {
 	 * @param max
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 * @deprecated since 3.0, use {@link #zRangeByScore(byte[], org.springframework.data.domain.Range)} instead.
 	 */
 	@Nullable
@@ -1246,7 +1246,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRangeByScore(byte[] key, org.springframework.data.domain.Range<? extends Number> range) {
@@ -1264,7 +1264,7 @@ public interface RedisZSetCommands {
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Set<byte[]> zRangeByScore(byte[] key, String min, String max, long offset, long count);
@@ -1278,7 +1278,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	@Nullable
 	Set<byte[]> zRangeByScore(byte[] key, org.springframework.data.domain.Range<? extends Number> range,
@@ -1290,7 +1290,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRangeByLex(byte[] key) {
@@ -1305,7 +1305,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRangeByLex(byte[] key, org.springframework.data.domain.Range<byte[]> range) {
@@ -1321,7 +1321,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.6
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	@Nullable
 	Set<byte[]> zRangeByLex(byte[] key, org.springframework.data.domain.Range<byte[]> range,
@@ -1333,7 +1333,7 @@ public interface RedisZSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRevRangeByLex(byte[] key) {
@@ -1348,7 +1348,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	@Nullable
 	default Set<byte[]> zRevRangeByLex(byte[] key, org.springframework.data.domain.Range<byte[]> range) {
@@ -1364,7 +1364,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	@Nullable
 	Set<byte[]> zRevRangeByLex(byte[] key, org.springframework.data.domain.Range<byte[]> range,
@@ -1378,7 +1378,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreByLex(byte[] dstKey, byte[] srcKey, org.springframework.data.domain.Range<byte[]> range) {
@@ -1394,7 +1394,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreByLex(byte[] dstKey, byte[] srcKey, org.springframework.data.domain.Range<byte[]> range,
@@ -1408,7 +1408,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreRevByLex(byte[] dstKey, byte[] srcKey, org.springframework.data.domain.Range<byte[]> range) {
@@ -1424,7 +1424,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreRevByLex(byte[] dstKey, byte[] srcKey, org.springframework.data.domain.Range<byte[]> range,
@@ -1438,7 +1438,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreByScore(byte[] dstKey, byte[] srcKey,
@@ -1455,7 +1455,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreByScore(byte[] dstKey, byte[] srcKey, org.springframework.data.domain.Range<? extends Number> range,
@@ -1469,7 +1469,7 @@ public interface RedisZSetCommands {
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Long zRangeStoreRevByScore(byte[] dstKey, byte[] srcKey,
@@ -1486,7 +1486,7 @@ public interface RedisZSetCommands {
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	Long zRangeStoreRevByScore(byte[] dstKey, byte[] srcKey,

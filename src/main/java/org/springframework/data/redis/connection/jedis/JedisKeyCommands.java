@@ -30,10 +30,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisKeyCommands;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.ValueEncoding;
-import org.springframework.data.redis.connection.ValueEncoding.RedisValueEncoding;
+import org.springframework.data.redis.connection.ValueEncoding.ValkeyValueEncoding;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.Cursor.CursorId;
@@ -51,7 +51,7 @@ import org.springframework.util.ObjectUtils;
  * @author ihaohong
  * @since 2.0
  */
-class JedisKeyCommands implements RedisKeyCommands {
+class JedisKeyCommands implements ValkeyKeyCommands {
 
 	private final JedisConnection connection;
 
@@ -362,7 +362,7 @@ class JedisKeyCommands implements RedisKeyCommands {
 		Assert.notNull(key, "Key must not be null");
 
 		return connection.invoke().from(JedisBinaryCommands::objectEncoding, PipelineBinaryCommands::objectEncoding, key)
-				.getOrElse(JedisConverters::toEncoding, () -> RedisValueEncoding.VACANT);
+				.getOrElse(JedisConverters::toEncoding, () -> ValkeyValueEncoding.VACANT);
 	}
 
 	@Nullable

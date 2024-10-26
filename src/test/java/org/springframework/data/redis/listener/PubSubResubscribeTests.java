@@ -34,20 +34,20 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.test.condition.EnabledIfLongRunningTest;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Costin Leau
@@ -66,36 +66,36 @@ public class PubSubResubscribeTests {
 	private final Object handler = new MessageHandler("handler1", bag);
 	private final MessageListenerAdapter adapter = new MessageListenerAdapter(handler);
 
-	private RedisMessageListenerContainer container;
-	private RedisConnectionFactory factory;
+	private ValkeyMessageListenerContainer container;
+	private ValkeyConnectionFactory factory;
 
 	@SuppressWarnings("rawtypes") //
-	private RedisTemplate template;
+	private ValkeyTemplate template;
 
-	public PubSubResubscribeTests(RedisConnectionFactory connectionFactory) {
+	public PubSubResubscribeTests(ValkeyConnectionFactory connectionFactory) {
 		this.factory = connectionFactory;
 	}
 
 	public static Collection<Object[]> testParams() {
 
-		List<RedisConnectionFactory> factories = new ArrayList<>(3);
+		List<ValkeyConnectionFactory> factories = new ArrayList<>(3);
 
 		// Jedis
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		factories.add(jedisConnFactory);
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		factories.add(lettuceConnFactory);
 
 		if (clusterAvailable()) {
 
 			LettuceConnectionFactory lettuceClusterConnFactory = LettuceConnectionFactoryExtension
-					.getConnectionFactory(RedisCluster.class);
+					.getConnectionFactory(ValkeyCluster.class);
 
 			factories.add(lettuceClusterConnFactory);
 		}
@@ -106,12 +106,12 @@ public class PubSubResubscribeTests {
 	@BeforeEach
 	void setUp() throws Exception {
 
-		template = new StringRedisTemplate(factory);
+		template = new StringValkeyTemplate(factory);
 
 		adapter.setSerializer(template.getValueSerializer());
 		adapter.afterPropertiesSet();
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(template.getConnectionFactory());
 		container.setBeanName("container");
 		container.setTaskExecutor(new SyncTaskExecutor());
@@ -126,7 +126,7 @@ public class PubSubResubscribeTests {
 		bag.clear();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@EnabledIfLongRunningTest
 	void testContainerPatternResubscribe() {
 
@@ -164,7 +164,7 @@ public class PubSubResubscribeTests {
 		await().atMost(Duration.ofSeconds(2)).until(() -> bag2.contains(payload1) && bag2.contains(payload2));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainerChannelResubscribe() {
 
 		String payload1 = "do";
@@ -191,10 +191,10 @@ public class PubSubResubscribeTests {
 	}
 
 	/**
-	 * Validates the behavior of {@link RedisMessageListenerContainer} when it needs to spin up a thread executing its
+	 * Validates the behavior of {@link ValkeyMessageListenerContainer} when it needs to spin up a thread executing its
 	 * PatternSubscriptionTask
 	 */
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testInitializeContainerWithMultipleTopicsIncludingPattern() {
 
 		assumeFalse(isClusterAware(template.getConnectionFactory()));
@@ -231,15 +231,15 @@ public class PubSubResubscribeTests {
 	}
 
 	private static boolean clusterAvailable() {
-		return RedisDetector.isClusterAvailable();
+		return ValkeyDetector.isClusterAvailable();
 	}
 
-	private static boolean isClusterAware(RedisConnectionFactory connectionFactory) {
+	private static boolean isClusterAware(ValkeyConnectionFactory connectionFactory) {
 
 		if (connectionFactory instanceof LettuceConnectionFactory lettuceConnectionFactory) {
 			return lettuceConnectionFactory.isClusterAware();
 		} else if (connectionFactory instanceof JedisConnectionFactory jedisConnectionFactory) {
-			return jedisConnectionFactory.isRedisClusterAware();
+			return jedisConnectionFactory.isValkeyClusterAware();
 		}
 		return false;
 	}

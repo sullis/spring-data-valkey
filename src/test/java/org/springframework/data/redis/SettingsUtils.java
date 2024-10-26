@@ -21,13 +21,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisSocketConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeySocketConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 
 /**
- * Utility class exposing connection settings to connect Redis instances during test execution. Settings can be adjusted
+ * Utility class exposing connection settings to connect Valkey instances during test execution. Settings can be adjusted
  * by overriding these in {@literal org/springframework/data/redis/test.properties}.
  *
  * @author Costin Leau
@@ -58,35 +58,35 @@ public abstract class SettingsUtils {
 	private SettingsUtils() {}
 
 	/**
-	 * @return the Redis hostname.
+	 * @return the Valkey hostname.
 	 */
 	public static String getHost() {
 		return SETTINGS.getProperty("host");
 	}
 
 	/**
-	 * @return the Redis port.
+	 * @return the Valkey port.
 	 */
 	public static int getPort() {
 		return Integer.parseInt(SETTINGS.getProperty("port"));
 	}
 
 	/**
-	 * @return the Redis Cluster port.
+	 * @return the Valkey Cluster port.
 	 */
 	public static int getSentinelPort() {
 		return Integer.parseInt(SETTINGS.getProperty("sentinelPort"));
 	}
 
 	/**
-	 * @return the Redis Sentinel Master Id.
+	 * @return the Valkey Sentinel Master Id.
 	 */
 	public static String getSentinelMaster() {
 		return "mymaster";
 	}
 
 	/**
-	 * @return the Redis Cluster port.
+	 * @return the Valkey Cluster port.
 	 */
 	public static int getClusterPort() {
 		return Integer.parseInt(SETTINGS.getProperty("clusterPort"));
@@ -101,43 +101,43 @@ public abstract class SettingsUtils {
 	}
 
 	/**
-	 * Construct a new {@link RedisStandaloneConfiguration} initialized with test endpoint settings.
+	 * Construct a new {@link ValkeyStandaloneConfiguration} initialized with test endpoint settings.
 	 *
-	 * @return a new {@link RedisStandaloneConfiguration} initialized with test endpoint settings.
+	 * @return a new {@link ValkeyStandaloneConfiguration} initialized with test endpoint settings.
 	 */
-	public static RedisStandaloneConfiguration standaloneConfiguration() {
-		return new RedisStandaloneConfiguration(getHost(), getPort());
+	public static ValkeyStandaloneConfiguration standaloneConfiguration() {
+		return new ValkeyStandaloneConfiguration(getHost(), getPort());
 	}
 
 	/**
-	 * Construct a new {@link RedisSentinelConfiguration} initialized with test endpoint settings.
+	 * Construct a new {@link ValkeySentinelConfiguration} initialized with test endpoint settings.
 	 *
-	 * @return a new {@link RedisSentinelConfiguration} initialized with test endpoint settings.
+	 * @return a new {@link ValkeySentinelConfiguration} initialized with test endpoint settings.
 	 */
-	public static RedisSentinelConfiguration sentinelConfiguration() {
+	public static ValkeySentinelConfiguration sentinelConfiguration() {
 
 		List<String> sentinelHostPorts = List.of("%s:%d".formatted(getHost(), getSentinelPort()),
 				"%s:%d".formatted(getHost(), getSentinelPort() + 1));
 
-		return new RedisSentinelConfiguration(getSentinelMaster(), new HashSet<>(sentinelHostPorts));
+		return new ValkeySentinelConfiguration(getSentinelMaster(), new HashSet<>(sentinelHostPorts));
 	}
 
 	/**
-	 * Construct a new {@link RedisClusterConfiguration} initialized with test endpoint settings.
+	 * Construct a new {@link ValkeyClusterConfiguration} initialized with test endpoint settings.
 	 *
-	 * @return a new {@link RedisClusterConfiguration} initialized with test endpoint settings.
+	 * @return a new {@link ValkeyClusterConfiguration} initialized with test endpoint settings.
 	 */
-	public static RedisClusterConfiguration clusterConfiguration() {
-		return new RedisClusterConfiguration(List.of("%s:%d".formatted(getHost(), getClusterPort())));
+	public static ValkeyClusterConfiguration clusterConfiguration() {
+		return new ValkeyClusterConfiguration(List.of("%s:%d".formatted(getHost(), getClusterPort())));
 	}
 
 	/**
-	 * Construct a new {@link RedisSocketConfiguration} initialized with test endpoint settings.
+	 * Construct a new {@link ValkeySocketConfiguration} initialized with test endpoint settings.
 	 *
-	 * @return a new {@link RedisSocketConfiguration} initialized with test endpoint settings.
+	 * @return a new {@link ValkeySocketConfiguration} initialized with test endpoint settings.
 	 */
-	public static RedisSocketConfiguration socketConfiguration() {
-		return new RedisSocketConfiguration(getSocket());
+	public static ValkeySocketConfiguration socketConfiguration() {
+		return new ValkeySocketConfiguration(getSocket());
 	}
 
 }

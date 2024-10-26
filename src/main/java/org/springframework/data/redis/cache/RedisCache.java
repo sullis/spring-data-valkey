@@ -34,8 +34,8 @@ import org.springframework.cache.support.SimpleValueWrapper;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -43,9 +43,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * {@link AbstractValueAdaptingCache Cache} implementation using Redis as the underlying store for cache data.
+ * {@link AbstractValueAdaptingCache Cache} implementation using Valkey as the underlying store for cache data.
  * <p>
- * Use {@link RedisCacheManager} to create {@link RedisCache} instances.
+ * Use {@link ValkeyCacheManager} to create {@link ValkeyCache} instances.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -55,31 +55,31 @@ import org.springframework.util.ReflectionUtils;
  * @since 2.0
  */
 @SuppressWarnings("unused")
-public class RedisCache extends AbstractValueAdaptingCache {
+public class ValkeyCache extends AbstractValueAdaptingCache {
 
-	static final byte[] BINARY_NULL_VALUE = RedisSerializer.java().serialize(NullValue.INSTANCE);
+	static final byte[] BINARY_NULL_VALUE = ValkeySerializer.java().serialize(NullValue.INSTANCE);
 
-	static final String CACHE_RETRIEVAL_UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE = "The Redis driver configured with RedisCache through RedisCacheWriter does not support CompletableFuture-based retrieval";
+	static final String CACHE_RETRIEVAL_UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE = "The Valkey driver configured with ValkeyCache through ValkeyCacheWriter does not support CompletableFuture-based retrieval";
 
-	private final RedisCacheConfiguration cacheConfiguration;
+	private final ValkeyCacheConfiguration cacheConfiguration;
 
-	private final RedisCacheWriter cacheWriter;
+	private final ValkeyCacheWriter cacheWriter;
 
 	private final String name;
 
 	/**
-	 * Create a new {@link RedisCache} with the given {@link String name} and {@link RedisCacheConfiguration}, using the
-	 * {@link RedisCacheWriter} to execute Redis commands supporting the cache operations.
+	 * Create a new {@link ValkeyCache} with the given {@link String name} and {@link ValkeyCacheConfiguration}, using the
+	 * {@link ValkeyCacheWriter} to execute Valkey commands supporting the cache operations.
 	 *
 	 * @param name {@link String name} for this {@link Cache}; must not be {@literal null}.
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations by executing the
-	 *          necessary Redis commands; must not be {@literal null}.
-	 * @param cacheConfiguration {@link RedisCacheConfiguration} applied to this {@link RedisCache} on creation; must not
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations by executing the
+	 *          necessary Valkey commands; must not be {@literal null}.
+	 * @param cacheConfiguration {@link ValkeyCacheConfiguration} applied to this {@link ValkeyCache} on creation; must not
 	 *          be {@literal null}.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
-	 *           are {@literal null} or the given {@link String} name for this {@link RedisCache} is {@literal null}.
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
+	 *           are {@literal null} or the given {@link String} name for this {@link ValkeyCache} is {@literal null}.
 	 */
-	protected RedisCache(String name, RedisCacheWriter cacheWriter, RedisCacheConfiguration cacheConfiguration) {
+	protected ValkeyCache(String name, ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration cacheConfiguration) {
 
 		super(cacheConfiguration.getAllowCacheNullValues());
 
@@ -92,20 +92,20 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	}
 
 	/**
-	 * Get the {@link RedisCacheConfiguration} used to configure this {@link RedisCache} on initialization.
+	 * Get the {@link ValkeyCacheConfiguration} used to configure this {@link ValkeyCache} on initialization.
 	 *
-	 * @return an immutable {@link RedisCacheConfiguration} used to configure this {@link RedisCache} on initialization.
+	 * @return an immutable {@link ValkeyCacheConfiguration} used to configure this {@link ValkeyCache} on initialization.
 	 */
-	public RedisCacheConfiguration getCacheConfiguration() {
+	public ValkeyCacheConfiguration getCacheConfiguration() {
 		return this.cacheConfiguration;
 	}
 
 	/**
-	 * Gets the configured {@link RedisCacheWriter} used to adapt Redis for cache operations.
+	 * Gets the configured {@link ValkeyCacheWriter} used to adapt Valkey for cache operations.
 	 *
-	 * @return the configured {@link RedisCacheWriter} used to adapt Redis for cache operations.
+	 * @return the configured {@link ValkeyCacheWriter} used to adapt Valkey for cache operations.
 	 */
-	protected RedisCacheWriter getCacheWriter() {
+	protected ValkeyCacheWriter getCacheWriter() {
 		return this.cacheWriter;
 	}
 
@@ -115,7 +115,7 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	 *
 	 * @return the configured {@link ConversionService} used to convert {@link Object cache keys} to a {@link String} when
 	 *         accessing entries in the cache.
-	 * @see RedisCacheConfiguration#getConversionService()
+	 * @see ValkeyCacheConfiguration#getConversionService()
 	 * @see #getCacheConfiguration()
 	 */
 	protected ConversionService getConversionService() {
@@ -128,16 +128,16 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	}
 
 	@Override
-	public RedisCacheWriter getNativeCache() {
+	public ValkeyCacheWriter getNativeCache() {
 		return getCacheWriter();
 	}
 
 	/**
 	 * Return the {@link CacheStatistics} snapshot for this cache instance.
 	 * <p>
-	 * Statistics are accumulated per cache instance and not from the backing Redis data store.
+	 * Statistics are accumulated per cache instance and not from the backing Valkey data store.
 	 *
-	 * @return {@link CacheStatistics} object for this {@link RedisCache}.
+	 * @return {@link CacheStatistics} object for this {@link ValkeyCache}.
 	 * @since 2.4
 	 */
 	public CacheStatistics getStatistics() {
@@ -234,9 +234,9 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	/**
 	 * Clear keys that match the given {@link String keyPattern}.
 	 * <p>
-	 * Useful when cache keys are formatted in a style where Redis patterns can be used for matching these.
+	 * Useful when cache keys are formatted in a style where Valkey patterns can be used for matching these.
 	 *
-	 * @param keyPattern {@link String pattern} used to match Redis keys to clear.
+	 * @param keyPattern {@link String pattern} used to match Valkey keys to clear.
 	 * @since 3.0
 	 */
 	public void clear(String keyPattern) {
@@ -297,8 +297,8 @@ public class RedisCache extends AbstractValueAdaptingCache {
 
 		if (nullCacheValueIsNotAllowed(cacheValue)) {
 			throw new IllegalArgumentException(("Cache '%s' does not allow 'null' values; Avoid storing null"
-					+ " via '@Cacheable(unless=\"#result == null\")' or configure RedisCache to allow 'null'"
-					+ " via RedisCacheConfiguration").formatted(getName()));
+					+ " via '@Cacheable(unless=\"#result == null\")' or configure ValkeyCache to allow 'null'"
+					+ " via ValkeyCacheConfiguration").formatted(getName()));
 		}
 
 		return cacheValue;
@@ -306,7 +306,7 @@ public class RedisCache extends AbstractValueAdaptingCache {
 
 	/**
 	 * Customization hook called before passing object to
-	 * {@link org.springframework.data.redis.serializer.RedisSerializer}.
+	 * {@link org.springframework.data.redis.serializer.ValkeySerializer}.
 	 *
 	 * @param value can be {@literal null}.
 	 * @return preprocessed value. Can be {@literal null}.
@@ -321,7 +321,7 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	 *
 	 * @param cacheKey {@link String cache key} to serialize; must not be {@literal null}.
 	 * @return an array of bytes from the given, serialized {@link String cache key}; never {@literal null}.
-	 * @see RedisCacheConfiguration#getKeySerializationPair()
+	 * @see ValkeyCacheConfiguration#getKeySerializationPair()
 	 */
 	protected byte[] serializeCacheKey(String cacheKey) {
 		return ByteUtils.getBytes(getCacheConfiguration().getKeySerializationPair().write(cacheKey));
@@ -332,7 +332,7 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	 *
 	 * @param value {@link Object} to serialize and cache; must not be {@literal null}.
 	 * @return an array of bytes from the serialized {@link Object value}; never {@literal null}.
-	 * @see RedisCacheConfiguration#getValueSerializationPair()
+	 * @see ValkeyCacheConfiguration#getValueSerializationPair()
 	 */
 	protected byte[] serializeCacheValue(Object value) {
 
@@ -348,8 +348,8 @@ public class RedisCache extends AbstractValueAdaptingCache {
 	 *
 	 * @param value array of bytes to deserialize; must not be {@literal null}.
 	 * @return an {@link Object} deserialized from the array of bytes using the configured value
-	 *         {@link RedisSerializationContext.SerializationPair}; can be {@literal null}.
-	 * @see RedisCacheConfiguration#getValueSerializationPair()
+	 *         {@link ValkeySerializationContext.SerializationPair}; can be {@literal null}.
+	 * @see ValkeyCacheConfiguration#getValueSerializationPair()
 	 */
 	@Nullable
 	protected Object deserializeCacheValue(byte[] value) {
@@ -410,7 +410,7 @@ public class RedisCache extends AbstractValueAdaptingCache {
 		}
 
 		throw new IllegalStateException(("Cannot convert cache key %s to String; Please register a suitable Converter"
-				+ " via 'RedisCacheConfiguration.configureKeyConverters(...)' or override '%s.toString()'")
+				+ " via 'ValkeyCacheConfiguration.configureKeyConverters(...)' or override '%s.toString()'")
 				.formatted(source, key.getClass().getName()));
 	}
 

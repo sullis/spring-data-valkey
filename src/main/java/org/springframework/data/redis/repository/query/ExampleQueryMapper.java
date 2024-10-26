@@ -31,8 +31,8 @@ import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.redis.core.convert.IndexResolver;
 import org.springframework.data.redis.core.convert.IndexedData;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.core.mapping.RedisPersistentProperty;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentProperty;
 import org.springframework.data.support.ExampleMatcherAccessor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -41,7 +41,7 @@ import org.springframework.util.StringUtils;
 /**
  * Mapper for Query-by-Example examples to an actual query.
  * <p>
- * This mapper creates a {@link RedisOperationChain} for a given {@link Example} considering exact matches,
+ * This mapper creates a {@link ValkeyOperationChain} for a given {@link Example} considering exact matches,
  * {@link PropertyValueTransformer value transformations} and {@link MatchMode} for indexed simple and nested type
  * properties. {@link java.util.Map} and {@link java.util.Collection} properties are not considered.
  * <p>
@@ -54,7 +54,7 @@ public class ExampleQueryMapper {
 
 	private final Set<StringMatcher> SUPPORTED_MATCHERS = EnumSet.of(StringMatcher.DEFAULT, StringMatcher.EXACT);
 
-	private final MappingContext<RedisPersistentEntity<?>, RedisPersistentProperty> mappingContext;
+	private final MappingContext<ValkeyPersistentEntity<?>, ValkeyPersistentProperty> mappingContext;
 	private final IndexResolver indexResolver;
 
 	/**
@@ -63,7 +63,7 @@ public class ExampleQueryMapper {
 	 * @param mappingContext must not be {@literal null}.
 	 * @param indexResolver must not be {@literal null}.
 	 */
-	public ExampleQueryMapper(MappingContext<RedisPersistentEntity<?>, RedisPersistentProperty> mappingContext,
+	public ExampleQueryMapper(MappingContext<ValkeyPersistentEntity<?>, ValkeyPersistentProperty> mappingContext,
 			IndexResolver indexResolver) {
 
 		Assert.notNull(mappingContext, "MappingContext must not be null");
@@ -74,14 +74,14 @@ public class ExampleQueryMapper {
 	}
 
 	/**
-	 * Retrieve a mapped {@link RedisOperationChain} to query secondary indexes given {@link Example}.
+	 * Retrieve a mapped {@link ValkeyOperationChain} to query secondary indexes given {@link Example}.
 	 *
 	 * @param example must not be {@literal null}.
-	 * @return the mapped {@link RedisOperationChain}.
+	 * @return the mapped {@link ValkeyOperationChain}.
 	 */
-	public RedisOperationChain getMappedExample(Example<?> example) {
+	public ValkeyOperationChain getMappedExample(Example<?> example) {
 
-		RedisOperationChain chain = new RedisOperationChain();
+		ValkeyOperationChain chain = new ValkeyOperationChain();
 
 		ExampleMatcherAccessor matcherAccessor = new ExampleMatcherAccessor(example.getMatcher());
 
@@ -91,8 +91,8 @@ public class ExampleQueryMapper {
 		return chain;
 	}
 
-	private void applyPropertySpecs(String path, @Nullable Object probe, RedisPersistentEntity<?> persistentEntity,
-			ExampleMatcherAccessor exampleSpecAccessor, MatchMode matchMode, RedisOperationChain chain) {
+	private void applyPropertySpecs(String path, @Nullable Object probe, ValkeyPersistentEntity<?> persistentEntity,
+			ExampleMatcherAccessor exampleSpecAccessor, MatchMode matchMode, ValkeyOperationChain chain) {
 
 		if (probe == null) {
 			return;
@@ -121,8 +121,8 @@ public class ExampleQueryMapper {
 	}
 
 	private void applyPropertySpec(String path, Predicate<String> hasIndex, ExampleMatcherAccessor exampleSpecAccessor,
-			PersistentPropertyAccessor propertyAccessor, RedisPersistentProperty property, MatchMode matchMode,
-			RedisOperationChain chain) {
+			PersistentPropertyAccessor propertyAccessor, ValkeyPersistentProperty property, MatchMode matchMode,
+			ValkeyOperationChain chain) {
 
 		StringMatcher stringMatcher = exampleSpecAccessor.getDefaultStringMatcher();
 		boolean ignoreCase = exampleSpecAccessor.isIgnoreCaseEnabled();
@@ -134,12 +134,12 @@ public class ExampleQueryMapper {
 		}
 
 		if (ignoreCase) {
-			throw new InvalidDataAccessApiUsageException("Redis Query-by-Example supports only case-sensitive matching.");
+			throw new InvalidDataAccessApiUsageException("Valkey Query-by-Example supports only case-sensitive matching.");
 		}
 
 		if (!SUPPORTED_MATCHERS.contains(stringMatcher)) {
 			throw new InvalidDataAccessApiUsageException(
-					("Redis Query-by-Example does not support string matcher %s;" + " Supported matchers are: %s.")
+					("Valkey Query-by-Example does not support string matcher %s;" + " Supported matchers are: %s.")
 							.formatted(stringMatcher, SUPPORTED_MATCHERS));
 		}
 
@@ -168,7 +168,7 @@ public class ExampleQueryMapper {
 		}
 	}
 
-	private Set<IndexedData> getIndexedData(String path, Object probe, RedisPersistentEntity<?> persistentEntity) {
+	private Set<IndexedData> getIndexedData(String path, Object probe, ValkeyPersistentEntity<?> persistentEntity) {
 
 		String keySpace = persistentEntity.getKeySpace();
 		return keySpace == null ? Collections.emptySet()

@@ -19,18 +19,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.context.ApplicationEvent;
-import org.springframework.data.redis.core.convert.MappingRedisConverter.BinaryKeyspaceIdentifier;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter.BinaryKeyspaceIdentifier;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link RedisKeyExpiredEvent} is a Redis specific {@link ApplicationEvent} published when a particular key in Redis
+ * {@link ValkeyKeyExpiredEvent} is a Valkey specific {@link ApplicationEvent} published when a particular key in Valkey
  * expires. It can hold the value of the expired key next to the key, but is not required to do so.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisKeyExpiredEvent<T> extends RedisKeyspaceEvent {
+public class ValkeyKeyExpiredEvent<T> extends ValkeyKeyspaceEvent {
 
 	/**
 	 * Use {@literal UTF-8} as default charset.
@@ -41,33 +41,33 @@ public class RedisKeyExpiredEvent<T> extends RedisKeyspaceEvent {
 	private final @Nullable Object value;
 
 	/**
-	 * Creates new {@link RedisKeyExpiredEvent}.
+	 * Creates new {@link ValkeyKeyExpiredEvent}.
 	 *
 	 * @param key the expired key.
 	 */
-	public RedisKeyExpiredEvent(byte[] key) {
+	public ValkeyKeyExpiredEvent(byte[] key) {
 		this(key, null);
 	}
 
 	/**
-	 * Creates new {@link RedisKeyExpiredEvent}
+	 * Creates new {@link ValkeyKeyExpiredEvent}
 	 *
 	 * @param key the expired key.
 	 * @param value the value of the expired key. Can be {@literal null}.
 	 */
-	public RedisKeyExpiredEvent(byte[] key, @Nullable Object value) {
+	public ValkeyKeyExpiredEvent(byte[] key, @Nullable Object value) {
 		this(null, key, value);
 	}
 
 	/**
-	 * Creates new {@link RedisKeyExpiredEvent}
+	 * Creates new {@link ValkeyKeyExpiredEvent}
 	 *
 	 * @param channel the Pub/Sub channel through which this event was received.
 	 * @param key the expired key.
 	 * @param value the value of the expired key. Can be {@literal null}.
 	 * @since 1.8
 	 */
-	public RedisKeyExpiredEvent(@Nullable String channel, byte[] key, @Nullable Object value) {
+	public ValkeyKeyExpiredEvent(@Nullable String channel, byte[] key, @Nullable Object value) {
 		super(channel, key);
 
 		if (BinaryKeyspaceIdentifier.isValid(key)) {
@@ -111,7 +111,7 @@ public class RedisKeyExpiredEvent<T> extends RedisKeyspaceEvent {
 	public String toString() {
 
 		byte[] id = getId();
-		return "RedisKeyExpiredEvent [keyspace=" + getKeyspace() + ", id=" + (id == null ? null : new String(id)) + "]";
+		return "ValkeyKeyExpiredEvent [keyspace=" + getKeyspace() + ", id=" + (id == null ? null : new String(id)) + "]";
 	}
 
 }

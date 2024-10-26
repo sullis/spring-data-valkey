@@ -19,7 +19,7 @@ import java.beans.PropertyEditorSupport;
 
 /**
  * PropertyEditor allowing for easy injection of {@link org.springframework.data.redis.core.GeoOperations} from
- * {@link org.springframework.data.redis.core.RedisOperations}.
+ * {@link org.springframework.data.redis.core.ValkeyOperations}.
  *
  * @author Ninad Divadkar
  * @author Christoph Strobl
@@ -28,10 +28,10 @@ class GeoOperationsEditor extends PropertyEditorSupport {
 
 	public void setValue(Object value) {
 
-		if (value instanceof RedisOperations<?, ?> redisOperations) {
+		if (value instanceof ValkeyOperations<?, ?> redisOperations) {
 			super.setValue(redisOperations.opsForGeo());
 		} else {
-			throw new IllegalArgumentException("Editor supports only conversion of type " + RedisOperations.class);
+			throw new IllegalArgumentException("Editor supports only conversion of type " + ValkeyOperations.class);
 		}
 	}
 }

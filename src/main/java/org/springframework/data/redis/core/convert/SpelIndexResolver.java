@@ -25,8 +25,8 @@ import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.data.redis.core.index.ConfigurableIndexDefinitionProvider;
 import org.springframework.data.redis.core.index.IndexDefinition;
 import org.springframework.data.redis.core.index.SpelIndexDefinition;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.BeanResolver;
 import org.springframework.expression.Expression;
@@ -46,28 +46,28 @@ public class SpelIndexResolver implements IndexResolver {
 
 	private final ConfigurableIndexDefinitionProvider settings;
 	private final SpelExpressionParser parser;
-	private final RedisMappingContext mappingContext;
+	private final ValkeyMappingContext mappingContext;
 	private final Map<SpelIndexDefinition, Expression> expressionCache;
 	private @Nullable BeanResolver beanResolver;
 
 	/**
 	 * Creates a new instance using a default {@link SpelExpressionParser}.
 	 *
-	 * @param mappingContext the {@link RedisMappingContext} to use. Cannot be null.
+	 * @param mappingContext the {@link ValkeyMappingContext} to use. Cannot be null.
 	 */
-	public SpelIndexResolver(RedisMappingContext mappingContext) {
+	public SpelIndexResolver(ValkeyMappingContext mappingContext) {
 		this(mappingContext, new SpelExpressionParser());
 	}
 
 	/**
 	 * Creates a new instance
 	 *
-	 * @param mappingContext the {@link RedisMappingContext} to use. Cannot be null.
+	 * @param mappingContext the {@link ValkeyMappingContext} to use. Cannot be null.
 	 * @param parser the {@link SpelExpressionParser} to use. Cannot be null.
 	 */
-	public SpelIndexResolver(RedisMappingContext mappingContext, SpelExpressionParser parser) {
+	public SpelIndexResolver(ValkeyMappingContext mappingContext, SpelExpressionParser parser) {
 
-		Assert.notNull(mappingContext, "RedisMappingContext must not be null");
+		Assert.notNull(mappingContext, "ValkeyMappingContext must not be null");
 		Assert.notNull(parser, "SpelExpressionParser must not be null");
 		this.mappingContext = mappingContext;
 		this.settings = mappingContext.getMappingConfiguration().getIndexConfiguration();
@@ -81,7 +81,7 @@ public class SpelIndexResolver implements IndexResolver {
 			return Collections.emptySet();
 		}
 
-		RedisPersistentEntity<?> entity = mappingContext.getPersistentEntity(typeInformation);
+		ValkeyPersistentEntity<?> entity = mappingContext.getPersistentEntity(typeInformation);
 
 		if (entity == null) {
 			return Collections.emptySet();

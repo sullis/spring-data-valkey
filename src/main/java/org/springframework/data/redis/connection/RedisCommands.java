@@ -18,23 +18,23 @@ package org.springframework.data.redis.connection;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface defining the commands supported by Redis.
+ * Interface defining the commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public interface RedisCommands extends RedisKeyCommands, RedisStringCommands, RedisListCommands, RedisSetCommands,
-		RedisZSetCommands, RedisHashCommands, RedisTxCommands, RedisPubSubCommands, RedisConnectionCommands,
-		RedisServerCommands, RedisStreamCommands, RedisScriptingCommands, RedisGeoCommands, RedisHyperLogLogCommands {
+public interface ValkeyCommands extends ValkeyKeyCommands, ValkeyStringCommands, ValkeyListCommands, ValkeySetCommands,
+		ValkeyZSetCommands, ValkeyHashCommands, ValkeyTxCommands, ValkeyPubSubCommands, ValkeyConnectionCommands,
+		ValkeyServerCommands, ValkeyStreamCommands, ValkeyScriptingCommands, ValkeyGeoCommands, ValkeyHyperLogLogCommands {
 
 	/**
-	 * {@literal Native} or {@literal raw} execution of the given Redis command along with the given arguments.
+	 * {@literal Native} or {@literal raw} execution of the given Valkey command along with the given arguments.
 	 * <p>
 	 * The command is executed as is, with as little interpretation as possible - it is up to the caller to take care
 	 * of any processing of arguments or the result.
 	 *
-	 * @param command Redis {@link String command} to execute; must not be {@literal null}.
+	 * @param command Valkey {@link String command} to execute; must not be {@literal null}.
 	 * @param args optional array of command arguments; may be empty;
 	 * @return the execution result; may be {@literal null}.
 	 */

@@ -21,24 +21,24 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.util.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory bean that facilitates creation of Redis-based collections. Supports list, set, zset (or sortedSet), map (or
+ * Factory bean that facilitates creation of Valkey-based collections. Supports list, set, zset (or sortedSet), map (or
  * hash) and properties. Uses the key and {@link CollectionType} to determine what collection type to use. The factory
  * verifies the key type if a {@link CollectionType} is specified. Defaults to {@link CollectionType#LIST}.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
- * @see RedisStore
+ * @see ValkeyStore
  */
-public class RedisCollectionFactoryBean implements SmartFactoryBean<RedisStore>, BeanNameAware, InitializingBean {
+public class ValkeyCollectionFactoryBean implements SmartFactoryBean<ValkeyStore>, BeanNameAware, InitializingBean {
 
 	/**
 	 * Collection types supported by this factory.
@@ -111,11 +111,11 @@ public class RedisCollectionFactoryBean implements SmartFactoryBean<RedisStore>,
 	}
 
 	private @Nullable CollectionType type;
-	private @Nullable RedisTemplate<String, ?> template;
+	private @Nullable ValkeyTemplate<String, ?> template;
 	private @Nullable String key;
 	private @Nullable String beanName;
 
-	private @Nullable Lazy<RedisStore> store;
+	private @Nullable Lazy<ValkeyStore> store;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -125,7 +125,7 @@ public class RedisCollectionFactoryBean implements SmartFactoryBean<RedisStore>,
 		}
 
 		Assert.hasText(key, "Collection key is required - no key or bean name specified");
-		Assert.notNull(template, "Redis template is required");
+		Assert.notNull(template, "Valkey template is required");
 
 		store = Lazy.of(() -> {
 
@@ -147,28 +147,28 @@ public class RedisCollectionFactoryBean implements SmartFactoryBean<RedisStore>,
 		});
 	}
 
-	private RedisStore createStore(CollectionType collectionType, String key, RedisOperations<String, ?> operations) {
+	private ValkeyStore createStore(CollectionType collectionType, String key, ValkeyOperations<String, ?> operations) {
 
 		return switch (collectionType) {
-			case LIST -> RedisList.create(key, operations);
-			case SET -> new DefaultRedisSet<>(key, operations);
-			case ZSET -> RedisZSet.create(key, operations);
-			case PROPERTIES -> new RedisProperties(key, operations);
-			case MAP -> new DefaultRedisMap<>(key, operations);
+			case LIST -> ValkeyList.create(key, operations);
+			case SET -> new DefaultValkeySet<>(key, operations);
+			case ZSET -> ValkeyZSet.create(key, operations);
+			case PROPERTIES -> new ValkeyProperties(key, operations);
+			case MAP -> new DefaultValkeyMap<>(key, operations);
 		};
 	}
 
 	@Override
-	public RedisStore getObject() {
+	public ValkeyStore getObject() {
 
 		Assert.state(store != null,
-				"RedisCollectionFactoryBean is not initialized. Ensure to initialize this factory by calling afterPropertiesSet() before obtaining the factory object.");
+				"ValkeyCollectionFactoryBean is not initialized. Ensure to initialize this factory by calling afterPropertiesSet() before obtaining the factory object.");
 		return store.get();
 	}
 
 	@Override
 	public Class<?> getObjectType() {
-		return (store != null ? store.get().getClass() : RedisStore.class);
+		return (store != null ? store.get().getClass() : ValkeyStore.class);
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class RedisCollectionFactoryBean implements SmartFactoryBean<RedisStore>,
 	 *
 	 * @param template The template to set.
 	 */
-	public void setTemplate(RedisTemplate<String, ?> template) {
+	public void setTemplate(ValkeyTemplate<String, ?> template) {
 		this.template = template;
 	}
 

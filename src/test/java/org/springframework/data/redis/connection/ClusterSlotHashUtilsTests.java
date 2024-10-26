@@ -22,7 +22,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.data.redis.test.extension.JedisExtension;
 import org.springframework.util.StringUtils;
 
@@ -37,7 +37,7 @@ import redis.clients.jedis.JedisCluster;
  * @author Mark Paluch
  * @author John Blum
  */
-@EnabledOnRedisClusterAvailable
+@EnabledOnValkeyClusterAvailable
 @ExtendWith(JedisExtension.class)
 public class ClusterSlotHashUtilsTests {
 

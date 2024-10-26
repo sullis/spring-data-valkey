@@ -25,9 +25,9 @@ import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
-import org.springframework.data.redis.connection.RedisStreamCommands.XClaimOptions;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XClaimOptions;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -42,7 +42,7 @@ import org.springframework.data.redis.connection.stream.StreamInfo.XInfoStream;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.support.collections.CollectionUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -63,10 +63,10 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	private final StreamObjectMapper objectMapper;
 
 	@SuppressWarnings("unchecked")
-	DefaultStreamOperations(RedisTemplate<K, ?> template,
+	DefaultStreamOperations(ValkeyTemplate<K, ?> template,
 			@Nullable HashMapper<? super K, ? super HK, ? super HV> mapper) {
 
-		super((RedisTemplate<K, Object>) template);
+		super((ValkeyTemplate<K, Object>) template);
 
 		this.objectMapper = new StreamObjectMapper(mapper) {
 			@Override
@@ -156,11 +156,11 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	@Override
 	public List<MapRecord<K, HK, HV>> claim(K key, String consumerGroup, String newOwner, XClaimOptions xClaimOptions) {
 
-		return CollectionUtils.nullSafeList(execute(new RecordDeserializingRedisCallback() {
+		return CollectionUtils.nullSafeList(execute(new RecordDeserializingValkeyCallback() {
 
 			@Nullable
 			@Override
-			List<ByteRecord> inRedis(RedisConnection connection) {
+			List<ByteRecord> inValkey(ValkeyConnection connection) {
 				return connection.streamCommands().xClaim(rawKey(key), consumerGroup, newOwner, xClaimOptions);
 			}
 		}));
@@ -246,11 +246,11 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	@Override
 	public List<MapRecord<K, HK, HV>> range(K key, Range<String> range, Limit limit) {
 
-		return execute(new RecordDeserializingRedisCallback() {
+		return execute(new RecordDeserializingValkeyCallback() {
 
 			@Nullable
 			@Override
-			List<ByteRecord> inRedis(RedisConnection connection) {
+			List<ByteRecord> inValkey(ValkeyConnection connection) {
 				return connection.xRange(rawKey(key), range, limit);
 			}
 		});
@@ -259,11 +259,11 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	@Override
 	public List<MapRecord<K, HK, HV>> read(StreamReadOptions readOptions, StreamOffset<K>... streams) {
 
-		return execute(new RecordDeserializingRedisCallback() {
+		return execute(new RecordDeserializingValkeyCallback() {
 
 			@Nullable
 			@Override
-			List<ByteRecord> inRedis(RedisConnection connection) {
+			List<ByteRecord> inValkey(ValkeyConnection connection) {
 				return connection.xRead(readOptions, rawStreamOffsets(streams));
 			}
 		});
@@ -272,11 +272,11 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	@Override
 	public List<MapRecord<K, HK, HV>> read(Consumer consumer, StreamReadOptions readOptions, StreamOffset<K>... streams) {
 
-		return execute(new RecordDeserializingRedisCallback() {
+		return execute(new RecordDeserializingValkeyCallback() {
 
 			@Nullable
 			@Override
-			List<ByteRecord> inRedis(RedisConnection connection) {
+			List<ByteRecord> inValkey(ValkeyConnection connection) {
 				return connection.xReadGroup(consumer, readOptions, rawStreamOffsets(streams));
 			}
 		});
@@ -285,11 +285,11 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	@Override
 	public List<MapRecord<K, HK, HV>> reverseRange(K key, Range<String> range, Limit limit) {
 
-		return execute(new RecordDeserializingRedisCallback() {
+		return execute(new RecordDeserializingValkeyCallback() {
 
 			@Nullable
 			@Override
-			List<ByteRecord> inRedis(RedisConnection connection) {
+			List<ByteRecord> inValkey(ValkeyConnection connection) {
 				return connection.xRevRange(rawKey(key), range, limit);
 			}
 		});
@@ -328,7 +328,7 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private byte[] serialize(Object value, RedisSerializer serializer) {
+	private byte[] serialize(Object value, ValkeySerializer serializer) {
 
 		Object _value = value;
 		if (!serializer.canSerialize(value.getClass())) {
@@ -345,12 +345,12 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 				.toArray(it -> new StreamOffset[it]);
 	}
 
-	abstract class RecordDeserializingRedisCallback implements RedisCallback<List<MapRecord<K, HK, HV>>> {
+	abstract class RecordDeserializingValkeyCallback implements ValkeyCallback<List<MapRecord<K, HK, HV>>> {
 
 		@SuppressWarnings("unchecked")
-		public final List<MapRecord<K, HK, HV>> doInRedis(RedisConnection connection) {
+		public final List<MapRecord<K, HK, HV>> doInValkey(ValkeyConnection connection) {
 
-			List<ByteRecord> raw = inRedis(connection);
+			List<ByteRecord> raw = inValkey(connection);
 			if (raw == null) {
 				return Collections.emptyList();
 			}
@@ -364,6 +364,6 @@ class DefaultStreamOperations<K, HK, HV> extends AbstractOperations<K, Object> i
 		}
 
 		@Nullable
-		abstract List<ByteRecord> inRedis(RedisConnection connection);
+		abstract List<ByteRecord> inValkey(ValkeyConnection connection);
 	}
 }

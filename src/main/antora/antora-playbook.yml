@@ -6,7 +6,7 @@ antora:
     - require: '@springio/antora-extensions'
       root_component_name: 'data-redis'
 site:
-  title: Spring Data Redis
+  title: Spring Data Valkey
   url: https://docs.spring.io/spring-data-valkey/reference/
 content:
   sources:

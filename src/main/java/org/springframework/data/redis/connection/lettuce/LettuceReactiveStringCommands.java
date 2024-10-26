@@ -28,15 +28,15 @@ import java.util.stream.Collectors;
 import org.reactivestreams.Publisher;
 
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.AbsentByteBufferResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.ByteBufferResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.RangeCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.AbsentByteBufferResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.ByteBufferResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.RangeCommand;
 import org.springframework.data.redis.connection.ReactiveStringCommands;
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.util.Assert;
 
@@ -52,14 +52,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveStringCommands implements ReactiveStringCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveStringCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveStringCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveStringCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -92,7 +92,7 @@ class LettuceReactiveStringCommands implements ReactiveStringCommands {
 			if (command.getExpiration().isPresent() || command.getOption().isPresent()) {
 
 				Expiration expiration = command.getExpiration().orElse(null);
-				RedisStringCommands.SetOption setOption = command.getOption().orElse(null);
+				ValkeyStringCommands.SetOption setOption = command.getOption().orElse(null);
 
 				args = LettuceConverters.toSetArgs(expiration, setOption);
 			}
@@ -402,7 +402,7 @@ class LettuceReactiveStringCommands implements ReactiveStringCommands {
 				reactiveCommands.strlen(command.getKey()).map(respValue -> new NumericResponse<>(command, respValue))));
 	}
 
-	protected LettuceReactiveRedisConnection getConnection() {
+	protected LettuceReactiveValkeyConnection getConnection() {
 		return this.connection;
 	}
 

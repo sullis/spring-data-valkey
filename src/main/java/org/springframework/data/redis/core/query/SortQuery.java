@@ -17,16 +17,16 @@ package org.springframework.data.redis.core.query;
 
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.SortParameters.Order;
 import org.springframework.data.redis.connection.SortParameters.Range;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.lang.Nullable;
 
 /**
- * High-level abstraction over a Redis SORT (generified equivalent of {@link SortParameters}). To be used with
- * {@link RedisTemplate} (just as {@link SortParameters} is used by {@link RedisConnection}).
+ * High-level abstraction over a Valkey SORT (generified equivalent of {@link SortParameters}). To be used with
+ * {@link ValkeyTemplate} (just as {@link SortParameters} is used by {@link ValkeyConnection}).
  *
  * @author Costin Leau
  * @author Mark Paluch

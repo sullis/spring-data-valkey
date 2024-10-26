@@ -32,37 +32,37 @@ import org.springframework.data.keyvalue.repository.KeyValueRepository;
 import org.springframework.data.keyvalue.repository.config.QueryCreatorType;
 import org.springframework.data.keyvalue.repository.query.KeyValuePartTreeQuery;
 import org.springframework.data.keyvalue.repository.support.KeyValueRepositoryFactoryBean;
-import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.ValkeyCacheManager;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.core.*;
-import org.springframework.data.redis.core.RedisConnectionUtils.RedisConnectionProxy;
+import org.springframework.data.redis.core.ValkeyConnectionUtils.ValkeyConnectionProxy;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.MappingConfiguration;
-import org.springframework.data.redis.core.convert.MappingRedisConverter;
-import org.springframework.data.redis.core.convert.RedisConverter;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyCustomConversions;
 import org.springframework.data.redis.core.convert.ReferenceResolver;
 import org.springframework.data.redis.core.convert.ReferenceResolverImpl;
 import org.springframework.data.redis.core.index.ConfigurableIndexDefinitionProvider;
 import org.springframework.data.redis.core.index.IndexConfiguration;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.repository.query.RedisPartTreeQuery;
-import org.springframework.data.redis.repository.query.RedisQueryCreator;
-import org.springframework.data.redis.repository.support.RedisRepositoryFactoryBean;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
+import org.springframework.data.redis.repository.query.ValkeyPartTreeQuery;
+import org.springframework.data.redis.repository.query.ValkeyQueryCreator;
+import org.springframework.data.redis.repository.support.ValkeyRepositoryFactoryBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link RuntimeHintsRegistrar} for Redis operations and repository support.
+ * {@link RuntimeHintsRegistrar} for Valkey operations and repository support.
  *
  * @author Christoph Strobl
  * @since 3.0
  */
-public class RedisRuntimeHints implements RuntimeHintsRegistrar {
+public class ValkeyRuntimeHints implements RuntimeHintsRegistrar {
 
 	/**
-	 * Get a {@link RuntimeHints} instance containing the ones for Redis.
+	 * Get a {@link RuntimeHints} instance containing the ones for Valkey.
 	 *
 	 * @param config callback to provide additional custom hints.
 	 * @return new instance of {@link RuntimeHints}.
@@ -70,7 +70,7 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 	public static RuntimeHints redisHints(Consumer<RuntimeHints> config) {
 
 		RuntimeHints hints = new RuntimeHints();
-		new RedisRuntimeHints().registerHints(hints, null);
+		new ValkeyRuntimeHints().registerHints(hints, null);
 		config.accept(hints);
 		return hints;
 	}
@@ -80,20 +80,20 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 
 		// CACHE
 		hints.serialization().registerType(org.springframework.cache.support.NullValue.class,
-				hint -> hint.onReachableType(TypeReference.of(RedisCacheManager.class)));
+				hint -> hint.onReachableType(TypeReference.of(ValkeyCacheManager.class)));
 
 		// REFLECTION
 		hints.reflection().registerTypes(
-				Arrays.asList(TypeReference.of(RedisConnection.class), TypeReference.of(StringRedisConnection.class),
-						TypeReference.of(DefaultedRedisConnection.class), TypeReference.of(DefaultedRedisClusterConnection.class),
-						TypeReference.of(RedisKeyCommands.class), TypeReference.of(RedisStringCommands.class),
-						TypeReference.of(RedisListCommands.class), TypeReference.of(RedisSetCommands.class),
-						TypeReference.of(RedisZSetCommands.class), TypeReference.of(RedisHashCommands.class),
-						TypeReference.of(RedisTxCommands.class), TypeReference.of(RedisPubSubCommands.class),
-						TypeReference.of(RedisConnectionCommands.class), TypeReference.of(RedisServerCommands.class),
-						TypeReference.of(RedisStreamCommands.class), TypeReference.of(RedisScriptingCommands.class),
-						TypeReference.of(RedisGeoCommands.class), TypeReference.of(RedisHyperLogLogCommands.class),
-						TypeReference.of(RedisClusterCommands.class), TypeReference.of(ReactiveRedisConnection.class),
+				Arrays.asList(TypeReference.of(ValkeyConnection.class), TypeReference.of(StringValkeyConnection.class),
+						TypeReference.of(DefaultedValkeyConnection.class), TypeReference.of(DefaultedValkeyClusterConnection.class),
+						TypeReference.of(ValkeyKeyCommands.class), TypeReference.of(ValkeyStringCommands.class),
+						TypeReference.of(ValkeyListCommands.class), TypeReference.of(ValkeySetCommands.class),
+						TypeReference.of(ValkeyZSetCommands.class), TypeReference.of(ValkeyHashCommands.class),
+						TypeReference.of(ValkeyTxCommands.class), TypeReference.of(ValkeyPubSubCommands.class),
+						TypeReference.of(ValkeyConnectionCommands.class), TypeReference.of(ValkeyServerCommands.class),
+						TypeReference.of(ValkeyStreamCommands.class), TypeReference.of(ValkeyScriptingCommands.class),
+						TypeReference.of(ValkeyGeoCommands.class), TypeReference.of(ValkeyHyperLogLogCommands.class),
+						TypeReference.of(ValkeyClusterCommands.class), TypeReference.of(ReactiveValkeyConnection.class),
 						TypeReference.of(ReactiveKeyCommands.class), TypeReference.of(ReactiveStringCommands.class),
 						TypeReference.of(ReactiveListCommands.class), TypeReference.of(ReactiveSetCommands.class),
 						TypeReference.of(ReactiveZSetCommands.class), TypeReference.of(ReactiveHashCommands.class),
@@ -107,17 +107,17 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 						TypeReference.of(ReactiveClusterStreamCommands.class),
 						TypeReference.of(ReactiveClusterScriptingCommands.class),
 						TypeReference.of(ReactiveClusterGeoCommands.class),
-						TypeReference.of(ReactiveClusterHyperLogLogCommands.class), TypeReference.of(ReactiveRedisOperations.class),
-						TypeReference.of(ReactiveRedisConnectionFactory.class), TypeReference.of(ReactiveRedisTemplate.class),
-						TypeReference.of(RedisOperations.class), TypeReference.of(RedisTemplate.class),
-						TypeReference.of(StringRedisTemplate.class), TypeReference.of(KeyspaceConfiguration.class),
-						TypeReference.of(MappingConfiguration.class), TypeReference.of(MappingRedisConverter.class),
-						TypeReference.of(RedisConverter.class), TypeReference.of(RedisCustomConversions.class),
+						TypeReference.of(ReactiveClusterHyperLogLogCommands.class), TypeReference.of(ReactiveValkeyOperations.class),
+						TypeReference.of(ReactiveValkeyConnectionFactory.class), TypeReference.of(ReactiveValkeyTemplate.class),
+						TypeReference.of(ValkeyOperations.class), TypeReference.of(ValkeyTemplate.class),
+						TypeReference.of(StringValkeyTemplate.class), TypeReference.of(KeyspaceConfiguration.class),
+						TypeReference.of(MappingConfiguration.class), TypeReference.of(MappingValkeyConverter.class),
+						TypeReference.of(ValkeyConverter.class), TypeReference.of(ValkeyCustomConversions.class),
 						TypeReference.of(ReferenceResolver.class), TypeReference.of(ReferenceResolverImpl.class),
 						TypeReference.of(IndexConfiguration.class), TypeReference.of(ConfigurableIndexDefinitionProvider.class),
-						TypeReference.of(RedisMappingContext.class), TypeReference.of(RedisRepositoryFactoryBean.class),
-						TypeReference.of(RedisQueryCreator.class), TypeReference.of(RedisPartTreeQuery.class),
-						TypeReference.of(MessageListener.class), TypeReference.of(RedisMessageListenerContainer.class),
+						TypeReference.of(ValkeyMappingContext.class), TypeReference.of(ValkeyRepositoryFactoryBean.class),
+						TypeReference.of(ValkeyQueryCreator.class), TypeReference.of(ValkeyPartTreeQuery.class),
+						TypeReference.of(MessageListener.class), TypeReference.of(ValkeyMessageListenerContainer.class),
 
 						TypeReference
 								.of("org.springframework.data.redis.core.BoundOperationsProxyFactory$DefaultBoundKeyOperations"),
@@ -130,7 +130,7 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 						TypeReference.of("org.springframework.data.redis.core.DefaultValueOperations"),
 						TypeReference.of("org.springframework.data.redis.core.DefaultZSetOperations"),
 
-						TypeReference.of(RedisKeyValueAdapter.class), TypeReference.of(RedisKeyValueTemplate.class),
+						TypeReference.of(ValkeyKeyValueAdapter.class), TypeReference.of(ValkeyKeyValueTemplate.class),
 
 						// Key-Value
 						TypeReference.of(KeySpace.class), TypeReference.of(AbstractKeyValueAdapter.class),
@@ -143,11 +143,11 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 						MemberCategory.INVOKE_PUBLIC_METHODS));
 
 		// PROXIES
-		hints.proxies().registerJdkProxy(TypeReference.of(RedisConnection.class));
-		hints.proxies().registerJdkProxy(TypeReference.of(DefaultedRedisConnection.class));
-		hints.proxies().registerJdkProxy(TypeReference.of(ReactiveRedisConnection.class));
-		hints.proxies().registerJdkProxy(TypeReference.of(StringRedisConnection.class),
-				TypeReference.of(DecoratedRedisConnection.class));
+		hints.proxies().registerJdkProxy(TypeReference.of(ValkeyConnection.class));
+		hints.proxies().registerJdkProxy(TypeReference.of(DefaultedValkeyConnection.class));
+		hints.proxies().registerJdkProxy(TypeReference.of(ReactiveValkeyConnection.class));
+		hints.proxies().registerJdkProxy(TypeReference.of(StringValkeyConnection.class),
+				TypeReference.of(DecoratedValkeyConnection.class));
 
 		// keys are bound by a proxy
 		boundOperationsProxy(BoundGeoOperations.class, classLoader, hints);
@@ -160,18 +160,18 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 		boundOperationsProxy(BoundZSetOperations.class, classLoader, hints);
 
 		// Connection Splitting
-		registerRedisConnectionProxy(TypeReference.of(RedisCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisGeoCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisHashCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisHyperLogLogCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisKeyCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisListCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisSetCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisScriptingCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisServerCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisStreamCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisStringCommands.class), hints);
-		registerRedisConnectionProxy(TypeReference.of(RedisZSetCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyGeoCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyHashCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyHyperLogLogCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyKeyCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyListCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeySetCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyScriptingCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyServerCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyStreamCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyStringCommands.class), hints);
+		registerValkeyConnectionProxy(TypeReference.of(ValkeyZSetCommands.class), hints);
 	}
 
 	static void boundOperationsProxy(Class<?> type, ClassLoader classLoader, RuntimeHints hints) {
@@ -195,9 +195,9 @@ public class RedisRuntimeHints implements RuntimeHintsRegistrar {
 				TypeReference.of("org.springframework.core.DecoratingProxy"));
 	}
 
-	static void registerRedisConnectionProxy(TypeReference typeReference, RuntimeHints hints) {
+	static void registerValkeyConnectionProxy(TypeReference typeReference, RuntimeHints hints) {
 
-		hints.proxies().registerJdkProxy(TypeReference.of(RedisConnectionProxy.class), //
+		hints.proxies().registerJdkProxy(TypeReference.of(ValkeyConnectionProxy.class), //
 				typeReference, //
 				TypeReference.of("org.springframework.aop.SpringProxy"), //
 				TypeReference.of("org.springframework.aop.framework.Advised"), //

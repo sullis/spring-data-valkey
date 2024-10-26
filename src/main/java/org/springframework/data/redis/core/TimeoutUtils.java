@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Helper class featuring methods for calculating Redis timeouts
+ * Helper class featuring methods for calculating Valkey timeouts
  *
  * @author Jennifer Hickey
  * @author Mark Paluch
@@ -41,7 +41,7 @@ public abstract class TimeoutUtils {
 	/**
 	 * Converts the given timeout to seconds.
 	 * <p>
-	 * Since a 0 timeout blocks some Redis ops indefinitely, this method will return 1 if the original value is greater
+	 * Since a 0 timeout blocks some Valkey ops indefinitely, this method will return 1 if the original value is greater
 	 * than 0 but is truncated to 0 on conversion.
 	 *
 	 * @param duration The duration to convert
@@ -55,7 +55,7 @@ public abstract class TimeoutUtils {
 	/**
 	 * Converts the given timeout to seconds.
 	 * <p>
-	 * Since a 0 timeout blocks some Redis ops indefinitely, this method will return 1 if the original value is greater
+	 * Since a 0 timeout blocks some Valkey ops indefinitely, this method will return 1 if the original value is greater
 	 * than 0 but is truncated to 0 on conversion.
 	 *
 	 * @param timeout The timeout to convert
@@ -85,7 +85,7 @@ public abstract class TimeoutUtils {
 	/**
 	 * Converts the given timeout to milliseconds.
 	 * <p>
-	 * Since a 0 timeout blocks some Redis ops indefinitely, this method will return 1 if the original value is greater
+	 * Since a 0 timeout blocks some Valkey ops indefinitely, this method will return 1 if the original value is greater
 	 * than 0 but is truncated to 0 on conversion.
 	 *
 	 * @param timeout The timeout to convert
@@ -98,7 +98,7 @@ public abstract class TimeoutUtils {
 
 	private static long roundUpIfNecessary(long timeout, long convertedTimeout) {
 
-		// A 0 timeout blocks some Redis ops indefinitely, round up if that's
+		// A 0 timeout blocks some Valkey ops indefinitely, round up if that's
 		// not the intention
 		if (timeout > 0 && convertedTimeout == 0) {
 			return 1;

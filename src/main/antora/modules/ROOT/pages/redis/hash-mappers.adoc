@@ -1,16 +1,16 @@
 [[redis.hashmappers.root]]
 = Hash Mapping
 
-Data can be stored by using various data structures within Redis. javadoc:org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer[] can convert objects in https://en.wikipedia.org/wiki/JSON[JSON] format. Ideally, JSON can be stored as a value by using plain keys. You can achieve a more sophisticated mapping of structured objects by using Redis hashes. Spring Data Redis offers various strategies for mapping data to hashes (depending on the use case):
+Data can be stored by using various data structures within Valkey. javadoc:org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer[] can convert objects in https://en.wikipedia.org/wiki/JSON[JSON] format. Ideally, JSON can be stored as a value by using plain keys. You can achieve a more sophisticated mapping of structured objects by using Valkey hashes. Spring Data Valkey offers various strategies for mapping data to hashes (depending on the use case):
 
 * Direct mapping, by using javadoc:org.springframework.data.redis.core.HashOperations[] and a xref:redis.adoc#redis:serializer[serializer]
-* Using xref:repositories.adoc[Redis Repositories]
+* Using xref:repositories.adoc[Valkey Repositories]
 * Using javadoc:org.springframework.data.redis.hash.HashMapper[] and javadoc:org.springframework.data.redis.core.HashOperations[]
 
 [[redis.hashmappers.mappers]]
 == Hash Mappers
 
-Hash mappers are converters of map objects to a `Map<K, V>` and back. javadoc:org.springframework.data.redis.hash.HashMapper[] is intended for using with Redis Hashes.
+Hash mappers are converters of map objects to a `Map<K, V>` and back. javadoc:org.springframework.data.redis.hash.HashMapper[] is intended for using with Valkey Hashes.
 
 Multiple implementations are available:
 
@@ -53,7 +53,7 @@ public class HashMapping {
 [[redis.hashmappers.jackson2]]
 === Jackson2HashMapper
 
-javadoc:org.springframework.data.redis.hash.Jackson2HashMapper[] provides Redis Hash mapping for domain objects by using https://github.com/FasterXML/jackson[FasterXML Jackson].
+javadoc:org.springframework.data.redis.hash.Jackson2HashMapper[] provides Valkey Hash mapping for domain objects by using https://github.com/FasterXML/jackson[FasterXML Jackson].
 `Jackson2HashMapper` can map top-level properties as Hash field names and, optionally, flatten the structure.
 Simple types map to simple values. Complex types (nested objects, collections, maps, and so on) are represented as nested JSON.
 

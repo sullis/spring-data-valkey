@@ -26,20 +26,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.SettingsUtils;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.util.backoff.FixedBackOff;
 
 /**
- * Integration tests for {@link RedisMessageListenerContainer}.
+ * Integration tests for {@link ValkeyMessageListenerContainer}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-class RedisMessageListenerContainerFailureIntegrationTests {
+class ValkeyMessageListenerContainerFailureIntegrationTests {
 
 	private final Object handler = new Object() {
 
@@ -50,7 +50,7 @@ class RedisMessageListenerContainerFailureIntegrationTests {
 	private final MessageListenerAdapter adapter = new MessageListenerAdapter(handler);
 
 	private JedisConnectionFactory connectionFactory;
-	private RedisMessageListenerContainer container;
+	private ValkeyMessageListenerContainer container;
 
 	private Executor executorMock;
 
@@ -59,7 +59,7 @@ class RedisMessageListenerContainerFailureIntegrationTests {
 
 		executorMock = mock(Executor.class);
 
-		RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration configuration = new ValkeyStandaloneConfiguration();
 		configuration.setPort(SettingsUtils.getPort());
 		configuration.setHostName(SettingsUtils.getHost());
 		configuration.setDatabase(2);
@@ -68,7 +68,7 @@ class RedisMessageListenerContainerFailureIntegrationTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(connectionFactory);
 		container.setBeanName("container");
 		container.setTaskExecutor(new SyncTaskExecutor());
@@ -112,13 +112,13 @@ class RedisMessageListenerContainerFailureIntegrationTests {
 		// interrupt thread once Executor.execute is called
 		doAnswer(invocationOnMock -> {
 
-			throw new RedisConnectionFailureException("I want to break free");
+			throw new ValkeyConnectionFailureException("I want to break free");
 		}).when(executorMock).execute(any(Runnable.class));
 
 		container.setRecoveryBackoff(new FixedBackOff(1, 5));
 		container.addMessageListener(adapter, new ChannelTopic("a"));
 		assertThatThrownBy(() -> container.start()).isInstanceOf(CompletionException.class)
-				.hasRootCauseInstanceOf(RedisConnectionFailureException.class);
+				.hasRootCauseInstanceOf(ValkeyConnectionFailureException.class);
 
 		assertThat(container.isRunning()).isTrue();
 		assertThat(container.isListening()).isFalse();

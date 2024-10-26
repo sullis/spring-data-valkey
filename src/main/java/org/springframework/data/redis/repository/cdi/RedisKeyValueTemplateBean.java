@@ -25,29 +25,29 @@ import java.util.Set;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyKeyValueTemplate;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.util.Assert;
 
 /**
- * {@link CdiBean} to create {@link RedisKeyValueTemplate} instances.
+ * {@link CdiBean} to create {@link ValkeyKeyValueTemplate} instances.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-public class RedisKeyValueTemplateBean extends CdiBean<KeyValueOperations> {
+public class ValkeyKeyValueTemplateBean extends CdiBean<KeyValueOperations> {
 
-	private final Bean<RedisKeyValueAdapter> keyValueAdapter;
+	private final Bean<ValkeyKeyValueAdapter> keyValueAdapter;
 
 	/**
-	 * Creates a new {@link RedisKeyValueTemplateBean}.
+	 * Creates a new {@link ValkeyKeyValueTemplateBean}.
 	 *
 	 * @param keyValueAdapter must not be {@literal null}.
 	 * @param qualifiers must not be {@literal null}.
 	 * @param beanManager must not be {@literal null}.
 	 */
-	public RedisKeyValueTemplateBean(Bean<RedisKeyValueAdapter> keyValueAdapter, Set<Annotation> qualifiers,
+	public ValkeyKeyValueTemplateBean(Bean<ValkeyKeyValueAdapter> keyValueAdapter, Set<Annotation> qualifiers,
 			BeanManager beanManager) {
 
 		super(qualifiers, KeyValueOperations.class, beanManager);
@@ -58,12 +58,12 @@ public class RedisKeyValueTemplateBean extends CdiBean<KeyValueOperations> {
 	@Override
 	public KeyValueOperations create(CreationalContext<KeyValueOperations> creationalContext) {
 
-		RedisKeyValueAdapter keyValueAdapter = getDependencyInstance(this.keyValueAdapter, RedisKeyValueAdapter.class);
+		ValkeyKeyValueAdapter keyValueAdapter = getDependencyInstance(this.keyValueAdapter, ValkeyKeyValueAdapter.class);
 
-		RedisMappingContext redisMappingContext = new RedisMappingContext();
+		ValkeyMappingContext redisMappingContext = new ValkeyMappingContext();
 		redisMappingContext.afterPropertiesSet();
 
-		return new RedisKeyValueTemplate(keyValueAdapter, redisMappingContext);
+		return new ValkeyKeyValueTemplate(keyValueAdapter, redisMappingContext);
 	}
 
 	@Override

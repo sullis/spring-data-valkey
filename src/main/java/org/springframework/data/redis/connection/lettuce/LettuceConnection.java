@@ -17,28 +17,28 @@ package org.springframework.data.redis.connection.lettuce;
 
 import static io.lettuce.core.protocol.CommandType.*;
 
-import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.AbstractValkeyClient;
 import io.lettuce.core.LettuceFutures;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyFuture;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.TransactionResult;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
-import io.lettuce.core.api.sync.RedisCommands;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
-import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.async.ValkeyAsyncCommands;
+import io.lettuce.core.api.sync.ValkeyCommands;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.async.ValkeyClusterAsyncCommands;
+import io.lettuce.core.cluster.api.sync.ValkeyClusterCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
-import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.codec.ValkeyCodec;
 import io.lettuce.core.output.*;
 import io.lettuce.core.protocol.Command;
 import io.lettuce.core.protocol.CommandArgs;
 import io.lettuce.core.protocol.CommandType;
 import io.lettuce.core.protocol.ProtocolKeyword;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.sentinel.api.StatefulRedisSentinelConnection;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.sentinel.api.StatefulValkeySentinelConnection;
 
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
@@ -67,26 +67,26 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.ExceptionTranslationStrategy;
 import org.springframework.data.redis.FallbackExceptionTranslationStrategy;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.convert.TransactionResultConverter;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionProvider.TargetAware;
 import org.springframework.data.redis.connection.lettuce.LettuceResult.LettuceResultBuilder;
 import org.springframework.data.redis.connection.lettuce.LettuceResult.LettuceStatusResult;
 import org.springframework.data.redis.core.Cursor.CursorId;
-import org.springframework.data.redis.core.RedisCommand;
+import org.springframework.data.redis.core.ValkeyCommand;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@code RedisConnection} implementation on top of <a href="https://github.com/mp911de/lettuce">Lettuce</a> Redis
+ * {@code ValkeyConnection} implementation on top of <a href="https://github.com/mp911de/lettuce">Lettuce</a> Valkey
  * client.
  * <p>
- * While the underlying Lettuce {@literal RedisClient} and {@literal StatefulRedisConnection} instances used by
+ * While the underlying Lettuce {@literal ValkeyClient} and {@literal StatefulValkeyConnection} instances used by
  * {@link LettuceConnection} are Thread-safe, this class itself is not Thread-safe. Therefore, instances of
- * {@link LettuceConnection} should not be shared across multiple Threads when executing Redis commands and other
+ * {@link LettuceConnection} should not be shared across multiple Threads when executing Valkey commands and other
  * operations. If optimal performance is required by your application(s), then we recommend direct access to the
  * low-level, API provided by the underlying Lettuce client library (driver), where such Thread-safety guarantees can be
  * made. Simply call {@link #getNativeConnection()} and use the native resource as required.
@@ -102,12 +102,12 @@ import org.springframework.util.ObjectUtils;
  * @author ihaohong
  * @author John Blum
  */
-public class LettuceConnection extends AbstractRedisConnection {
+public class LettuceConnection extends AbstractValkeyConnection {
 
 	private static final ExceptionTranslationStrategy EXCEPTION_TRANSLATION = new FallbackExceptionTranslationStrategy(
 			LettuceExceptionConverter.INSTANCE);
 
-	static final RedisCodec<byte[], byte[]> CODEC = ByteArrayCodec.INSTANCE;
+	static final ValkeyCodec<byte[], byte[]> CODEC = ByteArrayCodec.INSTANCE;
 
 	private static final TypeHints typeHints = new TypeHints();
 
@@ -169,9 +169,9 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 * Creates a new {@link LettuceConnection}.
 	 *
 	 * @param timeout The connection timeout (in milliseconds)
-	 * @param client The {@link RedisClient} to use when instantiating a native connection
+	 * @param client The {@link ValkeyClient} to use when instantiating a native connection
 	 */
-	public LettuceConnection(long timeout, RedisClient client) {
+	public LettuceConnection(long timeout, ValkeyClient client) {
 		this(null, timeout, client);
 	}
 
@@ -181,10 +181,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 * @param sharedConnection A native connection that is shared with other {@link LettuceConnection}s. Will not be used
 	 *          for transactions or blocking operations
 	 * @param timeout The connection timeout (in milliseconds)
-	 * @param client The {@link RedisClient} to use when making pub/sub, blocking, and tx connections
+	 * @param client The {@link ValkeyClient} to use when making pub/sub, blocking, and tx connections
 	 */
-	public LettuceConnection(@Nullable StatefulRedisConnection<byte[], byte[]> sharedConnection, long timeout,
-			RedisClient client) {
+	public LettuceConnection(@Nullable StatefulValkeyConnection<byte[], byte[]> sharedConnection, long timeout,
+			ValkeyClient client) {
 		this(sharedConnection, timeout, client, 0);
 	}
 
@@ -194,14 +194,14 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 * @param sharedConnection A native connection that is shared with other {@link LettuceConnection}s. Should not be
 	 *          used for transactions or blocking operations.
 	 * @param timeout The connection timeout (in milliseconds)
-	 * @param client The {@link RedisClient} to use when making pub/sub connections.
-	 * @param defaultDbIndex The db index to use along with {@link RedisClient} when establishing a dedicated connection.
+	 * @param client The {@link ValkeyClient} to use when making pub/sub connections.
+	 * @param defaultDbIndex The db index to use along with {@link ValkeyClient} when establishing a dedicated connection.
 	 * @since 1.7
 	 */
-	public LettuceConnection(@Nullable StatefulRedisConnection<byte[], byte[]> sharedConnection, long timeout,
-			@Nullable AbstractRedisClient client, int defaultDbIndex) {
+	public LettuceConnection(@Nullable StatefulValkeyConnection<byte[], byte[]> sharedConnection, long timeout,
+			@Nullable AbstractValkeyClient client, int defaultDbIndex) {
 
-		this.connectionProvider = new StandaloneConnectionProvider((RedisClient) client, CODEC);
+		this.connectionProvider = new StandaloneConnectionProvider((ValkeyClient) client, CODEC);
 		this.asyncSharedConnection = sharedConnection;
 		this.timeout = timeout;
 		this.defaultDbIndex = defaultDbIndex;
@@ -215,10 +215,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 *          used for transactions or blocking operations.
 	 * @param connectionProvider connection provider to obtain and release native connections.
 	 * @param timeout The connection timeout (in milliseconds)
-	 * @param defaultDbIndex The db index to use along with {@link RedisClient} when establishing a dedicated connection.
+	 * @param defaultDbIndex The db index to use along with {@link ValkeyClient} when establishing a dedicated connection.
 	 * @since 2.0
 	 */
-	public LettuceConnection(@Nullable StatefulRedisConnection<byte[], byte[]> sharedConnection,
+	public LettuceConnection(@Nullable StatefulValkeyConnection<byte[], byte[]> sharedConnection,
 			LettuceConnectionProvider connectionProvider, long timeout, int defaultDbIndex) {
 
 		this((StatefulConnection<byte[], byte[]>) sharedConnection, connectionProvider, timeout, defaultDbIndex);
@@ -231,7 +231,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 *          used for transactions or blocking operations.
 	 * @param connectionProvider connection provider to obtain and release native connections.
 	 * @param timeout The connection timeout (in milliseconds)
-	 * @param defaultDbIndex The db index to use along with {@link RedisClient} when establishing a dedicated connection.
+	 * @param defaultDbIndex The db index to use along with {@link ValkeyClient} when establishing a dedicated connection.
 	 * @since 2.1
 	 */
 	LettuceConnection(@Nullable StatefulConnection<byte[], byte[]> sharedConnection,
@@ -247,62 +247,62 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	public org.springframework.data.redis.connection.RedisCommands commands() {
+	public org.springframework.data.redis.connection.ValkeyCommands commands() {
 		return this;
 	}
 
 	@Override
-	public RedisGeoCommands geoCommands() {
+	public ValkeyGeoCommands geoCommands() {
 		return this.geoCommands;
 	}
 
 	@Override
-	public RedisHashCommands hashCommands() {
+	public ValkeyHashCommands hashCommands() {
 		return this.hashCommands;
 	}
 
 	@Override
-	public RedisHyperLogLogCommands hyperLogLogCommands() {
+	public ValkeyHyperLogLogCommands hyperLogLogCommands() {
 		return this.hyperLogLogCommands;
 	}
 
 	@Override
-	public RedisKeyCommands keyCommands() {
+	public ValkeyKeyCommands keyCommands() {
 		return this.keyCommands;
 	}
 
 	@Override
-	public RedisListCommands listCommands() {
+	public ValkeyListCommands listCommands() {
 		return this.listCommands;
 	}
 
 	@Override
-	public RedisScriptingCommands scriptingCommands() {
+	public ValkeyScriptingCommands scriptingCommands() {
 		return this.scriptingCommands;
 	}
 
 	@Override
-	public RedisSetCommands setCommands() {
+	public ValkeySetCommands setCommands() {
 		return this.setCommands;
 	}
 
 	@Override
-	public RedisServerCommands serverCommands() {
+	public ValkeyServerCommands serverCommands() {
 		return this.serverCommands;
 	}
 
 	@Override
-	public RedisStreamCommands streamCommands() {
+	public ValkeyStreamCommands streamCommands() {
 		return this.streamCommands;
 	}
 
 	@Override
-	public RedisStringCommands stringCommands() {
+	public ValkeyStringCommands stringCommands() {
 		return this.stringCommands;
 	}
 
 	@Override
-	public RedisZSetCommands zSetCommands() {
+	public ValkeyZSetCommands zSetCommands() {
 		return this.zSetCommands;
 	}
 
@@ -318,7 +318,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 	/**
 	 * 'Native' or 'raw' execution of the given command along-side the given arguments.
 	 *
-	 * @see RedisConnection#execute(String, byte[]...)
+	 * @see ValkeyConnection#execute(String, byte[]...)
 	 * @param command Command to execute
 	 * @param commandOutputTypeHint Type of Output to use, may be (may be {@literal null}).
 	 * @param args Possible command arguments (may be {@literal null})
@@ -345,11 +345,11 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		Command redisCommand = new Command(commandType, expectedOutput, commandArguments);
 
-		return invoke().just(RedisClusterAsyncCommands::dispatch, redisCommand.getType(), redisCommand.getOutput(),
+		return invoke().just(ValkeyClusterAsyncCommands::dispatch, redisCommand.getType(), redisCommand.getOutput(),
 				redisCommand.getArgs());
 	}
 
-	RedisClusterAsyncCommands<byte[], byte[]> getAsyncConnection() {
+	ValkeyClusterAsyncCommands<byte[], byte[]> getAsyncConnection() {
 
 		if (isQueueing() || isPipelined()) {
 			return getAsyncDedicatedConnection();
@@ -358,10 +358,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 		StatefulConnection<byte[], byte[]> sharedConnection = this.asyncSharedConnection;
 
 		if (sharedConnection != null) {
-			if (sharedConnection instanceof StatefulRedisConnection<byte[], byte[]> statefulConnection) {
+			if (sharedConnection instanceof StatefulValkeyConnection<byte[], byte[]> statefulConnection) {
 				return statefulConnection.async();
 			}
-			if (sharedConnection instanceof StatefulRedisClusterConnection<byte[], byte[]> statefulClusterConnection) {
+			if (sharedConnection instanceof StatefulValkeyClusterConnection<byte[], byte[]> statefulClusterConnection) {
 				return statefulClusterConnection.async();
 			}
 		}
@@ -380,14 +380,14 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	/**
-	 * Obtain a {@link LettuceInvoker} to call Lettuce methods using the given {@link RedisClusterAsyncCommands
+	 * Obtain a {@link LettuceInvoker} to call Lettuce methods using the given {@link ValkeyClusterAsyncCommands
 	 * connection}.
 	 *
 	 * @param connection the connection to use.
 	 * @return the {@link LettuceInvoker}.
 	 * @since 2.5
 	 */
-	LettuceInvoker invoke(RedisClusterAsyncCommands<byte[], byte[]> connection) {
+	LettuceInvoker invoke(ValkeyClusterAsyncCommands<byte[], byte[]> connection) {
 		return doInvoke(connection, false);
 	}
 
@@ -402,7 +402,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 		return doInvoke(getAsyncConnection(), true);
 	}
 
-	private LettuceInvoker doInvoke(RedisClusterAsyncCommands<byte[], byte[]> connection, boolean statusCommand) {
+	private LettuceInvoker doInvoke(ValkeyClusterAsyncCommands<byte[], byte[]> connection, boolean statusCommand) {
 
 		if (isPipelined()) {
 
@@ -537,7 +537,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	public RedisClusterAsyncCommands<byte[], byte[]> getNativeConnection() {
+	public ValkeyClusterAsyncCommands<byte[], byte[]> getNativeConnection() {
 
 		LettuceSubscription subscription = this.subscription;
 
@@ -588,7 +588,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		try {
 
-			boolean done = LettuceFutures.awaitAll(timeout, TimeUnit.MILLISECONDS, futures.toArray(new RedisFuture[0]));
+			boolean done = LettuceFutures.awaitAll(timeout, TimeUnit.MILLISECONDS, futures.toArray(new ValkeyFuture[0]));
 
 			List<Object> results = new ArrayList<>(futures.size());
 
@@ -601,7 +601,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 					if (resultHolder.isCompletedExceptionally()) {
 
 						String message;
-						if (resultHolder instanceof io.lettuce.core.protocol.RedisCommand<?, ?, ?> rc) {
+						if (resultHolder instanceof io.lettuce.core.protocol.ValkeyCommand<?, ?, ?> rc) {
 							message = rc.getOutput().getError();
 						} else {
 							try {
@@ -639,27 +639,27 @@ public class LettuceConnection extends AbstractRedisConnection {
 			ppline.clear();
 
 			if (problem != null) {
-				throw new RedisPipelineException(problem, results);
+				throw new ValkeyPipelineException(problem, results);
 			}
 
 			if (done) {
 				return results;
 			}
 
-			throw new RedisPipelineException(new QueryTimeoutException("Redis command timed out"));
+			throw new ValkeyPipelineException(new QueryTimeoutException("Valkey command timed out"));
 		} catch (Exception ex) {
-			throw new RedisPipelineException(ex);
+			throw new ValkeyPipelineException(ex);
 		}
 	}
 
 	@Override
 	public byte[] echo(byte[] message) {
-		return invoke().just(RedisClusterAsyncCommands::echo, message);
+		return invoke().just(ValkeyClusterAsyncCommands::echo, message);
 	}
 
 	@Override
 	public String ping() {
-		return invoke().just(RedisClusterAsyncCommands::ping);
+		return invoke().just(ValkeyClusterAsyncCommands::ping);
 	}
 
 	@Override
@@ -669,10 +669,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		try {
 			if (isPipelined()) {
-				pipeline(newLettuceStatusResult(getAsyncDedicatedRedisCommands().discard()));
+				pipeline(newLettuceStatusResult(getAsyncDedicatedValkeyCommands().discard()));
 				return;
 			}
-			getDedicatedRedisCommands().discard();
+			getDedicatedValkeyCommands().discard();
 		} catch (Exception ex) {
 			throw convertLettuceAccessException(ex);
 		} finally {
@@ -690,7 +690,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 			Converter<Exception, DataAccessException> exceptionConverter = this::convertLettuceAccessException;
 
 			if (isPipelined()) {
-				RedisFuture<TransactionResult> exec = getAsyncDedicatedRedisCommands().exec();
+				ValkeyFuture<TransactionResult> exec = getAsyncDedicatedValkeyCommands().exec();
 
 				LettuceTransactionResultConverter resultConverter = new LettuceTransactionResultConverter(
 						new LinkedList<>(txResults), exceptionConverter);
@@ -701,7 +701,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 				return null;
 			}
 
-			TransactionResult transactionResult = getDedicatedRedisCommands().exec();
+			TransactionResult transactionResult = getDedicatedValkeyCommands().exec();
 
 			List<Object> results = LettuceConverters.transactionResultUnwrapper().convert(transactionResult);
 
@@ -726,10 +726,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		try {
 			if (isPipelined()) {
-				getAsyncDedicatedRedisCommands().multi();
+				getAsyncDedicatedValkeyCommands().multi();
 				return;
 			}
-			getDedicatedRedisCommands().multi();
+			getDedicatedValkeyCommands().multi();
 		} catch (Exception ex) {
 			throw convertLettuceAccessException(ex);
 		}
@@ -745,7 +745,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		this.dbIndex = dbIndex;
 
-		invokeStatus().just(RedisClusterAsyncCommands::dispatch, CommandType.SELECT,
+		invokeStatus().just(ValkeyClusterAsyncCommands::dispatch, CommandType.SELECT,
 				new StatusOutput<>(ByteArrayCodec.INSTANCE), new CommandArgs<>(ByteArrayCodec.INSTANCE).add(dbIndex));
 	}
 
@@ -754,14 +754,14 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		try {
 			if (isPipelined()) {
-				pipeline(newLettuceStatusResult(getAsyncDedicatedRedisCommands().unwatch()));
+				pipeline(newLettuceStatusResult(getAsyncDedicatedValkeyCommands().unwatch()));
 				return;
 			}
 			if (isQueueing()) {
-				transaction(newLettuceStatusResult(getAsyncDedicatedRedisCommands().unwatch()));
+				transaction(newLettuceStatusResult(getAsyncDedicatedValkeyCommands().unwatch()));
 				return;
 			}
-			getDedicatedRedisCommands().unwatch();
+			getDedicatedValkeyCommands().unwatch();
 		} catch (Exception ex) {
 			throw convertLettuceAccessException(ex);
 		}
@@ -776,14 +776,14 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 		try {
 			if (isPipelined()) {
-				pipeline(newLettuceStatusResult(getAsyncDedicatedRedisCommands().watch(keys)));
+				pipeline(newLettuceStatusResult(getAsyncDedicatedValkeyCommands().watch(keys)));
 				return;
 			}
 			if (isQueueing()) {
-				transaction(new LettuceStatusResult(getAsyncDedicatedRedisCommands().watch(keys)));
+				transaction(new LettuceStatusResult(getAsyncDedicatedValkeyCommands().watch(keys)));
 				return;
 			}
-			getDedicatedRedisCommands().watch(keys);
+			getDedicatedValkeyCommands().watch(keys);
 		} catch (Exception ex) {
 			throw convertLettuceAccessException(ex);
 		}
@@ -795,7 +795,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 	@Override
 	public Long publish(byte[] channel, byte[] message) {
-		return invoke().just(RedisClusterAsyncCommands::publish, channel, message);
+		return invoke().just(ValkeyClusterAsyncCommands::publish, channel, message);
 	}
 
 	@Override
@@ -866,10 +866,10 @@ public class LettuceConnection extends AbstractRedisConnection {
 	/**
 	 * Configures the flushing policy when using pipelining.
 	 *
-	 * @param pipeliningFlushPolicy the flushing policy to control when commands get written to the Redis connection.
+	 * @param pipeliningFlushPolicy the flushing policy to control when commands get written to the Valkey connection.
 	 * @see PipeliningFlushPolicy#flushEachCommand()
 	 * @see #openPipeline()
-	 * @see StatefulRedisConnection#flushCommands()
+	 * @see StatefulValkeyConnection#flushCommands()
 	 * @since 2.3
 	 */
 	public void setPipeliningFlushPolicy(PipeliningFlushPolicy pipeliningFlushPolicy) {
@@ -880,17 +880,17 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	/**
-	 * {@link #close()} the current connection and open a new pub/sub connection to the Redis server.
+	 * {@link #close()} the current connection and open a new pub/sub connection to the Valkey server.
 	 *
 	 * @return never {@literal null}.
 	 */
 	@SuppressWarnings("unchecked")
-	protected StatefulRedisPubSubConnection<byte[], byte[]> switchToPubSub() {
+	protected StatefulValkeyPubSubConnection<byte[], byte[]> switchToPubSub() {
 
 		checkSubscription();
 		reset();
 
-		return this.connectionProvider.getConnection(StatefulRedisPubSubConnection.class);
+		return this.connectionProvider.getConnection(StatefulValkeyPubSubConnection.class);
 	}
 
 	/**
@@ -903,22 +903,22 @@ public class LettuceConnection extends AbstractRedisConnection {
 	 * @since 2.2
 	 */
 	protected LettuceSubscription doCreateSubscription(MessageListener listener,
-			StatefulRedisPubSubConnection<byte[], byte[]> connection, LettuceConnectionProvider connectionProvider) {
+			StatefulValkeyPubSubConnection<byte[], byte[]> connection, LettuceConnectionProvider connectionProvider) {
 
 		return new LettuceSubscription(listener, connection, connectionProvider);
 	}
 
-	protected RedisClusterCommands<byte[], byte[]> getConnection() {
+	protected ValkeyClusterCommands<byte[], byte[]> getConnection() {
 
 		if (isQueueing()) {
 			return getDedicatedConnection();
 		}
 
 		if (asyncSharedConnection != null) {
-			if (asyncSharedConnection instanceof StatefulRedisConnection<byte[], byte[]> statefulConnection) {
+			if (asyncSharedConnection instanceof StatefulValkeyConnection<byte[], byte[]> statefulConnection) {
 				return statefulConnection.sync();
 			}
-			if (asyncSharedConnection instanceof StatefulRedisClusterConnection<byte[], byte[]> statefulClusterConnection) {
+			if (asyncSharedConnection instanceof StatefulValkeyClusterConnection<byte[], byte[]> statefulClusterConnection) {
 				return statefulClusterConnection.sync();
 			}
 		}
@@ -926,33 +926,33 @@ public class LettuceConnection extends AbstractRedisConnection {
 		return getDedicatedConnection();
 	}
 
-	RedisClusterCommands<byte[], byte[]> getDedicatedConnection() {
+	ValkeyClusterCommands<byte[], byte[]> getDedicatedConnection() {
 
 		StatefulConnection<byte[], byte[]> connection = getOrCreateDedicatedConnection();
 
-		if (connection instanceof StatefulRedisConnection<byte[], byte[]> statefulConnection) {
+		if (connection instanceof StatefulValkeyConnection<byte[], byte[]> statefulConnection) {
 			return statefulConnection.sync();
 		}
-		if (connection instanceof StatefulRedisClusterConnection<byte[], byte[]> statefulClusterConnection) {
+		if (connection instanceof StatefulValkeyClusterConnection<byte[], byte[]> statefulClusterConnection) {
 			return statefulClusterConnection.sync();
 		}
 
 		throw new IllegalStateException("%s is not a supported connection type".formatted(connection.getClass().getName()));
 	}
 
-	protected RedisClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
+	protected ValkeyClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
 
 		if (isClosed()) {
-			throw new RedisSystemException("Connection is closed", null);
+			throw new ValkeySystemException("Connection is closed", null);
 		}
 
 		StatefulConnection<byte[], byte[]> connection = getOrCreateDedicatedConnection();
 
-		if (connection instanceof StatefulRedisConnection<byte[], byte[]> statefulConnection) {
+		if (connection instanceof StatefulValkeyConnection<byte[], byte[]> statefulConnection) {
 			return statefulConnection.async();
 		}
 
-		if (asyncDedicatedConnection instanceof StatefulRedisClusterConnection<byte[], byte[]> statefulClusterConnection) {
+		if (asyncDedicatedConnection instanceof StatefulValkeyClusterConnection<byte[], byte[]> statefulClusterConnection) {
 			return statefulClusterConnection.async();
 		}
 
@@ -965,9 +965,9 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	protected boolean isActive(RedisNode node) {
+	protected boolean isActive(ValkeyNode node) {
 
-		StatefulRedisSentinelConnection<String, String> connection = null;
+		StatefulValkeySentinelConnection<String, String> connection = null;
 
 		try {
 			connection = getConnection(node);
@@ -982,9 +982,9 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	@Override
-	protected RedisSentinelConnection getSentinelConnection(RedisNode sentinel) {
+	protected ValkeySentinelConnection getSentinelConnection(ValkeyNode sentinel) {
 
-		StatefulRedisSentinelConnection<String, String> connection = getConnection(sentinel);
+		StatefulValkeySentinelConnection<String, String> connection = getConnection(sentinel);
 
 		return new LettuceSentinelConnection(connection);
 	}
@@ -994,13 +994,13 @@ public class LettuceConnection extends AbstractRedisConnection {
 	}
 
 	@SuppressWarnings("unchecked")
-	private StatefulRedisSentinelConnection<String, String> getConnection(RedisNode sentinel) {
-		return ((TargetAware) getConnectionProvider()).getConnection(StatefulRedisSentinelConnection.class,
-				getRedisURI(sentinel));
+	private StatefulValkeySentinelConnection<String, String> getConnection(ValkeyNode sentinel) {
+		return ((TargetAware) getConnectionProvider()).getConnection(StatefulValkeySentinelConnection.class,
+				getValkeyURI(sentinel));
 	}
 
 	@Nullable
-	private <T> T await(RedisFuture<T> cmd) {
+	private <T> T await(ValkeyFuture<T> cmd) {
 
 		if (this.isMulti) {
 			return null;
@@ -1022,18 +1022,18 @@ public class LettuceConnection extends AbstractRedisConnection {
 		return this.asyncDedicatedConnection;
 	}
 
-	private RedisCommands<byte[], byte[]> getDedicatedRedisCommands() {
-		return (RedisCommands<byte[], byte[]>) getDedicatedConnection();
+	private ValkeyCommands<byte[], byte[]> getDedicatedValkeyCommands() {
+		return (ValkeyCommands<byte[], byte[]>) getDedicatedConnection();
 	}
 
-	private RedisAsyncCommands<byte[], byte[]> getAsyncDedicatedRedisCommands() {
-		return (RedisAsyncCommands<byte[], byte[]>) getAsyncDedicatedConnection();
+	private ValkeyAsyncCommands<byte[], byte[]> getAsyncDedicatedValkeyCommands() {
+		return (ValkeyAsyncCommands<byte[], byte[]>) getAsyncDedicatedConnection();
 	}
 
 	private void checkSubscription() {
 
 		if (isSubscribed()) {
-			throw new RedisSubscribedConnectionException(
+			throw new ValkeySubscribedConnectionException(
 					"Connection already subscribed; use the connection Subscription to cancel or add new channels");
 		}
 	}
@@ -1042,13 +1042,13 @@ public class LettuceConnection extends AbstractRedisConnection {
 		return doCreateSubscription(listener, switchToPubSub(), connectionProvider);
 	}
 
-	private RedisURI getRedisURI(RedisNode node) {
-		return RedisURI.Builder.redis(node.getHost(), getPort(node)).build();
+	private ValkeyURI getValkeyURI(ValkeyNode node) {
+		return ValkeyURI.Builder.redis(node.getHost(), getPort(node)).build();
 	}
 
-	private int getPort(RedisNode node) {
+	private int getPort(ValkeyNode node) {
 		Integer port = node.getPort();
-		return port != null ? port : RedisURI.DEFAULT_REDIS_PORT;
+		return port != null ? port : ValkeyURI.DEFAULT_REDIS_PORT;
 	}
 
 	private boolean customizedDatabaseIndex() {
@@ -1057,7 +1057,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 	private static void potentiallySelectDatabase(StatefulConnection<byte[], byte[]> connection, int dbIndex) {
 
-		if (connection instanceof StatefulRedisConnection<byte[], byte[]> statefulConnection) {
+		if (connection instanceof StatefulValkeyConnection<byte[], byte[]> statefulConnection) {
 			statefulConnection.sync().select(dbIndex);
 		}
 	}
@@ -1075,9 +1075,9 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 	private void validateCommand(ProtocolKeyword command, @Nullable byte[]... args) {
 
-		RedisCommand redisCommand = RedisCommand.failsafeCommandLookup(command.name());
+		ValkeyCommand redisCommand = ValkeyCommand.failsafeCommandLookup(command.name());
 
-		if (!RedisCommand.UNKNOWN.equals(redisCommand) && redisCommand.requiresArguments()) {
+		if (!ValkeyCommand.UNKNOWN.equals(redisCommand) && redisCommand.requiresArguments()) {
 			try {
 				redisCommand.validateArgumentCount(args != null ? args.length : 0);
 			} catch (IllegalArgumentException ex) {
@@ -1302,7 +1302,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 			Constructor<CommandOutput> constructor = CONSTRUCTORS.get(type);
 
 			if (constructor == null) {
-				constructor = (Constructor<CommandOutput>) ClassUtils.getConstructorIfAvailable(type, RedisCodec.class);
+				constructor = (Constructor<CommandOutput>) ClassUtils.getConstructorIfAvailable(type, ValkeyCodec.class);
 				CONSTRUCTORS.put(type, constructor);
 			}
 
@@ -1312,12 +1312,12 @@ public class LettuceConnection extends AbstractRedisConnection {
 
 	/**
 	 * Strategy interface to control pipelining flush behavior. Lettuce writes (flushes) each command individually to the
-	 * Redis connection. Flushing behavior can be customized to optimize for performance. Flushing can be either stateless
+	 * Valkey connection. Flushing behavior can be customized to optimize for performance. Flushing can be either stateless
 	 * or stateful. An example for stateful flushing is size-based (buffer) flushing to flush after a configured number of
 	 * commands.
 	 *
-	 * @see StatefulRedisConnection#setAutoFlushCommands(boolean)
-	 * @see StatefulRedisConnection#flushCommands()
+	 * @see StatefulValkeyConnection#setAutoFlushCommands(boolean)
+	 * @see StatefulValkeyConnection#flushCommands()
 	 * @author Mark Paluch
 	 * @since 2.3
 	 */
@@ -1346,7 +1346,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 		 * recurring so a buffer size of e.g. {@code 2} will flush after 2, 4, 6, … commands.
 		 *
 		 * @param bufferSize the number of commands to buffer before flushing. Must be greater than zero.
-		 * @return a policy to flush buffered commands to the Redis connection once the configured number of commands was
+		 * @return a policy to flush buffered commands to the Valkey connection once the configured number of commands was
 		 *         issued.
 		 */
 		static PipeliningFlushPolicy buffered(int bufferSize) {
@@ -1375,7 +1375,7 @@ public class LettuceConnection extends AbstractRedisConnection {
 		void onOpen(StatefulConnection<?, ?> connection);
 
 		/**
-		 * Callback for each issued Redis command.
+		 * Callback for each issued Valkey command.
 		 *
 		 * @param connection Lettuce {@link StatefulConnection}.
 		 * @see #pipeline(LettuceResult)

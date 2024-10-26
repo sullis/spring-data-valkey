@@ -16,25 +16,25 @@
 package org.springframework.data.redis.test.condition;
 
 import org.springframework.data.redis.connection.ConnectionUtils;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 
 /**
- * Enumerates the supported Redis driver types.
+ * Enumerates the supported Valkey driver types.
  *
  * @author Thomas Darimont
  */
-public enum RedisDriver {
+public enum ValkeyDriver {
 
 	JEDIS {
 		@Override
-		public boolean matches(RedisConnectionFactory connectionFactory) {
+		public boolean matches(ValkeyConnectionFactory connectionFactory) {
 			return ConnectionUtils.isJedis(connectionFactory);
 		}
 	},
 
 	LETTUCE {
 		@Override
-		public boolean matches(RedisConnectionFactory connectionFactory) {
+		public boolean matches(ValkeyConnectionFactory connectionFactory) {
 			return ConnectionUtils.isLettuce(connectionFactory);
 		}
 
@@ -42,7 +42,7 @@ public enum RedisDriver {
 
 	/**
 	 * @param connectionFactory
-	 * @return true of the given {@link RedisConnectionFactory} is supported by the current redis driver.
+	 * @return true of the given {@link ValkeyConnectionFactory} is supported by the current redis driver.
 	 */
-	public abstract boolean matches(RedisConnectionFactory connectionFactory);
+	public abstract boolean matches(ValkeyConnectionFactory connectionFactory);
 }

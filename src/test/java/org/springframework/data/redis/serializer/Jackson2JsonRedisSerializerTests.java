@@ -28,15 +28,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
- * Unit tests for {@link Jackson2JsonRedisSerializer}.
+ * Unit tests for {@link Jackson2JsonValkeySerializer}.
  *
  * @author Thomas Darimont
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-class Jackson2JsonRedisSerializerTests {
+class Jackson2JsonValkeySerializerTests {
 
-	private Jackson2JsonRedisSerializer<Person> serializer = new Jackson2JsonRedisSerializer<>(Person.class);
+	private Jackson2JsonValkeySerializer<Person> serializer = new Jackson2JsonValkeySerializer<>(Person.class);
 
 	@Test // DATAREDIS-241
 	void testJackson2JsonSerializer() throws Exception {
@@ -73,7 +73,7 @@ class Jackson2JsonRedisSerializerTests {
 	@Test // GH-2322
 	void shouldConsiderWriter() {
 
-		serializer = new Jackson2JsonRedisSerializer<>(new ObjectMapper(),
+		serializer = new Jackson2JsonValkeySerializer<>(new ObjectMapper(),
 				TypeFactory.defaultInstance().constructType(Person.class), JacksonObjectReader.create(),
 				(mapper, source) -> "foo".getBytes());
 		Person person = new PersonObjectFactory().instance();

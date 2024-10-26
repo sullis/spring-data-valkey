@@ -27,21 +27,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Representation of a Redis server within the cluster.
+ * Representation of a Valkey server within the cluster.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisClusterNode extends RedisNode {
+public class ValkeyClusterNode extends ValkeyNode {
 
 	/**
-	 * Get {@link RedisClusterNodeBuilder} for creating new {@link RedisClusterNode}.
+	 * Get {@link ValkeyClusterNodeBuilder} for creating new {@link ValkeyClusterNode}.
 	 *
 	 * @return never {@literal null}.
 	 */
-	public static RedisClusterNodeBuilder newRedisClusterNode() {
-		return new RedisClusterNodeBuilder();
+	public static ValkeyClusterNodeBuilder newValkeyClusterNode() {
+		return new ValkeyClusterNodeBuilder();
 	}
 
 	private @Nullable LinkState linkState;
@@ -50,28 +50,28 @@ public class RedisClusterNode extends RedisNode {
 
 	private final SlotRange slotRange;
 
-	protected RedisClusterNode() {
+	protected ValkeyClusterNode() {
 
 		this.flags = Collections.emptySet();
 		this.slotRange = SlotRange.empty();
 	}
 
 	/**
-	 * Creates new {@link RedisClusterNode} with empty {@link SlotRange}.
+	 * Creates new {@link ValkeyClusterNode} with empty {@link SlotRange}.
 	 *
 	 * @param host must not be {@literal null}.
 	 * @param port
 	 */
-	public RedisClusterNode(String host, int port) {
+	public ValkeyClusterNode(String host, int port) {
 		this(host, port, SlotRange.empty());
 	}
 
 	/**
-	 * Creates new {@link RedisClusterNode} with an id and empty {@link SlotRange}.
+	 * Creates new {@link ValkeyClusterNode} with an id and empty {@link SlotRange}.
 	 *
 	 * @param id must not be {@literal null}.
 	 */
-	public RedisClusterNode(String id) {
+	public ValkeyClusterNode(String id) {
 
 		this(SlotRange.empty());
 
@@ -81,11 +81,11 @@ public class RedisClusterNode extends RedisNode {
 	}
 
 	/**
-	 * Creates new {@link RedisClusterNode} with given {@link SlotRange}.
+	 * Creates new {@link ValkeyClusterNode} with given {@link SlotRange}.
 	 *
 	 * @param slotRange must not be {@literal null}.
 	 */
-	public RedisClusterNode(SlotRange slotRange) {
+	public ValkeyClusterNode(SlotRange slotRange) {
 
 		Assert.notNull(slotRange, "SlotRange must not be null");
 
@@ -94,13 +94,13 @@ public class RedisClusterNode extends RedisNode {
 	}
 
 	/**
-	 * Creates new {@link RedisClusterNode} with given {@link SlotRange}.
+	 * Creates new {@link ValkeyClusterNode} with given {@link SlotRange}.
 	 *
 	 * @param host must not be {@literal null}.
 	 * @param port
 	 * @param slotRange must not be {@literal null}.
 	 */
-	public RedisClusterNode(String host, int port, SlotRange slotRange) {
+	public ValkeyClusterNode(String host, int port, SlotRange slotRange) {
 
 		super(host, port);
 
@@ -120,7 +120,7 @@ public class RedisClusterNode extends RedisNode {
 	}
 
 	/**
-	 * Determines whether this {@link RedisClusterNode} manages the identified {@link Integer slot} in the cluster.
+	 * Determines whether this {@link ValkeyClusterNode} manages the identified {@link Integer slot} in the cluster.
 	 *
 	 * @param slot {@link Integer} identifying the slot to evaluate.
 	 * @return {@literal true} if slot is covered.
@@ -217,7 +217,7 @@ public class RedisClusterNode extends RedisNode {
 
 		/**
 		 * Determines whether this {@link SlotRange} contains the given {@link Integer slot}, which implies
-		 * this cluster nodes manages the slot holding data stored in Redis.
+		 * this cluster nodes manages the slot holding data stored in Valkey.
 		 *
 		 * @param slot {@link Integer slot} to evaluate.
 		 * @return true when slot is part of the range.
@@ -307,47 +307,47 @@ public class RedisClusterNode extends RedisNode {
 	}
 
 	/**
-	 * Builder for creating new {@link RedisClusterNode}.
+	 * Builder for creating new {@link ValkeyClusterNode}.
 	 *
 	 * @author Christoph Strobl
 	 * @since 1.7
 	 */
-	public static class RedisClusterNodeBuilder extends RedisNodeBuilder {
+	public static class ValkeyClusterNodeBuilder extends ValkeyNodeBuilder {
 
 		@Nullable Set<Flag> flags;
 		@Nullable LinkState linkState;
 		SlotRange slotRange;
 
-		public RedisClusterNodeBuilder() {
+		public ValkeyClusterNodeBuilder() {
 			this.slotRange = SlotRange.empty();
 		}
 
 		@Override
-		public RedisClusterNodeBuilder listeningAt(String host, int port) {
+		public ValkeyClusterNodeBuilder listeningAt(String host, int port) {
 			super.listeningAt(host, port);
 			return this;
 		}
 
 		@Override
-		public RedisClusterNodeBuilder withName(String name) {
+		public ValkeyClusterNodeBuilder withName(String name) {
 			super.withName(name);
 			return this;
 		}
 
 		@Override
-		public RedisClusterNodeBuilder withId(String id) {
+		public ValkeyClusterNodeBuilder withId(String id) {
 			super.withId(id);
 			return this;
 		}
 
 		@Override
-		public RedisClusterNodeBuilder promotedAs(NodeType nodeType) {
+		public ValkeyClusterNodeBuilder promotedAs(NodeType nodeType) {
 			super.promotedAs(nodeType);
 			return this;
 		}
 
 		@Override
-		public RedisClusterNodeBuilder replicaOf(String masterId) {
+		public ValkeyClusterNodeBuilder replicaOf(String masterId) {
 			super.replicaOf(masterId);
 			return this;
 		}
@@ -358,7 +358,7 @@ public class RedisClusterNode extends RedisNode {
 		 * @param flags
 		 * @return
 		 */
-		public RedisClusterNodeBuilder withFlags(Set<Flag> flags) {
+		public ValkeyClusterNodeBuilder withFlags(Set<Flag> flags) {
 
 			this.flags = flags;
 			return this;
@@ -370,7 +370,7 @@ public class RedisClusterNode extends RedisNode {
 		 * @param range
 		 * @return
 		 */
-		public RedisClusterNodeBuilder serving(SlotRange range) {
+		public ValkeyClusterNodeBuilder serving(SlotRange range) {
 
 			this.slotRange = range;
 			return this;
@@ -382,21 +382,21 @@ public class RedisClusterNode extends RedisNode {
 		 * @param linkState
 		 * @return
 		 */
-		public RedisClusterNodeBuilder linkState(LinkState linkState) {
+		public ValkeyClusterNodeBuilder linkState(LinkState linkState) {
 			this.linkState = linkState;
 			return this;
 		}
 
 		@Override
-		public RedisClusterNode build() {
+		public ValkeyClusterNode build() {
 
-			RedisNode base = super.build();
+			ValkeyNode base = super.build();
 
-			RedisClusterNode node;
+			ValkeyClusterNode node;
 			if (base.host != null) {
-				node = new RedisClusterNode(base.getHost(), base.getPort(), slotRange);
+				node = new ValkeyClusterNode(base.getHost(), base.getPort(), slotRange);
 			} else {
-				node = new RedisClusterNode(slotRange);
+				node = new ValkeyClusterNode(slotRange);
 			}
 			node.id = base.id;
 			node.type = base.type;

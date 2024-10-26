@@ -30,18 +30,18 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.convert.ConfigurableTypeInformationMapper;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.convert.DefaultRedisTypeMapper;
-import org.springframework.data.redis.core.convert.MappingRedisConverter;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
-import org.springframework.data.redis.core.convert.RedisTypeMapper;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.convert.DefaultValkeyTypeMapper;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyCustomConversions;
+import org.springframework.data.redis.core.convert.ValkeyTypeMapper;
 import org.springframework.data.redis.core.convert.ReferenceResolver;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.repository.configuration.EnableValkeyRepositories;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -51,44 +51,44 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
-public class RedisRepositoryIntegrationTests extends RedisRepositoryIntegrationTestBase {
+public class ValkeyRepositoryIntegrationTests extends ValkeyRepositoryIntegrationTestBase {
 
 	@Configuration
-	@EnableRedisRepositories(considerNestedRepositories = true, indexConfiguration = MyIndexConfiguration.class,
+	@EnableValkeyRepositories(considerNestedRepositories = true, indexConfiguration = MyIndexConfiguration.class,
 			keyspaceConfiguration = MyKeyspaceConfiguration.class,
 			includeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 					classes = { PersonRepository.class, CityRepository.class, ImmutableObjectRepository.class, UserRepository.class }) })
 	static class Config {
 
 		@Bean
-		RedisConnectionFactory connectionFactory() {
+		ValkeyConnectionFactory connectionFactory() {
 			return new JedisConnectionFactory();
 		}
 
 		@Bean
-		RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory connectionFactory) {
+		ValkeyTemplate<?, ?> redisTemplate(ValkeyConnectionFactory connectionFactory) {
 
-			RedisTemplate<String, String> template = new RedisTemplate<>();
+			ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
 
-			template.setDefaultSerializer(StringRedisSerializer.UTF_8);
+			template.setDefaultSerializer(StringValkeySerializer.UTF_8);
 			template.setConnectionFactory(connectionFactory);
 
 			return template;
 		}
 
 		@Bean
-		public MappingRedisConverter redisConverter(RedisMappingContext mappingContext,
-				RedisCustomConversions customConversions, ReferenceResolver referenceResolver) {
+		public MappingValkeyConverter redisConverter(ValkeyMappingContext mappingContext,
+				ValkeyCustomConversions customConversions, ReferenceResolver referenceResolver) {
 
-			MappingRedisConverter mappingRedisConverter = new MappingRedisConverter(mappingContext, null, referenceResolver,
+			MappingValkeyConverter mappingValkeyConverter = new MappingValkeyConverter(mappingContext, null, referenceResolver,
 					customTypeMapper());
 
-			mappingRedisConverter.setCustomConversions(customConversions);
+			mappingValkeyConverter.setCustomConversions(customConversions);
 
-			return mappingRedisConverter;
+			return mappingValkeyConverter;
 		}
 
-		private RedisTypeMapper customTypeMapper() {
+		private ValkeyTypeMapper customTypeMapper() {
 
 			Map<Class<?>, String> mapping = new HashMap<>();
 
@@ -97,11 +97,11 @@ public class RedisRepositoryIntegrationTests extends RedisRepositoryIntegrationT
 
 			ConfigurableTypeInformationMapper mapper = new ConfigurableTypeInformationMapper(mapping);
 
-			return new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, Collections.singletonList(mapper));
+			return new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, Collections.singletonList(mapper));
 		}
 	}
 
-	@Autowired RedisOperations<String, String> operations;
+	@Autowired ValkeyOperations<String, String> operations;
 
 	@Test // DATAREDIS-543
 	public void shouldConsiderCustomTypeMapper() {

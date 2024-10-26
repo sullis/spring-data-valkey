@@ -58,7 +58,7 @@ class TestConfig {
 	ClientResources clientResources(ObservationRegistry observationRegistry) {
 
 		ClientResources resources = ClientResources.builder()
-				.tracing(new MicrometerTracingAdapter(observationRegistry, "Redis", true)).build();
+				.tracing(new MicrometerTracingAdapter(observationRegistry, "Valkey", true)).build();
 
 		ShutdownQueue.register(() -> resources.shutdown(0, 0, TimeUnit.MILLISECONDS));
 		return resources;

@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to dispatch arbitrary Redis commands using Jedis commands.
+ * Utility class to dispatch arbitrary Valkey commands using Jedis commands.
  *
  * @author Christoph Strobl
  * @author Mark Paluch

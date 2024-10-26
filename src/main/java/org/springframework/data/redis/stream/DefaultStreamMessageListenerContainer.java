@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -34,10 +34,10 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.StreamOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ErrorHandler;
@@ -45,7 +45,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Simple {@link Executor} based {@link StreamMessageListenerContainer} implementation for running {@link Task tasks} to
- * poll on Redis Streams.
+ * poll on Valkey Streams.
  * <p>
  * This message container creates long-running tasks that are executed on {@link Executor}.
  *
@@ -60,7 +60,7 @@ class DefaultStreamMessageListenerContainer<K, V extends Record<K, ?>> implement
 	private final Executor taskExecutor;
 	private final ErrorHandler errorHandler;
 	private final StreamReadOptions readOptions;
-	private final RedisTemplate<K, ?> template;
+	private final ValkeyTemplate<K, ?> template;
 	private final StreamOperations<K, Object, Object> streamOperations;
 	private final StreamMessageListenerContainerOptions<K, V> containerOptions;
 
@@ -74,16 +74,16 @@ class DefaultStreamMessageListenerContainer<K, V extends Record<K, ?>> implement
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param containerOptions must not be {@literal null}.
 	 */
-	DefaultStreamMessageListenerContainer(RedisConnectionFactory connectionFactory,
+	DefaultStreamMessageListenerContainer(ValkeyConnectionFactory connectionFactory,
 			StreamMessageListenerContainerOptions<K, V> containerOptions) {
 
-		Assert.notNull(connectionFactory, "RedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ValkeyConnectionFactory must not be null");
 		Assert.notNull(containerOptions, "StreamMessageListenerContainerOptions must not be null");
 
 		this.taskExecutor = containerOptions.getExecutor();
 		this.errorHandler = containerOptions.getErrorHandler();
 		this.readOptions = getStreamReadOptions(containerOptions);
-		this.template = createRedisTemplate(connectionFactory, containerOptions);
+		this.template = createValkeyTemplate(connectionFactory, containerOptions);
 		this.containerOptions = containerOptions;
 
 		if (containerOptions.hasHashMapper()) {
@@ -108,10 +108,10 @@ class DefaultStreamMessageListenerContainer<K, V extends Record<K, ?>> implement
 		return readOptions;
 	}
 
-	private RedisTemplate<K, V> createRedisTemplate(RedisConnectionFactory connectionFactory,
+	private ValkeyTemplate<K, V> createValkeyTemplate(ValkeyConnectionFactory connectionFactory,
 			StreamMessageListenerContainerOptions<K, V> containerOptions) {
 
-		RedisTemplate<K, V> template = new RedisTemplate<>();
+		ValkeyTemplate<K, V> template = new ValkeyTemplate<>();
 		template.setKeySerializer(containerOptions.getKeySerializer());
 		template.setValueSerializer(containerOptions.getKeySerializer());
 		template.setHashKeySerializer(containerOptions.getHashKeySerializer());
@@ -221,7 +221,7 @@ class DefaultStreamMessageListenerContainer<K, V extends Record<K, ?>> implement
 	@SuppressWarnings("unchecked")
 	private Function<ReadOffset, List<ByteRecord>> getReadFunction(StreamReadRequest<K> streamRequest) {
 
-		byte[] rawKey = ((RedisSerializer<K>) template.getKeySerializer())
+		byte[] rawKey = ((ValkeySerializer<K>) template.getKeySerializer())
 				.serialize(streamRequest.getStreamOffset().getKey());
 
 		if (streamRequest instanceof ConsumerStreamReadRequest<K> consumerStreamRequest) {
@@ -230,11 +230,11 @@ class DefaultStreamMessageListenerContainer<K, V extends Record<K, ?>> implement
 					: this.readOptions;
 			Consumer consumer = consumerStreamRequest.getConsumer();
 
-			return (offset) -> template.execute((RedisCallback<List<ByteRecord>>) connection -> connection.streamCommands()
+			return (offset) -> template.execute((ValkeyCallback<List<ByteRecord>>) connection -> connection.streamCommands()
 					.xReadGroup(consumer, readOptions, StreamOffset.create(rawKey, offset)));
 		}
 
-		return (offset) -> template.execute((RedisCallback<List<ByteRecord>>) connection -> connection.streamCommands()
+		return (offset) -> template.execute((ValkeyCallback<List<ByteRecord>>) connection -> connection.streamCommands()
 				.xRead(readOptions, StreamOffset.create(rawKey, offset)));
 	}
 

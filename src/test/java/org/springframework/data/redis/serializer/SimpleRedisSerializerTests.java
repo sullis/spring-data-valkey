@@ -34,7 +34,7 @@ import org.springframework.instrument.classloading.ShadowingClassLoader;
  * @author Christoph Strobl
  * @author John Blum
  */
-class SimpleRedisSerializerTests {
+class SimpleValkeySerializerTests {
 
 	private static class A implements Serializable {
 
@@ -86,7 +86,7 @@ class SimpleRedisSerializerTests {
 		}
 	}
 
-	private RedisSerializer serializer = new JdkSerializationRedisSerializer();
+	private ValkeySerializer serializer = new JdkSerializationValkeySerializer();
 
 	@Test
 	void testBasicSerializationRoundtrip() throws Exception {
@@ -105,7 +105,7 @@ class SimpleRedisSerializerTests {
 
 		ClassLoader customClassLoader = new ShadowingClassLoader(ClassLoader.getSystemClassLoader());
 
-		JdkSerializationRedisSerializer serializer = new JdkSerializationRedisSerializer(customClassLoader);
+		JdkSerializationValkeySerializer serializer = new JdkSerializationValkeySerializer(customClassLoader);
 		SerializableDomainClass domainClass = new SerializableDomainClass();
 
 		byte[] serialized = serializer.serialize(domainClass);
@@ -145,7 +145,7 @@ class SimpleRedisSerializerTests {
 
 	@Test
 	void testJsonSerializer() throws Exception {
-		Jackson2JsonRedisSerializer<Person> serializer = new Jackson2JsonRedisSerializer<>(Person.class);
+		Jackson2JsonValkeySerializer<Person> serializer = new Jackson2JsonValkeySerializer<>(Person.class);
 		String value = UUID.randomUUID().toString();
 		Person p1 = new Person(value, value, 1, new Address(value, 2));
 		assertThat(serializer.deserialize(serializer.serialize(p1))).isEqualTo(p1);

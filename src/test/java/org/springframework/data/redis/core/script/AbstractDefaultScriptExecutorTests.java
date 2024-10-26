@@ -27,15 +27,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.Person;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.SessionCallback;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.scripting.support.StaticScriptSource;
 
 /**
@@ -49,17 +49,17 @@ import org.springframework.scripting.support.StaticScriptSource;
 public abstract class AbstractDefaultScriptExecutorTests {
 
 	@SuppressWarnings("rawtypes") //
-	private RedisTemplate template;
+	private ValkeyTemplate template;
 
-	protected abstract RedisConnectionFactory getConnectionFactory();
+	protected abstract ValkeyConnectionFactory getConnectionFactory();
 
 	@BeforeEach
 	void setup() {
 
-		StringRedisTemplate template = new StringRedisTemplate();
+		StringValkeyTemplate template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		template.execute((RedisCallback<Object>) connection -> {
+		template.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			connection.scriptFlush();
 			return null;
@@ -69,10 +69,10 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testExecuteLongResult() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<Long> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/increment.lua"));
 		script.setResultType(Long.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
@@ -85,12 +85,12 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testExecuteBooleanResult() {
-		this.template = new RedisTemplate<String, Long>();
-		template.setKeySerializer(StringRedisSerializer.UTF_8);
+		this.template = new ValkeyTemplate<String, Long>();
+		template.setKeySerializer(StringValkeySerializer.UTF_8);
 		template.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<Boolean> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<Boolean> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/cas.lua"));
 		script.setResultType(Boolean.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
@@ -103,11 +103,11 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testExecuteListResultCustomArgsSerializer() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
 		template.boundListOps("mylist").leftPushAll("a", "b", "c", "d");
-		DefaultRedisScript<List> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<List> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/bulkpop.lua"));
 		script.setResultType(List.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
@@ -119,10 +119,10 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testExecuteMixedListResult() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<List> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<List> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/popandlength.lua"));
 		script.setResultType(List.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
@@ -135,10 +135,10 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testExecuteValueResult() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return redis.call('GET',KEYS[1])");
 		script.setResultType(String.class);
 		template.opsForValue().set("foo", "bar");
@@ -149,12 +149,12 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testExecuteStatusResult() {
-		this.template = new RedisTemplate<String, Long>();
-		template.setKeySerializer(StringRedisSerializer.UTF_8);
+		this.template = new ValkeyTemplate<String, Long>();
+		template.setKeySerializer(StringValkeySerializer.UTF_8);
 		template.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript script = new DefaultRedisScript();
+		DefaultValkeyScript script = new DefaultValkeyScript();
 		script.setScriptText("return redis.call('SET',KEYS[1], ARGV[1])");
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
 		Object result = scriptExecutor.execute(script, Collections.singletonList("foo"), 3L);
@@ -165,18 +165,18 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testExecuteCustomResultSerializer() {
-		Jackson2JsonRedisSerializer<Person> personSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
-		this.template = new RedisTemplate<String, Person>();
-		template.setKeySerializer(StringRedisSerializer.UTF_8);
+		Jackson2JsonValkeySerializer<Person> personSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
+		this.template = new ValkeyTemplate<String, Person>();
+		template.setKeySerializer(StringValkeySerializer.UTF_8);
 		template.setValueSerializer(personSerializer);
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptSource(new StaticScriptSource("redis.call('SET',KEYS[1], ARGV[1])\nreturn 'FOO'"));
 		script.setResultType(String.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
 		Person joe = new Person("Joe", "Schmoe", 23);
-		String result = scriptExecutor.execute(script, personSerializer, StringRedisSerializer.UTF_8,
+		String result = scriptExecutor.execute(script, personSerializer, StringValkeySerializer.UTF_8,
 				Collections.singletonList("bar"), joe);
 		assertThat(result).isEqualTo("FOO");
 		assertThat(template.boundValueOps("bar").get()).isEqualTo(joe);
@@ -185,52 +185,52 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testExecutePipelined() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		final DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		final DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return KEYS[1]");
 		script.setResultType(String.class);
 		List<Object> results = template.executePipelined(new SessionCallback<String>() {
 			@SuppressWarnings("rawtypes")
-			public String execute(RedisOperations operations) throws DataAccessException {
+			public String execute(ValkeyOperations operations) throws DataAccessException {
 				return (String) operations.execute(script, Collections.singletonList("foo"));
 			}
 
 		});
-		// Result is deserialized by RedisTemplate as part of executePipelined
+		// Result is deserialized by ValkeyTemplate as part of executePipelined
 		assertThat(results).isEqualTo(Collections.singletonList("foo"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testExecuteTx() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		final DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		final DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return 'bar'..KEYS[1]");
 		script.setResultType(String.class);
 		List<Object> results = (List<Object>) template.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings("rawtypes")
-			public List<Object> execute(RedisOperations operations) throws DataAccessException {
+			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 				operations.multi();
 				operations.execute(script, Collections.singletonList("foo"));
 				return operations.exec();
 			}
 
 		});
-		// Result is deserialized by RedisTemplate as part of exec
+		// Result is deserialized by ValkeyTemplate as part of exec
 		assertThat(results).isEqualTo(Collections.singletonList("barfoo"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void testExecuteCachedNullKeys() {
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return 'HELLO'");
 		script.setResultType(String.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
@@ -242,11 +242,11 @@ public abstract class AbstractDefaultScriptExecutorTests {
 	@Test // DATAREDIS-356
 	void shouldTransparentlyReEvaluateScriptIfNotPresent() throws Exception {
 
-		this.template = new StringRedisTemplate();
+		this.template = new StringValkeyTemplate();
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
 
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return 'BUBU" + System.currentTimeMillis() + "'");
 		script.setResultType(String.class);
 

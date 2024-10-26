@@ -24,20 +24,20 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.keyvalue.core.KeyValueOperations;
-import org.springframework.data.redis.repository.query.RedisQueryCreator;
-import org.springframework.data.redis.repository.support.RedisRepositoryFactory;
+import org.springframework.data.redis.repository.query.ValkeyQueryCreator;
+import org.springframework.data.redis.repository.support.ValkeyRepositoryFactory;
 import org.springframework.data.repository.cdi.CdiRepositoryBean;
 import org.springframework.data.repository.config.CustomRepositoryImplementationDetector;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link CdiRepositoryBean} to create Redis repository instances.
+ * {@link CdiRepositoryBean} to create Valkey repository instances.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-public class RedisRepositoryBean<T> extends CdiRepositoryBean<T> {
+public class ValkeyRepositoryBean<T> extends CdiRepositoryBean<T> {
 
 	private final Bean<KeyValueOperations> keyValueTemplate;
 
@@ -51,7 +51,7 @@ public class RedisRepositoryBean<T> extends CdiRepositoryBean<T> {
 	 * @param detector detector for the custom {@link org.springframework.data.repository.Repository} implementations
 	 *          {@link CustomRepositoryImplementationDetector}, can be {@literal null}.
 	 */
-	public RedisRepositoryBean(Bean<KeyValueOperations> keyValueTemplate, Set<Annotation> qualifiers,
+	public ValkeyRepositoryBean(Bean<KeyValueOperations> keyValueTemplate, Set<Annotation> qualifiers,
 			Class<T> repositoryType, BeanManager beanManager, @Nullable CustomRepositoryImplementationDetector detector) {
 
 		super(qualifiers, repositoryType, beanManager, Optional.ofNullable(detector));
@@ -65,6 +65,6 @@ public class RedisRepositoryBean<T> extends CdiRepositoryBean<T> {
 
 		KeyValueOperations keyValueTemplate = getDependencyInstance(this.keyValueTemplate, KeyValueOperations.class);
 
-		return create(() -> new RedisRepositoryFactory(keyValueTemplate, RedisQueryCreator.class), repositoryType);
+		return create(() -> new ValkeyRepositoryFactory(keyValueTemplate, ValkeyQueryCreator.class), repositoryType);
 	}
 }

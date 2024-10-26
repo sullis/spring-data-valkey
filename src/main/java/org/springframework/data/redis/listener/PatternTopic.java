@@ -18,7 +18,7 @@ package org.springframework.data.redis.listener;
 import org.springframework.util.Assert;
 
 /**
- * {@link Topic} {@link String pattern} matching multiple Redis channels.
+ * {@link Topic} {@link String pattern} matching multiple Valkey channels.
  *
  * @author Costin Leau
  * @author Mark Paluch

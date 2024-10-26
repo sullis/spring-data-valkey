@@ -19,10 +19,10 @@ import java.util.Set;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.core.convert.GeoIndexedPropertyValue;
 import org.springframework.data.redis.core.convert.IndexedData;
-import org.springframework.data.redis.core.convert.RedisConverter;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
 import org.springframework.data.redis.core.convert.RemoveIndexedData;
 import org.springframework.data.redis.core.convert.SimpleIndexedPropertyValue;
 import org.springframework.data.redis.util.ByteUtils;
@@ -33,7 +33,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * {@link IndexWriter} takes care of writing <a href="https://redis.io/topics/indexes">secondary index</a> structures to
- * Redis. Depending on the type of {@link IndexedData}, it uses Sets with specific names to add actually referenced keys
+ * Valkey. Depending on the type of {@link IndexedData}, it uses Sets with specific names to add actually referenced keys
  * to. While doing so {@link IndexWriter} also keeps track of all indexes associated with the root types key, which
  * allows to remove the root key from all indexes in case of deletion.
  *
@@ -47,8 +47,8 @@ class IndexWriter {
 	private static final byte[] SEPARATOR = ":".getBytes();
 	private static final byte[] IDX = "idx".getBytes();
 
-	private final RedisConnection connection;
-	private final RedisConverter converter;
+	private final ValkeyConnection connection;
+	private final ValkeyConverter converter;
 
 	/**
 	 * Creates new {@link IndexWriter}.
@@ -56,10 +56,10 @@ class IndexWriter {
 	 * @param connection must not be {@literal null}.
 	 * @param converter must not be {@literal null}.
 	 */
-	public IndexWriter(RedisConnection connection, RedisConverter converter) {
+	public IndexWriter(ValkeyConnection connection, ValkeyConverter converter) {
 
-		Assert.notNull(connection, "RedisConnection cannot be null");
-		Assert.notNull(converter, "RedisConverter cannot be null");
+		Assert.notNull(connection, "ValkeyConnection cannot be null");
+		Assert.notNull(converter, "ValkeyConverter cannot be null");
 
 		this.connection = connection;
 		this.converter = converter;
@@ -293,7 +293,7 @@ class IndexWriter {
 		}
 
 		throw new InvalidDataAccessApiUsageException(("Cannot convert %s to binary representation for index key generation;"
-				+ " Are you missing a Converter; Did you register a non PathBasedRedisIndexDefinition"
+				+ " Are you missing a Converter; Did you register a non PathBasedValkeyIndexDefinition"
 				+ " that might apply to a complex type").formatted(source.getClass()));
 	}
 

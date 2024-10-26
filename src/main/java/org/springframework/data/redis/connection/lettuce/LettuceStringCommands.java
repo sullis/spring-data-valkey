@@ -16,21 +16,21 @@
 package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.BitFieldArgs;
-import io.lettuce.core.api.async.RedisStringAsyncCommands;
+import io.lettuce.core.api.async.ValkeyStringAsyncCommands;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisStringCommands} implementation for {@literal Lettuce}.
+ * {@link ValkeyStringCommands} implementation for {@literal Lettuce}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class LettuceStringCommands implements RedisStringCommands {
+class LettuceStringCommands implements ValkeyStringCommands {
 
 	private final LettuceConnection connection;
 
@@ -51,7 +51,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::get, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::get, key);
 	}
 
 	@Nullable
@@ -60,7 +60,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::getdel, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::getdel, key);
 	}
 
 	@Nullable
@@ -70,7 +70,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(expiration, "Expiration must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::getex, key, LettuceConverters.toGetExArgs(expiration));
+		return connection.invoke().just(ValkeyStringAsyncCommands::getex, key, LettuceConverters.toGetExArgs(expiration));
 	}
 
 	@Override
@@ -79,7 +79,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::getset, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::getset, key, value);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(keys, "Keys must not be null");
 		Assert.noNullElements(keys, "Keys must not contain null elements");
 
-		return connection.invoke().fromMany(RedisStringAsyncCommands::mget, keys)
+		return connection.invoke().fromMany(ValkeyStringAsyncCommands::mget, keys)
 				.toList(source -> source.getValueOrElse(null));
 	}
 
@@ -98,7 +98,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::set, key, value)
+		return connection.invoke().from(ValkeyStringAsyncCommands::set, key, value)
 				.get(Converters.stringToBooleanConverter());
 	}
 
@@ -111,7 +111,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(option, "Option must not be null");
 
 		return connection.invoke()
-				.from(RedisStringAsyncCommands::set, key, value, LettuceConverters.toSetArgs(expiration, option))
+				.from(ValkeyStringAsyncCommands::set, key, value, LettuceConverters.toSetArgs(expiration, option))
 				.orElse(LettuceConverters.stringToBooleanConverter(), false);
 	}
 
@@ -121,7 +121,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::setnx, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::setnx, key, value);
 	}
 
 	@Override
@@ -130,7 +130,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::setex, key, seconds, value)
+		return connection.invoke().from(ValkeyStringAsyncCommands::setex, key, seconds, value)
 				.get(Converters.stringToBooleanConverter());
 	}
 
@@ -140,7 +140,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::psetex, key, milliseconds, value)
+		return connection.invoke().from(ValkeyStringAsyncCommands::psetex, key, milliseconds, value)
 				.get(Converters.stringToBooleanConverter());
 	}
 
@@ -149,7 +149,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(tuples, "Tuples must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::mset, tuples).get(Converters.stringToBooleanConverter());
+		return connection.invoke().from(ValkeyStringAsyncCommands::mset, tuples).get(Converters.stringToBooleanConverter());
 	}
 
 	@Override
@@ -157,7 +157,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(tuples, "Tuples must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::msetnx, tuples);
+		return connection.invoke().just(ValkeyStringAsyncCommands::msetnx, tuples);
 	}
 
 	@Override
@@ -165,7 +165,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::incr, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::incr, key);
 	}
 
 	@Override
@@ -173,7 +173,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::incrby, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::incrby, key, value);
 	}
 
 	@Override
@@ -181,7 +181,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::incrbyfloat, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::incrbyfloat, key, value);
 	}
 
 	@Override
@@ -189,7 +189,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::decr, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::decr, key);
 	}
 
 	@Override
@@ -197,7 +197,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::decrby, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::decrby, key, value);
 	}
 
 	@Override
@@ -206,7 +206,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::append, key, value);
+		return connection.invoke().just(ValkeyStringAsyncCommands::append, key, value);
 	}
 
 	@Override
@@ -214,7 +214,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::getrange, key, start, end);
+		return connection.invoke().just(ValkeyStringAsyncCommands::getrange, key, start, end);
 	}
 
 	@Override
@@ -223,7 +223,7 @@ class LettuceStringCommands implements RedisStringCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		connection.invokeStatus().just(RedisStringAsyncCommands::setrange, key, offset, value);
+		connection.invokeStatus().just(ValkeyStringAsyncCommands::setrange, key, offset, value);
 	}
 
 	@Override
@@ -231,7 +231,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::getbit, key, offset)
+		return connection.invoke().from(ValkeyStringAsyncCommands::getbit, key, offset)
 				.get(LettuceConverters.longToBoolean());
 	}
 
@@ -240,7 +240,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisStringAsyncCommands::setbit, key, offset, LettuceConverters.toInt(value))
+		return connection.invoke().from(ValkeyStringAsyncCommands::setbit, key, offset, LettuceConverters.toInt(value))
 				.get(LettuceConverters.longToBoolean());
 	}
 
@@ -249,7 +249,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::bitcount, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::bitcount, key);
 	}
 
 	@Override
@@ -257,7 +257,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::bitcount, key, start, end);
+		return connection.invoke().just(ValkeyStringAsyncCommands::bitcount, key, start, end);
 	}
 
 	@Override
@@ -268,7 +268,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		BitFieldArgs args = LettuceConverters.toBitFieldArgs(subCommands);
 
-		return connection.invoke().just(RedisStringAsyncCommands::bitfield, key, args);
+		return connection.invoke().just(ValkeyStringAsyncCommands::bitfield, key, args);
 	}
 
 	@Override
@@ -305,14 +305,14 @@ class LettuceStringCommands implements RedisStringCommands {
 		if (range.getLowerBound().isBounded()) {
 
 			if (range.getUpperBound().isBounded()) {
-				return connection.invoke().just(RedisStringAsyncCommands::bitpos, key, bit, getLowerValue(range),
+				return connection.invoke().just(ValkeyStringAsyncCommands::bitpos, key, bit, getLowerValue(range),
 						getUpperValue(range));
 			}
 
-			return connection.invoke().just(RedisStringAsyncCommands::bitpos, key, bit, getLowerValue(range));
+			return connection.invoke().just(ValkeyStringAsyncCommands::bitpos, key, bit, getLowerValue(range));
 		}
 
-		return connection.invoke().just(RedisStringAsyncCommands::bitpos, key, bit);
+		return connection.invoke().just(ValkeyStringAsyncCommands::bitpos, key, bit);
 	}
 
 	@Override
@@ -320,7 +320,7 @@ class LettuceStringCommands implements RedisStringCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStringAsyncCommands::strlen, key);
+		return connection.invoke().just(ValkeyStringAsyncCommands::strlen, key);
 	}
 
 	private static <T extends Comparable<T>> T getUpperValue(Range<T> range) {

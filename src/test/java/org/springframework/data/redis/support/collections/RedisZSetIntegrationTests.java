@@ -16,31 +16,31 @@
 package org.springframework.data.redis.support.collections;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 
 /**
- * Parameterized instance of Redis sorted set tests.
+ * Parameterized instance of Valkey sorted set tests.
  *
  * @author Costin Leau
  */
-public class RedisZSetIntegrationTests extends AbstractRedisZSetTestIntegration<Object> {
+public class ValkeyZSetIntegrationTests extends AbstractValkeyZSetTestIntegration<Object> {
 
 	/**
-	 * Constructs a new <code>RedisZSetTests</code> instance.
+	 * Constructs a new <code>ValkeyZSetTests</code> instance.
 	 *
 	 * @param factory
 	 * @param template
 	 */
-	public RedisZSetIntegrationTests(ObjectFactory<Object> factory, RedisTemplate template) {
+	public ValkeyZSetIntegrationTests(ObjectFactory<Object> factory, ValkeyTemplate template) {
 		super(factory, template);
 	}
 
-	RedisStore copyStore(RedisStore store) {
-		return RedisZSet.create(store.getKey(), store.getOperations());
+	ValkeyStore copyStore(ValkeyStore store) {
+		return ValkeyZSet.create(store.getKey(), store.getOperations());
 	}
 
-	AbstractRedisCollection<Object> createCollection() {
+	AbstractValkeyCollection<Object> createCollection() {
 		String redisName = getClass().getName();
-		return new DefaultRedisZSet(redisName, template);
+		return new DefaultValkeyZSet(redisName, template);
 	}
 }

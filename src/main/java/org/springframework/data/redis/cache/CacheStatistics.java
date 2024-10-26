@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Cache statistics for a {@link RedisCache}. <br />
+ * Cache statistics for a {@link ValkeyCache}. <br />
  * <strong>NOTE:</strong> {@link CacheStatistics} only serve local (in memory) data and do not collect any server
  * statistics.
  *
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public interface CacheStatistics {
 
 	/**
-	 * @return the name of the {@link RedisCache}.
+	 * @return the name of the {@link ValkeyCache}.
 	 */
 	String getCacheName();
 

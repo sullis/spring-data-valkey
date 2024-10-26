@@ -32,13 +32,13 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.ReactiveGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoReference.GeoMemberReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -51,11 +51,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveGeoOperations<K, V> implements ReactiveGeoOperations<K, V> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, V> serializationContext;
 
-	DefaultReactiveGeoOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, V> serializationContext) {
+	DefaultReactiveGeoOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, V> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;
@@ -272,7 +272,7 @@ class DefaultReactiveGeoOperations<K, V> implements ReactiveGeoOperations<K, V> 
 
 	@Override
 	public Flux<GeoResult<GeoLocation<V>>> search(K key, GeoReference<V> reference,
-			GeoShape geoPredicate, RedisGeoCommands.GeoSearchCommandArgs args) {
+			GeoShape geoPredicate, ValkeyGeoCommands.GeoSearchCommandArgs args) {
 
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(reference, "GeoReference must not be null");
@@ -285,7 +285,7 @@ class DefaultReactiveGeoOperations<K, V> implements ReactiveGeoOperations<K, V> 
 
 	@Override
 	public Mono<Long> searchAndStore(K key, K destKey, GeoReference<V> reference,
-			GeoShape geoPredicate, RedisGeoCommands.GeoSearchStoreCommandArgs args) {
+			GeoShape geoPredicate, ValkeyGeoCommands.GeoSearchStoreCommandArgs args) {
 
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(reference, "GeoReference must not be null");

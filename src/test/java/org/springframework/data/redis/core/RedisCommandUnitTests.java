@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * Unit tests for {@link RedisCommand}.
+ * Unit tests for {@link ValkeyCommand}.
  *
  * @author Christoph Strobl
  * @author Thomas Darimont
@@ -31,85 +31,85 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Oscar Cai
  * @author John Blum
  */
-class RedisCommandUnitTests {
+class ValkeyCommandUnitTests {
 
 	@Test // DATAREDIS-73
 	void shouldIdentifyAliasCorrectly() {
-		assertThat(RedisCommand.CONFIG_SET.isRepresentedBy("setconfig")).isTrue();
+		assertThat(ValkeyCommand.CONFIG_SET.isRepresentedBy("setconfig")).isTrue();
 	}
 
 	@Test // DATAREDIS-73
 	void shouldIdentifyAliasCorrectlyWhenNamePassedInMixedCase() {
-		assertThat(RedisCommand.CONFIG_SET.isRepresentedBy("SetConfig")).isTrue();
+		assertThat(ValkeyCommand.CONFIG_SET.isRepresentedBy("SetConfig")).isTrue();
 	}
 
 	@Test // DATAREDIS-73
 	void shouldNotThrowExceptionWhenUsingNullKeyForRepresentationCheck() {
-		assertThat(RedisCommand.CONFIG_SET.isRepresentedBy(null)).isFalse();
+		assertThat(ValkeyCommand.CONFIG_SET.isRepresentedBy(null)).isFalse();
 	}
 
 	@Test // DATAREDIS-73
 	void shouldIdentifyAliasCorrectlyViaLookup() {
-		assertThat(RedisCommand.failsafeCommandLookup("setconfig")).isEqualTo(RedisCommand.CONFIG_SET);
+		assertThat(ValkeyCommand.failsafeCommandLookup("setconfig")).isEqualTo(ValkeyCommand.CONFIG_SET);
 	}
 
 	@Test // DATAREDIS-73
 	void shouldIdentifyAliasCorrectlyWhenNamePassedInMixedCaseViaLookup() {
-		assertThat(RedisCommand.failsafeCommandLookup("SetConfig")).isEqualTo(RedisCommand.CONFIG_SET);
+		assertThat(ValkeyCommand.failsafeCommandLookup("SetConfig")).isEqualTo(ValkeyCommand.CONFIG_SET);
 	}
 
 	@Test // DATAREDIS-73
 	void shouldReturnUnknownCommandForUnknownCommandString() {
-		assertThat(RedisCommand.failsafeCommandLookup("strangecommand")).isEqualTo(RedisCommand.UNKNOWN);
+		assertThat(ValkeyCommand.failsafeCommandLookup("strangecommand")).isEqualTo(ValkeyCommand.UNKNOWN);
 	}
 
 	@Test // DATAREDIS-73, DATAREDIS-972, DATAREDIS-1013
 	void shouldNotThrowExceptionOnValidArgumentCount() {
 
-		RedisCommand.AUTH.validateArgumentCount(1);
-		RedisCommand.ZADD.validateArgumentCount(3);
-		RedisCommand.ZADD.validateArgumentCount(4);
-		RedisCommand.ZADD.validateArgumentCount(5);
-		RedisCommand.ZADD.validateArgumentCount(100);
-		RedisCommand.SELECT.validateArgumentCount(1);
+		ValkeyCommand.AUTH.validateArgumentCount(1);
+		ValkeyCommand.ZADD.validateArgumentCount(3);
+		ValkeyCommand.ZADD.validateArgumentCount(4);
+		ValkeyCommand.ZADD.validateArgumentCount(5);
+		ValkeyCommand.ZADD.validateArgumentCount(100);
+		ValkeyCommand.SELECT.validateArgumentCount(1);
 	}
 
 	@Test // DATAREDIS-822
 	void shouldConsiderMinMaxArguments() {
 
-		RedisCommand.BITPOS.validateArgumentCount(2);
-		RedisCommand.BITPOS.validateArgumentCount(3);
-		RedisCommand.BITPOS.validateArgumentCount(4);
+		ValkeyCommand.BITPOS.validateArgumentCount(2);
+		ValkeyCommand.BITPOS.validateArgumentCount(3);
+		ValkeyCommand.BITPOS.validateArgumentCount(4);
 	}
 
 	@Test // DATAREDIS-822
 	void shouldReportArgumentMismatchIfMaxArgumentsExceeded() {
-		assertThatIllegalArgumentException().isThrownBy(() -> RedisCommand.SELECT.validateArgumentCount(0))
+		assertThatIllegalArgumentException().isThrownBy(() -> ValkeyCommand.SELECT.validateArgumentCount(0))
 				.withMessageContaining("SELECT command requires 1 argument");
 	}
 
 	@Test // DATAREDIS-73
 	void shouldThrowExceptionOnInvalidArgumentCountWhenExpectedExactMatch() {
-		assertThatIllegalArgumentException().isThrownBy(() -> RedisCommand.AUTH.validateArgumentCount(2))
+		assertThatIllegalArgumentException().isThrownBy(() -> ValkeyCommand.AUTH.validateArgumentCount(2))
 				.withMessageContaining("AUTH command requires 1 argument");
 	}
 
 	@Test // DATAREDIS-73
 	void shouldThrowExceptionOnInvalidArgumentCountForDelWhenExpectedMinimalMatch() {
-		assertThatIllegalArgumentException().isThrownBy(() -> RedisCommand.DEL.validateArgumentCount(0))
+		assertThatIllegalArgumentException().isThrownBy(() -> ValkeyCommand.DEL.validateArgumentCount(0))
 				.withMessageContaining("DEL command requires at least 1 argument");
 	}
 
 	@Test // DATAREDIS-972
 	void shouldThrowExceptionOnInvalidArgumentCountForZaddWhenExpectedMinimalMatch() {
-		assertThatIllegalArgumentException().isThrownBy(() -> RedisCommand.ZADD.validateArgumentCount(2))
+		assertThatIllegalArgumentException().isThrownBy(() -> ValkeyCommand.ZADD.validateArgumentCount(2))
 				.withMessageContaining("ZADD command requires at least 3 arguments");
 	}
 
 	@Test // GH-2644
 	void isRepresentedByIsCorrectForAllCommandsAndTheirAliases() {
 
-		for (RedisCommand command : RedisCommand.values()) {
+		for (ValkeyCommand command : ValkeyCommand.values()) {
 
 			assertThat(command.isRepresentedBy(command.name())).isTrue();
 			assertThat(command.isRepresentedBy(command.name().toLowerCase())).isTrue();
@@ -124,18 +124,18 @@ class RedisCommandUnitTests {
 	@Test // GH-2646
 	void commandRequiresArgumentsIsCorrect() {
 
-		Arrays.stream(RedisCommand.values())
+		Arrays.stream(ValkeyCommand.values())
 				.forEach(command -> assertThat(command.requiresArguments())
-						.describedAs("Redis command [%s] failed required arguments check", command)
+						.describedAs("Valkey command [%s] failed required arguments check", command)
 						.isEqualTo((int) ReflectionTestUtils.getField(command, "minArgs") > 0));
 	}
 
 	@Test // GH-2646
 	void commandRequiresExactNumberOfArgumentsIsCorrect() {
 
-		Arrays.stream(RedisCommand.values())
+		Arrays.stream(ValkeyCommand.values())
 				.forEach(command -> assertThat(command.requiresExactNumberOfArguments())
-						.describedAs("Redis command [%s] failed requires exact arguments check").isEqualTo(
+						.describedAs("Valkey command [%s] failed requires exact arguments check").isEqualTo(
 								ReflectionTestUtils.getField(command, "minArgs") == ReflectionTestUtils.getField(command, "maxArgs")));
 	}
 

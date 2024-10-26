@@ -19,18 +19,18 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisCacheWriter} provides low-level access to Redis commands ({@code SET, SETNX, GET, EXPIRE,...}) used for
+ * {@link ValkeyCacheWriter} provides low-level access to Valkey commands ({@code SET, SETNX, GET, EXPIRE,...}) used for
  * caching.
  * <p>
- * The {@link RedisCacheWriter} may be shared by multiple cache implementations and is responsible for reading/writing
- * binary data from/to Redis. The implementation honors potential cache lock flags that might be set.
+ * The {@link ValkeyCacheWriter} may be shared by multiple cache implementations and is responsible for reading/writing
+ * binary data from/to Valkey. The implementation honors potential cache lock flags that might be set.
  * <p>
- * The default {@link RedisCacheWriter} implementation can be customized with {@link BatchStrategy} to tune performance
+ * The default {@link ValkeyCacheWriter} implementation can be customized with {@link BatchStrategy} to tune performance
  * behavior.
  *
  * @author Christoph Strobl
@@ -38,81 +38,81 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-public interface RedisCacheWriter extends CacheStatisticsProvider {
+public interface ValkeyCacheWriter extends CacheStatisticsProvider {
 
 	/**
-	 * Create new {@link RedisCacheWriter} without locking behavior.
+	 * Create new {@link ValkeyCacheWriter} without locking behavior.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
-	 * @return new instance of {@link DefaultRedisCacheWriter}.
+	 * @return new instance of {@link DefaultValkeyCacheWriter}.
 	 */
-	static RedisCacheWriter nonLockingRedisCacheWriter(RedisConnectionFactory connectionFactory) {
-		return nonLockingRedisCacheWriter(connectionFactory, BatchStrategies.keys());
+	static ValkeyCacheWriter nonLockingValkeyCacheWriter(ValkeyConnectionFactory connectionFactory) {
+		return nonLockingValkeyCacheWriter(connectionFactory, BatchStrategies.keys());
 	}
 
 	/**
-	 * Create new {@link RedisCacheWriter} without locking behavior.
+	 * Create new {@link ValkeyCacheWriter} without locking behavior.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param batchStrategy must not be {@literal null}.
-	 * @return new instance of {@link DefaultRedisCacheWriter}.
+	 * @return new instance of {@link DefaultValkeyCacheWriter}.
 	 * @since 2.6
 	 */
-	static RedisCacheWriter nonLockingRedisCacheWriter(RedisConnectionFactory connectionFactory,
+	static ValkeyCacheWriter nonLockingValkeyCacheWriter(ValkeyConnectionFactory connectionFactory,
 			BatchStrategy batchStrategy) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 		Assert.notNull(batchStrategy, "BatchStrategy must not be null");
 
-		return new DefaultRedisCacheWriter(connectionFactory, batchStrategy);
+		return new DefaultValkeyCacheWriter(connectionFactory, batchStrategy);
 	}
 
 	/**
-	 * Create new {@link RedisCacheWriter} with locking behavior.
+	 * Create new {@link ValkeyCacheWriter} with locking behavior.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
-	 * @return new instance of {@link DefaultRedisCacheWriter}.
+	 * @return new instance of {@link DefaultValkeyCacheWriter}.
 	 */
-	static RedisCacheWriter lockingRedisCacheWriter(RedisConnectionFactory connectionFactory) {
-		return lockingRedisCacheWriter(connectionFactory, BatchStrategies.keys());
+	static ValkeyCacheWriter lockingValkeyCacheWriter(ValkeyConnectionFactory connectionFactory) {
+		return lockingValkeyCacheWriter(connectionFactory, BatchStrategies.keys());
 	}
 
 	/**
-	 * Create new {@link RedisCacheWriter} with locking behavior.
+	 * Create new {@link ValkeyCacheWriter} with locking behavior.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param batchStrategy must not be {@literal null}.
-	 * @return new instance of {@link DefaultRedisCacheWriter}.
+	 * @return new instance of {@link DefaultValkeyCacheWriter}.
 	 * @since 2.6
 	 */
-	static RedisCacheWriter lockingRedisCacheWriter(RedisConnectionFactory connectionFactory,
+	static ValkeyCacheWriter lockingValkeyCacheWriter(ValkeyConnectionFactory connectionFactory,
 			BatchStrategy batchStrategy) {
 
-		return lockingRedisCacheWriter(connectionFactory, Duration.ofMillis(50), TtlFunction.persistent(), batchStrategy);
+		return lockingValkeyCacheWriter(connectionFactory, Duration.ofMillis(50), TtlFunction.persistent(), batchStrategy);
 	}
 
 	/**
-	 * Create new {@link RedisCacheWriter} with locking behavior.
+	 * Create new {@link ValkeyCacheWriter} with locking behavior.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param sleepTime sleep time between lock access attempts, must not be {@literal null}.
 	 * @param lockTtlFunction TTL function to compute the Lock TTL. The function is called with contextual keys and values
 	 *          (such as the cache name on cleanup or the actual key/value on put requests); must not be {@literal null}.
 	 * @param batchStrategy must not be {@literal null}.
-	 * @return new instance of {@link DefaultRedisCacheWriter}.
+	 * @return new instance of {@link DefaultValkeyCacheWriter}.
 	 * @since 3.2
 	 */
-	static RedisCacheWriter lockingRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime,
+	static ValkeyCacheWriter lockingValkeyCacheWriter(ValkeyConnectionFactory connectionFactory, Duration sleepTime,
 			TtlFunction lockTtlFunction, BatchStrategy batchStrategy) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 
-		return new DefaultRedisCacheWriter(connectionFactory, sleepTime, lockTtlFunction, CacheStatisticsCollector.none(),
+		return new DefaultValkeyCacheWriter(connectionFactory, sleepTime, lockTtlFunction, CacheStatisticsCollector.none(),
 				batchStrategy);
 	}
 
 	/**
-	 * Get the binary value representation from Redis stored for the given key.
+	 * Get the binary value representation from Valkey stored for the given key.
 	 *
 	 * @param name must not be {@literal null}.
 	 * @param key must not be {@literal null}.
@@ -123,7 +123,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	byte[] get(String name, byte[] key);
 
 	/**
-	 * Get the binary value representation from Redis stored for the given key and set the given {@link Duration TTL
+	 * Get the binary value representation from Valkey stored for the given key and set the given {@link Duration TTL
 	 * expiration} for the cache entry.
 	 *
 	 * @param name must not be {@literal null}.
@@ -137,7 +137,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	}
 
 	/**
-	 * Get the binary value representation from Redis stored for the given key and set the given {@link Duration TTL
+	 * Get the binary value representation from Valkey stored for the given key and set the given {@link Duration TTL
 	 * expiration} for the cache entry, obtaining the value from {@code valueLoader} if necessary.
 	 * <p>
 	 * If possible (and configured for locking), implementations should ensure that the loading operation is synchronized
@@ -168,10 +168,10 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	 * {@link #retrieve(String, byte[], Duration)} cache operations are supported by the implementation.
 	 * <p>
 	 * The main factor for whether the {@literal retrieve} operation can be supported will primarily be determined by the
-	 * Redis driver in use at runtime.
+	 * Valkey driver in use at runtime.
 	 * <p>
-	 * Returns {@literal false} by default. This will have an effect of {@link RedisCache#retrieve(Object)} and
-	 * {@link RedisCache#retrieve(Object, Supplier)} throwing an {@link UnsupportedOperationException}.
+	 * Returns {@literal false} by default. This will have an effect of {@link ValkeyCache#retrieve(Object)} and
+	 * {@link ValkeyCache#retrieve(Object, Supplier)} throwing an {@link UnsupportedOperationException}.
 	 *
 	 * @return {@literal true} if asynchronous {@literal retrieve} operations are supported by the implementation.
 	 * @since 3.2
@@ -181,14 +181,14 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	}
 
 	/**
-	 * Asynchronously retrieves the {@link CompletableFuture value} to which the {@link RedisCache} maps the given
+	 * Asynchronously retrieves the {@link CompletableFuture value} to which the {@link ValkeyCache} maps the given
 	 * {@link byte[] key}.
 	 * <p>
 	 * This operation is non-blocking.
 	 *
-	 * @param name {@link String} with the name of the {@link RedisCache}.
-	 * @param key {@link byte[] key} mapped to the {@link CompletableFuture value} in the {@link RedisCache}.
-	 * @return the {@link CompletableFuture value} to which the {@link RedisCache} maps the given {@link byte[] key}.
+	 * @param name {@link String} with the name of the {@link ValkeyCache}.
+	 * @param key {@link byte[] key} mapped to the {@link CompletableFuture value} in the {@link ValkeyCache}.
+	 * @return the {@link CompletableFuture value} to which the {@link ValkeyCache} maps the given {@link byte[] key}.
 	 * @see #retrieve(String, byte[], Duration)
 	 * @since 3.2
 	 */
@@ -197,21 +197,21 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	}
 
 	/**
-	 * Asynchronously retrieves the {@link CompletableFuture value} to which the {@link RedisCache} maps the given
+	 * Asynchronously retrieves the {@link CompletableFuture value} to which the {@link ValkeyCache} maps the given
 	 * {@link byte[] key} setting the {@link Duration TTL expiration} for the cache entry.
 	 * <p>
 	 * This operation is non-blocking.
 	 *
-	 * @param name {@link String} with the name of the {@link RedisCache}.
-	 * @param key {@link byte[] key} mapped to the {@link CompletableFuture value} in the {@link RedisCache}.
+	 * @param name {@link String} with the name of the {@link ValkeyCache}.
+	 * @param key {@link byte[] key} mapped to the {@link CompletableFuture value} in the {@link ValkeyCache}.
 	 * @param ttl {@link Duration} specifying the {@literal expiration timeout} for the cache entry.
-	 * @return the {@link CompletableFuture value} to which the {@link RedisCache} maps the given {@link byte[] key}.
+	 * @return the {@link CompletableFuture value} to which the {@link ValkeyCache} maps the given {@link byte[] key}.
 	 * @since 3.2
 	 */
 	CompletableFuture<byte[]> retrieve(String name, byte[] key, @Nullable Duration ttl);
 
 	/**
-	 * Write the given key/value pair to Redis and set the expiration time if defined.
+	 * Write the given key/value pair to Valkey and set the expiration time if defined.
 	 *
 	 * @param name cache name must not be {@literal null}.
 	 * @param key key for the cache entry. Must not be {@literal null}.
@@ -221,7 +221,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	void put(String name, byte[] key, byte[] value, @Nullable Duration ttl);
 
 	/**
-	 * Store the given key/value pair asynchronously to Redis and set the expiration time if defined.
+	 * Store the given key/value pair asynchronously to Valkey and set the expiration time if defined.
 	 * <p>
 	 * This operation is non-blocking.
 	 *
@@ -234,7 +234,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	CompletableFuture<Void> store(String name, byte[] key, byte[] value, @Nullable Duration ttl);
 
 	/**
-	 * Write the given value to Redis if the key does not already exist.
+	 * Write the given value to Valkey if the key does not already exist.
 	 *
 	 * @param name cache name must not be {@literal null}.
 	 * @param key key for the cache entry. Must not be {@literal null}.
@@ -246,7 +246,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	byte[] putIfAbsent(String name, byte[] key, byte[] value, @Nullable Duration ttl);
 
 	/**
-	 * Remove the given key from Redis.
+	 * Remove the given key from Valkey.
 	 *
 	 * @param name cache name must not be {@literal null}.
 	 * @param key key for the cache entry. Must not be {@literal null}.
@@ -269,12 +269,12 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 	void clearStatistics(String name);
 
 	/**
-	 * Obtain a {@link RedisCacheWriter} using the given {@link CacheStatisticsCollector} to collect metrics.
+	 * Obtain a {@link ValkeyCacheWriter} using the given {@link CacheStatisticsCollector} to collect metrics.
 	 *
 	 * @param cacheStatisticsCollector must not be {@literal null}.
-	 * @return new instance of {@link RedisCacheWriter}.
+	 * @return new instance of {@link ValkeyCacheWriter}.
 	 */
-	RedisCacheWriter withStatisticsCollector(CacheStatisticsCollector cacheStatisticsCollector);
+	ValkeyCacheWriter withStatisticsCollector(CacheStatisticsCollector cacheStatisticsCollector);
 
 	/**
 	 * Function to compute the time to live from the cache {@code key} and {@code value}.
@@ -313,7 +313,7 @@ public interface RedisCacheWriter extends CacheStatisticsProvider {
 		/**
 		 * Compute a {@link Duration time-to-live (TTL)} using the cache {@code key} and {@code value}.
 		 * <p>
-		 * The {@link Duration time-to-live (TTL)} is computed on each write operation. Redis uses millisecond granularity
+		 * The {@link Duration time-to-live (TTL)} is computed on each write operation. Valkey uses millisecond granularity
 		 * for timeouts. Any more granular values (e.g. micros or nanos) are not considered and will be truncated due to
 		 * rounding. Returning {@link Duration#ZERO}, or a value less than {@code Duration.ofMillis(1)}, results in a
 		 * persistent value that does not expire.

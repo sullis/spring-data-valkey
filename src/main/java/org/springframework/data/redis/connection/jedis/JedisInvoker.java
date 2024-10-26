@@ -50,9 +50,9 @@ import org.springframework.util.Assert;
  * <pre class="code">
  * JedisInvoker invoker = …;
  *
- * Long result = invoker.just(BinaryJedisCommands::geoadd, RedisPipeline::geoadd, key, point.getX(), point.getY(), member);
+ * Long result = invoker.just(BinaryJedisCommands::geoadd, ValkeyPipeline::geoadd, key, point.getX(), point.getY(), member);
  *
- * List&lt;byte[]&gt; result = invoker.from(BinaryJedisCommands::geohash, RedisPipeline::geohash, key, members)
+ * List&lt;byte[]&gt; result = invoker.from(BinaryJedisCommands::geohash, ValkeyPipeline::geohash, key, members)
  * 				.get(JedisConverters.bytesListToStringListConverter());
  * </pre>
  * <p>

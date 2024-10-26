@@ -18,8 +18,8 @@ package org.springframework.data.redis.domain.geo;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Shape;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
 
 /**
  * Search predicate for {@code GEOSEARCH} and {@code GEOSEARCHSTORE} commands.

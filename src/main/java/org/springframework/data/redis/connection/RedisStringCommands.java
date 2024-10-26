@@ -24,13 +24,13 @@ import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
 
 /**
- * String/Value-specific commands supported by Redis.
+ * String/Value-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public interface RedisStringCommands {
+public interface ValkeyStringCommands {
 
 	enum BitOperation {
 		AND, OR, XOR, NOT;
@@ -41,7 +41,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/get">Redis Documentation: GET</a>
+	 * @see <a href="https://redis.io/commands/get">Valkey Documentation: GET</a>
 	 */
 	@Nullable
 	byte[] get(byte[] key);
@@ -51,7 +51,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getdel">Redis Documentation: GETDEL</a>
+	 * @see <a href="https://redis.io/commands/getdel">Valkey Documentation: GETDEL</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -67,7 +67,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param expiration must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -79,7 +79,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} if key did not exist before or when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getset">Redis Documentation: GETSET</a>
+	 * @see <a href="https://redis.io/commands/getset">Valkey Documentation: GETSET</a>
 	 */
 	@Nullable
 	byte[] getSet(byte[] key, byte[] value);
@@ -90,7 +90,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/mget">Redis Documentation: MGET</a>
+	 * @see <a href="https://redis.io/commands/mget">Valkey Documentation: MGET</a>
 	 */
 	@Nullable
 	List<byte[]> mGet(byte[]... keys);
@@ -101,7 +101,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	@Nullable
 	Boolean set(byte[] key, byte[] value);
@@ -117,7 +117,7 @@ public interface RedisStringCommands {
 	 * @param option must not be {@literal null}. Use {@link SetOption#upsert()} to add non existing.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.7
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	@Nullable
 	Boolean set(byte[] key, byte[] value, Expiration expiration, SetOption option);
@@ -128,7 +128,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
+	 * @see <a href="https://redis.io/commands/setnx">Valkey Documentation: SETNX</a>
 	 */
 	@Nullable
 	Boolean setNX(byte[] key, byte[] value);
@@ -140,7 +140,7 @@ public interface RedisStringCommands {
 	 * @param seconds
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+	 * @see <a href="https://redis.io/commands/setex">Valkey Documentation: SETEX</a>
 	 */
 	@Nullable
 	Boolean setEx(byte[] key, long seconds, byte[] value);
@@ -153,7 +153,7 @@ public interface RedisStringCommands {
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/psetex">Redis Documentation: PSETEX</a>
+	 * @see <a href="https://redis.io/commands/psetex">Valkey Documentation: PSETEX</a>
 	 */
 	@Nullable
 	Boolean pSetEx(byte[] key, long milliseconds, byte[] value);
@@ -163,7 +163,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param tuple must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/mset">Redis Documentation: MSET</a>
+	 * @see <a href="https://redis.io/commands/mset">Valkey Documentation: MSET</a>
 	 */
 	@Nullable
 	Boolean mSet(Map<byte[], byte[]> tuple);
@@ -174,7 +174,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param tuple must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/msetnx">Redis Documentation: MSETNX</a>
+	 * @see <a href="https://redis.io/commands/msetnx">Valkey Documentation: MSETNX</a>
 	 */
 	@Nullable
 	Boolean mSetNX(Map<byte[], byte[]> tuple);
@@ -184,7 +184,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/incr">Redis Documentation: INCR</a>
+	 * @see <a href="https://redis.io/commands/incr">Valkey Documentation: INCR</a>
 	 */
 	@Nullable
 	Long incr(byte[] key);
@@ -195,7 +195,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/incrby">Redis Documentation: INCRBY</a>
+	 * @see <a href="https://redis.io/commands/incrby">Valkey Documentation: INCRBY</a>
 	 */
 	@Nullable
 	Long incrBy(byte[] key, long value);
@@ -206,7 +206,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/incrbyfloat">Redis Documentation: INCRBYFLOAT</a>
+	 * @see <a href="https://redis.io/commands/incrbyfloat">Valkey Documentation: INCRBYFLOAT</a>
 	 */
 	@Nullable
 	Double incrBy(byte[] key, double value);
@@ -216,7 +216,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/decr">Redis Documentation: DECR</a>
+	 * @see <a href="https://redis.io/commands/decr">Valkey Documentation: DECR</a>
 	 */
 	@Nullable
 	Long decr(byte[] key);
@@ -227,7 +227,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/decrby">Redis Documentation: DECRBY</a>
+	 * @see <a href="https://redis.io/commands/decrby">Valkey Documentation: DECRBY</a>
 	 */
 	@Nullable
 	Long decrBy(byte[] key, long value);
@@ -238,7 +238,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/append">Redis Documentation: APPEND</a>
+	 * @see <a href="https://redis.io/commands/append">Valkey Documentation: APPEND</a>
 	 */
 	@Nullable
 	Long append(byte[] key, byte[] value);
@@ -250,7 +250,7 @@ public interface RedisStringCommands {
 	 * @param start
 	 * @param end
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getrange">Redis Documentation: GETRANGE</a>
+	 * @see <a href="https://redis.io/commands/getrange">Valkey Documentation: GETRANGE</a>
 	 */
 	@Nullable
 	byte[] getRange(byte[] key, long start, long end);
@@ -261,7 +261,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @param offset
-	 * @see <a href="https://redis.io/commands/setrange">Redis Documentation: SETRANGE</a>
+	 * @see <a href="https://redis.io/commands/setrange">Valkey Documentation: SETRANGE</a>
 	 */
 	void setRange(byte[] key, byte[] value, long offset);
 
@@ -271,7 +271,7 @@ public interface RedisStringCommands {
 	 * @param key must not be {@literal null}.
 	 * @param offset
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getbit">Redis Documentation: GETBIT</a>
+	 * @see <a href="https://redis.io/commands/getbit">Valkey Documentation: GETBIT</a>
 	 */
 	@Nullable
 	Boolean getBit(byte[] key, long offset);
@@ -283,7 +283,7 @@ public interface RedisStringCommands {
 	 * @param offset
 	 * @param value
 	 * @return the original bit value stored at {@code offset} or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/setbit">Redis Documentation: SETBIT</a>
+	 * @see <a href="https://redis.io/commands/setbit">Valkey Documentation: SETBIT</a>
 	 */
 	@Nullable
 	Boolean setBit(byte[] key, long offset, boolean value);
@@ -293,7 +293,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/bitcount">Redis Documentation: BITCOUNT</a>
+	 * @see <a href="https://redis.io/commands/bitcount">Valkey Documentation: BITCOUNT</a>
 	 */
 	@Nullable
 	Long bitCount(byte[] key);
@@ -306,7 +306,7 @@ public interface RedisStringCommands {
 	 * @param start
 	 * @param end
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/bitcount">Redis Documentation: BITCOUNT</a>
+	 * @see <a href="https://redis.io/commands/bitcount">Valkey Documentation: BITCOUNT</a>
 	 */
 	@Nullable
 	Long bitCount(byte[] key, long start, long end);
@@ -330,7 +330,7 @@ public interface RedisStringCommands {
 	 * @param destination must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/bitop">Redis Documentation: BITOP</a>
+	 * @see <a href="https://redis.io/commands/bitop">Valkey Documentation: BITOP</a>
 	 */
 	@Nullable
 	Long bitOp(BitOperation op, byte[] destination, byte[]... keys);
@@ -342,7 +342,7 @@ public interface RedisStringCommands {
 	 * @param bit the bit value to look for.
 	 * @return {@literal null} when used in pipeline / transaction. The position of the first bit set to 1 or 0 according
 	 *         to the request.
-	 * @see <a href="https://redis.io/commands/bitpos">Redis Documentation: BITPOS</a>
+	 * @see <a href="https://redis.io/commands/bitpos">Valkey Documentation: BITPOS</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -360,7 +360,7 @@ public interface RedisStringCommands {
 	 * @param range must not be {@literal null}. Use {@link Range#unbounded()} to not limit search.
 	 * @return {@literal null} when used in pipeline / transaction. The position of the first bit set to 1 or 0 according
 	 *         to the request.
-	 * @see <a href="https://redis.io/commands/bitpos">Redis Documentation: BITPOS</a>
+	 * @see <a href="https://redis.io/commands/bitpos">Valkey Documentation: BITPOS</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -371,7 +371,7 @@ public interface RedisStringCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/strlen">Redis Documentation: STRLEN</a>
+	 * @see <a href="https://redis.io/commands/strlen">Valkey Documentation: STRLEN</a>
 	 */
 	@Nullable
 	Long strLen(byte[] key);

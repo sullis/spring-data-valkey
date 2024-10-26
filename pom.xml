@@ -7,8 +7,8 @@
 	<artifactId>spring-data-valkey</artifactId>
 	<version>3.4.0-SNAPSHOT</version>
 
-	<name>Spring Data Redis</name>
-	<description>Spring Data module for Redis</description>
+	<name>Spring Data Valkey</name>
+	<description>Spring Data module for Valkey</description>
 	<url>https://spring.io/projects/spring-data-valkey</url>
 
 	<parent>
@@ -305,7 +305,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<systemPropertyVariables>
-						<redis.server.version>${redis.server.version}</redis.server.version>
+						<valkey.server.version>${valkey.server.version}</valkey.server.version>
 						<lettuce>${lettuce}</lettuce>
 						<jedis>${jedis}</jedis>
 					</systemPropertyVariables>

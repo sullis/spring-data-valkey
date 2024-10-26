@@ -26,62 +26,62 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.util.Assert;
 
 /**
- * {@link CdiBean} to create {@link RedisKeyValueAdapter} instances.
+ * {@link CdiBean} to create {@link ValkeyKeyValueAdapter} instances.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-public class RedisKeyValueAdapterBean extends CdiBean<RedisKeyValueAdapter> {
+public class ValkeyKeyValueAdapterBean extends CdiBean<ValkeyKeyValueAdapter> {
 
-	private final Bean<RedisOperations<?, ?>> redisOperations;
+	private final Bean<ValkeyOperations<?, ?>> redisOperations;
 
 	/**
-	 * Creates a new {@link RedisKeyValueAdapterBean}.
+	 * Creates a new {@link ValkeyKeyValueAdapterBean}.
 	 *
 	 * @param redisOperations must not be {@literal null}.
 	 * @param qualifiers must not be {@literal null}.
 	 * @param beanManager must not be {@literal null}.
 	 */
-	public RedisKeyValueAdapterBean(Bean<RedisOperations<?, ?>> redisOperations, Set<Annotation> qualifiers,
+	public ValkeyKeyValueAdapterBean(Bean<ValkeyOperations<?, ?>> redisOperations, Set<Annotation> qualifiers,
 			BeanManager beanManager) {
 
-		super(qualifiers, RedisKeyValueAdapter.class, beanManager);
-		Assert.notNull(redisOperations, "RedisOperations Bean must not be null");
+		super(qualifiers, ValkeyKeyValueAdapter.class, beanManager);
+		Assert.notNull(redisOperations, "ValkeyOperations Bean must not be null");
 		this.redisOperations = redisOperations;
 	}
 
 	@Override
-	public RedisKeyValueAdapter create(CreationalContext<RedisKeyValueAdapter> creationalContext) {
+	public ValkeyKeyValueAdapter create(CreationalContext<ValkeyKeyValueAdapter> creationalContext) {
 
 		Type beanType = getBeanType();
 
-		return new RedisKeyValueAdapter(getDependencyInstance(this.redisOperations, beanType));
+		return new ValkeyKeyValueAdapter(getDependencyInstance(this.redisOperations, beanType));
 	}
 
 	private Type getBeanType() {
 
 		for (Type type : this.redisOperations.getTypes()) {
-			if (type instanceof Class<?> && RedisOperations.class.isAssignableFrom((Class<?>) type)) {
+			if (type instanceof Class<?> && ValkeyOperations.class.isAssignableFrom((Class<?>) type)) {
 				return type;
 			}
 
 			if (type instanceof ParameterizedType parameterizedType) {
 				if (parameterizedType.getRawType() instanceof Class<?>
-						&& RedisOperations.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
+						&& ValkeyOperations.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
 					return type;
 				}
 			}
 		}
-		throw new IllegalStateException("Cannot resolve bean type for class " + RedisOperations.class.getName());
+		throw new IllegalStateException("Cannot resolve bean type for class " + ValkeyOperations.class.getName());
 	}
 
 	@Override
-	public void destroy(RedisKeyValueAdapter instance, CreationalContext<RedisKeyValueAdapter> creationalContext) {
+	public void destroy(ValkeyKeyValueAdapter instance, CreationalContext<ValkeyKeyValueAdapter> creationalContext) {
 
 		if (instance instanceof DisposableBean) {
 			try {

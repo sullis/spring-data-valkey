@@ -27,20 +27,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.redis.connection.ReactivePubSubCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveSubscription;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 
 /**
- * Unit tests for {@link ReactiveRedisTemplate}.
+ * Unit tests for {@link ReactiveValkeyTemplate}.
  *
  * @author Mark Paluch
  */
-class ReactiveRedisTemplateUnitTests {
+class ReactiveValkeyTemplateUnitTests {
 
-	private ReactiveRedisConnectionFactory connectionFactoryMock = mock(ReactiveRedisConnectionFactory.class);
-	private ReactiveRedisConnection connectionMock = mock(ReactiveRedisConnection.class);
+	private ReactiveValkeyConnectionFactory connectionFactoryMock = mock(ReactiveValkeyConnectionFactory.class);
+	private ReactiveValkeyConnection connectionMock = mock(ReactiveValkeyConnection.class);
 
 	@Test // DATAREDIS-999
 	void closeShouldUseAsyncRelease() {
@@ -48,8 +48,8 @@ class ReactiveRedisTemplateUnitTests {
 		when(connectionFactoryMock.getReactiveConnection()).thenReturn(connectionMock);
 		when(connectionMock.closeLater()).thenReturn(Mono.empty());
 
-		ReactiveRedisTemplate<String, String> template = new ReactiveRedisTemplate<>(connectionFactoryMock,
-				RedisSerializationContext.string());
+		ReactiveValkeyTemplate<String, String> template = new ReactiveValkeyTemplate<>(connectionFactoryMock,
+				ValkeySerializationContext.string());
 
 		template.execute(connection -> Mono.empty()) //
 				.as(StepVerifier::create) //
@@ -74,8 +74,8 @@ class ReactiveRedisTemplateUnitTests {
 		when(pubSubCommands.createSubscription(any())).thenReturn(Mono.just(subscription));
 		when(subscription.receive()).thenReturn(Flux.create(sink -> {}));
 
-		ReactiveRedisTemplate<String, String> template = new ReactiveRedisTemplate<>(connectionFactoryMock,
-				RedisSerializationContext.string());
+		ReactiveValkeyTemplate<String, String> template = new ReactiveValkeyTemplate<>(connectionFactoryMock,
+				ValkeySerializationContext.string());
 
 		template.listenToChannel("channel") //
 				.as(StepVerifier::create) //

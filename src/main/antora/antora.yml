@@ -1,6 +1,6 @@
 name: data-redis
 version: true
-title: Spring Data Redis
+title: Spring Data Valkey
 nav:
   - modules/ROOT/nav.adoc
 ext:

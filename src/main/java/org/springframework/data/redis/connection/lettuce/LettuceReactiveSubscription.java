@@ -15,8 +15,8 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.pubsub.api.reactive.ValkeyPubSubReactiveCommands;
 import reactor.core.Disposable;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
@@ -48,16 +48,16 @@ import org.springframework.util.ObjectUtils;
 class LettuceReactiveSubscription implements ReactiveSubscription {
 
 	private final LettuceByteBufferPubSubListenerWrapper listener;
-	private final StatefulRedisPubSubConnection<ByteBuffer, ByteBuffer> connection;
+	private final StatefulValkeyPubSubConnection<ByteBuffer, ByteBuffer> connection;
 
-	private final RedisPubSubReactiveCommands<ByteBuffer, ByteBuffer> reactive;
+	private final ValkeyPubSubReactiveCommands<ByteBuffer, ByteBuffer> reactive;
 	private final LettuceReactivePubSubCommands commands;
 
 	private final State patternState;
 	private final State channelState;
 
 	LettuceReactiveSubscription(SubscriptionListener subscriptionListener,
-			StatefulRedisPubSubConnection<ByteBuffer, ByteBuffer> connection, LettuceReactivePubSubCommands commands,
+			StatefulValkeyPubSubConnection<ByteBuffer, ByteBuffer> connection, LettuceReactivePubSubCommands commands,
 			Function<Throwable, Throwable> exceptionTranslator) {
 
 		this.listener = new LettuceByteBufferPubSubListenerWrapper(

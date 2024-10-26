@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.api.sync.RedisServerCommands;
+import io.lettuce.core.api.sync.ValkeyServerCommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.MultiNodeResult;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.NodeResult;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterServerCommands;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterServerCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.lettuce.LettuceClusterConnection.LettuceClusterCommandCallback;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.util.Assert;
 
 /**
@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  * @author Dennis Neufeld
  * @since 2.0
  */
-class LettuceClusterServerCommands extends LettuceServerCommands implements RedisClusterServerCommands {
+class LettuceClusterServerCommands extends LettuceServerCommands implements ValkeyClusterServerCommands {
 
 	private final LettuceClusterConnection connection;
 
@@ -50,53 +50,53 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	@Override
-	public void bgReWriteAof(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::bgrewriteaof, node);
+	public void bgReWriteAof(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::bgrewriteaof, node);
 	}
 
 	@Override
-	public void bgSave(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::bgsave, node);
+	public void bgSave(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::bgsave, node);
 	}
 
 	@Override
-	public Long lastSave(RedisClusterNode node) {
+	public Long lastSave(ValkeyClusterNode node) {
 		return executeCommandOnSingleNode(client -> client.lastsave().getTime(), node).getValue();
 	}
 
 	@Override
-	public void save(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::save, node);
+	public void save(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::save, node);
 	}
 
 	@Override
-	public Long dbSize(RedisClusterNode node) {
-		return executeCommandOnSingleNode(RedisServerCommands::dbsize, node).getValue();
+	public Long dbSize(ValkeyClusterNode node) {
+		return executeCommandOnSingleNode(ValkeyServerCommands::dbsize, node).getValue();
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::flushdb, node);
+	public void flushDb(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::flushdb, node);
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node, FlushOption option) {
+	public void flushDb(ValkeyClusterNode node, FlushOption option) {
 		executeCommandOnSingleNode(it -> it.flushdb(LettuceConverters.toFlushMode(option)), node);
 	}
 
 	@Override
-	public void flushAll(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::flushall, node);
+	public void flushAll(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::flushall, node);
 	}
 
 	@Override
-	public void flushAll(RedisClusterNode node, FlushOption option) {
+	public void flushAll(ValkeyClusterNode node, FlushOption option) {
 		executeCommandOnSingleNode(it -> it.flushall(LettuceConverters.toFlushMode(option)), node);
 	}
 
 	@Override
-	public Properties info(RedisClusterNode node) {
-		return LettuceConverters.toProperties(executeCommandOnSingleNode(RedisServerCommands::info, node).getValue());
+	public Properties info(ValkeyClusterNode node) {
+		return LettuceConverters.toProperties(executeCommandOnSingleNode(ValkeyServerCommands::info, node).getValue());
 	}
 
 	@Override
@@ -135,7 +135,7 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	@Override
-	public Properties info(RedisClusterNode node, String section) {
+	public Properties info(ValkeyClusterNode node, String section) {
 
 		Assert.hasText(section, "Section must not be null or empty");
 
@@ -143,7 +143,7 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	@Override
-	public void shutdown(RedisClusterNode node) {
+	public void shutdown(ValkeyClusterNode node) {
 
 		executeCommandOnSingleNode((LettuceClusterCommandCallback<Void>) client -> {
 			client.shutdown(true);
@@ -171,7 +171,7 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	@Override
-	public Properties getConfig(RedisClusterNode node, String pattern) {
+	public Properties getConfig(ValkeyClusterNode node, String pattern) {
 
 		Assert.hasText(pattern, "Pattern must not be null or empty");
 
@@ -188,7 +188,7 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	@Override
-	public void setConfig(RedisClusterNode node, String param, String value) {
+	public void setConfig(ValkeyClusterNode node, String param, String value) {
 
 		Assert.hasText(param, "Parameter must not be null or empty");
 		Assert.hasText(value, "Value must not be null or empty");
@@ -198,46 +198,46 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 
 	@Override
 	public void resetConfigStats() {
-		executeCommandOnAllNodes(RedisServerCommands::configResetstat);
+		executeCommandOnAllNodes(ValkeyServerCommands::configResetstat);
 	}
 
 	@Override
-	public void resetConfigStats(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::configResetstat, node);
+	public void resetConfigStats(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::configResetstat, node);
 	}
 
 	@Override
 	public void rewriteConfig() {
-		executeCommandOnAllNodes(RedisServerCommands::configRewrite);
+		executeCommandOnAllNodes(ValkeyServerCommands::configRewrite);
 	}
 
 	@Override
-	public void rewriteConfig(RedisClusterNode node) {
-		executeCommandOnSingleNode(RedisServerCommands::configRewrite, node);
+	public void rewriteConfig(ValkeyClusterNode node) {
+		executeCommandOnSingleNode(ValkeyServerCommands::configRewrite, node);
 	}
 
 	@Override
-	public Long time(RedisClusterNode node, TimeUnit timeUnit) {
-		return convertListOfStringToTime(executeCommandOnSingleNode(RedisServerCommands::time, node).getValue(), timeUnit);
+	public Long time(ValkeyClusterNode node, TimeUnit timeUnit) {
+		return convertListOfStringToTime(executeCommandOnSingleNode(ValkeyServerCommands::time, node).getValue(), timeUnit);
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList() {
+	public List<ValkeyClientInfo> getClientList() {
 
-		List<String> map = executeCommandOnAllNodes(RedisServerCommands::clientList).resultsAsList();
+		List<String> map = executeCommandOnAllNodes(ValkeyServerCommands::clientList).resultsAsList();
 
-		ArrayList<RedisClientInfo> result = new ArrayList<>();
+		ArrayList<ValkeyClientInfo> result = new ArrayList<>();
 		for (String infos : map) {
-			result.addAll(LettuceConverters.toListOfRedisClientInformation(infos));
+			result.addAll(LettuceConverters.toListOfValkeyClientInformation(infos));
 		}
 		return result;
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList(RedisClusterNode node) {
+	public List<ValkeyClientInfo> getClientList(ValkeyClusterNode node) {
 
 		return LettuceConverters
-				.toListOfRedisClientInformation(executeCommandOnSingleNode(RedisServerCommands::clientList, node).getValue());
+				.toListOfValkeyClientInformation(executeCommandOnSingleNode(ValkeyServerCommands::clientList, node).getValue());
 	}
 
 	@Override
@@ -253,7 +253,7 @@ class LettuceClusterServerCommands extends LettuceServerCommands implements Redi
 	}
 
 	private <T> NodeResult<T> executeCommandOnSingleNode(LettuceClusterCommandCallback<T> command,
-			RedisClusterNode node) {
+			ValkeyClusterNode node) {
 		return connection.getClusterCommandExecutor().executeCommandOnSingleNode(command, node);
 	}
 

@@ -28,66 +28,66 @@ import java.util.List;
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.ReactiveSubscription.Message;
-import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.core.script.ValkeyScript;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.Topic;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.util.Assert;
 
 /**
- * Interface that specified a basic set of Redis operations, implemented by {@link ReactiveRedisTemplate}. Not often
+ * Interface that specified a basic set of Valkey operations, implemented by {@link ReactiveValkeyTemplate}. Not often
  * used but a useful option for extensibility and testability (as it can be easily mocked or stubbed).
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.0
  */
-public interface ReactiveRedisOperations<K, V> {
+public interface ReactiveValkeyOperations<K, V> {
 
 	/**
-	 * Executes the given action within a Redis connection. Application exceptions thrown by the action object get
-	 * propagated to the caller (can only be unchecked) whenever possible. Redis exceptions are transformed into
+	 * Executes the given action within a Valkey connection. Application exceptions thrown by the action object get
+	 * propagated to the caller (can only be unchecked) whenever possible. Valkey exceptions are transformed into
 	 * appropriate DAO ones. Allows for returning a result object, that is a domain object or a collection of domain
 	 * objects. Performs automatic serialization/deserialization for the given objects to and from binary data suitable
-	 * for the Redis storage. Note: Callback code is not supposed to handle transactions itself! Use an appropriate
+	 * for the Valkey storage. Note: Callback code is not supposed to handle transactions itself! Use an appropriate
 	 * transaction manager. Generally, callback code must not touch any Connection lifecycle methods, like close, to let
 	 * the template do its work.
 	 *
 	 * @param <T> return type
-	 * @param action callback object that specifies the Redis action
+	 * @param action callback object that specifies the Valkey action
 	 * @return a result object returned by the action or {@link Flux#empty()}.
 	 */
-	<T> Flux<T> execute(ReactiveRedisCallback<T> action);
+	<T> Flux<T> execute(ReactiveValkeyCallback<T> action);
 
 	/**
-	 * Executes the given action within a Redis session using the same
-	 * {@link org.springframework.data.redis.connection.ReactiveRedisConnection}. Application exceptions thrown by the
-	 * action object get propagated to the caller (can only be unchecked) whenever possible. Redis exceptions are
+	 * Executes the given action within a Valkey session using the same
+	 * {@link org.springframework.data.redis.connection.ReactiveValkeyConnection}. Application exceptions thrown by the
+	 * action object get propagated to the caller (can only be unchecked) whenever possible. Valkey exceptions are
 	 * transformed into appropriate DAO ones. Allows for returning a result object, that is a domain object or a
 	 * collection of domain objects. Performs automatic serialization/deserialization for the given objects to and from
-	 * binary data suitable for the Redis storage. Note: Callback code is not supposed to handle transactions itself! Use
+	 * binary data suitable for the Valkey storage. Note: Callback code is not supposed to handle transactions itself! Use
 	 * an appropriate transaction manager. Generally, callback code must not touch any Connection lifecycle methods, like
 	 * close, to let the template do its work.
 	 *
 	 * @param <T> return type
-	 * @param action callback object that specifies the Redis action
+	 * @param action callback object that specifies the Valkey action
 	 * @return a result object returned by the action or {@link Flux#empty()}.
 	 * @since 2.6
 	 */
-	<T> Flux<T> executeInSession(ReactiveRedisSessionCallback<K, V, T> action);
+	<T> Flux<T> executeInSession(ReactiveValkeySessionCallback<K, V, T> action);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Pub/Sub
+	// Methods dealing with Valkey Pub/Sub
 	// -------------------------------------------------------------------------
 
 	/**
@@ -97,22 +97,22 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param message message to publish. Must not be {@literal null}.
 	 * @return the number of clients that received the message
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
 	 */
 	Mono<Long> convertAndSend(String destination, V message);
 
 	/**
-	 * Subscribe to the given Redis {@code channels} and emit {@link Message messages} received for those.
+	 * Subscribe to the given Valkey {@code channels} and emit {@link Message messages} received for those.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param channels must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.1
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer
 	 */
 	default Flux<? extends Message<String, V>> listenToChannel(String... channels) {
 
@@ -122,18 +122,18 @@ public interface ReactiveRedisOperations<K, V> {
 	}
 
 	/**
-	 * Subscribe to the Redis channels matching the given {@code pattern} and emit {@link Message messages} received for
+	 * Subscribe to the Valkey channels matching the given {@code pattern} and emit {@link Message messages} received for
 	 * those.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param patterns must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.1
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer
 	 */
 	default Flux<? extends Message<String, V>> listenToPattern(String... patterns) {
 
@@ -142,34 +142,34 @@ public interface ReactiveRedisOperations<K, V> {
 	}
 
 	/**
-	 * Subscribe to the Redis channels for the given {@link Topic topics} and emit {@link Message messages} received for
+	 * Subscribe to the Valkey channels for the given {@link Topic topics} and emit {@link Message messages} received for
 	 * those.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param topics must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.1
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer
 	 */
 	Flux<? extends Message<String, V>> listenTo(Topic... topics);
 
 	/**
-	 * Subscribe to the given Redis {@code channels} and emit {@link Message messages} received for those. The
+	 * Subscribe to the given Valkey {@code channels} and emit {@link Message messages} received for those. The
 	 * {@link Mono} completes once the {@link Topic topic} subscriptions are registered.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param channels must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.6
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer#receiveLater(ChannelTopic...)
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer#receiveLater(ChannelTopic...)
 	 */
 	default Mono<Flux<? extends Message<String, V>>> listenToChannelLater(String... channels) {
 
@@ -179,18 +179,18 @@ public interface ReactiveRedisOperations<K, V> {
 	}
 
 	/**
-	 * Subscribe to the Redis channels matching the given {@code pattern} and emit {@link Message messages} received for
+	 * Subscribe to the Valkey channels matching the given {@code pattern} and emit {@link Message messages} received for
 	 * those. The {@link Mono} completes once the {@link Topic topic} subscriptions are registered.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param patterns must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.6
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer#receiveLater(PatternTopic...)
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer#receiveLater(PatternTopic...)
 	 */
 	default Mono<Flux<? extends Message<String, V>>> listenToPatternLater(String... patterns) {
 
@@ -199,24 +199,24 @@ public interface ReactiveRedisOperations<K, V> {
 	}
 
 	/**
-	 * Subscribe to the Redis channels for the given {@link Topic topics} and emit {@link Message messages} received for
+	 * Subscribe to the Valkey channels for the given {@link Topic topics} and emit {@link Message messages} received for
 	 * those. The {@link Mono} completes once the {@link Topic topic} subscriptions are registered.
 	 * <p>
 	 * Note that this method allocates a new
-	 * {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} and uses a dedicated
+	 * {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} and uses a dedicated
 	 * connection, similar to other methods on this interface. Invoking this method multiple times is an indication that
-	 * you should use {@link org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer} directly.
+	 * you should use {@link org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer} directly.
 	 *
 	 * @param topics must not be {@literal null}.
 	 * @return a hot sequence of {@link Message messages}.
 	 * @since 2.6
-	 * @see org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer#receiveLater(Iterable,
-	 *      RedisSerializationContext.SerializationPair, RedisSerializationContext.SerializationPair)
+	 * @see org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer#receiveLater(Iterable,
+	 *      ValkeySerializationContext.SerializationPair, ValkeySerializationContext.SerializationPair)
 	 */
 	Mono<Flux<? extends Message<String, V>>> listenToLater(Topic... topics);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Keys
+	// Methods dealing with Valkey Keys
 	// -------------------------------------------------------------------------
 
 	/**
@@ -225,7 +225,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param sourceKey must not be {@literal null}.
 	 * @param targetKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/copy">Redis Documentation: COPY</a>
+	 * @see <a href="https://redis.io/commands/copy">Valkey Documentation: COPY</a>
 	 * @since 2.6
 	 */
 	Mono<Boolean> copy(K sourceKey, K targetKey, boolean replace);
@@ -235,7 +235,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
 	 */
 	Mono<Boolean> hasKey(K key);
 
@@ -244,19 +244,19 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/type">Redis Documentation: TYPE</a>
+	 * @see <a href="https://redis.io/commands/type">Valkey Documentation: TYPE</a>
 	 */
 	Mono<DataType> type(K key);
 
 	/**
 	 * Find all keys matching the given {@code pattern}. <br />
 	 * <strong>IMPORTANT:</strong> It is recommended to use {@link #scan()} to iterate over the keyspace as
-	 * {@link #keys(Object)} is a non-interruptible and expensive Redis operation.
+	 * {@link #keys(Object)} is a non-interruptible and expensive Valkey operation.
 	 *
 	 * @param pattern must not be {@literal null}.
 	 * @return the {@link Flux} emitting matching keys one by one.
 	 * @throws IllegalArgumentException in case the pattern is {@literal null}.
-	 * @see <a href="https://redis.io/commands/keys">Redis Documentation: KEYS</a>
+	 * @see <a href="https://redis.io/commands/keys">Valkey Documentation: KEYS</a>
 	 */
 	Flux<K> keys(K pattern);
 
@@ -266,7 +266,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @return the {@link Flux} emitting the {@literal keys} one by one or an {@link Flux#empty() empty flux} if none
 	 *         exist.
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<K> scan() {
@@ -281,7 +281,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @return the {@link Flux} emitting the {@literal keys} one by one or an {@link Flux#empty() empty flux} if none
 	 *         exist.
 	 * @throws IllegalArgumentException when the given {@code options} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 * @since 2.1
 	 */
 	Flux<K> scan(ScanOptions options);
@@ -290,7 +290,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * Return a random key from the keyspace.
 	 *
 	 * @return
-	 * @see <a href="https://redis.io/commands/randomkey">Redis Documentation: RANDOMKEY</a>
+	 * @see <a href="https://redis.io/commands/randomkey">Valkey Documentation: RANDOMKEY</a>
 	 */
 	Mono<K> randomKey();
 
@@ -299,7 +299,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/rename">Redis Documentation: RENAME</a>
+	 * @see <a href="https://redis.io/commands/rename">Valkey Documentation: RENAME</a>
 	 */
 	Mono<Boolean> rename(K oldKey, K newKey);
 
@@ -309,7 +309,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/renamenx">Redis Documentation: RENAMENX</a>
+	 * @see <a href="https://redis.io/commands/renamenx">Valkey Documentation: RENAMENX</a>
 	 */
 	Mono<Boolean> renameIfAbsent(K oldKey, K newKey);
 
@@ -318,7 +318,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return The number of keys that were removed.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
 	 */
 	Mono<Long> delete(K... key);
 
@@ -328,7 +328,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
 	 */
 	Mono<Long> delete(Publisher<K> keys);
 
@@ -338,7 +338,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	Mono<Long> unlink(K... key);
@@ -350,7 +350,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	Mono<Long> unlink(Publisher<K> keys);
@@ -378,7 +378,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/persist">Redis Documentation: PERSIST</a>
+	 * @see <a href="https://redis.io/commands/persist">Valkey Documentation: PERSIST</a>
 	 */
 	Mono<Boolean> persist(K key);
 
@@ -388,7 +388,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param dbIndex
 	 * @return
-	 * @see <a href="https://redis.io/commands/move">Redis Documentation: MOVE</a>
+	 * @see <a href="https://redis.io/commands/move">Valkey Documentation: MOVE</a>
 	 */
 	Mono<Boolean> move(K key, int dbIndex);
 
@@ -398,76 +398,76 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @return the {@link Duration} of the associated key. {@link Duration#ZERO} if no timeout associated or empty
 	 *         {@link Mono} if the key does not exist.
-	 * @see <a href="https://redis.io/commands/pttl">Redis Documentation: PTTL</a>
+	 * @see <a href="https://redis.io/commands/pttl">Valkey Documentation: PTTL</a>
 	 */
 	Mono<Duration> getExpire(K key);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Lua scripts
+	// Methods dealing with Valkey Lua scripts
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Executes the given {@link RedisScript}.
+	 * Executes the given {@link ValkeyScript}.
 	 *
 	 * @param script must not be {@literal null}.
-	 * @return result value of the script {@link Flux#empty()} if {@link RedisScript#getResultType()} is {@literal null},
+	 * @return result value of the script {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is {@literal null},
 	 *         likely indicating a throw-away status reply (i.e. "OK").
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script) {
+	default <T> Flux<T> execute(ValkeyScript<T> script) {
 		return execute(script, Collections.emptyList());
 	}
 
 	/**
-	 * Executes the given {@link RedisScript}.
+	 * Executes the given {@link ValkeyScript}.
 	 *
 	 * @param script must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
-	 * @return result value of the script {@link Flux#empty()} if {@link RedisScript#getResultType()} is {@literal null},
+	 * @return result value of the script {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is {@literal null},
 	 *         likely indicating a throw-away status reply (i.e. "OK").
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script, List<K> keys) {
+	default <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys) {
 		return execute(script, keys, Collections.emptyList());
 	}
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script The script to execute. Must not be {@literal null}.
 	 * @param keys keys that need to be passed to the script. Must not be {@literal null}.
 	 * @param args args that need to be passed to the script. Must not be {@literal null}.
-	 * @return result value of the script {@link Flux#empty()} if {@link RedisScript#getResultType()} is {@literal null},
+	 * @return result value of the script {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is {@literal null},
 	 *         likely indicating a throw-away status reply (i.e. "OK").
 	 * @since 3.4
 	 */
-	default <T> Flux<T> execute(RedisScript<T> script, List<K> keys, Object... args) {
+	default <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, Object... args) {
 		return execute(script, keys, Arrays.asList(args));
 	}
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script The script to execute. Must not be {@literal null}.
 	 * @param keys keys that need to be passed to the script. Must not be {@literal null}.
 	 * @param args args that need to be passed to the script. Must not be {@literal null}.
-	 * @return result value of the script {@link Flux#empty()} if {@link RedisScript#getResultType()} is {@literal null},
+	 * @return result value of the script {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is {@literal null},
 	 *         likely indicating a throw-away status reply (i.e. "OK").
 	 */
-	<T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args);
+	<T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args);
 
 	/**
-	 * Executes the given {@link RedisScript}, using the provided {@link RedisSerializer}s to serialize the script
+	 * Executes the given {@link ValkeyScript}, using the provided {@link ValkeySerializer}s to serialize the script
 	 * arguments and result.
 	 *
 	 * @param script The script to execute
-	 * @param argsWriter The {@link RedisElementWriter} to use for serializing args
-	 * @param resultReader The {@link RedisElementReader} to use for serializing the script return value
+	 * @param argsWriter The {@link ValkeyElementWriter} to use for serializing args
+	 * @param resultReader The {@link ValkeyElementReader} to use for serializing the script return value
 	 * @param keys keys that need to be passed to the script.
 	 * @param args args that need to be passed to the script.
-	 * @return result value of the script {@link Flux#empty()} if {@link RedisScript#getResultType()} is {@literal null},
+	 * @return result value of the script {@link Flux#empty()} if {@link ValkeyScript#getResultType()} is {@literal null},
 	 *         likely indicating a throw-away status reply (i.e. "OK").
 	 */
-	<T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args, RedisElementWriter<?> argsWriter,
-			RedisElementReader<T> resultReader);
+	<T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args, ValkeyElementWriter<?> argsWriter,
+			ValkeyElementReader<T> resultReader);
 
 	// -------------------------------------------------------------------------
 	// Methods to obtain specific operations interface objects.
@@ -488,7 +488,7 @@ public interface ReactiveRedisOperations<K, V> {
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return geospatial specific operations.
 	 */
-	<K, V> ReactiveGeoOperations<K, V> opsForGeo(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveGeoOperations<K, V> opsForGeo(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
 	 * Returns the operations performed on hash values.
@@ -500,14 +500,14 @@ public interface ReactiveRedisOperations<K, V> {
 	<HK, HV> ReactiveHashOperations<K, HK, HV> opsForHash();
 
 	/**
-	 * Returns the operations performed on hash values given a {@link RedisSerializationContext}.
+	 * Returns the operations performed on hash values given a {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @param <HK> hash key (or field) type.
 	 * @param <HV> hash value type.
 	 * @return hash operations.
 	 */
-	<K, HK, HV> ReactiveHashOperations<K, HK, HV> opsForHash(RedisSerializationContext<K, ?> serializationContext);
+	<K, HK, HV> ReactiveHashOperations<K, HK, HV> opsForHash(ValkeySerializationContext<K, ?> serializationContext);
 
 	/**
 	 * Returns the operations performed on multisets using HyperLogLog.
@@ -517,12 +517,12 @@ public interface ReactiveRedisOperations<K, V> {
 	ReactiveHyperLogLogOperations<K, V> opsForHyperLogLog();
 
 	/**
-	 * Returns the operations performed on multisets using HyperLogLog given a {@link RedisSerializationContext}.
+	 * Returns the operations performed on multisets using HyperLogLog given a {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return never {@literal null}.
 	 */
-	<K, V> ReactiveHyperLogLogOperations<K, V> opsForHyperLogLog(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveHyperLogLogOperations<K, V> opsForHyperLogLog(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
 	 * Returns the operations performed on list values.
@@ -532,12 +532,12 @@ public interface ReactiveRedisOperations<K, V> {
 	ReactiveListOperations<K, V> opsForList();
 
 	/**
-	 * Returns the operations performed on list values given a {@link RedisSerializationContext}.
+	 * Returns the operations performed on list values given a {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return list operations.
 	 */
-	<K, V> ReactiveListOperations<K, V> opsForList(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveListOperations<K, V> opsForList(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
 	 * Returns the operations performed on set values.
@@ -547,12 +547,12 @@ public interface ReactiveRedisOperations<K, V> {
 	ReactiveSetOperations<K, V> opsForSet();
 
 	/**
-	 * Returns the operations performed on set values given a {@link RedisSerializationContext}.
+	 * Returns the operations performed on set values given a {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return set operations.
 	 */
-	<K, V> ReactiveSetOperations<K, V> opsForSet(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveSetOperations<K, V> opsForSet(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
 	 * Returns the operations performed on streams.
@@ -572,29 +572,29 @@ public interface ReactiveRedisOperations<K, V> {
 	<HK, HV> ReactiveStreamOperations<K, HK, HV> opsForStream(HashMapper<? super K, ? super HK, ? super HV> hashMapper);
 
 	/**
-	 * Returns the operations performed on streams given a {@link RedisSerializationContext}.
+	 * Returns the operations performed on streams given a {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return stream operations.
 	 * @since 2.2
 	 */
-	<HK, HV> ReactiveStreamOperations<K, HK, HV> opsForStream(RedisSerializationContext<K, ?> serializationContext);
+	<HK, HV> ReactiveStreamOperations<K, HK, HV> opsForStream(ValkeySerializationContext<K, ?> serializationContext);
 
 	/**
-	 * Returns the operations performed on simple values (or Strings in Redis terminology).
+	 * Returns the operations performed on simple values (or Strings in Valkey terminology).
 	 *
 	 * @return value operations
 	 */
 	ReactiveValueOperations<K, V> opsForValue();
 
 	/**
-	 * Returns the operations performed on simple values (or Strings in Redis terminology) given a
-	 * {@link RedisSerializationContext}.
+	 * Returns the operations performed on simple values (or Strings in Valkey terminology) given a
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return value operations.
 	 */
-	<K, V> ReactiveValueOperations<K, V> opsForValue(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveValueOperations<K, V> opsForValue(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
 	 * Returns the operations performed on zset values (also known as sorted sets).
@@ -605,15 +605,15 @@ public interface ReactiveRedisOperations<K, V> {
 
 	/**
 	 * Returns the operations performed on zset values (also known as sorted sets) given a
-	 * {@link RedisSerializationContext}.
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param serializationContext serializers to be used with the returned operations, must not be {@literal null}.
 	 * @return zset operations.
 	 */
-	<K, V> ReactiveZSetOperations<K, V> opsForZSet(RedisSerializationContext<K, V> serializationContext);
+	<K, V> ReactiveZSetOperations<K, V> opsForZSet(ValkeySerializationContext<K, V> serializationContext);
 
 	/**
-	 * @return the {@link RedisSerializationContext}.
+	 * @return the {@link ValkeySerializationContext}.
 	 */
-	RedisSerializationContext<K, V> getSerializationContext();
+	ValkeySerializationContext<K, V> getSerializationContext();
 }

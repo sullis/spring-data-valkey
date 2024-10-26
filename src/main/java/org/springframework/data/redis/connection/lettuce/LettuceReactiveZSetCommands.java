@@ -32,11 +32,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyScanCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyScanCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.connection.ReactiveZSetCommands;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
@@ -59,14 +59,14 @@ import org.springframework.util.ObjectUtils;
  */
 class LettuceReactiveZSetCommands implements ReactiveZSetCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveZSetCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveZSetCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveZSetCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -753,7 +753,7 @@ class LettuceReactiveZSetCommands implements ReactiveZSetCommands {
 		return new DefaultTuple(ByteUtils.getBytes(value), score);
 	}
 
-	protected LettuceReactiveRedisConnection getConnection() {
+	protected LettuceReactiveValkeyConnection getConnection() {
 		return this.connection;
 	}
 }

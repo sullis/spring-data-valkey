@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.support.collections;
 
-import static org.springframework.data.redis.connection.RedisListCommands.*;
+import static org.springframework.data.redis.connection.ValkeyListCommands.*;
 
 import java.time.Duration;
 import java.util.Deque;
@@ -25,13 +25,13 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.TimeoutUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Redis extension for the {@link List} contract. Supports {@link List}, {@link Queue} and {@link Deque} contracts as
+ * Valkey extension for the {@link List} contract. Supports {@link List}, {@link Queue} and {@link Deque} contracts as
  * well as their equivalent blocking siblings {@link BlockingDeque} and {@link BlockingDeque}.
  *
  * @param <E> the type of elements in this collection.
@@ -39,57 +39,57 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @author John Blum
  */
-public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque<E> {
+public interface ValkeyList<E> extends ValkeyCollection<E>, List<E>, BlockingDeque<E> {
 
 	/**
-	 * Constructs a new, uncapped {@link RedisList} instance.
+	 * Constructs a new, uncapped {@link ValkeyList} instance.
 	 *
-	 * @param key Redis key of this list.
-	 * @param operations {@link RedisOperations} for the value type of this list.
+	 * @param key Valkey key of this list.
+	 * @param operations {@link ValkeyOperations} for the value type of this list.
 	 * @since 2.6
 	 */
-	static <E> RedisList<E> create(String key, RedisOperations<String, E> operations) {
-		return new DefaultRedisList<>(key, operations);
+	static <E> ValkeyList<E> create(String key, ValkeyOperations<String, E> operations) {
+		return new DefaultValkeyList<>(key, operations);
 	}
 
 	/**
-	 * Factory method used to construct a new {@link RedisList} from a Redis list reference by the given {@link String
+	 * Factory method used to construct a new {@link ValkeyList} from a Valkey list reference by the given {@link String
 	 * key}.
 	 *
-	 * @param key Redis key of this list.
-	 * @param operations {@link RedisOperations} for the value type of this list.
+	 * @param key Valkey key of this list.
+	 * @param operations {@link ValkeyOperations} for the value type of this list.
 	 * @param maxSize {@link Integer} used to constrain the size of the list.
 	 * @since 2.6
 	 */
-	static <E> RedisList<E> create(String key, RedisOperations<String, E> operations, int maxSize) {
-		return new DefaultRedisList<>(key, operations, maxSize);
+	static <E> ValkeyList<E> create(String key, ValkeyOperations<String, E> operations, int maxSize) {
+		return new DefaultValkeyList<>(key, operations, maxSize);
 	}
 
 	/**
-	 * Constructs a new, uncapped {@link DefaultRedisList} instance.
+	 * Constructs a new, uncapped {@link DefaultValkeyList} instance.
 	 *
 	 * @param boundOps {@link BoundListOperations} for the value type of this list.
 	 * @since 2.6
 	 */
-	static <E> RedisList<E> create(BoundListOperations<String, E> boundOps) {
-		return new DefaultRedisList<>(boundOps);
+	static <E> ValkeyList<E> create(BoundListOperations<String, E> boundOps) {
+		return new DefaultValkeyList<>(boundOps);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisList}.
+	 * Constructs a new {@link DefaultValkeyList}.
 	 *
 	 * @param boundOps {@link BoundListOperations} for the value type of this list.
 	 * @param maxSize {@link Integer} constraining the size of the list.
 	 * @since 2.6
 	 */
-	static <E> RedisList<E> create(BoundListOperations<String, E> boundOps, int maxSize) {
-		return new DefaultRedisList<>(boundOps, maxSize);
+	static <E> ValkeyList<E> create(BoundListOperations<String, E> boundOps, int maxSize) {
+		return new DefaultValkeyList<>(boundOps, maxSize);
 	}
 
 	/**
 	 * Atomically returns and removes the first element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 *
 	 * @param destination must not be {@literal null}.
 	 * @param destinationPosition must not be {@literal null}.
@@ -99,12 +99,12 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	E moveFirstTo(RedisList<E> destination, Direction destinationPosition);
+	E moveFirstTo(ValkeyList<E> destination, Direction destinationPosition);
 
 	/**
 	 * Atomically returns and removes the first element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 * <p>
 	 * <b>Blocks connection</b> until element available or {@code timeout} reached.
 	 *
@@ -118,12 +118,12 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	E moveFirstTo(RedisList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit);
+	E moveFirstTo(ValkeyList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit);
 
 	/**
 	 * Atomically returns and removes the first element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 * <p>
 	 * <b>Blocks connection</b> until element available or {@code timeout} reached.
 	 *
@@ -136,7 +136,7 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	default E moveFirstTo(RedisList<E> destination, Direction destinationPosition, Duration timeout) {
+	default E moveFirstTo(ValkeyList<E> destination, Direction destinationPosition, Duration timeout) {
 
 		Assert.notNull(timeout, "Timeout must not be null");
 		Assert.isTrue(!timeout.isNegative(), "Timeout must not be negative");
@@ -148,7 +148,7 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	/**
 	 * Atomically returns and removes the last element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 *
 	 * @param destination must not be {@literal null}.
 	 * @param destinationPosition must not be {@literal null}.
@@ -158,12 +158,12 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	E moveLastTo(RedisList<E> destination, Direction destinationPosition);
+	E moveLastTo(ValkeyList<E> destination, Direction destinationPosition);
 
 	/**
 	 * Atomically returns and removes the last element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 * <p>
 	 * <b>Blocks connection</b> until element available or {@code timeout} reached.
 	 *
@@ -177,12 +177,12 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	E moveLastTo(RedisList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit);
+	E moveLastTo(ValkeyList<E> destination, Direction destinationPosition, long timeout, TimeUnit unit);
 
 	/**
 	 * Atomically returns and removes the last element of the list stored at the bound key, and pushes the element at the
 	 * first/last element (head/tail depending on the {@link Direction destinationPosition} argument) of the list stored
-	 * at {@link RedisList destination}.
+	 * at {@link ValkeyList destination}.
 	 * <p>
 	 * <b>Blocks connection</b> until element available or {@code timeout} reached.
 	 *
@@ -195,7 +195,7 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @see Direction#last()
 	 */
 	@Nullable
-	default E moveLastTo(RedisList<E> destination, Direction destinationPosition, Duration timeout) {
+	default E moveLastTo(ValkeyList<E> destination, Direction destinationPosition, Duration timeout) {
 
 		Assert.notNull(timeout, "Timeout must not be null");
 		Assert.isTrue(!timeout.isNegative(), "Timeout must not be negative");
@@ -210,7 +210,7 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @param start
 	 * @param end
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/lrange">Redis Documentation: LRANGE</a>
+	 * @see <a href="https://redis.io/commands/lrange">Valkey Documentation: LRANGE</a>
 	 */
 	List<E> range(long start, long end);
 
@@ -219,9 +219,9 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 *
 	 * @param start
 	 * @param end
-	 * @see <a href="https://redis.io/commands/ltrim">Redis Documentation: LTRIM</a>
+	 * @see <a href="https://redis.io/commands/ltrim">Valkey Documentation: LTRIM</a>
 	 */
-	RedisList<E> trim(int start, int end);
+	ValkeyList<E> trim(int start, int end);
 
 	/**
 	 * Trim list at the bound key to elements between {@code start} and {@code end}.
@@ -229,9 +229,9 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 * @param start
 	 * @param end
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/ltrim">Redis Documentation: LTRIM</a>
+	 * @see <a href="https://redis.io/commands/ltrim">Valkey Documentation: LTRIM</a>
 	 */
-	RedisList<E> trim(long start, long end);
+	ValkeyList<E> trim(long start, long end);
 
 	/**
 	 * {@inheritDoc}
@@ -317,7 +317,7 @@ public interface RedisList<E> extends RedisCollection<E>, List<E>, BlockingDeque
 	 *
 	 * @return a reverse-ordered view of this collection.
 	 */
-	default RedisList<E> reversed() {
-		return new ReversedRedisListView<>(this);
+	default ValkeyList<E> reversed() {
+		return new ReversedValkeyListView<>(this);
 	}
 }

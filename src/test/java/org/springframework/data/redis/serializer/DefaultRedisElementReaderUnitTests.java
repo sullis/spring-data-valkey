@@ -23,11 +23,11 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link DefaultRedisElementReader}.
+ * Unit tests for {@link DefaultValkeyElementReader}.
  *
  * @author Mark Paluch
  */
-class DefaultRedisElementReaderUnitTests {
+class DefaultValkeyElementReaderUnitTests {
 
 	@Test // DATAREDIS-602
 	void shouldDecodeByteBufferCorrectly() {
@@ -35,8 +35,8 @@ class DefaultRedisElementReaderUnitTests {
 		String input = "123ü?™";
 		byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
 
-		DefaultRedisElementReader<String> reader = new DefaultRedisElementReader<>(
-				new StringRedisSerializer(StandardCharsets.UTF_8));
+		DefaultValkeyElementReader<String> reader = new DefaultValkeyElementReader<>(
+				new StringValkeySerializer(StandardCharsets.UTF_8));
 
 		String result = reader.read(ByteBuffer.wrap(bytes));
 
@@ -48,7 +48,7 @@ class DefaultRedisElementReaderUnitTests {
 
 		ByteBuffer input = ByteBuffer.allocate(1);
 
-		DefaultRedisElementReader<Object> reader = new DefaultRedisElementReader<>(null);
+		DefaultValkeyElementReader<Object> reader = new DefaultValkeyElementReader<>(null);
 
 		Object result = reader.read(input);
 

@@ -22,9 +22,9 @@ import reactor.test.StepVerifier;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Mark Paluch
@@ -36,7 +36,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 		super(fixture);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void scriptExistsShouldReturnState() {
 
 		assumeThat(connectionProvider).isInstanceOf(StandaloneConnectionProvider.class);
@@ -49,7 +49,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void scriptFlushShouldRemoveScripts() {
 
 		assumeThat(connectionProvider).isInstanceOf(StandaloneConnectionProvider.class);
@@ -69,7 +69,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void evalShaShouldReturnKey() {
 
 		assumeThat(connectionProvider).isInstanceOf(StandaloneConnectionProvider.class);
@@ -83,7 +83,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683, DATAREDIS-711
+	@ParameterizedValkeyTest // DATAREDIS-683, DATAREDIS-711
 	void evalShaShouldReturnMulti() {
 
 		assumeThat(connectionProvider).isInstanceOf(StandaloneConnectionProvider.class);
@@ -97,18 +97,18 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void evalShaShouldFail() {
 
 		assumeThat(connectionProvider).isInstanceOf(StandaloneConnectionProvider.class);
 
 		connection.scriptingCommands().evalSha("foo", ReturnType.VALUE, 1, SAME_SLOT_KEY_1_BBUFFER.duplicate())
 				.as(StepVerifier::create) //
-				.expectError(RedisSystemException.class) //
+				.expectError(ValkeySystemException.class) //
 				.verify();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void evalShouldReturnStatus() {
 
 		ByteBuffer script = wrap("return redis.call('set','%s','ghk')".formatted(SAME_SLOT_KEY_1));
@@ -119,7 +119,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void evalShouldReturnBooleanFalse() {
 
 		ByteBuffer script = wrap("return false");
@@ -129,7 +129,7 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683, DATAREDIS-711
+	@ParameterizedValkeyTest // DATAREDIS-683, DATAREDIS-711
 	void evalShouldReturnMultiNumbers() {
 
 		ByteBuffer script = wrap("return {1,2}");
@@ -139,13 +139,13 @@ public class LettuceReactiveScriptingCommandsIntegrationTests extends LettuceRea
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-683
+	@ParameterizedValkeyTest // DATAREDIS-683
 	void evalShouldFailWithScriptError() {
 
 		ByteBuffer script = wrap("return {1,2");
 
 		connection.scriptingCommands().eval(script, ReturnType.MULTI, 0).as(StepVerifier::create) //
-				.expectError(RedisSystemException.class) //
+				.expectError(ValkeySystemException.class) //
 				.verify();
 	}
 

@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.SettingsUtils;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -62,7 +62,7 @@ public class SynchronousIntegrationTests extends SampleTestRunner {
 
 		return (tracer, meterRegistry) -> {
 
-			RedisConnection connection = connectionFactory.getConnection();
+			ValkeyConnection connection = connectionFactory.getConnection();
 			connection.ping();
 
 			connection.close();

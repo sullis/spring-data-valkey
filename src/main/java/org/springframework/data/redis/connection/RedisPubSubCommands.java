@@ -18,13 +18,13 @@ package org.springframework.data.redis.connection;
 import org.springframework.lang.Nullable;
 
 /**
- * PubSub-specific Redis commands.
+ * PubSub-specific Valkey commands.
  *
  * @author Costin Leau
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-public interface RedisPubSubCommands {
+public interface ValkeyPubSubCommands {
 
 	/**
 	 * Indicates whether the current connection is subscribed (to at least one channel) or not.
@@ -47,7 +47,7 @@ public interface RedisPubSubCommands {
 	 * @param channel the channel to publish to. Must not be {@literal null}.
 	 * @param message message to publish. Must not be {@literal null}.
 	 * @return the number of clients that received the message or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
 	 */
 	@Nullable
 	Long publish(byte[] channel, byte[] message);
@@ -60,7 +60,7 @@ public interface RedisPubSubCommands {
 	 *
 	 * @param listener message listener, must not be {@literal null}.
 	 * @param channels channel names, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/subscribe">Redis Documentation: SUBSCRIBE</a>
+	 * @see <a href="https://redis.io/commands/subscribe">Valkey Documentation: SUBSCRIBE</a>
 	 */
 	void subscribe(MessageListener listener, byte[]... channels);
 
@@ -73,7 +73,7 @@ public interface RedisPubSubCommands {
 	 *
 	 * @param listener message listener, must not be {@literal null}.
 	 * @param patterns channel name patterns, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/psubscribe">Redis Documentation: PSUBSCRIBE</a>
+	 * @see <a href="https://redis.io/commands/psubscribe">Valkey Documentation: PSUBSCRIBE</a>
 	 */
 	void pSubscribe(MessageListener listener, byte[]... patterns);
 }

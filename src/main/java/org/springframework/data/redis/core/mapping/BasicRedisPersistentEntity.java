@@ -26,25 +26,25 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisPersistentEntity} implementation.
+ * {@link ValkeyPersistentEntity} implementation.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @param <T>
  */
-public class BasicRedisPersistentEntity<T> extends BasicKeyValuePersistentEntity<T, RedisPersistentProperty>
-		implements RedisPersistentEntity<T> {
+public class BasicValkeyPersistentEntity<T> extends BasicKeyValuePersistentEntity<T, ValkeyPersistentProperty>
+		implements ValkeyPersistentEntity<T> {
 
 	private final TimeToLiveAccessor timeToLiveAccessor;
 
 	/**
-	 * Creates new {@link BasicRedisPersistentEntity}.
+	 * Creates new {@link BasicValkeyPersistentEntity}.
 	 *
 	 * @param information must not be {@literal null}.
 	 * @param keySpaceResolver can be {@literal null}.
 	 * @param timeToLiveAccessor can be {@literal null}.
 	 */
-	public BasicRedisPersistentEntity(TypeInformation<T> information, @Nullable KeySpaceResolver keySpaceResolver,
+	public BasicValkeyPersistentEntity(TypeInformation<T> information, @Nullable KeySpaceResolver keySpaceResolver,
 			TimeToLiveAccessor timeToLiveAccessor) {
 		super(information, keySpaceResolver);
 
@@ -59,13 +59,13 @@ public class BasicRedisPersistentEntity<T> extends BasicKeyValuePersistentEntity
 
 	@Override
 	@Nullable
-	public RedisPersistentProperty getExplicitTimeToLiveProperty() {
+	public ValkeyPersistentProperty getExplicitTimeToLiveProperty() {
 		return this.getPersistentProperty(TimeToLive.class);
 	}
 
 	@Override
 	@Nullable
-	protected RedisPersistentProperty returnPropertyIfBetterIdPropertyCandidateOrNull(RedisPersistentProperty property) {
+	protected ValkeyPersistentProperty returnPropertyIfBetterIdPropertyCandidateOrNull(ValkeyPersistentProperty property) {
 
 		Assert.notNull(property, "Property must not be null");
 
@@ -73,7 +73,7 @@ public class BasicRedisPersistentEntity<T> extends BasicKeyValuePersistentEntity
 			return null;
 		}
 
-		RedisPersistentProperty currentIdProperty = getIdProperty();
+		ValkeyPersistentProperty currentIdProperty = getIdProperty();
 		boolean currentIdPropertyIsSet = currentIdProperty != null;
 
 		if (!currentIdPropertyIsSet) {

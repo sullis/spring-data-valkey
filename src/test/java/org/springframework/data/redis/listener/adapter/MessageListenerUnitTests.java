@@ -26,9 +26,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
 /**
  * Unit test for MessageListenerAdapter.
@@ -41,7 +41,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @ExtendWith(MockitoExtension.class)
 class MessageListenerUnitTests {
 
-	private static final StringRedisSerializer serializer = StringRedisSerializer.UTF_8;
+	private static final StringValkeySerializer serializer = StringValkeySerializer.UTF_8;
 	private static final String CHANNEL = "some::test:";
 	private static final byte[] RAW_CHANNEL = serializer.serialize(CHANNEL);
 	private static final String PAYLOAD = "do re mi";
@@ -190,7 +190,7 @@ class MessageListenerUnitTests {
 		ConcreteMessageHandler listener = spy(new ConcreteMessageHandler());
 
 		MessageListenerAdapter adapter = new MessageListenerAdapter(listener);
-		adapter.setSerializer(new PojoRedisSerializer());
+		adapter.setSerializer(new PojoValkeySerializer());
 		adapter.afterPropertiesSet();
 
 		adapter.onMessage(new DefaultMessage(new byte[0], "body".getBytes()), "".getBytes());
@@ -248,7 +248,7 @@ class MessageListenerUnitTests {
 
 		MessageListenerAdapter adapter = new MessageListenerAdapter(listener);
 		adapter.setDefaultListenerMethod("handle");
-		adapter.setSerializer(new PojoRedisSerializer());
+		adapter.setSerializer(new PojoValkeySerializer());
 		adapter.afterPropertiesSet();
 
 		adapter.onMessage(new DefaultMessage(new byte[0], "body".getBytes()), "".getBytes());
@@ -307,7 +307,7 @@ class MessageListenerUnitTests {
 
 	static class Pojo {}
 
-	static class PojoRedisSerializer implements RedisSerializer<Pojo> {
+	static class PojoValkeySerializer implements ValkeySerializer<Pojo> {
 
 		@Override
 		public byte[] serialize(Pojo value) throws SerializationException {

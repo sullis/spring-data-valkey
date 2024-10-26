@@ -22,16 +22,16 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RedisServer}.
+ * Unit tests for {@link ValkeyServer}.
  *
  * @author Mark Paluch
  */
-class RedisServerUnitTests {
+class ValkeyServerUnitTests {
 
 	@Test // DATAREDIS-618
 	void shouldReadNumberOfOtherSentinelsCorrectly() {
 
-		RedisServer redisServer = RedisServer.newServerFrom(createProperties());
+		ValkeyServer redisServer = ValkeyServer.newServerFrom(createProperties());
 
 		assertThat(redisServer.getNumberOtherSentinels()).isEqualTo(2L);
 	}

@@ -1,24 +1,24 @@
-= Spring Data Redis image:https://jenkins.spring.io/buildStatus/icon?job=spring-data-valkey%2Fmain&subject=Build[link=https://jenkins.spring.io/view/SpringData/job/spring-data-valkey/] https://gitter.im/spring-projects/spring-data[image:https://badges.gitter.im/spring-projects/spring-data.svg[Gitter]] image:https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A["Revved up by Develocity", link="https://ge.spring.io/scans?search.rootProjectNames=Spring Data Redis"]
+= Spring Data Valkey image:https://jenkins.spring.io/buildStatus/icon?job=spring-data-valkey%2Fmain&subject=Build[link=https://jenkins.spring.io/view/SpringData/job/spring-data-valkey/] https://gitter.im/spring-projects/spring-data[image:https://badges.gitter.im/spring-projects/spring-data.svg[Gitter]] image:https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A["Revved up by Develocity", link="https://ge.spring.io/scans?search.rootProjectNames=Spring Data Valkey"]
 
 The primary goal of the https://spring.io/projects/spring-data/[Spring Data] project is to make it easier to build Spring-powered applications that use new data access technologies such as non-relational databases, map-reduce frameworks, and cloud based data services.
 
-This module provides integration with the https://redis.io/[Redis] store.
+This module provides integration with the https://redis.io/[Valkey] store.
 
 == Features
 
-* Connection package as low-level abstraction across multiple Redis drivers (https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/redis/jedis[Jedis]).
-* Exception translation to Spring’s portable Data Access exception hierarchy for Redis driver exceptions
-* https://docs.spring.io/spring-data/redis/reference/redis/template.html[`RedisTemplate`] that provides a high level abstraction for performing various Redis operations, exception translation and serialization support.
+* Connection package as low-level abstraction across multiple Valkey drivers (https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/redis/jedis[Jedis]).
+* Exception translation to Spring’s portable Data Access exception hierarchy for Valkey driver exceptions
+* https://docs.spring.io/spring-data/redis/reference/redis/template.html[`ValkeyTemplate`] that provides a high level abstraction for performing various Valkey operations, exception translation and serialization support.
 * Pubsub support (such as a MessageListenerContainer for message-driven POJOs).
-* https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#redis:sentinel[Redis Sentinel] and https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#cluster.enable[Redis Cluster] support.
+* https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#redis:sentinel[Valkey Sentinel] and https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#cluster.enable[Valkey Cluster] support.
 * Reactive API using the Lettuce driver.
 * JDK, String, JSON and Spring Object/XML mapping serializers.
-* JDK Collection implementations on top of Redis.
+* JDK Collection implementations on top of Valkey.
 * Atomic counter support classes.
 * Sorting and Pipelining functionality.
 * Dedicated support for SORT, SORT/GET pattern and returned bulk values.
-* Redis implementation for Spring 3.1 cache abstraction.
-* Automatic implementation of `Repository` interfaces including support for custom finder methods using `@EnableRedisRepositories`.
+* Valkey implementation for Spring 3.1 cache abstraction.
+* Automatic implementation of `Repository` interfaces including support for custom finder methods using `@EnableValkeyRepositories`.
 * CDI support for repositories.
 
 == Code of Conduct
@@ -27,7 +27,7 @@ This project is governed by the https://github.com/spring-projects/.github/blob/
 
 == Getting Started
 
-Here is a quick teaser of an application using Spring Data Redis in Java:
+Here is a quick teaser of an application using Spring Data Valkey in Java:
 
 [source,java]
 ----
@@ -35,7 +35,7 @@ public class Example {
 
     // inject the actual template
     @Autowired
-    private RedisTemplate<String, String> template;
+    private ValkeyTemplate<String, String> template;
 
     // inject the template as ListOperations
     // can also inject as Value, Set, ZSet, and HashOperations
@@ -53,7 +53,7 @@ public class Example {
 class ApplicationConfig {
 
   @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
+  public ValkeyConnectionFactory redisConnectionFactory() {
     return new LettuceConnectionFactory();
   }
 }
@@ -100,7 +100,7 @@ If you are just starting out with Spring, try one of the https://spring.io/guide
 * If you are upgrading, check out the https://github.com/spring-projects/spring-data-commons/wiki#release-notes[Release notes] for "`new and noteworthy`" features.
 * Ask a question - we monitor https://stackoverflow.com[stackoverflow.com] for questions tagged with https://stackoverflow.com/tags/spring-data[`spring-data-valkey`].
 You can also chat with the community on https://gitter.im/spring-projects/spring-data[Gitter].
-* Report bugs with Spring Data Redis at https://github.com/spring-projects/spring-data-valkey/issues/new[github.com/spring-projects/spring-data-valkey].
+* Report bugs with Spring Data Valkey at https://github.com/spring-projects/spring-data-valkey/issues/new[github.com/spring-projects/spring-data-valkey].
 
 == Reporting Issues
 
@@ -118,7 +118,7 @@ Attach a link to your code or a compressed file containing your code.
 
 You don’t need to build from source to use Spring Data (binaries in https://repo.spring.io[repo.spring.io]), but if you want to try out the latest and greatest, Spring Data can be easily built with the https://github.com/takari/maven-wrapper[maven wrapper].
 You also need JDK 17 or above and `make`.
-The local build environment is managed within a `Makefile` to download, build and spin up Redis in various configurations (Standalone, Sentinel, Cluster, etc.)
+The local build environment is managed within a `Makefile` to download, build and spin up Valkey in various configurations (Standalone, Sentinel, Cluster, etc.)
 
 [source,bash]
 ----
@@ -128,7 +128,7 @@ The local build environment is managed within a `Makefile` to download, build an
 The preceding command runs a full build.
 You can use `make start`, `make stop`, and `make clean` commands to control the environment yourself.
 This is useful if you want to avoid constant server restarts.
-Once all Redis instances have been started, you can either run tests in your IDE or the full Maven build:
+Once all Valkey instances have been started, you can either run tests in your IDE or the full Maven build:
 
 [source,bash]
 ----
@@ -154,8 +154,8 @@ The generated documentation is available from `target/antora/site/index.html`.
 
 The https://spring.io/[spring.io] site contains several guides that show how to use Spring Data step-by-step:
 
-* https://spring.io/guides/gs/messaging-redis/[Messaging with Redis]: Learn how to use Redis as a message broker.
-* https://spring.io/guides/gs/spring-data-reactive-redis/[Accessing Data Reactively with Redis]: Learn how to reactively interface with Redis and Spring Data.
+* https://spring.io/guides/gs/messaging-redis/[Messaging with Valkey]: Learn how to use Valkey as a message broker.
+* https://spring.io/guides/gs/spring-data-reactive-redis/[Accessing Data Reactively with Valkey]: Learn how to reactively interface with Valkey and Spring Data.
 
 == Examples
 
@@ -163,4 +163,4 @@ The https://spring.io/[spring.io] site contains several guides that show how to 
 
 == License
 
-Spring Data Redis is Open Source software released under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
+Spring Data Valkey is Open Source software released under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].

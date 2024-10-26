@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
 /**
- * {@link TimeToLive} marks a single numeric property on aggregate root to be used for setting expirations in Redis. The
+ * {@link TimeToLive} marks a single numeric property on aggregate root to be used for setting expirations in Valkey. The
  * annotated property supersedes any other timeout configuration.
  *
  * <pre>
  * <code>
- * &#64;RedisHash
+ * &#64;ValkeyHash
  * class Person {
  *   &#64;Id String id;
  *   String name;

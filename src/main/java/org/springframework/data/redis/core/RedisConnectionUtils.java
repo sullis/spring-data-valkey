@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.RawTargetAccess;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.ResourceHolderSupport;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -35,11 +35,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Helper class that provides static methods for obtaining {@link RedisConnection} from a
- * {@link RedisConnectionFactory}. Includes special support for Spring-managed transactional RedisConnections, e.g.
+ * Helper class that provides static methods for obtaining {@link ValkeyConnection} from a
+ * {@link ValkeyConnectionFactory}. Includes special support for Spring-managed transactional ValkeyConnections, e.g.
  * managed by {@link org.springframework.transaction.support.AbstractPlatformTransactionManager}..
  * <p>
- * Used internally by Spring's {@link RedisTemplate}. Can also be used directly in application code.
+ * Used internally by Spring's {@link ValkeyTemplate}. Can also be used directly in application code.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -49,86 +49,86 @@ import org.springframework.util.ReflectionUtils;
  * @see #releaseConnection
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
  */
-public abstract class RedisConnectionUtils {
+public abstract class ValkeyConnectionUtils {
 
-	private static final Log log = LogFactory.getLog(RedisConnectionUtils.class);
+	private static final Log log = LogFactory.getLog(ValkeyConnectionUtils.class);
 
 	/**
-	 * Obtain a {@link RedisConnection} from the given {@link RedisConnectionFactory} and binds the connection to the
+	 * Obtain a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory} and binds the connection to the
 	 * current thread to be used in closure-scope, if none is already bound. Considers ongoing transactions by reusing the
 	 * transaction-bound connection and allows reentrant connection retrieval. Does not bind the connection to potentially
 	 * ongoing transactions.
 	 *
 	 * @param factory connection factory
-	 * @return a new Redis connection without transaction support.
+	 * @return a new Valkey connection without transaction support.
 	 */
-	public static RedisConnection bindConnection(RedisConnectionFactory factory) {
+	public static ValkeyConnection bindConnection(ValkeyConnectionFactory factory) {
 		return doGetConnection(factory, true, true, false);
 	}
 
 	/**
-	 * Obtain a {@link RedisConnection} from the given {@link RedisConnectionFactory} and binds the connection to the
+	 * Obtain a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory} and binds the connection to the
 	 * current thread to be used in closure-scope, if none is already bound. Considers ongoing transactions by reusing the
 	 * transaction-bound connection and allows reentrant connection retrieval. Binds also the connection to the ongoing
 	 * transaction if no connection is already bound if {@code transactionSupport} is enabled.
 	 *
 	 * @param factory connection factory.
 	 * @param transactionSupport whether transaction support is enabled.
-	 * @return a new Redis connection with transaction support if requested.
+	 * @return a new Valkey connection with transaction support if requested.
 	 */
-	public static RedisConnection bindConnection(RedisConnectionFactory factory, boolean transactionSupport) {
+	public static ValkeyConnection bindConnection(ValkeyConnectionFactory factory, boolean transactionSupport) {
 		return doGetConnection(factory, true, true, transactionSupport);
 	}
 
 	/**
-	 * Obtain a {@link RedisConnection} from the given {@link RedisConnectionFactory}. Is aware of existing connections
+	 * Obtain a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory}. Is aware of existing connections
 	 * bound to the current transaction (when using a transaction manager) or the current thread (when binding a
 	 * connection to a closure-scope). Does not bind newly created connections to ongoing transactions.
 	 *
 	 * @param factory connection factory for creating the connection.
-	 * @return an active Redis connection without transaction management.
+	 * @return an active Valkey connection without transaction management.
 	 */
-	public static RedisConnection getConnection(RedisConnectionFactory factory) {
+	public static ValkeyConnection getConnection(ValkeyConnectionFactory factory) {
 		return getConnection(factory, false);
 	}
 
 	/**
-	 * Obtain a {@link RedisConnection} from the given {@link RedisConnectionFactory}. Is aware of existing connections
+	 * Obtain a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory}. Is aware of existing connections
 	 * bound to the current transaction (when using a transaction manager) or the current thread (when binding a
 	 * connection to a closure-scope).
 	 *
 	 * @param factory connection factory for creating the connection.
 	 * @param transactionSupport whether transaction support is enabled.
-	 * @return an active Redis connection with transaction management if requested.
+	 * @return an active Valkey connection with transaction management if requested.
 	 */
-	public static RedisConnection getConnection(RedisConnectionFactory factory, boolean transactionSupport) {
+	public static ValkeyConnection getConnection(ValkeyConnectionFactory factory, boolean transactionSupport) {
 		return doGetConnection(factory, true, false, transactionSupport);
 	}
 
 	/**
-	 * Actually obtain a {@link RedisConnection} from the given {@link RedisConnectionFactory}. Is aware of existing
+	 * Actually obtain a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory}. Is aware of existing
 	 * connections bound to the current transaction (when using a transaction manager) or the current thread (when binding
-	 * a connection to a closure-scope). Will create a new {@link RedisConnection} otherwise, if {@code allowCreate} is
-	 * {@literal true}. This method allows for re-entrance as {@link RedisConnectionHolder} keeps track of ref-count.
+	 * a connection to a closure-scope). Will create a new {@link ValkeyConnection} otherwise, if {@code allowCreate} is
+	 * {@literal true}. This method allows for re-entrance as {@link ValkeyConnectionHolder} keeps track of ref-count.
 	 *
 	 * @param factory connection factory for creating the connection.
 	 * @param allowCreate whether a new (unbound) connection should be created when no connection can be found for the
 	 *          current thread.
 	 * @param bind binds the connection to the thread, in case one was created-
 	 * @param transactionSupport whether transaction support is enabled.
-	 * @return an active Redis connection.
+	 * @return an active Valkey connection.
 	 */
-	public static RedisConnection doGetConnection(RedisConnectionFactory factory, boolean allowCreate, boolean bind,
+	public static ValkeyConnection doGetConnection(ValkeyConnectionFactory factory, boolean allowCreate, boolean bind,
 			boolean transactionSupport) {
 
-		Assert.notNull(factory, "No RedisConnectionFactory specified");
+		Assert.notNull(factory, "No ValkeyConnectionFactory specified");
 
-		RedisConnectionHolder conHolder = (RedisConnectionHolder) TransactionSynchronizationManager.getResource(factory);
+		ValkeyConnectionHolder conHolder = (ValkeyConnectionHolder) TransactionSynchronizationManager.getResource(factory);
 
 		if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
 			conHolder.requested();
 			if (!conHolder.hasConnection()) {
-				log.debug("Fetching resumed Redis Connection from RedisConnectionFactory");
+				log.debug("Fetching resumed Valkey Connection from ValkeyConnectionFactory");
 				conHolder.setConnection(fetchConnection(factory));
 			}
 			return conHolder.getRequiredConnection();
@@ -140,8 +140,8 @@ public abstract class RedisConnectionUtils {
 			throw new IllegalArgumentException("No connection found and allowCreate = false");
 		}
 
-		log.debug("Fetching Redis Connection from RedisConnectionFactory");
-		RedisConnection connection = fetchConnection(factory);
+		log.debug("Fetching Valkey Connection from ValkeyConnectionFactory");
+		ValkeyConnection connection = fetchConnection(factory);
 
 		boolean bindSynchronization = TransactionSynchronizationManager.isActualTransactionActive() && transactionSupport;
 
@@ -152,12 +152,12 @@ public abstract class RedisConnectionUtils {
 			}
 
 			try {
-				// Use same RedisConnection for further Redis actions within the transaction.
+				// Use same ValkeyConnection for further Valkey actions within the transaction.
 				// Thread-bound object will get removed by synchronization at transaction completion.
-				RedisConnectionHolder holderToUse = conHolder;
+				ValkeyConnectionHolder holderToUse = conHolder;
 
 				if (holderToUse == null) {
-					holderToUse = new RedisConnectionHolder(connection);
+					holderToUse = new ValkeyConnectionHolder(connection);
 				} else {
 					holderToUse.setConnection(connection);
 				}
@@ -185,20 +185,20 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * Actually create a {@link RedisConnection} from the given {@link RedisConnectionFactory}.
+	 * Actually create a {@link ValkeyConnection} from the given {@link ValkeyConnectionFactory}.
 	 *
-	 * @param factory the {@link RedisConnectionFactory} to obtain RedisConnections from.
-	 * @return a Redis Connection from the given {@link RedisConnectionFactory} (never {@literal null}).
-	 * @see RedisConnectionFactory#getConnection()
+	 * @param factory the {@link ValkeyConnectionFactory} to obtain ValkeyConnections from.
+	 * @return a Valkey Connection from the given {@link ValkeyConnectionFactory} (never {@literal null}).
+	 * @see ValkeyConnectionFactory#getConnection()
 	 */
-	private static RedisConnection fetchConnection(RedisConnectionFactory factory) {
+	private static ValkeyConnection fetchConnection(ValkeyConnectionFactory factory) {
 		return factory.getConnection();
 	}
 
-	private static void potentiallyRegisterTransactionSynchronisation(RedisConnectionHolder connectionHolder,
-			final RedisConnectionFactory factory) {
+	private static void potentiallyRegisterTransactionSynchronisation(ValkeyConnectionHolder connectionHolder,
+			final ValkeyConnectionFactory factory) {
 
-		// Should go actually into RedisTransactionManager
+		// Should go actually into ValkeyTransactionManager
 
 		if (!connectionHolder.isTransactionActive()) {
 
@@ -206,7 +206,7 @@ public abstract class RedisConnectionUtils {
 			connectionHolder.setSynchronizedWithTransaction(true);
 			connectionHolder.requested();
 
-			RedisConnection connection = connectionHolder.getRequiredConnection();
+			ValkeyConnection connection = connectionHolder.getRequiredConnection();
 			boolean readOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
 
 			if (!readOnly) {
@@ -214,7 +214,7 @@ public abstract class RedisConnectionUtils {
 			}
 
 			TransactionSynchronizationManager
-					.registerSynchronization(new RedisTransactionSynchronizer(connectionHolder, connection, factory, readOnly));
+					.registerSynchronization(new ValkeyTransactionSynchronizer(connectionHolder, connection, factory, readOnly));
 		}
 	}
 
@@ -223,36 +223,36 @@ public abstract class RedisConnectionUtils {
 				&& !TransactionSynchronizationManager.isCurrentTransactionReadOnly();
 	}
 
-	private static RedisConnection createConnectionSplittingProxy(RedisConnection connection,
-			RedisConnectionFactory factory) {
+	private static ValkeyConnection createConnectionSplittingProxy(ValkeyConnection connection,
+			ValkeyConnectionFactory factory) {
 
 		ProxyFactory proxyFactory = new ProxyFactory(connection);
 
 		proxyFactory.addAdvice(new ConnectionSplittingInterceptor(factory));
-		proxyFactory.addInterface(RedisConnectionProxy.class);
+		proxyFactory.addInterface(ValkeyConnectionProxy.class);
 
-		return RedisConnection.class.cast(proxyFactory.getProxy());
+		return ValkeyConnection.class.cast(proxyFactory.getProxy());
 	}
 
 	/**
-	 * Closes the given {@link RedisConnection}, created via the given factory if not managed externally (i.e. not bound
+	 * Closes the given {@link ValkeyConnection}, created via the given factory if not managed externally (i.e. not bound
 	 * to the transaction).
 	 *
-	 * @param conn the Redis connection to close.
-	 * @param factory the Redis factory that the connection was created with.
+	 * @param conn the Valkey connection to close.
+	 * @param factory the Valkey factory that the connection was created with.
 	 */
-	public static void releaseConnection(@Nullable RedisConnection conn, RedisConnectionFactory factory) {
+	public static void releaseConnection(@Nullable ValkeyConnection conn, ValkeyConnectionFactory factory) {
 		if (conn == null) {
 			return;
 		}
 
-		RedisConnectionHolder conHolder = (RedisConnectionHolder) TransactionSynchronizationManager.getResource(factory);
+		ValkeyConnectionHolder conHolder = (ValkeyConnectionHolder) TransactionSynchronizationManager.getResource(factory);
 		if (conHolder != null) {
 
 			if (conHolder.isTransactionActive()) {
 				if (connectionEquals(conHolder, conn)) {
 					if (log.isDebugEnabled()) {
-						log.debug("RedisConnection will be closed when transaction finished");
+						log.debug("ValkeyConnection will be closed when transaction finished");
 					}
 
 					// It's the transactional Connection: Don't close it.
@@ -272,40 +272,40 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * Determine whether the given two RedisConnections are equal, asking the target {@link RedisConnection} in case of a
+	 * Determine whether the given two ValkeyConnections are equal, asking the target {@link ValkeyConnection} in case of a
 	 * proxy. Used to detect equality even if the user passed in a raw target Connection while the held one is a proxy.
 	 *
-	 * @param connectionHolder the {@link RedisConnectionHolder} for the held Connection (potentially a proxy)
-	 * @param passedInConnetion the {@link RedisConnection} passed-in by the user (potentially a target Connection without
+	 * @param connectionHolder the {@link ValkeyConnectionHolder} for the held Connection (potentially a proxy)
+	 * @param passedInConnetion the {@link ValkeyConnection} passed-in by the user (potentially a target Connection without
 	 *          proxy)
 	 * @return whether the given Connections are equal
 	 * @see #getTargetConnection
 	 */
-	private static boolean connectionEquals(RedisConnectionHolder connectionHolder, RedisConnection passedInConnetion) {
+	private static boolean connectionEquals(ValkeyConnectionHolder connectionHolder, ValkeyConnection passedInConnetion) {
 
 		if (!connectionHolder.hasConnection()) {
 			return false;
 		}
 
-		RedisConnection heldConnection = connectionHolder.getRequiredConnection();
+		ValkeyConnection heldConnection = connectionHolder.getRequiredConnection();
 
 		return heldConnection.equals(passedInConnetion) || getTargetConnection(heldConnection).equals(passedInConnetion);
 	}
 
 	/**
-	 * Return the innermost target {@link RedisConnection} of the given {@link RedisConnection}. If the given
-	 * {@link RedisConnection} is a proxy, it will be unwrapped until a non-proxy {@link RedisConnection} is found.
-	 * Otherwise, the passed-in {@link RedisConnection} will be returned as-is.
+	 * Return the innermost target {@link ValkeyConnection} of the given {@link ValkeyConnection}. If the given
+	 * {@link ValkeyConnection} is a proxy, it will be unwrapped until a non-proxy {@link ValkeyConnection} is found.
+	 * Otherwise, the passed-in {@link ValkeyConnection} will be returned as-is.
 	 *
-	 * @param connection the {@link RedisConnection} proxy to unwrap
+	 * @param connection the {@link ValkeyConnection} proxy to unwrap
 	 * @return the innermost target Connection, or the passed-in one if no proxy
-	 * @see RedisConnectionProxy#getTargetConnection()
+	 * @see ValkeyConnectionProxy#getTargetConnection()
 	 */
-	private static RedisConnection getTargetConnection(RedisConnection connection) {
+	private static ValkeyConnection getTargetConnection(ValkeyConnection connection) {
 
-		RedisConnection connectionToUse = connection;
+		ValkeyConnection connectionToUse = connection;
 
-		while (connectionToUse instanceof RedisConnectionProxy proxy) {
+		while (connectionToUse instanceof ValkeyConnectionProxy proxy) {
 			connectionToUse = proxy.getTargetConnection();
 		}
 
@@ -317,11 +317,11 @@ public abstract class RedisConnectionUtils {
 	 * transactions so transaction-bound connections aren't closed and reentrant closure-scope bound connections. Only the
 	 * outer-most call to leads to releasing and closing the connection.
 	 *
-	 * @param factory Redis factory
+	 * @param factory Valkey factory
 	 */
-	public static void unbindConnection(RedisConnectionFactory factory) {
+	public static void unbindConnection(ValkeyConnectionFactory factory) {
 
-		RedisConnectionHolder connectionHolder = (RedisConnectionHolder) TransactionSynchronizationManager
+		ValkeyConnectionHolder connectionHolder = (ValkeyConnectionHolder) TransactionSynchronizationManager
 				.getResource(factory);
 
 		if (connectionHolder == null) {
@@ -329,16 +329,16 @@ public abstract class RedisConnectionUtils {
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("Unbinding Redis Connection");
+			log.debug("Unbinding Valkey Connection");
 		}
 
 		if (connectionHolder.isTransactionActive()) {
 			if (log.isDebugEnabled()) {
-				log.debug("Redis Connection will be closed when outer transaction finished");
+				log.debug("Valkey Connection will be closed when outer transaction finished");
 			}
 		} else {
 
-			RedisConnection connection = connectionHolder.getConnection();
+			ValkeyConnection connection = connectionHolder.getConnection();
 
 			connectionHolder.released();
 
@@ -352,61 +352,61 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * Return whether the given Redis connection is transactional, that is, bound to the current thread by Spring's
+	 * Return whether the given Valkey connection is transactional, that is, bound to the current thread by Spring's
 	 * transaction facilities.
 	 *
-	 * @param connection Redis connection to check
-	 * @param connectionFactory Redis connection factory that the connection was created with
+	 * @param connection Valkey connection to check
+	 * @param connectionFactory Valkey connection factory that the connection was created with
 	 * @return whether the connection is transactional or not
 	 */
-	public static boolean isConnectionTransactional(RedisConnection connection,
-			RedisConnectionFactory connectionFactory) {
+	public static boolean isConnectionTransactional(ValkeyConnection connection,
+			ValkeyConnectionFactory connectionFactory) {
 
-		Assert.notNull(connectionFactory, "No RedisConnectionFactory specified");
+		Assert.notNull(connectionFactory, "No ValkeyConnectionFactory specified");
 
-		RedisConnectionHolder connectionHolder = (RedisConnectionHolder) TransactionSynchronizationManager
+		ValkeyConnectionHolder connectionHolder = (ValkeyConnectionHolder) TransactionSynchronizationManager
 				.getResource(connectionFactory);
 
 		return connectionHolder != null && connectionEquals(connectionHolder, connection);
 	}
 
-	private static void doCloseConnection(@Nullable RedisConnection connection) {
+	private static void doCloseConnection(@Nullable ValkeyConnection connection) {
 
 		if (connection == null) {
 			return;
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("Closing Redis Connection");
+			log.debug("Closing Valkey Connection");
 		}
 
 		try {
 			connection.close();
 		} catch (DataAccessException ex) {
-			log.debug("Could not close Redis Connection", ex);
+			log.debug("Could not close Valkey Connection", ex);
 		} catch (Throwable ex) {
-			log.debug("Unexpected exception on closing Redis Connection", ex);
+			log.debug("Unexpected exception on closing Valkey Connection", ex);
 		}
 	}
 
 	/**
-	 * A {@link TransactionSynchronization} that makes sure that the associated {@link RedisConnection} is released after
+	 * A {@link TransactionSynchronization} that makes sure that the associated {@link ValkeyConnection} is released after
 	 * the transaction completes.
 	 *
 	 * @author Christoph Strobl
 	 * @author Thomas Darimont
 	 * @author Mark Paluch
 	 */
-	private static class RedisTransactionSynchronizer implements TransactionSynchronization {
+	private static class ValkeyTransactionSynchronizer implements TransactionSynchronization {
 
-		private final RedisConnectionHolder connectionHolder;
-		private final RedisConnection connection;
-		private final RedisConnectionFactory factory;
+		private final ValkeyConnectionHolder connectionHolder;
+		private final ValkeyConnection connection;
+		private final ValkeyConnectionFactory factory;
 
 		private final boolean readOnly;
 
-		RedisTransactionSynchronizer(RedisConnectionHolder connectionHolder, RedisConnection connection,
-				RedisConnectionFactory factory, boolean readOnly) {
+		ValkeyTransactionSynchronizer(ValkeyConnectionHolder connectionHolder, ValkeyConnection connection,
+				ValkeyConnectionFactory factory, boolean readOnly) {
 
 			this.connectionHolder = connectionHolder;
 			this.connection = connection;
@@ -440,7 +440,7 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * {@link MethodInterceptor} that invokes read-only commands on a new {@link RedisConnection} while read-write
+	 * {@link MethodInterceptor} that invokes read-only commands on a new {@link ValkeyConnection} while read-write
 	 * commands are queued on the bound connection.
 	 *
 	 * @author Christoph Strobl
@@ -449,15 +449,15 @@ public abstract class RedisConnectionUtils {
 	 */
 	static class ConnectionSplittingInterceptor implements MethodInterceptor {
 
-		private final RedisConnectionFactory factory;
+		private final ValkeyConnectionFactory factory;
 		private final @Nullable Method commandInterfaceMethod;
 
-		public ConnectionSplittingInterceptor(RedisConnectionFactory factory) {
+		public ConnectionSplittingInterceptor(ValkeyConnectionFactory factory) {
 			this.factory = factory;
 			this.commandInterfaceMethod = null;
 		}
 
-		private ConnectionSplittingInterceptor(RedisConnectionFactory factory, Method commandInterfaceMethod) {
+		private ConnectionSplittingInterceptor(ValkeyConnectionFactory factory, Method commandInterfaceMethod) {
 			this.factory = factory;
 			this.commandInterfaceMethod = commandInterfaceMethod;
 		}
@@ -470,7 +470,7 @@ public abstract class RedisConnectionUtils {
 		public Object intercept(Object obj, Method method, Object[] args) throws Throwable {
 
 			if (method.getName().equals("getTargetConnection")) {
-				// Handle getTargetConnection method: return underlying RedisConnection.
+				// Handle getTargetConnection method: return underlying ValkeyConnection.
 				return obj;
 			}
 
@@ -479,18 +479,18 @@ public abstract class RedisConnectionUtils {
 
 			// bridge keyCommands etc. to defer target invocations
 			if (returnType.isInterface() && returnType.getPackageName().equals("org.springframework.data.redis.connection")
-					&& returnTypeName.startsWith("Redis") && returnTypeName.endsWith("Commands")) {
+					&& returnTypeName.startsWith("Valkey") && returnTypeName.endsWith("Commands")) {
 
 				ProxyFactory proxyFactory = new ProxyFactory(ReflectionUtils.invokeMethod(method, obj));
 
 				proxyFactory.addAdvice(new ConnectionSplittingInterceptor(factory, method));
-				proxyFactory.addInterface(RedisConnectionProxy.class);
+				proxyFactory.addInterface(ValkeyConnectionProxy.class);
 				proxyFactory.addInterface(returnType);
 
 				return proxyFactory.getProxy();
 			}
 
-			RedisCommand commandToExecute = RedisCommand.failsafeCommandLookup(method.getName());
+			ValkeyCommand commandToExecute = ValkeyCommand.failsafeCommandLookup(method.getName());
 
 			if (isPotentiallyThreadBoundCommand(commandToExecute)) {
 
@@ -505,7 +505,7 @@ public abstract class RedisConnectionUtils {
 				log.debug("Invoke '%s' on unbound connection".formatted(method.getName()));
 			}
 
-			RedisConnection connection = factory.getConnection();
+			ValkeyConnection connection = factory.getConnection();
 			Object target = connection;
 			try {
 
@@ -532,65 +532,65 @@ public abstract class RedisConnectionUtils {
 			}
 		}
 
-		private boolean isPotentiallyThreadBoundCommand(RedisCommand command) {
-			return RedisCommand.UNKNOWN.equals(command) || !command.isReadonly();
+		private boolean isPotentiallyThreadBoundCommand(ValkeyCommand command) {
+			return ValkeyCommand.UNKNOWN.equals(command) || !command.isReadonly();
 		}
 	}
 
 	/**
-	 * Resource holder wrapping a {@link RedisConnection}. {@link RedisConnectionUtils} binds instances of this class to
-	 * the thread, for a specific {@link RedisConnectionFactory}.
+	 * Resource holder wrapping a {@link ValkeyConnection}. {@link ValkeyConnectionUtils} binds instances of this class to
+	 * the thread, for a specific {@link ValkeyConnectionFactory}.
 	 *
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
 	 */
-	private static class RedisConnectionHolder extends ResourceHolderSupport {
+	private static class ValkeyConnectionHolder extends ResourceHolderSupport {
 
-		@Nullable private RedisConnection connection;
+		@Nullable private ValkeyConnection connection;
 
 		private boolean transactionActive = false;
 
 		/**
-		 * Create a new RedisConnectionHolder for the given Redis Connection assuming that there is no ongoing transaction.
+		 * Create a new ValkeyConnectionHolder for the given Valkey Connection assuming that there is no ongoing transaction.
 		 *
-		 * @param connection the Redis Connection to hold.
-		 * @see #RedisConnectionHolder(RedisConnection, boolean)
+		 * @param connection the Valkey Connection to hold.
+		 * @see #ValkeyConnectionHolder(ValkeyConnection, boolean)
 		 */
-		public RedisConnectionHolder(RedisConnection connection) {
+		public ValkeyConnectionHolder(ValkeyConnection connection) {
 			this.connection = connection;
 		}
 
 		/**
-		 * Return whether this holder currently has a {@link RedisConnection}.
+		 * Return whether this holder currently has a {@link ValkeyConnection}.
 		 */
 		protected boolean hasConnection() {
 			return this.connection != null;
 		}
 
 		@Nullable
-		public RedisConnection getConnection() {
+		public ValkeyConnection getConnection() {
 			return this.connection;
 		}
 
-		public RedisConnection getRequiredConnection() {
+		public ValkeyConnection getRequiredConnection() {
 
-			RedisConnection connection = getConnection();
+			ValkeyConnection connection = getConnection();
 
 			if (connection == null) {
-				throw new IllegalStateException("No active RedisConnection");
+				throw new IllegalStateException("No active ValkeyConnection");
 			}
 
 			return connection;
 		}
 
 		/**
-		 * Override the existing {@link RedisConnection} handle with the given {@link RedisConnection}. Reset the handle if
+		 * Override the existing {@link ValkeyConnection} handle with the given {@link ValkeyConnection}. Reset the handle if
 		 * given {@literal null}.
 		 * <p>
 		 * Used for releasing the Connection on suspend (with a {@literal null} argument) and setting a fresh Connection on
 		 * resume.
 		 */
-		protected void setConnection(@Nullable RedisConnection connection) {
+		protected void setConnection(@Nullable ValkeyConnection connection) {
 			this.connection = connection;
 		}
 
@@ -633,22 +633,22 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * Subinterface of {@link RedisConnection} to be implemented by {@link RedisConnection} proxies. Allows access to the
-	 * underlying target {@link RedisConnection}.
+	 * Subinterface of {@link ValkeyConnection} to be implemented by {@link ValkeyConnection} proxies. Allows access to the
+	 * underlying target {@link ValkeyConnection}.
 	 *
-	 * @see RedisConnectionUtils#getTargetConnection(RedisConnection)
+	 * @see ValkeyConnectionUtils#getTargetConnection(ValkeyConnection)
 	 * @since 2.4.2
 	 */
-	public interface RedisConnectionProxy extends RedisConnection, RawTargetAccess {
+	public interface ValkeyConnectionProxy extends ValkeyConnection, RawTargetAccess {
 
 		/**
-		 * Return the target {@link RedisConnection} of this proxy.
+		 * Return the target {@link ValkeyConnection} of this proxy.
 		 * <p>
-		 * This will typically be the native driver {@link RedisConnection} or a wrapper from a connection pool.
+		 * This will typically be the native driver {@link ValkeyConnection} or a wrapper from a connection pool.
 		 *
-		 * @return the underlying {@link RedisConnection} (never {@link null}).
+		 * @return the underlying {@link ValkeyConnection} (never {@link null}).
 		 */
-		RedisConnection getTargetConnection();
+		ValkeyConnection getTargetConnection();
 
 	}
 }

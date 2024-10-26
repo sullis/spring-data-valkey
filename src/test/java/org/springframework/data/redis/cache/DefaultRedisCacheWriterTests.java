@@ -16,7 +16,7 @@
 package org.springframework.data.redis.cache;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.springframework.data.redis.cache.RedisCacheWriter.*;
+import static org.springframework.data.redis.cache.ValkeyCacheWriter.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -34,26 +34,26 @@ import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver.DriverQualifier;
-import org.springframework.data.redis.test.condition.RedisDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver.DriverQualifier;
+import org.springframework.data.redis.test.condition.ValkeyDriver;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
- * Integration tests for {@link DefaultRedisCacheWriter}.
+ * Integration tests for {@link DefaultValkeyCacheWriter}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author ChanYoung Joung
  */
 @MethodSource("testParams")
-public class DefaultRedisCacheWriterTests {
+public class DefaultValkeyCacheWriterTests {
 
 	private static final String CACHE_NAME = "default-redis-cache-writer-tests";
 
@@ -63,9 +63,9 @@ public class DefaultRedisCacheWriterTests {
 	private byte[] binaryCacheKey = cacheKey.getBytes(StandardCharsets.UTF_8);
 	private byte[] binaryCacheValue = "value".getBytes(StandardCharsets.UTF_8);
 
-	private final @DriverQualifier RedisConnectionFactory connectionFactory;
+	private final @DriverQualifier ValkeyConnectionFactory connectionFactory;
 
-	public DefaultRedisCacheWriterTests(RedisConnectionFactory connectionFactory) {
+	public DefaultValkeyCacheWriterTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
@@ -75,13 +75,13 @@ public class DefaultRedisCacheWriterTests {
 
 	@BeforeEach
 	void setUp() {
-		doWithConnection(RedisConnection::flushAll);
+		doWithConnection(ValkeyConnection::flushAll);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void putShouldAddEternalEntry() {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.put(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO);
@@ -95,10 +95,10 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getLockWaitDuration(TimeUnit.NANOSECONDS)).isZero();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putShouldAddExpiringEntry() {
 
-		nonLockingRedisCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue,
+		nonLockingValkeyCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue,
 				Duration.ofSeconds(1));
 
 		doWithConnection(connection -> {
@@ -107,12 +107,12 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putShouldOverwriteExistingEternalEntry() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, "foo".getBytes()));
 
-		nonLockingRedisCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO);
+		nonLockingValkeyCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO);
 
 		doWithConnection(connection -> {
 			assertThat(connection.get(binaryCacheKey)).isEqualTo(binaryCacheValue);
@@ -120,13 +120,13 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putShouldOverwriteExistingExpiringEntryAndResetTtl() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, "foo".getBytes(),
 				Expiration.from(1, TimeUnit.MINUTES), SetOption.upsert()));
 
-		nonLockingRedisCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue,
+		nonLockingValkeyCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue,
 				Duration.ofSeconds(5));
 
 		doWithConnection(connection -> {
@@ -135,12 +135,12 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void getShouldReturnValue() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryCacheValue));
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		assertThat(writer.get(CACHE_NAME, binaryCacheKey)).isEqualTo(binaryCacheValue);
@@ -149,18 +149,18 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getMisses()).isZero();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getShouldReturnNullWhenKeyDoesNotExist() {
-		assertThat(nonLockingRedisCacheWriter(connectionFactory).get(CACHE_NAME, binaryCacheKey)).isNull();
+		assertThat(nonLockingValkeyCacheWriter(connectionFactory).get(CACHE_NAME, binaryCacheKey)).isNull();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void cacheHitRetrieveShouldIncrementStatistics() throws ExecutionException, InterruptedException {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryCacheValue));
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.retrieve(CACHE_NAME, binaryCacheKey).get();
@@ -169,11 +169,11 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getHits()).isOne();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void storeShouldIncrementStatistics() throws ExecutionException, InterruptedException {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.store(CACHE_NAME, binaryCacheKey, binaryCacheValue, null).get();
@@ -181,11 +181,11 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getPuts()).isOne();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void cacheMissRetrieveWithLoaderAsyncShouldIncrementStatistics() throws ExecutionException, InterruptedException {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.retrieve(CACHE_NAME, binaryCacheKey).get();
@@ -194,10 +194,10 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getMisses()).isOne();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void putIfAbsentShouldAddEternalEntryWhenKeyDoesNotExist() {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		assertThat(writer.putIfAbsent(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO)).isNull();
@@ -209,12 +209,12 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getPuts()).isOne();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void putIfAbsentShouldNotAddEternalEntryWhenKeyAlreadyExist() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryCacheValue));
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		assertThat(writer.putIfAbsent(CACHE_NAME, binaryCacheKey, "foo".getBytes(), Duration.ZERO))
@@ -227,10 +227,10 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getPuts()).isZero();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void putIfAbsentShouldAddExpiringEntryWhenKeyDoesNotExist() {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		assertThat(writer.putIfAbsent(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ofSeconds(5))).isNull();
@@ -242,10 +242,10 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getPuts()).isOne();
 	}
 
-	@ParameterizedRedisTest // GH-2890
+	@ParameterizedValkeyTest // GH-2890
 	void getWithValueLoaderShouldStoreCacheValue() {
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.get(CACHE_NAME, binaryCacheKey, () -> binaryCacheValue, Duration.ofSeconds(5), true);
@@ -258,12 +258,12 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getPuts()).isOne();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void removeShouldDeleteEntry() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryCacheValue));
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.remove(CACHE_NAME, binaryCacheKey);
@@ -273,7 +273,7 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getDeletes()).isOne();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-418, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-418, DATAREDIS-1082
 	void cleanShouldRemoveAllKeysByPattern() {
 
 		doWithConnection(connection -> {
@@ -281,7 +281,7 @@ public class DefaultRedisCacheWriterTests {
 			connection.set("foo".getBytes(), "bar".getBytes());
 		});
 
-		RedisCacheWriter writer = nonLockingRedisCacheWriter(connectionFactory)
+		ValkeyCacheWriter writer = nonLockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 
 		writer.clean(CACHE_NAME, (CACHE_NAME + "::*").getBytes(Charset.forName("UTF-8")));
@@ -294,24 +294,24 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(writer.getCacheStatistics(CACHE_NAME).getDeletes()).isOne();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void nonLockingCacheWriterShouldIgnoreExistingLock() {
 
-		((DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory)).lock(CACHE_NAME);
+		((DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory)).lock(CACHE_NAME);
 
-		nonLockingRedisCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO);
+		nonLockingValkeyCacheWriter(connectionFactory).put(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ZERO);
 
 		doWithConnection(connection -> {
 			assertThat(connection.exists(binaryCacheKey)).isTrue();
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void lockingCacheWriterShouldIgnoreExistingLockOnDifferenceCache() {
 
-		((DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory)).lock(CACHE_NAME);
+		((DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory)).lock(CACHE_NAME);
 
-		lockingRedisCacheWriter(connectionFactory).put(CACHE_NAME + "-no-the-other-cache", binaryCacheKey, binaryCacheValue,
+		lockingValkeyCacheWriter(connectionFactory).put(CACHE_NAME + "-no-the-other-cache", binaryCacheKey, binaryCacheValue,
 				Duration.ZERO);
 
 		doWithConnection(connection -> {
@@ -319,10 +319,10 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481, DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-481, DATAREDIS-1082
 	void lockingCacheWriterShouldWaitForLockRelease() throws InterruptedException {
 
-		DefaultRedisCacheWriter writer = (DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory)
+		DefaultValkeyCacheWriter writer = (DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory)
 				.withStatisticsCollector(CacheStatisticsCollector.create());
 		writer.lock(CACHE_NAME);
 
@@ -361,10 +361,10 @@ public class DefaultRedisCacheWriterTests {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void lockingCacheWriterShouldExitWhenInterruptedWaitForLockRelease() throws InterruptedException {
 
-		DefaultRedisCacheWriter cw = (DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory);
+		DefaultValkeyCacheWriter cw = (DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory);
 		cw.lock(CACHE_NAME);
 
 		CountDownLatch beforeWrite = new CountDownLatch(1);
@@ -373,11 +373,11 @@ public class DefaultRedisCacheWriterTests {
 
 		Thread th = new Thread(() -> {
 
-			DefaultRedisCacheWriter writer = new DefaultRedisCacheWriter(connectionFactory, Duration.ofMillis(50),
+			DefaultValkeyCacheWriter writer = new DefaultValkeyCacheWriter(connectionFactory, Duration.ofMillis(50),
 					BatchStrategies.keys()) {
 
 				@Override
-				boolean doCheckLock(String name, RedisConnection connection) {
+				boolean doCheckLock(String name, ValkeyConnection connection) {
 					beforeWrite.countDown();
 					return super.doCheckLock(name, connection);
 				}
@@ -402,10 +402,10 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(exceptionRef.get()).hasRootCauseInstanceOf(InterruptedException.class);
 	}
 
-	@ParameterizedRedisTest // GH-2300
+	@ParameterizedValkeyTest // GH-2300
 	void lockingCacheWriterShouldUsePersistentLocks() {
 
-		DefaultRedisCacheWriter writer = (DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory,
+		DefaultValkeyCacheWriter writer = (DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory,
 				Duration.ofSeconds(1), TtlFunction.persistent(), BatchStrategies.keys());
 
 		writer.lock(CACHE_NAME);
@@ -416,10 +416,10 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-2300
+	@ParameterizedValkeyTest // GH-2300
 	void lockingCacheWriterShouldApplyLockTtl() {
 
-		DefaultRedisCacheWriter writer = (DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory,
+		DefaultValkeyCacheWriter writer = (DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory,
 				Duration.ofSeconds(1), TtlFunction.just(Duration.ofSeconds(60)), BatchStrategies.keys());
 
 		writer.lock(CACHE_NAME);
@@ -430,10 +430,10 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1082
+	@ParameterizedValkeyTest // DATAREDIS-1082
 	void noOpStatisticsCollectorReturnsEmptyStatsInstance() {
 
-		DefaultRedisCacheWriter cw = (DefaultRedisCacheWriter) lockingRedisCacheWriter(connectionFactory);
+		DefaultValkeyCacheWriter cw = (DefaultValkeyCacheWriter) lockingValkeyCacheWriter(connectionFactory);
 		CacheStatistics stats = cw.getCacheStatistics(CACHE_NAME);
 
 		cw.putIfAbsent(CACHE_NAME, binaryCacheKey, binaryCacheValue, Duration.ofSeconds(5));
@@ -442,7 +442,7 @@ public class DefaultRedisCacheWriterTests {
 		assertThat(stats.getPuts()).isZero();
 	}
 
-	@ParameterizedRedisTest // GH-1686
+	@ParameterizedValkeyTest // GH-1686
 	void doLockShouldGetLock() throws InterruptedException {
 
 		int threadCount = 3;
@@ -450,10 +450,10 @@ public class DefaultRedisCacheWriterTests {
 		CountDownLatch afterWrite = new CountDownLatch(threadCount);
 		AtomicLong concurrency = new AtomicLong();
 
-		DefaultRedisCacheWriter cw = new DefaultRedisCacheWriter(connectionFactory, Duration.ofMillis(10),
+		DefaultValkeyCacheWriter cw = new DefaultValkeyCacheWriter(connectionFactory, Duration.ofMillis(10),
 				BatchStrategies.keys()) {
 
-			void doLock(String name, Object contextualKey, @Nullable Object contextualValue, RedisConnection connection) {
+			void doLock(String name, Object contextualKey, @Nullable Object contextualValue, ValkeyConnection connection) {
 
 				super.doLock(name, contextualKey, contextualValue, connection);
 
@@ -463,7 +463,7 @@ public class DefaultRedisCacheWriterTests {
 
 			@Nullable
 			@Override
-			Long doUnlock(String name, RedisConnection connection) {
+			Long doUnlock(String name, ValkeyConnection connection) {
 				try {
 					return super.doUnlock(name, connection);
 				} finally {
@@ -510,9 +510,9 @@ public class DefaultRedisCacheWriterTests {
 		});
 	}
 
-	private void doWithConnection(Consumer<RedisConnection> callback) {
+	private void doWithConnection(Consumer<ValkeyConnection> callback) {
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			callback.accept(connection);
 		}
 	}

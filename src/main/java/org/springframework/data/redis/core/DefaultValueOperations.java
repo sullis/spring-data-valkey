@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.BitFieldSubCommands;
-import org.springframework.data.redis.connection.DefaultedRedisConnection;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.DefaultedValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
 
@@ -40,19 +40,19 @@ import org.springframework.lang.Nullable;
  */
 class DefaultValueOperations<K, V> extends AbstractOperations<K, V> implements ValueOperations<K, V> {
 
-	DefaultValueOperations(RedisTemplate<K, V> template) {
+	DefaultValueOperations(ValkeyTemplate<K, V> template) {
 		super(template);
 	}
 
 	@Override
 	public V get(Object key) {
-		return execute(valueCallbackFor(key, DefaultedRedisConnection::get));
+		return execute(valueCallbackFor(key, DefaultedValkeyConnection::get));
 	}
 
 	@Nullable
 	@Override
 	public V getAndDelete(K key) {
-		return execute(valueCallbackFor(key, DefaultedRedisConnection::getDel));
+		return execute(valueCallbackFor(key, DefaultedValkeyConnection::getDel));
 	}
 
 	@Nullable

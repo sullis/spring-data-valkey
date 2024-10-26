@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A script to be executed using the <a href="https://redis.io/commands/eval">Redis scripting support</a> available as
+ * A script to be executed using the <a href="https://redis.io/commands/eval">Valkey scripting support</a> available as
  * of version 2.6
  *
  * @author Jennifer Hickey
@@ -29,10 +29,10 @@ import org.springframework.util.Assert;
  * @param <T> The script result type. Should be one of Long, Boolean, List, or deserialized value type. Can be
  *          {@literal null} if the script returns a throw-away status (i.e "OK")
  */
-public interface RedisScript<T> {
+public interface ValkeyScript<T> {
 
 	/**
-	 * @return The SHA1 of the script, used for executing Redis evalsha command.
+	 * @return The SHA1 of the script, used for executing Valkey evalsha command.
 	 */
 	String getSha1();
 
@@ -57,65 +57,65 @@ public interface RedisScript<T> {
 	}
 
 	/**
-	 * Creates new {@link RedisScript} from {@code script} as {@link String}.
+	 * Creates new {@link ValkeyScript} from {@code script} as {@link String}.
 	 *
 	 * @param script must not be {@literal null}.
-	 * @return new instance of {@link RedisScript}.
+	 * @return new instance of {@link ValkeyScript}.
 	 * @since 2.0
 	 */
-	static <T> RedisScript<T> of(String script) {
-		return new DefaultRedisScript<>(script);
+	static <T> ValkeyScript<T> of(String script) {
+		return new DefaultValkeyScript<>(script);
 	}
 
 	/**
-	 * Creates new {@link RedisScript} from {@code script} as {@link String}.
+	 * Creates new {@link ValkeyScript} from {@code script} as {@link String}.
 	 *
 	 * @param script must not be {@literal null}.
 	 * @param resultType must not be {@literal null}.
-	 * @return new instance of {@link RedisScript}.
+	 * @return new instance of {@link ValkeyScript}.
 	 * @since 2.0
 	 */
-	static <T> RedisScript<T> of(String script, Class<T> resultType) {
+	static <T> ValkeyScript<T> of(String script, Class<T> resultType) {
 
 		Assert.notNull(script, "Script must not be null");
 		Assert.notNull(resultType, "ResultType must not be null");
 
-		return new DefaultRedisScript<>(script, resultType);
+		return new DefaultValkeyScript<>(script, resultType);
 	}
 
 	/**
-	 * Creates new {@link RedisScript} (with throw away result) from the given {@link Resource}.
+	 * Creates new {@link ValkeyScript} (with throw away result) from the given {@link Resource}.
 	 *
 	 * @param resource must not be {@literal null}.
-	 * @return new instance of {@link RedisScript}.
+	 * @return new instance of {@link ValkeyScript}.
 	 * @throws IllegalArgumentException if the required argument is {@literal null}.
 	 * @since 2.2
 	 */
-	static <T> RedisScript<T> of(Resource resource) {
+	static <T> ValkeyScript<T> of(Resource resource) {
 
 		Assert.notNull(resource, "Resource must not be null");
 
-		DefaultRedisScript<T> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<T> script = new DefaultValkeyScript<>();
 		script.setLocation(resource);
 
 		return script;
 	}
 
 	/**
-	 * Creates new {@link RedisScript} from {@link Resource}.
+	 * Creates new {@link ValkeyScript} from {@link Resource}.
 	 *
 	 * @param resource must not be {@literal null}.
 	 * @param resultType must not be {@literal null}.
-	 * @return new instance of {@link RedisScript}.
+	 * @return new instance of {@link ValkeyScript}.
 	 * @throws IllegalArgumentException if any required argument is {@literal null}.
 	 * @since 2.2
 	 */
-	static <T> RedisScript<T> of(Resource resource, Class<T> resultType) {
+	static <T> ValkeyScript<T> of(Resource resource, Class<T> resultType) {
 
 		Assert.notNull(resource, "Resource must not be null");
 		Assert.notNull(resultType, "ResultType must not be null");
 
-		DefaultRedisScript<T> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<T> script = new DefaultValkeyScript<>();
 		script.setResultType(resultType);
 		script.setLocation(resource);
 

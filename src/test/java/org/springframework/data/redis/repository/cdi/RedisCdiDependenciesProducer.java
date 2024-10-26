@@ -20,35 +20,35 @@ import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyKeyValueTemplate;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Mark Paluch
  */
-public class RedisCdiDependenciesProducer {
+public class ValkeyCdiDependenciesProducer {
 
 	/**
-	 * Provides a producer method for {@link RedisConnectionFactory}.
+	 * Provides a producer method for {@link ValkeyConnectionFactory}.
 	 */
 	@Produces
-	public RedisConnectionFactory redisConnectionFactory() {
-		return JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+	public ValkeyConnectionFactory redisConnectionFactory() {
+		return JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 	}
 
 	/**
-	 * Provides a producer method for {@link RedisOperations}.
+	 * Provides a producer method for {@link ValkeyOperations}.
 	 */
 	@Produces
-	public RedisOperations<byte[], byte[]> redisOperationsProducer(RedisConnectionFactory redisConnectionFactory) {
+	public ValkeyOperations<byte[], byte[]> redisOperationsProducer(ValkeyConnectionFactory redisConnectionFactory) {
 
-		RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		template.afterPropertiesSet();
 		return template;
@@ -57,11 +57,11 @@ public class RedisCdiDependenciesProducer {
 	// shortcut for managed KeyValueAdapter/Template.
 	@Produces
 	@PersonDB
-	public RedisOperations<byte[], byte[]> redisOperationsProducerQualified(RedisOperations<byte[], byte[]> instance) {
+	public ValkeyOperations<byte[], byte[]> redisOperationsProducerQualified(ValkeyOperations<byte[], byte[]> instance) {
 		return instance;
 	}
 
-	public void closeRedisOperations(@Disposes RedisOperations<byte[], byte[]> redisOperations) throws Exception {
+	public void closeValkeyOperations(@Disposes ValkeyOperations<byte[], byte[]> redisOperations) throws Exception {
 
 		if (redisOperations instanceof DisposableBean disposableBean) {
 			disposableBean.destroy();
@@ -69,13 +69,13 @@ public class RedisCdiDependenciesProducer {
 	}
 
 	/**
-	 * Provides a producer method for {@link RedisKeyValueTemplate}.
+	 * Provides a producer method for {@link ValkeyKeyValueTemplate}.
 	 */
 	@Produces
-	public RedisKeyValueTemplate redisKeyValueAdapterDefault(RedisOperations<?, ?> redisOperations) {
+	public ValkeyKeyValueTemplate redisKeyValueAdapterDefault(ValkeyOperations<?, ?> redisOperations) {
 
-		RedisKeyValueAdapter redisKeyValueAdapter = new RedisKeyValueAdapter(redisOperations);
-		RedisKeyValueTemplate keyValueTemplate = new RedisKeyValueTemplate(redisKeyValueAdapter, new RedisMappingContext());
+		ValkeyKeyValueAdapter redisKeyValueAdapter = new ValkeyKeyValueAdapter(redisOperations);
+		ValkeyKeyValueTemplate keyValueTemplate = new ValkeyKeyValueTemplate(redisKeyValueAdapter, new ValkeyMappingContext());
 		return keyValueTemplate;
 	}
 

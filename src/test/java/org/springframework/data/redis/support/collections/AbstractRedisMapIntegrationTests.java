@@ -36,17 +36,17 @@ import org.springframework.data.redis.DoubleAsStringObjectFactory;
 import org.springframework.data.redis.LongAsStringObjectFactory;
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.RawObjectFactory;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
- * Integration test for Redis Map.
+ * Integration test for Valkey Map.
  *
  * @author Costin Leau
  * @author Jennifer Hickey
@@ -55,25 +55,25 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
  * @author Christian Bühler
  */
 @MethodSource("testParams")
-public abstract class AbstractRedisMapIntegrationTests<K, V> {
+public abstract class AbstractValkeyMapIntegrationTests<K, V> {
 
-	protected RedisMap<K, V> map;
+	protected ValkeyMap<K, V> map;
 	protected ObjectFactory<K> keyFactory;
 	protected ObjectFactory<V> valueFactory;
-	@SuppressWarnings("rawtypes") protected RedisTemplate template;
+	@SuppressWarnings("rawtypes") protected ValkeyTemplate template;
 
 	@SuppressWarnings("rawtypes")
-	AbstractRedisMapIntegrationTests(ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory, RedisTemplate template) {
+	AbstractValkeyMapIntegrationTests(ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory, ValkeyTemplate template) {
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
 		this.template = template;
 	}
 
-	abstract RedisMap<K, V> createMap();
+	abstract ValkeyMap<K, V> createMap();
 
 	@BeforeEach
 	void setUp() {
-		template.execute((RedisCallback<Object>) connection -> {
+		template.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushAll();
 			return null;
 		});
@@ -89,11 +89,11 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected RedisStore copyStore(RedisStore store) {
-		return new DefaultRedisMap(store.getKey(), store.getOperations());
+	protected ValkeyStore copyStore(ValkeyStore store) {
+		return new DefaultValkeyMap(store.getKey(), store.getOperations());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testClear() {
 		map.clear();
 		assertThat(map.size()).isEqualTo(0);
@@ -103,7 +103,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.size()).isEqualTo(0);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainsKey() {
 		K k1 = getKey();
 		K k2 = getKey();
@@ -116,30 +116,30 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.containsKey(k2)).isTrue();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainsValue() {
 		V v1 = getValue();
 
 		assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> map.containsValue(v1));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testEquals() {
-		RedisStore clone = copyStore(map);
+		ValkeyStore clone = copyStore(map);
 		assertThat(map).isEqualTo(clone);
 		assertThat(clone).isEqualTo(clone);
 		assertThat(map).isEqualTo(map);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testNotEquals() {
-		RedisOperations<String, ?> ops = map.getOperations();
-		RedisStore newInstance = new DefaultRedisMap<>(ops.<K, V> boundHashOps(map.getKey() + ":new"));
+		ValkeyOperations<String, ?> ops = map.getOperations();
+		ValkeyStore newInstance = new DefaultValkeyMap<>(ops.<K, V> boundHashOps(map.getKey() + ":new"));
 		assertThat(map.equals(newInstance)).isFalse();
 		assertThat(newInstance.equals(map)).isFalse();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGet() {
 		K k1 = getKey();
 		V v1 = getValue();
@@ -149,23 +149,23 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k1)).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGetKey() {
 		assertThat(map.getKey()).isNotNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testGetOperations() {
 		assertThat(map.getOperations()).isEqualTo(template);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testHashCode() {
 		assertThat(map.hashCode()).isNotEqualTo(map.getKey().hashCode());
 		assertThat(copyStore(map).hashCode()).isEqualTo(map.hashCode());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIncrementNotNumber() {
 		assumeThat(!(valueFactory instanceof LongAsStringObjectFactory)).isTrue();
 		K k1 = getKey();
@@ -176,12 +176,12 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 			Long value = map.increment(k1, 1);
 		} catch (InvalidDataAccessApiUsageException ex) {
 			// expected
-		} catch (RedisSystemException ex) {
+		} catch (ValkeySystemException ex) {
 			// expected for SRP and Lettuce
 		}
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIncrement() {
 		assumeThat(valueFactory instanceof LongAsStringObjectFactory).isTrue();
 		K k1 = getKey();
@@ -190,7 +190,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.increment(k1, 10)).isEqualTo(Long.valueOf(Long.valueOf((String) v1) + 10));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIncrementDouble() {
 		assumeThat(valueFactory instanceof DoubleAsStringObjectFactory).isTrue();
 		K k1 = getKey();
@@ -200,7 +200,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(twoDForm.format(map.increment(k1, 3.4))).isEqualTo(twoDForm.format(Double.valueOf((String) v1) + 3.4));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIsEmpty() {
 		map.clear();
 		assertThat(map.isEmpty()).isTrue();
@@ -211,7 +211,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testKeySet() {
 		map.clear();
 		assertThat(map.keySet().isEmpty()).isTrue();
@@ -228,7 +228,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(keySet.size()).isEqualTo(3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPut() {
 		K k1 = getKey();
 		K k2 = getKey();
@@ -242,7 +242,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k2)).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPutAll() {
 
 		Map<K, V> m = new LinkedHashMap<>();
@@ -264,7 +264,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k2)).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemove() {
 		K k1 = getKey();
 		K k2 = getKey();
@@ -287,7 +287,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k2)).isNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testSize() {
 		assertThat(map.size()).isEqualTo(0);
 		map.put(getKey(), getValue());
@@ -303,7 +303,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testValues() {
 		V v1 = getValue();
 		V v2 = getValue();
@@ -323,7 +323,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testEntrySet() {
 
 		Set<Entry<K, V>> entries = map.entrySet();
@@ -355,7 +355,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(values).doesNotContain(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPutIfAbsent() {
 
 		K k1 = getKey();
@@ -375,7 +375,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k2)).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testConcurrentRemove() {
 
 		K k1 = getKey();
@@ -390,12 +390,12 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k1)).isNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveNullValue() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.remove(getKey(), null));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testConcurrentReplaceTwoArgs() {
 
 		K k1 = getKey();
@@ -412,17 +412,17 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k1)).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReplaceNullOldValue() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.replace(getKey(), null, getValue()));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReplaceNullNewValue() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.replace(getKey(), getValue(), null));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testConcurrentReplaceOneArg() {
 
 		K k1 = getKey();
@@ -436,12 +436,12 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.get(k1)).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReplaceNullValue() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.replace(getKey(), null));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-314
+	@ParameterizedValkeyTest // DATAREDIS-314
 	public void testScanWorksCorrectly() throws IOException {
 
 		K k1 = getKey();
@@ -462,7 +462,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		cursor.close();
 	}
 
-	@ParameterizedRedisTest // GH-2048
+	@ParameterizedValkeyTest // GH-2048
 	@EnabledOnCommand("HRANDFIELD")
 	public void randomKeyFromHash() {
 
@@ -478,7 +478,7 @@ public abstract class AbstractRedisMapIntegrationTests<K, V> {
 		assertThat(map.randomKey()).isIn(k1, k2);
 	}
 
-	@ParameterizedRedisTest // GH-2048
+	@ParameterizedValkeyTest // GH-2048
 	@EnabledOnCommand("HRANDFIELD")
 	public void randomEntryFromHash() {
 

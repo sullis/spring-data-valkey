@@ -16,10 +16,10 @@
 package org.springframework.data.redis.domain.geo;
 
 import org.springframework.data.geo.Metric;
-import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
 
 /**
- * {@link Metric}s supported by Redis.
+ * {@link Metric}s supported by Valkey.
  *
  * @author Christoph Strobl
  * @since 2.6
@@ -32,7 +32,7 @@ public enum Metrics implements Metric {
 	private final String abbreviation;
 
 	/**
-	 * Creates a new {@link RedisGeoCommands.DistanceUnit} using the given muliplier.
+	 * Creates a new {@link ValkeyGeoCommands.DistanceUnit} using the given muliplier.
 	 *
 	 * @param multiplier the earth radius at equator.
 	 */

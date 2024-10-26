@@ -24,8 +24,8 @@ import java.util.concurrent.Callable;
 
 import org.awaitility.Awaitility;
 
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnection;
 
 /**
@@ -42,9 +42,9 @@ class PubSubAwaitUtil {
 	 * @param connectionFactory
 	 * @param runnable
 	 */
-	public static void runAndAwaitPatternSubscription(RedisConnectionFactory connectionFactory, Runnable runnable) {
+	public static void runAndAwaitPatternSubscription(ValkeyConnectionFactory connectionFactory, Runnable runnable) {
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 
 			Number before = numPat(connection);
 
@@ -67,10 +67,10 @@ class PubSubAwaitUtil {
 	 * @param channel
 	 * @param runnable
 	 */
-	public static void runAndAwaitChannelSubscription(RedisConnectionFactory connectionFactory, String channel,
+	public static void runAndAwaitChannelSubscription(ValkeyConnectionFactory connectionFactory, String channel,
 			Runnable runnable) {
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 
 			Number before = numSub(connection, channel);
 
@@ -85,7 +85,7 @@ class PubSubAwaitUtil {
 		}
 	}
 
-	private static long numPat(RedisConnection connection) {
+	private static long numPat(ValkeyConnection connection) {
 
 		if (connection instanceof LettuceConnection lettuceConnection) {
 			return ((Number) lettuceConnection.execute("PUBSUB", new IntegerOutput<>(ByteArrayCodec.INSTANCE),
@@ -95,7 +95,7 @@ class PubSubAwaitUtil {
 		return ((Number) connection.execute("PUBSUB", "NUMPAT".getBytes())).longValue();
 	}
 
-	private static long numSub(RedisConnection connection, String channel) {
+	private static long numSub(ValkeyConnection connection, String channel) {
 
 		List<?> pubsub;
 		if (connection instanceof LettuceConnection lettuceConnection) {

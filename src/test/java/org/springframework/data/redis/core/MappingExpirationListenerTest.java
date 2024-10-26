@@ -34,8 +34,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.core.convert.RedisConverter;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
 
 /**
  * @author Lucian Torje
@@ -45,24 +45,24 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MappingExpirationListenerTest {
 
-	@Mock private RedisOperations<?, ?> redisOperations;
-	@Mock private RedisConverter redisConverter;
-	@Mock private RedisMessageListenerContainer listenerContainer;
+	@Mock private ValkeyOperations<?, ?> redisOperations;
+	@Mock private ValkeyConverter redisConverter;
+	@Mock private ValkeyMessageListenerContainer listenerContainer;
 	@Mock private Message message;
 
-	private RedisKeyValueAdapter.MappingExpirationListener listener;
+	private ValkeyKeyValueAdapter.MappingExpirationListener listener;
 
 	@Test // GH-2954
 	void testOnNonKeyExpiration() {
 
 		byte[] key = "testKey".getBytes();
 		when(message.getBody()).thenReturn(key);
-		listener = new RedisKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
-				RedisKeyValueAdapter.ShadowCopy.ON);
+		listener = new ValkeyKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
+				ValkeyKeyValueAdapter.ShadowCopy.ON);
 
 		listener.onMessage(message, null);
 
-		verify(redisOperations, times(0)).execute(any(RedisCallback.class));
+		verify(redisOperations, times(0)).execute(any(ValkeyCallback.class));
 	}
 
 	@Test // GH-2954
@@ -73,16 +73,16 @@ class MappingExpirationListenerTest {
 		byte[] key = "abc:testKey".getBytes();
 		when(message.getBody()).thenReturn(key);
 
-		listener = new RedisKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
-				RedisKeyValueAdapter.ShadowCopy.OFF);
+		listener = new ValkeyKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
+				ValkeyKeyValueAdapter.ShadowCopy.OFF);
 		listener.setApplicationEventPublisher(eventList::add);
 		listener.onMessage(message, null);
 
-		verify(redisOperations, times(1)).execute(any(RedisCallback.class));
+		verify(redisOperations, times(1)).execute(any(ValkeyCallback.class));
 		assertThat(eventList).hasSize(1);
-		assertThat(eventList.get(0)).isInstanceOf(RedisKeyExpiredEvent.class);
-		assertThat(((RedisKeyExpiredEvent) (eventList.get(0))).getKeyspace()).isEqualTo("abc");
-		assertThat(((RedisKeyExpiredEvent) (eventList.get(0))).getId()).isEqualTo("testKey".getBytes());
+		assertThat(eventList.get(0)).isInstanceOf(ValkeyKeyExpiredEvent.class);
+		assertThat(((ValkeyKeyExpiredEvent) (eventList.get(0))).getKeyspace()).isEqualTo("abc");
+		assertThat(((ValkeyKeyExpiredEvent) (eventList.get(0))).getId()).isEqualTo("testKey".getBytes());
 	}
 
 	@Test // GH-2954
@@ -96,15 +96,15 @@ class MappingExpirationListenerTest {
 		when(redisConverter.getConversionService()).thenReturn(conversionService);
 		when(conversionService.convert(any(), eq(byte[].class))).thenReturn("foo".getBytes());
 
-		listener = new RedisKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
-				RedisKeyValueAdapter.ShadowCopy.ON);
+		listener = new ValkeyKeyValueAdapter.MappingExpirationListener(listenerContainer, redisOperations, redisConverter,
+				ValkeyKeyValueAdapter.ShadowCopy.ON);
 		listener.setApplicationEventPublisher(eventList::add);
 		listener.onMessage(message, null);
 
-		verify(redisOperations, times(2)).execute(any(RedisCallback.class)); // delete entry in index, delete phantom key
+		verify(redisOperations, times(2)).execute(any(ValkeyCallback.class)); // delete entry in index, delete phantom key
 		assertThat(eventList).hasSize(1);
-		assertThat(eventList.get(0)).isInstanceOf(RedisKeyExpiredEvent.class);
-		assertThat(((RedisKeyExpiredEvent) (eventList.get(0))).getKeyspace()).isEqualTo("abc");
-		assertThat(((RedisKeyExpiredEvent) (eventList.get(0))).getId()).isEqualTo("testKey".getBytes());
+		assertThat(eventList.get(0)).isInstanceOf(ValkeyKeyExpiredEvent.class);
+		assertThat(((ValkeyKeyExpiredEvent) (eventList.get(0))).getKeyspace()).isEqualTo("abc");
+		assertThat(((ValkeyKeyExpiredEvent) (eventList.get(0))).getId()).isEqualTo("testKey".getBytes());
 	}
 }

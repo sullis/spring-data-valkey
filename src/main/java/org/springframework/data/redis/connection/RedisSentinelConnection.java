@@ -21,7 +21,7 @@ import java.io.Closeable;
  * @author Christoph Strobl
  * @since 1.4
  */
-public interface RedisSentinelConnection extends RedisSentinelCommands, Closeable {
+public interface ValkeySentinelConnection extends ValkeySentinelCommands, Closeable {
 
 	/**
 	 * @return true if connected to server

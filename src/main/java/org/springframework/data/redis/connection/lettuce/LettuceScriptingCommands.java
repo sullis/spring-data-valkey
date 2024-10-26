@@ -15,14 +15,14 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.api.async.RedisScriptingAsyncCommands;
+import io.lettuce.core.api.async.ValkeyScriptingAsyncCommands;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisScriptingCommands;
+import org.springframework.data.redis.connection.ValkeyScriptingCommands;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.util.Assert;
 
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class LettuceScriptingCommands implements RedisScriptingCommands {
+class LettuceScriptingCommands implements ValkeyScriptingCommands {
 
 	private final LettuceConnection connection;
 
@@ -40,7 +40,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 
 	@Override
 	public void scriptFlush() {
-		connection.invoke().just(RedisScriptingAsyncCommands::scriptFlush);
+		connection.invoke().just(ValkeyScriptingAsyncCommands::scriptFlush);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 			throw new InvalidDataAccessApiUsageException("Script kill not permitted in a transaction");
 		}
 
-		connection.invoke().just(RedisScriptingAsyncCommands::scriptKill);
+		connection.invoke().just(ValkeyScriptingAsyncCommands::scriptKill);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 
 		Assert.notNull(script, "Script must not be null");
 
-		return connection.invoke().just(RedisScriptingAsyncCommands::scriptLoad, script);
+		return connection.invoke().just(ValkeyScriptingAsyncCommands::scriptLoad, script);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 		Assert.notNull(scriptSha1, "Script digests must not be null");
 		Assert.noNullElements(scriptSha1, "Script digests must not contain null elements");
 
-		return connection.invoke().just(RedisScriptingAsyncCommands::scriptExists, scriptSha1);
+		return connection.invoke().just(ValkeyScriptingAsyncCommands::scriptExists, scriptSha1);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 		String convertedScript = LettuceConverters.toString(script);
 
 		return connection
-				.invoke().from(RedisScriptingAsyncCommands::eval, convertedScript,
+				.invoke().from(ValkeyScriptingAsyncCommands::eval, convertedScript,
 						LettuceConverters.toScriptOutputType(returnType), keys, args)
 				.get(new LettuceEvalResultsConverter<T>(returnType));
 	}
@@ -94,7 +94,7 @@ class LettuceScriptingCommands implements RedisScriptingCommands {
 		byte[][] args = extractScriptArgs(numKeys, keysAndArgs);
 
 		return connection
-				.invoke().from(RedisScriptingAsyncCommands::evalsha, scriptSha1,
+				.invoke().from(ValkeyScriptingAsyncCommands::evalsha, scriptSha1,
 						LettuceConverters.toScriptOutputType(returnType), keys, args)
 				.get(new LettuceEvalResultsConverter<T>(returnType));
 	}

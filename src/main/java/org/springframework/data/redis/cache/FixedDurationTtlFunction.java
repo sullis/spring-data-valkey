@@ -17,7 +17,7 @@ package org.springframework.data.redis.cache;
 
 import java.time.Duration;
 
-import org.springframework.data.redis.cache.RedisCacheWriter.TtlFunction;
+import org.springframework.data.redis.cache.ValkeyCacheWriter.TtlFunction;
 import org.springframework.lang.Nullable;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
  * @author Mark Paluch
  * @author John Blum
  * @see java.time.Duration
- * @see org.springframework.data.redis.cache.RedisCacheWriter.TtlFunction
+ * @see org.springframework.data.redis.cache.ValkeyCacheWriter.TtlFunction
  * @since 3.2
  */
 public record FixedDurationTtlFunction(Duration duration) implements TtlFunction {

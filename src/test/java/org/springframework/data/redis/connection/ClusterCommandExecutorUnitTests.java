@@ -60,9 +60,9 @@ import org.springframework.data.redis.connection.ClusterCommandExecutor.MultiKey
 import org.springframework.data.redis.connection.ClusterCommandExecutor.MultiNodeResult;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.NodeExecution;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.NodeResult;
-import org.springframework.data.redis.connection.RedisClusterNode.LinkState;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisNode.NodeType;
+import org.springframework.data.redis.connection.ValkeyClusterNode.LinkState;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyNode.NodeType;
 
 /**
  * Unit Tests for {@link ClusterCommandExecutor}.
@@ -82,7 +82,7 @@ class ClusterCommandExecutorUnitTests {
 	private static final int CLUSTER_NODE_2_PORT = 7380;
 	private static final int CLUSTER_NODE_3_PORT = 7381;
 
-	private static final RedisClusterNode CLUSTER_NODE_1 = RedisClusterNode.newRedisClusterNode()
+	private static final ValkeyClusterNode CLUSTER_NODE_1 = ValkeyClusterNode.newValkeyClusterNode()
 			.listeningAt(CLUSTER_NODE_1_HOST, CLUSTER_NODE_1_PORT) //
 			.serving(new SlotRange(0, 5460)) //
 			.withId("ef570f86c7b1a953846668debc177a3a16733420") //
@@ -91,7 +91,7 @@ class ClusterCommandExecutorUnitTests {
 			.withName("ClusterNodeX") //
 			.build();
 
-	private static final RedisClusterNode CLUSTER_NODE_2 = RedisClusterNode.newRedisClusterNode()
+	private static final ValkeyClusterNode CLUSTER_NODE_2 = ValkeyClusterNode.newValkeyClusterNode()
 			.listeningAt(CLUSTER_NODE_2_HOST, CLUSTER_NODE_2_PORT) //
 			.serving(new SlotRange(5461, 10922)) //
 			.withId("0f2ee5df45d18c50aca07228cc18b1da96fd5e84") //
@@ -100,7 +100,7 @@ class ClusterCommandExecutorUnitTests {
 			.withName("ClusterNodeY") //
 			.build();
 
-	private static final RedisClusterNode CLUSTER_NODE_3 = RedisClusterNode.newRedisClusterNode()
+	private static final ValkeyClusterNode CLUSTER_NODE_3 = ValkeyClusterNode.newValkeyClusterNode()
 			.listeningAt(CLUSTER_NODE_3_HOST, CLUSTER_NODE_3_PORT) //
 			.serving(new SlotRange(10923, 16383)) //
 			.withId("3b9b8192a874fa8f1f09dbc0ee20afab5738eee7") //
@@ -109,11 +109,11 @@ class ClusterCommandExecutorUnitTests {
 			.withName("ClusterNodeZ") //
 			.build();
 
-	private static final RedisClusterNode CLUSTER_NODE_2_LOOKUP = RedisClusterNode.newRedisClusterNode()
+	private static final ValkeyClusterNode CLUSTER_NODE_2_LOOKUP = ValkeyClusterNode.newValkeyClusterNode()
 			.withId("0f2ee5df45d18c50aca07228cc18b1da96fd5e84") //
 			.build();
 
-	private static final RedisClusterNode UNKNOWN_CLUSTER_NODE = new RedisClusterNode("8.8.8.8", 7379, SlotRange.empty());
+	private static final ValkeyClusterNode UNKNOWN_CLUSTER_NODE = new ValkeyClusterNode("8.8.8.8", 7379, SlotRange.empty());
 
 	private ClusterCommandExecutor executor;
 
@@ -159,7 +159,7 @@ class ClusterCommandExecutorUnitTests {
 	void executeCommandOnSingleNodeByHostAndPortShouldBeExecutedCorrectly() {
 
 		executor.executeCommandOnSingleNode(COMMAND_CALLBACK,
-				new RedisClusterNode(CLUSTER_NODE_2_HOST, CLUSTER_NODE_2_PORT));
+				new ValkeyClusterNode(CLUSTER_NODE_2_HOST, CLUSTER_NODE_2_PORT));
 
 		verify(connection2).theWheelWeavesAsTheWheelWills();
 	}
@@ -168,7 +168,7 @@ class ClusterCommandExecutorUnitTests {
 	@SuppressWarnings("ConstantConditions")
 	void executeCommandOnSingleNodeByNodeIdShouldBeExecutedCorrectly() {
 
-		executor.executeCommandOnSingleNode(COMMAND_CALLBACK, new RedisClusterNode(CLUSTER_NODE_2.id));
+		executor.executeCommandOnSingleNode(COMMAND_CALLBACK, new ValkeyClusterNode(CLUSTER_NODE_2.id));
 
 		verify(connection2).theWheelWeavesAsTheWheelWills();
 	}
@@ -205,8 +205,8 @@ class ClusterCommandExecutorUnitTests {
 	void executeCommandAsyncOnNodesShouldExecuteCommandOnGivenNodesByHostAndPort() {
 
 		executor.executeCommandAsyncOnNodes(COMMAND_CALLBACK,
-				Arrays.asList(new RedisClusterNode(CLUSTER_NODE_1_HOST, CLUSTER_NODE_1_PORT),
-						new RedisClusterNode(CLUSTER_NODE_2_HOST, CLUSTER_NODE_2_PORT)));
+				Arrays.asList(new ValkeyClusterNode(CLUSTER_NODE_1_HOST, CLUSTER_NODE_1_PORT),
+						new ValkeyClusterNode(CLUSTER_NODE_2_HOST, CLUSTER_NODE_2_PORT)));
 
 		verify(connection1).theWheelWeavesAsTheWheelWills();
 		verify(connection2).theWheelWeavesAsTheWheelWills();
@@ -218,7 +218,7 @@ class ClusterCommandExecutorUnitTests {
 	void executeCommandAsyncOnNodesShouldExecuteCommandOnGivenNodesByNodeId() {
 
 		executor.executeCommandAsyncOnNodes(COMMAND_CALLBACK,
-				Arrays.asList(new RedisClusterNode(CLUSTER_NODE_1.id), CLUSTER_NODE_2_LOOKUP));
+				Arrays.asList(new ValkeyClusterNode(CLUSTER_NODE_1.id), CLUSTER_NODE_2_LOOKUP));
 
 		verify(connection1).theWheelWeavesAsTheWheelWills();
 		verify(connection2).theWheelWeavesAsTheWheelWills();
@@ -229,7 +229,7 @@ class ClusterCommandExecutorUnitTests {
 	void executeCommandAsyncOnNodesShouldFailOnGivenUnknownNodes() {
 
 		assertThatIllegalArgumentException().isThrownBy(() -> executor.executeCommandAsyncOnNodes(COMMAND_CALLBACK,
-				Arrays.asList(new RedisClusterNode("unknown"), CLUSTER_NODE_2_LOOKUP)));
+				Arrays.asList(new ValkeyClusterNode("unknown"), CLUSTER_NODE_2_LOOKUP)));
 	}
 
 	@Test // DATAREDIS-315
@@ -450,14 +450,14 @@ class ClusterCommandExecutorUnitTests {
 
 		@Override
 		@SuppressWarnings("all")
-		public Connection getResourceForSpecificNode(RedisClusterNode clusterNode) {
+		public Connection getResourceForSpecificNode(ValkeyClusterNode clusterNode) {
 
 			return CLUSTER_NODE_1.equals(clusterNode) ? connection1
 					: CLUSTER_NODE_2.equals(clusterNode) ? connection2 : CLUSTER_NODE_3.equals(clusterNode) ? connection3 : null;
 		}
 
 		@Override
-		public void returnResourceForSpecificNode(RedisClusterNode node, Object resource) {}
+		public void returnResourceForSpecificNode(ValkeyClusterNode node, Object resource) {}
 	}
 
 	interface ConnectionCommandCallback<S> extends ClusterCommandCallback<Connection, S> {}

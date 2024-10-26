@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
+import io.lettuce.core.api.reactive.ValkeyScriptingReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +30,7 @@ import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.util.Assert;
 
 /**
- * {@link ReactiveScriptingCommands} implementation for the <a href="https://lettuce.io/">Lettuce</a> Redis driver.
+ * {@link ReactiveScriptingCommands} implementation for the <a href="https://lettuce.io/">Lettuce</a> Valkey driver.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -40,14 +40,14 @@ class LettuceReactiveScriptingCommands implements ReactiveScriptingCommands {
 
 	private static final ByteBuffer[] EMPTY_BUFFER_ARRAY = new ByteBuffer[0];
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveScriptingCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveScriptingCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveScriptingCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -56,12 +56,12 @@ class LettuceReactiveScriptingCommands implements ReactiveScriptingCommands {
 
 	@Override
 	public Mono<String> scriptFlush() {
-		return connection.execute(RedisScriptingReactiveCommands::scriptFlush).next();
+		return connection.execute(ValkeyScriptingReactiveCommands::scriptFlush).next();
 	}
 
 	@Override
 	public Mono<String> scriptKill() {
-		return connection.execute(RedisScriptingReactiveCommands::scriptKill).next();
+		return connection.execute(ValkeyScriptingReactiveCommands::scriptKill).next();
 	}
 
 	@Override

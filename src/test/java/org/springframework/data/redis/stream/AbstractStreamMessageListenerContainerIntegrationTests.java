@@ -34,8 +34,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnection;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -45,7 +45,7 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamReadRequest;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
@@ -64,21 +64,21 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(2);
 
-	private final RedisConnectionFactory connectionFactory;
-	private final StringRedisTemplate redisTemplate;
+	private final ValkeyConnectionFactory connectionFactory;
+	private final StringValkeyTemplate redisTemplate;
 	private final StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> containerOptions = StreamMessageListenerContainerOptions
 			.builder().pollTimeout(Duration.ofMillis(100)).build();
 
-	AbstractStreamMessageListenerContainerIntegrationTests(RedisConnectionFactory connectionFactory) {
+	AbstractStreamMessageListenerContainerIntegrationTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
-		this.redisTemplate = new StringRedisTemplate(connectionFactory);
+		this.redisTemplate = new StringValkeyTemplate(connectionFactory);
 		this.redisTemplate.afterPropertiesSet();
 	}
 
 	@BeforeEach
 	void before() {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushDb();
 		connection.close();
 	}
@@ -393,7 +393,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 	private int getNumberOfPending(String stream, String group) {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 
 		if (connection instanceof LettuceConnection lettuce) {
 

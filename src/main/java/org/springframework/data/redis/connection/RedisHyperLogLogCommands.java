@@ -18,13 +18,13 @@ package org.springframework.data.redis.connection;
 import org.springframework.lang.Nullable;
 
 /**
- * {@literal HyperLogLog} specific commands supported by Redis.
+ * {@literal HyperLogLog} specific commands supported by Valkey.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.5
  */
-public interface RedisHyperLogLogCommands {
+public interface ValkeyHyperLogLogCommands {
 
 	/**
 	 * Adds given {@literal values} to the HyperLogLog stored at given {@literal key}.
@@ -32,7 +32,7 @@ public interface RedisHyperLogLogCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
 	 */
 	@Nullable
 	Long pfAdd(byte[] key, byte[]... values);
@@ -42,7 +42,7 @@ public interface RedisHyperLogLogCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
 	 */
 	@Nullable
 	Long pfCount(byte[]... keys);
@@ -52,7 +52,7 @@ public interface RedisHyperLogLogCommands {
 	 *
 	 * @param destinationKey must not be {@literal null}.
 	 * @param sourceKeys must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/pfmerge">Redis Documentation: PFMERGE</a>
+	 * @see <a href="https://redis.io/commands/pfmerge">Valkey Documentation: PFMERGE</a>
 	 */
 	void pfMerge(byte[] destinationKey, byte[]... sourceKeys);
 

@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection;
 /**
  * Listener for subscription notifications.
  * <p>
- * Subscription notifications are reported by Redis as confirmation for subscribe and unsubscribe operations for
+ * Subscription notifications are reported by Valkey as confirmation for subscribe and unsubscribe operations for
  * channels and patterns.
  *
  * @author Mark Paluch
@@ -32,7 +32,7 @@ public interface SubscriptionListener {
 	SubscriptionListener NO_OP_SUBSCRIPTION_LISTENER = new SubscriptionListener() {};
 
 	/**
-	 * Notification when Redis has confirmed a channel subscription.
+	 * Notification when Valkey has confirmed a channel subscription.
 	 *
 	 * @param channel name of the channel.
 	 * @param count subscriber count.
@@ -40,7 +40,7 @@ public interface SubscriptionListener {
 	default void onChannelSubscribed(byte[] channel, long count) {}
 
 	/**
-	 * Notification when Redis has confirmed a channel un-subscription.
+	 * Notification when Valkey has confirmed a channel un-subscription.
 	 *
 	 * @param channel name of the channel.
 	 * @param count subscriber count.
@@ -48,7 +48,7 @@ public interface SubscriptionListener {
 	default void onChannelUnsubscribed(byte[] channel, long count) {}
 
 	/**
-	 * Notification when Redis has confirmed a pattern subscription.
+	 * Notification when Valkey has confirmed a pattern subscription.
 	 *
 	 * @param pattern the pattern.
 	 * @param count subscriber count.
@@ -56,7 +56,7 @@ public interface SubscriptionListener {
 	default void onPatternSubscribed(byte[] pattern, long count) {}
 
 	/**
-	 * Notification when Redis has confirmed a pattern un-subscription.
+	 * Notification when Valkey has confirmed a pattern un-subscription.
 	 *
 	 * @param pattern the pattern.
 	 * @param count subscriber count.

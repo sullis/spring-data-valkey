@@ -17,7 +17,7 @@ package org.springframework.data.redis.connection.stream;
 
 import java.nio.ByteBuffer;
 
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 
@@ -30,7 +30,7 @@ import org.springframework.lang.Nullable;
 class StreamSerialization {
 
 	/**
-	 * Serialize the {@code value} using the optional {@link RedisSerializer}. If no conversion is possible, {@code value}
+	 * Serialize the {@code value} using the optional {@link ValkeySerializer}. If no conversion is possible, {@code value}
 	 * is assumed to be a byte array.
 	 *
 	 * @param serializer the serializer. Can be {@literal null}.
@@ -38,35 +38,35 @@ class StreamSerialization {
 	 * @return the serialized (binary) representation of {@code value}.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static byte[] serialize(@Nullable RedisSerializer<?> serializer, Object value) {
-		return canSerialize(serializer, value) ? ((RedisSerializer) serializer).serialize(value) : (byte[]) value;
+	static byte[] serialize(@Nullable ValkeySerializer<?> serializer, Object value) {
+		return canSerialize(serializer, value) ? ((ValkeySerializer) serializer).serialize(value) : (byte[]) value;
 	}
 
 	/**
-	 * Deserialize the {@code value using the optional {@link RedisSerializer}. If no conversion is possible, return
+	 * Deserialize the {@code value using the optional {@link ValkeySerializer}. If no conversion is possible, return
 	 * {@code value}. @param serializer @param value @param <T> @return
 	 */
-	static <T> T deserialize(@Nullable RedisSerializer<? extends T> serializer, ByteBuffer value) {
+	static <T> T deserialize(@Nullable ValkeySerializer<? extends T> serializer, ByteBuffer value) {
 		return deserialize(serializer, ByteUtils.getBytes(value));
 	}
 
 	/**
-	 * Deserialize the {@code value using the optional {@link RedisSerializer}. If no conversion is possible, return
+	 * Deserialize the {@code value using the optional {@link ValkeySerializer}. If no conversion is possible, return
 	 * {@code value}. @param serializer @param value @param <T> @return
 	 */
-	static <T> T deserialize(@Nullable RedisSerializer<? extends T> serializer, byte[] value) {
+	static <T> T deserialize(@Nullable ValkeySerializer<? extends T> serializer, byte[] value) {
 		return serializer != null ? serializer.deserialize(value) : (T) value;
 	}
 
 	/**
-	 * Returns whether the given {@link RedisSerializer} is capable of serializing the {@code value} to {@literal byte[]}.
+	 * Returns whether the given {@link ValkeySerializer} is capable of serializing the {@code value} to {@literal byte[]}.
 	 *
 	 * @param serializer the serializer. Can be {@literal null}.
 	 * @param value the value to serialize.
-	 * @return {@literal true} if the given {@link RedisSerializer} is capable of serializing the {@code value} to
+	 * @return {@literal true} if the given {@link ValkeySerializer} is capable of serializing the {@code value} to
 	 *         {@literal byte[]}.
 	 */
-	private static boolean canSerialize(@Nullable RedisSerializer<?> serializer, @Nullable Object value) {
+	private static boolean canSerialize(@Nullable ValkeySerializer<?> serializer, @Nullable Object value) {
 		return serializer != null && (value == null || serializer.canSerialize(value.getClass()));
 	}
 }

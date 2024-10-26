@@ -21,35 +21,35 @@ import static org.assertj.core.api.Assertions.*;
 
 
 /**
- * Unit tests for {@link RedisPassword}.
+ * Unit tests for {@link ValkeyPassword}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-class RedisPasswordUnitTests {
+class ValkeyPasswordUnitTests {
 
 	@Test // DATAREDIS-574
 	void shouldCreateFromEmptyString() {
-		assertThat(RedisPassword.of("").toOptional()).isEmpty();
+		assertThat(ValkeyPassword.of("").toOptional()).isEmpty();
 	}
 
 	@Test // DATAREDIS-574
 	void shouldCreateFromExistingString() {
-		assertThat(RedisPassword.of("foo").map(String::new)).contains("foo");
+		assertThat(ValkeyPassword.of("foo").map(String::new)).contains("foo");
 	}
 
 	@Test // DATAREDIS-574
 	void shouldCreateFromEmptyCharArray() {
-		assertThat(RedisPassword.of("".toCharArray()).toOptional()).isEmpty();
+		assertThat(ValkeyPassword.of("".toCharArray()).toOptional()).isEmpty();
 	}
 
 	@Test // DATAREDIS-574
 	void shouldCreateFromExistingCharArray() {
-		assertThat(RedisPassword.of("foo".toCharArray()).map(String::new)).contains("foo");
+		assertThat(ValkeyPassword.of("foo".toCharArray()).map(String::new)).contains("foo");
 	}
 
 	@Test // DATAREDIS-574
 	void toStringShouldHideValue() {
-		assertThat(RedisPassword.of("foo".toCharArray()).toString()).startsWith("RedisPassword[**").doesNotContain("foo");
+		assertThat(ValkeyPassword.of("foo".toCharArray()).toString()).startsWith("ValkeyPassword[**").doesNotContain("foo");
 	}
 }

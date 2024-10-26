@@ -23,28 +23,28 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.Cache.ValueWrapper;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
 
 /**
- * Unit tests for {@link RedisCache}.
+ * Unit tests for {@link ValkeyCache}.
  *
  * @author John Blum
  * @author Mark Paluch
  */
-class RedisCacheUnitTests {
+class ValkeyCacheUnitTests {
 
 	@Test // GH-2650
 	void cacheRetrieveValueCallsCacheWriterRetrieveCorrectly() throws Exception {
 
-		RedisCacheWriter mockCacheWriter = mock(RedisCacheWriter.class);
+		ValkeyCacheWriter mockCacheWriter = mock(ValkeyCacheWriter.class);
 
 		doReturn(true).when(mockCacheWriter).supportsAsyncRetrieve();
 		doReturn(usingCompletedFuture("TEST".getBytes())).when(mockCacheWriter).retrieve(anyString(), any(byte[].class));
 
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+		ValkeyCacheConfiguration cacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig()
 				.serializeValuesWith(SerializationPair.byteArray());
 
-		RedisCache cache = new RedisCache("TestCache", mockCacheWriter, cacheConfiguration);
+		ValkeyCache cache = new ValkeyCache("TestCache", mockCacheWriter, cacheConfiguration);
 
 		CompletableFuture<ValueWrapper> value = cache.retrieve("TestKey");
 

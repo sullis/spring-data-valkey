@@ -18,14 +18,14 @@ package org.springframework.data.redis.connection;
 import java.util.Collection;
 
 /**
- * Redis Sentinel-specific commands.
+ * Valkey Sentinel-specific commands.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.4
- * @see <a href="https://redis.io/topics/sentinel">Redis Sentinel Documentation</a>
+ * @see <a href="https://redis.io/topics/sentinel">Valkey Sentinel Documentation</a>
  */
-public interface RedisSentinelCommands {
+public interface ValkeySentinelCommands {
 
 	/**
 	 * Force a failover as if the {@literal master} was not reachable.
@@ -37,17 +37,17 @@ public interface RedisSentinelCommands {
 	/**
 	 * Get a {@link Collection} of monitored masters and their state.
 	 *
-	 * @return Collection of {@link RedisServer}s. Never {@literal null}.
+	 * @return Collection of {@link ValkeyServer}s. Never {@literal null}.
 	 */
-	Collection<RedisServer> masters();
+	Collection<ValkeyServer> masters();
 
 	/**
 	 * Show list of replicas for given {@literal master}.
 	 *
 	 * @param master must not be {@literal null}.
-	 * @return Collection of {@link RedisServer}s. Never {@literal null}.
+	 * @return Collection of {@link ValkeyServer}s. Never {@literal null}.
 	 */
-	Collection<RedisServer> replicas(NamedNode master);
+	Collection<ValkeyServer> replicas(NamedNode master);
 
 	/**
 	 * Removes given {@literal master}. The server will no longer be monitored and will no longer be returned by
@@ -58,11 +58,11 @@ public interface RedisSentinelCommands {
 	void remove(NamedNode master);
 
 	/**
-	 * Tell sentinel to start monitoring a new {@literal master} with the specified {@link RedisServer#getName()},
-	 * {@link RedisServer#getHost()}, {@link RedisServer#getPort()}, and {@link RedisServer#getQuorum()}.
+	 * Tell sentinel to start monitoring a new {@literal master} with the specified {@link ValkeyServer#getName()},
+	 * {@link ValkeyServer#getHost()}, {@link ValkeyServer#getPort()}, and {@link ValkeyServer#getQuorum()}.
 	 *
 	 * @param master must not be {@literal null}.
 	 */
-	void monitor(RedisServer master);
+	void monitor(ValkeyServer master);
 
 }

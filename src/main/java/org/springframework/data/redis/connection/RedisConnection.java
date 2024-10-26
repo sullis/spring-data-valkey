@@ -20,15 +20,15 @@ import java.util.List;
 import org.springframework.dao.DataAccessException;
 
 /**
- * A connection to a Redis server.
+ * A connection to a Valkey server.
  * <p>
- * The {@link RedisConnection} interface serves as a common abstraction across various Redis client libraries (or
+ * The {@link ValkeyConnection} interface serves as a common abstraction across various Valkey client libraries (or
  * drivers).
  * <p>
- * Additionally, performs exception translation between the underlying Redis client library and Spring DAO exceptions.
- * The methods follow as much as possible the Redis names and conventions.
+ * Additionally, performs exception translation between the underlying Valkey client library and Spring DAO exceptions.
+ * The methods follow as much as possible the Valkey names and conventions.
  * <p>
- * {@link RedisConnection Redis connections}, unlike perhaps their underlying native connection are not Thread-safe and
+ * {@link ValkeyConnection Valkey connections}, unlike perhaps their underlying native connection are not Thread-safe and
  * should not be shared across multiple threads, concurrently or simultaneously.
  *
  * @author Costin Leau
@@ -37,12 +37,12 @@ import org.springframework.dao.DataAccessException;
  * @author James Howe
  * @author John Blum
  */
-public interface RedisConnection extends RedisCommandsProvider, DefaultedRedisConnection, AutoCloseable {
+public interface ValkeyConnection extends ValkeyCommandsProvider, DefaultedValkeyConnection, AutoCloseable {
 
 	/**
 	 * Closes or quits the connection.
 	 *
-	 * @throws DataAccessException if the {@link RedisConnection} could not be closed.
+	 * @throws DataAccessException if the {@link ValkeyConnection} could not be closed.
 	 */
 	@Override
 	void close() throws DataAccessException;
@@ -99,15 +99,15 @@ public interface RedisConnection extends RedisCommandsProvider, DefaultedRedisCo
 	 * Executes the commands in the pipeline and returns their result. If the connection is not pipelined, an empty
 	 * collection is returned.
 	 *
-	 * @throws RedisPipelineException if the pipeline contains any incorrect/invalid statements
+	 * @throws ValkeyPipelineException if the pipeline contains any incorrect/invalid statements
 	 * @return the result of the executed commands.
 	 */
-	List<Object> closePipeline() throws RedisPipelineException;
+	List<Object> closePipeline() throws ValkeyPipelineException;
 
 	/**
-	 * @return the {@link RedisSentinelConnection} when using Redis Sentinel.
+	 * @return the {@link ValkeySentinelConnection} when using Valkey Sentinel.
 	 * @since 1.4
 	 */
-	RedisSentinelConnection getSentinelConnection();
+	ValkeySentinelConnection getSentinelConnection();
 
 }

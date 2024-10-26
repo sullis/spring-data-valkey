@@ -22,12 +22,12 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
 
 /**
- * Interface for the {@literal cluster} commands supported by Redis executed using reactive infrastructure. A
- * {@link RedisClusterNode} can be obtained from {@link #clusterGetNodes()} or it can be constructed using either
- * {@link RedisClusterNode#getHost() host} and {@link RedisClusterNode#getPort()} or the {@link RedisClusterNode#getId()
+ * Interface for the {@literal cluster} commands supported by Valkey executed using reactive infrastructure. A
+ * {@link ValkeyClusterNode} can be obtained from {@link #clusterGetNodes()} or it can be constructed using either
+ * {@link ValkeyClusterNode#getHost() host} and {@link ValkeyClusterNode#getPort()} or the {@link ValkeyClusterNode#getId()
  * node Id}.
  *
  * @author Mark Paluch
@@ -39,138 +39,138 @@ public interface ReactiveClusterCommands {
 	/**
 	 * Retrieve cluster node information such as {@literal id}, {@literal host}, {@literal port} and {@literal slots}.
 	 *
-	 * @return a {@link Flux} emitting {@link RedisClusterNode cluster nodes}, an {@link Flux#empty() empty one} if none
+	 * @return a {@link Flux} emitting {@link ValkeyClusterNode cluster nodes}, an {@link Flux#empty() empty one} if none
 	 *         found.
-	 * @see <a href="https://redis.io/commands/cluster-nodes">Redis Documentation: CLUSTER NODES</a>
+	 * @see <a href="https://redis.io/commands/cluster-nodes">Valkey Documentation: CLUSTER NODES</a>
 	 */
-	Flux<RedisClusterNode> clusterGetNodes();
+	Flux<ValkeyClusterNode> clusterGetNodes();
 
 	/**
 	 * Retrieve information about connected replicas for given master node.
 	 *
 	 * @param master must not be {@literal null}.
-	 * @return a {@link Flux} emitting {@link RedisClusterNode cluster nodes}, an {@link Flux#empty() empty one} if none
+	 * @return a {@link Flux} emitting {@link ValkeyClusterNode cluster nodes}, an {@link Flux#empty() empty one} if none
 	 *         found.
-	 * @see <a href="https://redis.io/commands/cluster-replicas">Redis Documentation: CLUSTER REPLICAS</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicas">Valkey Documentation: CLUSTER REPLICAS</a>
 	 */
-	Flux<RedisClusterNode> clusterGetReplicas(RedisClusterNode master);
+	Flux<ValkeyClusterNode> clusterGetReplicas(ValkeyClusterNode master);
 
 	/**
 	 * Retrieve information about masters and their connected replicas.
 	 *
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-replicas">Redis Documentation: CLUSTER REPLICAS</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicas">Valkey Documentation: CLUSTER REPLICAS</a>
 	 */
-	Mono<Map<RedisClusterNode, Collection<RedisClusterNode>>> clusterGetMasterReplicaMap();
+	Mono<Map<ValkeyClusterNode, Collection<ValkeyClusterNode>>> clusterGetMasterReplicaMap();
 
 	/**
 	 * Find the slot for a given {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return a {@link Mono} emitting the calculated slog.
-	 * @see <a href="https://redis.io/commands/cluster-keyslot">Redis Documentation: CLUSTER KEYSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-keyslot">Valkey Documentation: CLUSTER KEYSLOT</a>
 	 */
 	Mono<Integer> clusterGetSlotForKey(ByteBuffer key);
 
 	/**
-	 * Find the {@link RedisClusterNode} serving given {@literal slot}.
+	 * Find the {@link ValkeyClusterNode} serving given {@literal slot}.
 	 *
 	 * @param slot
-	 * @return a {@link Mono} emitting the {@link RedisClusterNode} handling the given slot.
+	 * @return a {@link Mono} emitting the {@link ValkeyClusterNode} handling the given slot.
 	 */
-	Mono<RedisClusterNode> clusterGetNodeForSlot(int slot);
+	Mono<ValkeyClusterNode> clusterGetNodeForSlot(int slot);
 
 	/**
-	 * Find the {@link RedisClusterNode} serving given {@literal key}.
+	 * Find the {@link ValkeyClusterNode} serving given {@literal key}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @return a {@link Mono} emitting the {@link RedisClusterNode} handling the slot for the given key.
+	 * @return a {@link Mono} emitting the {@link ValkeyClusterNode} handling the slot for the given key.
 	 */
-	Mono<RedisClusterNode> clusterGetNodeForKey(ByteBuffer key);
+	Mono<ValkeyClusterNode> clusterGetNodeForKey(ByteBuffer key);
 
 	/**
 	 * Get cluster information.
 	 *
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-info">Redis Documentation: CLUSTER INFO</a>
+	 * @see <a href="https://redis.io/commands/cluster-info">Valkey Documentation: CLUSTER INFO</a>
 	 */
 	Mono<ClusterInfo> clusterGetClusterInfo();
 
 	/**
-	 * Assign slots to given {@link RedisClusterNode}.
+	 * Assign slots to given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param slots must not be empty.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-addslots">Redis Documentation: CLUSTER ADDSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-addslots">Valkey Documentation: CLUSTER ADDSLOTS</a>
 	 */
-	Mono<Void> clusterAddSlots(RedisClusterNode node, int... slots);
+	Mono<Void> clusterAddSlots(ValkeyClusterNode node, int... slots);
 
 	/**
-	 * Assign {@link SlotRange#getSlotsArray()} to given {@link RedisClusterNode}.
+	 * Assign {@link SlotRange#getSlotsArray()} to given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-addslots">Redis Documentation: CLUSTER ADDSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-addslots">Valkey Documentation: CLUSTER ADDSLOTS</a>
 	 */
-	Mono<Void> clusterAddSlots(RedisClusterNode node, SlotRange range);
+	Mono<Void> clusterAddSlots(ValkeyClusterNode node, SlotRange range);
 
 	/**
 	 * Count the number of keys assigned to one {@literal slot}.
 	 *
 	 * @param slot
 	 * @return a {@link Mono} emitting the number of keys stored at the given slot.
-	 * @see <a href="https://redis.io/commands/cluster-countkeysinslot">Redis Documentation: CLUSTER COUNTKEYSINSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-countkeysinslot">Valkey Documentation: CLUSTER COUNTKEYSINSLOT</a>
 	 */
 	Mono<Long> clusterCountKeysInSlot(int slot);
 
 	/**
-	 * Remove slots from {@link RedisClusterNode}.
+	 * Remove slots from {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-delslots">Redis Documentation: CLUSTER DELSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-delslots">Valkey Documentation: CLUSTER DELSLOTS</a>
 	 */
-	Mono<Void> clusterDeleteSlots(RedisClusterNode node, int... slots);
+	Mono<Void> clusterDeleteSlots(ValkeyClusterNode node, int... slots);
 
 	/**
-	 * Removes {@link SlotRange#getSlotsArray()} from given {@link RedisClusterNode}.
+	 * Removes {@link SlotRange#getSlotsArray()} from given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-delslots">Redis Documentation: CLUSTER DELSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-delslots">Valkey Documentation: CLUSTER DELSLOTS</a>
 	 */
-	Mono<Void> clusterDeleteSlotsInRange(RedisClusterNode node, SlotRange range);
+	Mono<Void> clusterDeleteSlotsInRange(ValkeyClusterNode node, SlotRange range);
 
 	/**
 	 * Remove given {@literal node} from cluster.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-forget">Redis Documentation: CLUSTER FORGET</a>
+	 * @see <a href="https://redis.io/commands/cluster-forget">Valkey Documentation: CLUSTER FORGET</a>
 	 */
-	Mono<Void> clusterForget(RedisClusterNode node);
+	Mono<Void> clusterForget(ValkeyClusterNode node);
 
 	/**
 	 * Add given {@literal node} to cluster.
 	 *
-	 * @param node must contain {@link RedisClusterNode#getHost() host} and {@link RedisClusterNode#getPort()} and must
+	 * @param node must contain {@link ValkeyClusterNode#getHost() host} and {@link ValkeyClusterNode#getPort()} and must
 	 *          not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-meet">Redis Documentation: CLUSTER MEET</a>
+	 * @see <a href="https://redis.io/commands/cluster-meet">Valkey Documentation: CLUSTER MEET</a>
 	 */
-	Mono<Void> clusterMeet(RedisClusterNode node);
+	Mono<Void> clusterMeet(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param slot
 	 * @param mode must not be{@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-setslot">Redis Documentation: CLUSTER SETSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-setslot">Valkey Documentation: CLUSTER SETSLOT</a>
 	 */
-	Mono<Void> clusterSetSlot(RedisClusterNode node, int slot, AddSlots mode);
+	Mono<Void> clusterSetSlot(ValkeyClusterNode node, int slot, AddSlots mode);
 
 	/**
 	 * Get {@literal keys} served by slot.
@@ -179,7 +179,7 @@ public interface ReactiveClusterCommands {
 	 * @param count must not be {@literal null}.
 	 * @return a {@link Flux} emitting the number of requested keys in the given slot, or signalling completion if none
 	 *         found.
-	 * @see <a href="https://redis.io/commands/cluster-getkeysinslot">Redis Documentation: CLUSTER GETKEYSINSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-getkeysinslot">Valkey Documentation: CLUSTER GETKEYSINSLOT</a>
 	 */
 	Flux<ByteBuffer> clusterGetKeysInSlot(int slot, int count);
 
@@ -189,9 +189,9 @@ public interface ReactiveClusterCommands {
 	 * @param master must not be {@literal null}.
 	 * @param replica must not be {@literal null}.
 	 * @return a {@link Mono} signaling completion.
-	 * @see <a href="https://redis.io/commands/cluster-replicate">Redis Documentation: CLUSTER REPLICATE</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicate">Valkey Documentation: CLUSTER REPLICATE</a>
 	 */
-	Mono<Void> clusterReplicate(RedisClusterNode master, RedisClusterNode replica);
+	Mono<Void> clusterReplicate(ValkeyClusterNode master, ValkeyClusterNode replica);
 
 	enum AddSlots {
 		MIGRATING, IMPORTING, STABLE, NODE

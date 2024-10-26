@@ -21,14 +21,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Abstract utility class for common assertions used in Spring Data Redis.
+ * Abstract utility class for common assertions used in Spring Data Valkey.
  *
  * @author John Blum
  * @since 3.1.0
  * @deprecated since 3.3, will be removed in a future revision in favor of Spring's {@link Assert} utility.
  */
 @Deprecated(since = "3.3", forRemoval = true)
-public abstract class RedisAssertions {
+public abstract class ValkeyAssertions {
 
 	/**
 	 * Asserts the given {@link Object} is not {@literal null}.

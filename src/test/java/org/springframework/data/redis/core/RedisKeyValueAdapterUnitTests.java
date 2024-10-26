@@ -36,39 +36,39 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.redis.core.convert.Bucket;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.MappingConfiguration;
-import org.springframework.data.redis.core.convert.RedisData;
+import org.springframework.data.redis.core.convert.ValkeyData;
 import org.springframework.data.redis.core.convert.SimpleIndexedPropertyValue;
 import org.springframework.data.redis.core.index.IndexConfiguration;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
 
 /**
- * Unit tests for {@link RedisKeyValueAdapter}.
+ * Unit tests for {@link ValkeyKeyValueAdapter}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class RedisKeyValueAdapterUnitTests {
+class ValkeyKeyValueAdapterUnitTests {
 
-	private RedisKeyValueAdapter adapter;
-	private RedisTemplate<?, ?> template;
-	private RedisMappingContext context;
+	private ValkeyKeyValueAdapter adapter;
+	private ValkeyTemplate<?, ?> template;
+	private ValkeyMappingContext context;
 	@Mock JedisConnectionFactory jedisConnectionFactoryMock;
-	@Mock RedisConnection redisConnectionMock;
+	@Mock ValkeyConnection redisConnectionMock;
 
 	@BeforeEach
 	void setUp() throws Exception {
 
-		template = new RedisTemplate<>();
+		template = new ValkeyTemplate<>();
 		template.setConnectionFactory(jedisConnectionFactoryMock);
 		template.afterPropertiesSet();
 
@@ -95,10 +95,10 @@ class RedisKeyValueAdapterUnitTests {
 
 		when(redisConnectionMock.getConfig("notify-keyspace-events")).thenReturn(keyspaceEventsConfig);
 
-		context = new RedisMappingContext(new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
+		context = new ValkeyMappingContext(new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
 		context.afterPropertiesSet();
 
-		adapter = new RedisKeyValueAdapter(template, context);
+		adapter = new ValkeyKeyValueAdapter(template, context);
 		adapter.afterPropertiesSet();
 		adapter.start();
 	}
@@ -119,7 +119,7 @@ class RedisKeyValueAdapterUnitTests {
 	@Test // DATAREDIS-512, DATAREDIS-530
 	void putShouldRemoveExistingIndexValuesWhenUpdating() {
 
-		RedisData rd = new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("_id", "1")));
+		ValkeyData rd = new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("_id", "1")));
 		rd.addIndexedData(new SimpleIndexedPropertyValue("persons", "firstname", "rand"));
 
 		when(redisConnectionMock.sMembers(Mockito.any(byte[].class)))
@@ -134,7 +134,7 @@ class RedisKeyValueAdapterUnitTests {
 	@Test // DATAREDIS-512
 	void putShouldNotTryToRemoveExistingIndexValuesWhenInsertingNew() {
 
-		RedisData rd = new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("_id", "1")));
+		ValkeyData rd = new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("_id", "1")));
 		rd.addIndexedData(new SimpleIndexedPropertyValue("persons", "firstname", "rand"));
 
 		when(redisConnectionMock.sMembers(Mockito.any(byte[].class)))
@@ -151,7 +151,7 @@ class RedisKeyValueAdapterUnitTests {
 
 		adapter.destroy();
 
-		adapter = new RedisKeyValueAdapter(template, context);
+		adapter = new ValkeyKeyValueAdapter(template, context);
 		adapter.setEnableKeyspaceEvents(EnableKeyspaceEvents.ON_STARTUP);
 		adapter.afterPropertiesSet();
 		adapter.start();
@@ -166,7 +166,7 @@ class RedisKeyValueAdapterUnitTests {
 
 		adapter.destroy();
 
-		adapter = new RedisKeyValueAdapter(template, context);
+		adapter = new ValkeyKeyValueAdapter(template, context);
 		adapter.setEnableKeyspaceEvents(EnableKeyspaceEvents.ON_STARTUP);
 		adapter.afterPropertiesSet();
 		adapter.start();
@@ -185,7 +185,7 @@ class RedisKeyValueAdapterUnitTests {
 
 		adapter.destroy();
 
-		adapter = new RedisKeyValueAdapter(template, context);
+		adapter = new ValkeyKeyValueAdapter(template, context);
 		adapter.setEnableKeyspaceEvents(EnableKeyspaceEvents.ON_DEMAND);
 		adapter.afterPropertiesSet();
 
@@ -209,7 +209,7 @@ class RedisKeyValueAdapterUnitTests {
 
 		adapter.destroy();
 
-		adapter = new RedisKeyValueAdapter(template, context);
+		adapter = new ValkeyKeyValueAdapter(template, context);
 		adapter.afterPropertiesSet();
 
 		KeyExpirationEventMessageListener listener = ((AtomicReference<KeyExpirationEventMessageListener>) getField(adapter,
@@ -231,7 +231,7 @@ class RedisKeyValueAdapterUnitTests {
 		@Id String id;
 	}
 
-	@RedisHash(timeToLive = 10)
+	@ValkeyHash(timeToLive = 10)
 	static class WithTimeToLive {
 		@Id String id;
 	}

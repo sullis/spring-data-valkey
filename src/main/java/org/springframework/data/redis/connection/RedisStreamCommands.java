@@ -34,17 +34,17 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Stream-specific Redis commands.
+ * Stream-specific Valkey commands.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Tugdual Grall
  * @author Dengliming
  * @author Mark John Moreno
- * @see <a href="https://redis.io/topics/streams-intro">Redis Documentation - Streams</a>
+ * @see <a href="https://redis.io/topics/streams-intro">Valkey Documentation - Streams</a>
  * @since 2.2
  */
-public interface RedisStreamCommands {
+public interface ValkeyStreamCommands {
 
 	/**
 	 * Acknowledge one or more records, identified via their id, as processed.
@@ -53,7 +53,7 @@ public interface RedisStreamCommands {
 	 * @param group name of the consumer group.
 	 * @param recordIds the String representation of the {@literal id's} of the records to acknowledge.
 	 * @return length of acknowledged messages. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xack">Redis Documentation: XACK</a>
+	 * @see <a href="https://redis.io/commands/xack">Valkey Documentation: XACK</a>
 	 */
 	@Nullable
 	default Long xAck(byte[] key, String group, String... recordIds) {
@@ -67,7 +67,7 @@ public interface RedisStreamCommands {
 	 * @param group name of the consumer group.
 	 * @param recordIds the {@literal id's} of the records to acknowledge.
 	 * @return length of acknowledged messages. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xack">Redis Documentation: XACK</a>
+	 * @see <a href="https://redis.io/commands/xack">Valkey Documentation: XACK</a>
 	 */
 	@Nullable
 	Long xAck(byte[] key, String group, RecordId... recordIds);
@@ -78,7 +78,7 @@ public interface RedisStreamCommands {
 	 * @param key the {@literal key} the stream is stored at.
 	 * @param content the records content modeled as {@link Map field/value pairs}.
 	 * @return the server generated {@link RecordId id}. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xadd">Redis Documentation: XADD</a>
+	 * @see <a href="https://redis.io/commands/xadd">Valkey Documentation: XADD</a>
 	 */
 	@Nullable
 	default RecordId xAdd(byte[] key, Map<byte[], byte[]> content) {
@@ -280,7 +280,7 @@ public interface RedisStreamCommands {
 	 * @param newOwner the name of the new {@literal consumer}.
 	 * @param options must not be {@literal null}.
 	 * @return list of {@link RecordId ids} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -295,7 +295,7 @@ public interface RedisStreamCommands {
 	 * @param minIdleTime must not be {@literal null}.
 	 * @param recordIds must not be {@literal null}.
 	 * @return list of {@link ByteRecord} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -312,7 +312,7 @@ public interface RedisStreamCommands {
 	 * @param newOwner the name of the new {@literal consumer}.
 	 * @param options must not be {@literal null}.
 	 * @return list of {@link ByteRecord} that changed user.
-	 * @see <a href="https://redis.io/commands/xclaim">Redis Documentation: XCLAIM</a>
+	 * @see <a href="https://redis.io/commands/xclaim">Valkey Documentation: XCLAIM</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -527,7 +527,7 @@ public interface RedisStreamCommands {
 	 * @param key the {@literal key} the stream is stored at.
 	 * @param recordIds the id's of the records to remove.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xdel">Redis Documentation: XDEL</a>
+	 * @see <a href="https://redis.io/commands/xdel">Valkey Documentation: XDEL</a>
 	 */
 	@Nullable
 	default Long xDel(byte[] key, String... recordIds) {
@@ -541,7 +541,7 @@ public interface RedisStreamCommands {
 	 * @param key the {@literal key} the stream is stored at.
 	 * @param recordIds the id's of the records to remove.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xdel">Redis Documentation: XDEL</a>
+	 * @see <a href="https://redis.io/commands/xdel">Valkey Documentation: XDEL</a>
 	 */
 	@Nullable
 	Long xDel(byte[] key, RecordId... recordIds);
@@ -641,7 +641,7 @@ public interface RedisStreamCommands {
 	 *
 	 * @param key the {@literal key} the stream is stored at.
 	 * @return length of the stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xlen">Redis Documentation: XLEN</a>
+	 * @see <a href="https://redis.io/commands/xlen">Valkey Documentation: XLEN</a>
 	 */
 	@Nullable
 	Long xLen(byte[] key);
@@ -653,7 +653,7 @@ public interface RedisStreamCommands {
 	 * @param groupName the name of the {@literal consumer group}. Must not be {@literal null}.
 	 * @return a summary of pending messages within the given {@literal consumer group} or {@literal null} when used in
 	 *         pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -665,7 +665,7 @@ public interface RedisStreamCommands {
 	 * @param key the {@literal key} the stream is stored at. Must not be {@literal null}.
 	 * @param consumer the consumer to fetch {@link PendingMessages} for. Must not be {@literal null}.
 	 * @return pending messages for the given {@link Consumer} or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -680,7 +680,7 @@ public interface RedisStreamCommands {
 	 * @param groupName the name of the {@literal consumer group}. Must not be {@literal null}.
 	 * @param consumerName the consumer to fetch {@link PendingMessages} for. Must not be {@literal null}.
 	 * @return pending messages for the given {@link Consumer} or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -698,7 +698,7 @@ public interface RedisStreamCommands {
 	 * @param count limit the number of results. Must not be {@literal null}.
 	 * @return pending messages for the given {@literal consumer group} or {@literal null} when used in pipeline /
 	 *         transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -715,7 +715,7 @@ public interface RedisStreamCommands {
 	 * @param range the range of messages ids to search within. Must not be {@literal null}.
 	 * @param count limit the number of results. Must not be {@literal null}.
 	 * @return pending messages for the given {@link Consumer} or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -734,7 +734,7 @@ public interface RedisStreamCommands {
 	 * @param count limit the number of results. Must not be {@literal null}.
 	 * @return pending messages for the given {@literal consumer} in given {@literal consumer group} or {@literal null}
 	 *         when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -751,7 +751,7 @@ public interface RedisStreamCommands {
 	 * @param options the options containing {@literal range}, {@literal consumer} and {@literal count}. Must not be
 	 *          {@literal null}.
 	 * @return pending messages matching given criteria or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xpending">Redis Documentation: xpending</a>
+	 * @see <a href="https://redis.io/commands/xpending">Valkey Documentation: xpending</a>
 	 * @since 2.3
 	 */
 	@Nullable
@@ -869,7 +869,7 @@ public interface RedisStreamCommands {
 	 * @param key the {@literal key} the stream is stored at.
 	 * @param range must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	default List<ByteRecord> xRange(byte[] key, Range<String> range) {
@@ -886,7 +886,7 @@ public interface RedisStreamCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	List<ByteRecord> xRange(byte[] key, Range<String> range, Limit limit);
@@ -896,7 +896,7 @@ public interface RedisStreamCommands {
 	 *
 	 * @param streams the streams to read from.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	default List<ByteRecord> xRead(StreamOffset<byte[]>... streams) {
@@ -909,7 +909,7 @@ public interface RedisStreamCommands {
 	 * @param readOptions read arguments.
 	 * @param streams the streams to read from.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	List<ByteRecord> xRead(StreamReadOptions readOptions, StreamOffset<byte[]>... streams);
@@ -920,7 +920,7 @@ public interface RedisStreamCommands {
 	 * @param consumer consumer/group.
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	default List<ByteRecord> xReadGroup(Consumer consumer, StreamOffset<byte[]>... streams) {
@@ -934,7 +934,7 @@ public interface RedisStreamCommands {
 	 * @param readOptions read arguments.
 	 * @param streams the streams to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	List<ByteRecord> xReadGroup(Consumer consumer, StreamReadOptions readOptions, StreamOffset<byte[]>... streams);
@@ -945,7 +945,7 @@ public interface RedisStreamCommands {
 	 * @param key the stream key.
 	 * @param range must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	default List<ByteRecord> xRevRange(byte[] key, Range<String> range) {
@@ -959,7 +959,7 @@ public interface RedisStreamCommands {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	List<ByteRecord> xRevRange(byte[] key, Range<String> range, Limit limit);
@@ -970,7 +970,7 @@ public interface RedisStreamCommands {
 	 * @param key the stream key.
 	 * @param count length of the stream.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long xTrim(byte[] key, long count);
@@ -983,7 +983,7 @@ public interface RedisStreamCommands {
 	 * @param approximateTrimming the trimming must be performed in a approximated way in order to maximize performances.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long xTrim(byte[] key, long count, boolean approximateTrimming);

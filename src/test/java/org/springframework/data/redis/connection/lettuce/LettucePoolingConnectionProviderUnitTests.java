@@ -17,8 +17,8 @@ package org.springframework.data.redis.connection.lettuce;
 
 import static org.mockito.Mockito.*;
 
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.async.ValkeyAsyncCommands;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +38,8 @@ import org.mockito.quality.Strictness;
 class LettucePoolingConnectionProviderUnitTests {
 
 	@Mock LettuceConnectionProvider connectionProviderMock;
-	@Mock StatefulRedisConnection<byte[], byte[]> connectionMock;
-	@Mock RedisAsyncCommands<byte[], byte[]> commandsMock;
+	@Mock StatefulValkeyConnection<byte[], byte[]> connectionMock;
+	@Mock ValkeyAsyncCommands<byte[], byte[]> commandsMock;
 
 	private LettucePoolingClientConfiguration config = LettucePoolingClientConfiguration.defaultConfiguration();
 
@@ -55,7 +55,7 @@ class LettucePoolingConnectionProviderUnitTests {
 
 		LettucePoolingConnectionProvider provider = new LettucePoolingConnectionProvider(connectionProviderMock, config);
 
-		provider.release(provider.getConnection(StatefulRedisConnection.class));
+		provider.release(provider.getConnection(StatefulValkeyConnection.class));
 
 		verifyNoInteractions(commandsMock);
 	}
@@ -66,7 +66,7 @@ class LettucePoolingConnectionProviderUnitTests {
 		LettucePoolingConnectionProvider provider = new LettucePoolingConnectionProvider(connectionProviderMock, config);
 		when(connectionMock.isMulti()).thenReturn(true);
 
-		provider.release(provider.getConnection(StatefulRedisConnection.class));
+		provider.release(provider.getConnection(StatefulValkeyConnection.class));
 
 		verify(commandsMock).discard();
 	}

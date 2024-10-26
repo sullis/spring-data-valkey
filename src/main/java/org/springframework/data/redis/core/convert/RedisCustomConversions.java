@@ -30,7 +30,7 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
  * @see org.springframework.data.convert.CustomConversions
  * @see SimpleTypeHolder
  */
-public class RedisCustomConversions extends org.springframework.data.convert.CustomConversions {
+public class ValkeyCustomConversions extends org.springframework.data.convert.CustomConversions {
 
 	private static final StoreConversions STORE_CONVERSIONS;
 	private static final List<Object> STORE_CONVERTERS;
@@ -47,18 +47,18 @@ public class RedisCustomConversions extends org.springframework.data.convert.Cus
 	}
 
 	/**
-	 * Creates an empty {@link RedisCustomConversions} object.
+	 * Creates an empty {@link ValkeyCustomConversions} object.
 	 */
-	public RedisCustomConversions() {
+	public ValkeyCustomConversions() {
 		this(Collections.emptyList());
 	}
 
 	/**
-	 * Creates a new {@link RedisCustomConversions} instance registering the given converters.
+	 * Creates a new {@link ValkeyCustomConversions} instance registering the given converters.
 	 *
 	 * @param converters
 	 */
-	public RedisCustomConversions(List<?> converters) {
+	public ValkeyCustomConversions(List<?> converters) {
 		super(STORE_CONVERSIONS, converters);
 	}
 }

@@ -27,32 +27,32 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.serializer.JdkSerializationValkeySerializer;
 import org.springframework.instrument.classloading.ShadowingClassLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Unit tests for {@link RedisTemplate}.
+ * Unit tests for {@link ValkeyTemplate}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
-class RedisTemplateUnitTests {
+class ValkeyTemplateUnitTests {
 
-	private RedisTemplate<Object, Object> template;
-	private @Mock RedisConnectionFactory connectionFactoryMock;
-	private @Mock RedisConnection redisConnectionMock;
+	private ValkeyTemplate<Object, Object> template;
+	private @Mock ValkeyConnectionFactory connectionFactoryMock;
+	private @Mock ValkeyConnection redisConnectionMock;
 
 	@BeforeEach
 	void setUp() {
 
 		TransactionSynchronizationManager.clear();
 
-		template = new RedisTemplate<>();
+		template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactoryMock);
 		when(connectionFactoryMock.getConnection()).thenReturn(redisConnectionMock);
 
@@ -78,13 +78,13 @@ class RedisTemplateUnitTests {
 
 		ShadowingClassLoader scl = new ShadowingClassLoader(ClassLoader.getSystemClassLoader());
 
-		template = new RedisTemplate<>();
+		template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactoryMock);
 		template.setBeanClassLoader(scl);
 		template.afterPropertiesSet();
 
 		when(redisConnectionMock.get(any(byte[].class)))
-				.thenReturn(new JdkSerializationRedisSerializer().serialize(new SomeArbitrarySerializableObject()));
+				.thenReturn(new JdkSerializationValkeySerializer().serialize(new SomeArbitrarySerializableObject()));
 
 		Object deserialized = template.opsForValue().get("spring");
 		assertThat(deserialized).isNotNull();
@@ -107,7 +107,7 @@ class RedisTemplateUnitTests {
 		template.execute(new SessionCallback<Object>() {
 			@Nullable
 			@Override
-			public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+			public <K, V> Object execute(ValkeyOperations<K, V> operations) throws DataAccessException {
 
 				template.multi();
 				template.multi();
@@ -124,7 +124,7 @@ class RedisTemplateUnitTests {
 
 		template.execute(new SessionCallback<Object>() {
 			@Override
-			public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+			public <K, V> Object execute(ValkeyOperations<K, V> operations) throws DataAccessException {
 
 				template.multi();
 				template.multi();
@@ -141,10 +141,10 @@ class RedisTemplateUnitTests {
 
 		template.setEnableTransactionSupport(true);
 
-		template.execute(new RedisCallback<Object>() {
+		template.execute(new ValkeyCallback<Object>() {
 			@Nullable
 			@Override
-			public Object doInRedis(RedisConnection connection) throws DataAccessException {
+			public Object doInValkey(ValkeyConnection connection) throws DataAccessException {
 
 				template.multi();
 				template.multi();
@@ -160,17 +160,17 @@ class RedisTemplateUnitTests {
 		private static final long serialVersionUID = -5973659324040506423L;
 	}
 
-	static class CapturingCallback implements RedisCallback<Cursor<Object>> {
+	static class CapturingCallback implements ValkeyCallback<Cursor<Object>> {
 
-		private RedisConnection connection;
+		private ValkeyConnection connection;
 
 		@Override
-		public Cursor<Object> doInRedis(RedisConnection connection) throws DataAccessException {
+		public Cursor<Object> doInValkey(ValkeyConnection connection) throws DataAccessException {
 			this.connection = connection;
 			return null;
 		}
 
-		public RedisConnection getConnection() {
+		public ValkeyConnection getConnection() {
 			return connection;
 		}
 	}

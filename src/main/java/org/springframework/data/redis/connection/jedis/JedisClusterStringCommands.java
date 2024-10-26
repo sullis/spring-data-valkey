@@ -28,7 +28,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.jedis.JedisClusterConnection.JedisMultiKeyClusterCommandCallback;
 import org.springframework.data.redis.connection.lettuce.LettuceConverters;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author dengliming
  * @since 2.0
  */
-class JedisClusterStringCommands implements RedisStringCommands {
+class JedisClusterStringCommands implements ValkeyStringCommands {
 
 	private final JedisClusterConnection connection;
 

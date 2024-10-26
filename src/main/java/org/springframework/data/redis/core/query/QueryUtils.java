@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.springframework.data.redis.connection.DefaultSortParameters;
 import org.springframework.data.redis.connection.SortParameters;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
  * Utilities for {@link SortQuery} implementations.
@@ -30,13 +30,13 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 public abstract class QueryUtils {
 
-	public static <K> SortParameters convertQuery(SortQuery<K> query, RedisSerializer<String> stringSerializer) {
+	public static <K> SortParameters convertQuery(SortQuery<K> query, ValkeySerializer<String> stringSerializer) {
 
 		return new DefaultSortParameters(stringSerializer.serialize(query.getBy()), query.getLimit(), serialize(
 				query.getGetPattern(), stringSerializer), query.getOrder(), query.isAlphabetic());
 	}
 
-	private static byte[][] serialize(List<String> strings, RedisSerializer<String> stringSerializer) {
+	private static byte[][] serialize(List<String> strings, ValkeySerializer<String> stringSerializer) {
 		List<byte[]> raw = null;
 
 		if (strings == null) {

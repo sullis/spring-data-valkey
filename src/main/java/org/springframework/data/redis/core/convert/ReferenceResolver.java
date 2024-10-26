@@ -21,7 +21,7 @@ import org.springframework.data.annotation.Reference;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link ReferenceResolver} retrieves Objects marked with {@link Reference} from Redis.
+ * {@link ReferenceResolver} retrieves Objects marked with {@link Reference} from Valkey.
  *
  * @author Christoph Strobl
  * @author Mark Paluch

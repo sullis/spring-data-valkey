@@ -26,7 +26,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.ReactiveClusterStringCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
 
 /**
  * @author Christoph Strobl
@@ -41,12 +41,12 @@ class LettuceReactiveClusterStringCommands extends LettuceReactiveStringCommands
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterStringCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterStringCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 
 	@Override
-	public Flux<ReactiveRedisConnection.NumericResponse<BitOpCommand, Long>> bitOp(Publisher<BitOpCommand> commands) {
+	public Flux<ReactiveValkeyConnection.NumericResponse<BitOpCommand, Long>> bitOp(Publisher<BitOpCommand> commands) {
 
 		return getConnection().execute(cmd -> Flux.from(commands).concatMap(command -> {
 
@@ -63,7 +63,7 @@ class LettuceReactiveClusterStringCommands extends LettuceReactiveStringCommands
 	}
 
 	@Override
-	public Flux<ReactiveRedisConnection.BooleanResponse<MSetCommand>> mSetNX(Publisher<MSetCommand> commands) {
+	public Flux<ReactiveValkeyConnection.BooleanResponse<MSetCommand>> mSetNX(Publisher<MSetCommand> commands) {
 
 		return getConnection().execute(cmd -> Flux.from(commands).concatMap(command -> {
 

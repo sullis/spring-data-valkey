@@ -26,8 +26,8 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.ReactiveClusterHyperLogLogCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.util.Assert;
 
 /**
@@ -43,7 +43,7 @@ class LettuceReactiveClusterHyperLogLogCommands extends LettuceReactiveHyperLogL
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterHyperLogLogCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterHyperLogLogCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 

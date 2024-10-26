@@ -26,80 +26,80 @@ import java.util.Set;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.transaction.AbstractTransactionSupportingCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link CacheManager} implementation for Redis backed by {@link RedisCache}.
+ * {@link CacheManager} implementation for Valkey backed by {@link ValkeyCache}.
  * <p>
  * This {@link CacheManager} creates {@link Cache caches} on first write, by default. Empty {@link Cache caches}
- * are not visible in Redis due to how Redis represents empty data structures.
+ * are not visible in Valkey due to how Valkey represents empty data structures.
  * <p>
- * {@link Cache Caches} requiring a different {@link RedisCacheConfiguration cache configuration} than the
- * {@link RedisCacheConfiguration#defaultCacheConfig() default cache configuration} can be specified via
- * {@link RedisCacheManagerBuilder#withInitialCacheConfigurations(Map)} or individually using
- * {@link RedisCacheManagerBuilder#withCacheConfiguration(String, RedisCacheConfiguration)}.
+ * {@link Cache Caches} requiring a different {@link ValkeyCacheConfiguration cache configuration} than the
+ * {@link ValkeyCacheConfiguration#defaultCacheConfig() default cache configuration} can be specified via
+ * {@link ValkeyCacheManagerBuilder#withInitialCacheConfigurations(Map)} or individually using
+ * {@link ValkeyCacheManagerBuilder#withCacheConfiguration(String, ValkeyCacheConfiguration)}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author Yanming Zhou
  * @author John Blum
  * @see org.springframework.cache.transaction.AbstractTransactionSupportingCacheManager
- * @see org.springframework.data.redis.connection.RedisConnectionFactory
- * @see org.springframework.data.redis.cache.RedisCacheConfiguration
- * @see org.springframework.data.redis.cache.RedisCacheWriter
- * @see org.springframework.data.redis.cache.RedisCache
+ * @see org.springframework.data.redis.connection.ValkeyConnectionFactory
+ * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+ * @see org.springframework.data.redis.cache.ValkeyCacheWriter
+ * @see org.springframework.data.redis.cache.ValkeyCache
  * @since 2.0
  */
-public class RedisCacheManager extends AbstractTransactionSupportingCacheManager {
+public class ValkeyCacheManager extends AbstractTransactionSupportingCacheManager {
 
 	protected static final boolean DEFAULT_ALLOW_RUNTIME_CACHE_CREATION = true;
 
 	private final boolean allowRuntimeCacheCreation;
 
-	private final RedisCacheConfiguration defaultCacheConfiguration;
+	private final ValkeyCacheConfiguration defaultCacheConfiguration;
 
-	private final RedisCacheWriter cacheWriter;
+	private final ValkeyCacheWriter cacheWriter;
 
-	private final Map<String, RedisCacheConfiguration> initialCacheConfiguration;
+	private final Map<String, ValkeyCacheConfiguration> initialCacheConfiguration;
 
 	/**
-	 * Creates a new {@link RedisCacheManager} initialized with the given {@link RedisCacheWriter} and default
-	 * {@link RedisCacheConfiguration}.
+	 * Creates a new {@link ValkeyCacheManager} initialized with the given {@link ValkeyCacheWriter} and default
+	 * {@link ValkeyCacheConfiguration}.
 	 * <p>
-	 * Allows {@link RedisCache cache} creation at runtime.
+	 * Allows {@link ValkeyCache cache} creation at runtime.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 */
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration) {
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration) {
 		this(cacheWriter, defaultCacheConfiguration, DEFAULT_ALLOW_RUNTIME_CACHE_CREATION);
 	}
 
 	/**
-	 * Creates a new {@link RedisCacheManager} initialized with the given {@link RedisCacheWriter}
-	 * and default {@link RedisCacheConfiguration} along with whether to allow cache creation at runtime.
+	 * Creates a new {@link ValkeyCacheManager} initialized with the given {@link ValkeyCacheWriter}
+	 * and default {@link ValkeyCacheConfiguration} along with whether to allow cache creation at runtime.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
 	 * @param allowRuntimeCacheCreation boolean specifying whether to allow creation of undeclared caches at runtime;
-	 * {@literal true} by default. Maybe just use {@link RedisCacheConfiguration#defaultCacheConfig()}.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * {@literal true} by default. Maybe just use {@link ValkeyCacheConfiguration#defaultCacheConfig()}.
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 * @since 2.0.4
 	 */
-	private RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
+	private ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
 			boolean allowRuntimeCacheCreation) {
 
 		Assert.notNull(defaultCacheConfiguration, "DefaultCacheConfiguration must not be null");
@@ -112,51 +112,51 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	}
 
 	/**
-	 * Creates a new {@link RedisCacheManager} initialized with the given {@link RedisCacheWriter} and a default
-	 * {@link RedisCacheConfiguration} along with an optional, initial set of {@link String cache names}
-	 * used to create {@link RedisCache Redis caches} on startup.
+	 * Creates a new {@link ValkeyCacheManager} initialized with the given {@link ValkeyCacheWriter} and a default
+	 * {@link ValkeyCacheConfiguration} along with an optional, initial set of {@link String cache names}
+	 * used to create {@link ValkeyCache Valkey caches} on startup.
 	 * <p>
-	 * Allows {@link RedisCache cache} creation at runtime.
+	 * Allows {@link ValkeyCache cache} creation at runtime.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
-	 * @param initialCacheNames optional set of {@link String cache names} used to create {@link RedisCache Redis caches}
-	 * on startup. The default {@link RedisCacheConfiguration} will be applied to each cache.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
+	 * @param initialCacheNames optional set of {@link String cache names} used to create {@link ValkeyCache Valkey caches}
+	 * on startup. The default {@link ValkeyCacheConfiguration} will be applied to each cache.
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 */
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
 			String... initialCacheNames) {
 
 		this(cacheWriter, defaultCacheConfiguration, DEFAULT_ALLOW_RUNTIME_CACHE_CREATION, initialCacheNames);
 	}
 
 	/**
-	 * Creates a new {@link RedisCacheManager} initialized with the given {@link RedisCacheWriter} and default
-	 * {@link RedisCacheConfiguration} along with whether to allow cache creation at runtime.
+	 * Creates a new {@link ValkeyCacheManager} initialized with the given {@link ValkeyCacheWriter} and default
+	 * {@link ValkeyCacheConfiguration} along with whether to allow cache creation at runtime.
 	 * <p>
 	 * Additionally, the optional, initial set of {@link String cache names} will be used to
-	 * create {@link RedisCache Redis caches} on startup.
+	 * create {@link ValkeyCache Valkey caches} on startup.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
 	 * @param allowRuntimeCacheCreation boolean specifying whether to allow creation of undeclared caches at runtime;
-	 * {@literal true} by default. Maybe just use {@link RedisCacheConfiguration#defaultCacheConfig()}.
-	 * @param initialCacheNames optional set of {@link String cache names} used to create {@link RedisCache Redis caches}
-	 * on startup. The default {@link RedisCacheConfiguration} will be applied to each cache.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * {@literal true} by default. Maybe just use {@link ValkeyCacheConfiguration#defaultCacheConfig()}.
+	 * @param initialCacheNames optional set of {@link String cache names} used to create {@link ValkeyCache Valkey caches}
+	 * on startup. The default {@link ValkeyCacheConfiguration} will be applied to each cache.
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 * @since 2.0.4
 	 */
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
 			boolean allowRuntimeCacheCreation, String... initialCacheNames) {
 
 		this(cacheWriter, defaultCacheConfiguration, allowRuntimeCacheCreation);
@@ -167,56 +167,56 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	}
 
 	/**
-	 * Creates new {@link RedisCacheManager} using given {@link RedisCacheWriter} and default
-	 * {@link RedisCacheConfiguration}.
+	 * Creates new {@link ValkeyCacheManager} using given {@link ValkeyCacheWriter} and default
+	 * {@link ValkeyCacheConfiguration}.
 	 * <p>
-	 * Additionally, an initial {@link RedisCache} will be created and configured using the associated
-	 * {@link RedisCacheConfiguration} for each {@link String named} {@link RedisCache} in the given {@link Map}.
+	 * Additionally, an initial {@link ValkeyCache} will be created and configured using the associated
+	 * {@link ValkeyCacheConfiguration} for each {@link String named} {@link ValkeyCache} in the given {@link Map}.
 	 * <p>
-	 * Allows {@link RedisCache cache} creation at runtime.
+	 * Allows {@link ValkeyCache cache} creation at runtime.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
 	 * @param initialCacheConfigurations {@link Map} of declared, known {@link String cache names} along with associated
-	 * {@link RedisCacheConfiguration} used to create and configure {@link RedisCache Reds caches} on startup;
+	 * {@link ValkeyCacheConfiguration} used to create and configure {@link ValkeyCache Reds caches} on startup;
 	 * must not be {@literal null}.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 */
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
-			Map<String, RedisCacheConfiguration> initialCacheConfigurations) {
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
+			Map<String, ValkeyCacheConfiguration> initialCacheConfigurations) {
 
 		this(cacheWriter, defaultCacheConfiguration, DEFAULT_ALLOW_RUNTIME_CACHE_CREATION, initialCacheConfigurations);
 	}
 
 	/**
-	 * Creates a new {@link RedisCacheManager} initialized with the given {@link RedisCacheWriter} and a default
-	 * {@link RedisCacheConfiguration}, and whether to allow {@link RedisCache} creation at runtime.
+	 * Creates a new {@link ValkeyCacheManager} initialized with the given {@link ValkeyCacheWriter} and a default
+	 * {@link ValkeyCacheConfiguration}, and whether to allow {@link ValkeyCache} creation at runtime.
 	 * <p>
-	 * Additionally, an initial {@link RedisCache} will be created and configured using the associated
-	 * {@link RedisCacheConfiguration} for each {@link String named} {@link RedisCache} in the given {@link Map}.
+	 * Additionally, an initial {@link ValkeyCache} will be created and configured using the associated
+	 * {@link ValkeyCacheConfiguration} for each {@link String named} {@link ValkeyCache} in the given {@link Map}.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @param defaultCacheConfiguration {@link RedisCacheConfiguration} applied to new {@link RedisCache Redis caches}
-	 * by default when no cache-specific {@link RedisCacheConfiguration} is provided; must not be {@literal null}.
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @param defaultCacheConfiguration {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache Valkey caches}
+	 * by default when no cache-specific {@link ValkeyCacheConfiguration} is provided; must not be {@literal null}.
 	 * @param allowRuntimeCacheCreation boolean specifying whether to allow creation of undeclared caches at runtime;
-	 * {@literal true} by default. Maybe just use {@link RedisCacheConfiguration#defaultCacheConfig()}.
+	 * {@literal true} by default. Maybe just use {@link ValkeyCacheConfiguration#defaultCacheConfig()}.
 	 * @param initialCacheConfigurations {@link Map} of declared, known {@link String cache names} along with the
-	 * associated {@link RedisCacheConfiguration} used to create and configure {@link RedisCache Redis caches}
+	 * associated {@link ValkeyCacheConfiguration} used to create and configure {@link ValkeyCache Valkey caches}
 	 * on startup; must not be {@literal null}.
-	 * @throws IllegalArgumentException if either the given {@link RedisCacheWriter} or {@link RedisCacheConfiguration}
+	 * @throws IllegalArgumentException if either the given {@link ValkeyCacheWriter} or {@link ValkeyCacheConfiguration}
 	 * are {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheConfiguration
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @see org.springframework.data.redis.cache.ValkeyCacheConfiguration
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 * @since 2.0.4
 	 */
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
-			boolean allowRuntimeCacheCreation, Map<String, RedisCacheConfiguration> initialCacheConfigurations) {
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
+			boolean allowRuntimeCacheCreation, Map<String, ValkeyCacheConfiguration> initialCacheConfigurations) {
 
 		this(cacheWriter, defaultCacheConfiguration, allowRuntimeCacheCreation);
 
@@ -226,69 +226,69 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	}
 
 	/**
-	 * @deprecated since 3.2. Use {@link RedisCacheManager#RedisCacheManager(RedisCacheWriter, RedisCacheConfiguration, boolean, Map)} instead.
+	 * @deprecated since 3.2. Use {@link ValkeyCacheManager#ValkeyCacheManager(ValkeyCacheWriter, ValkeyCacheConfiguration, boolean, Map)} instead.
 	 */
 	@Deprecated(since = "3.2")
-	public RedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration,
-			Map<String, RedisCacheConfiguration> initialCacheConfigurations, boolean allowRuntimeCacheCreation) {
+	public ValkeyCacheManager(ValkeyCacheWriter cacheWriter, ValkeyCacheConfiguration defaultCacheConfiguration,
+			Map<String, ValkeyCacheConfiguration> initialCacheConfigurations, boolean allowRuntimeCacheCreation) {
 
 		this(cacheWriter, defaultCacheConfiguration, allowRuntimeCacheCreation, initialCacheConfigurations);
 	}
 
 	/**
-	 * Factory method returning a {@literal Builder} used to construct and configure a {@link RedisCacheManager}.
+	 * Factory method returning a {@literal Builder} used to construct and configure a {@link ValkeyCacheManager}.
 	 *
-	 * @return new {@link RedisCacheManagerBuilder}.
+	 * @return new {@link ValkeyCacheManagerBuilder}.
 	 * @since 2.3
 	 */
-	public static RedisCacheManagerBuilder builder() {
-		return new RedisCacheManagerBuilder();
+	public static ValkeyCacheManagerBuilder builder() {
+		return new ValkeyCacheManagerBuilder();
 	}
 
 	/**
-	 * Factory method returning a {@literal Builder} used to construct and configure a {@link RedisCacheManager}
-	 * initialized with the given {@link RedisCacheWriter}.
+	 * Factory method returning a {@literal Builder} used to construct and configure a {@link ValkeyCacheManager}
+	 * initialized with the given {@link ValkeyCacheWriter}.
 	 *
-	 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-	 * by executing appropriate Redis commands; must not be {@literal null}.
-	 * @return new {@link RedisCacheManagerBuilder}.
-	 * @throws IllegalArgumentException if the given {@link RedisCacheWriter} is {@literal null}.
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+	 * by executing appropriate Valkey commands; must not be {@literal null}.
+	 * @return new {@link ValkeyCacheManagerBuilder}.
+	 * @throws IllegalArgumentException if the given {@link ValkeyCacheWriter} is {@literal null}.
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 */
-	public static RedisCacheManagerBuilder builder(RedisCacheWriter cacheWriter) {
+	public static ValkeyCacheManagerBuilder builder(ValkeyCacheWriter cacheWriter) {
 
 		Assert.notNull(cacheWriter, "CacheWriter must not be null");
 
-		return RedisCacheManagerBuilder.fromCacheWriter(cacheWriter);
+		return ValkeyCacheManagerBuilder.fromCacheWriter(cacheWriter);
 	}
 
 	/**
-	 * Factory method returning a {@literal Builder} used to construct and configure a {@link RedisCacheManager}
-	 * initialized with the given {@link RedisConnectionFactory}.
+	 * Factory method returning a {@literal Builder} used to construct and configure a {@link ValkeyCacheManager}
+	 * initialized with the given {@link ValkeyConnectionFactory}.
 	 *
-	 * @param connectionFactory {@link RedisConnectionFactory} used by the {@link RedisCacheManager}
-	 * to acquire connections to Redis when performing {@link RedisCache} operations; must not be {@literal null}.
-	 * @return new {@link RedisCacheManagerBuilder}.
-	 * @throws IllegalArgumentException if the given {@link RedisConnectionFactory} is {@literal null}.
-	 * @see org.springframework.data.redis.connection.RedisConnectionFactory
+	 * @param connectionFactory {@link ValkeyConnectionFactory} used by the {@link ValkeyCacheManager}
+	 * to acquire connections to Valkey when performing {@link ValkeyCache} operations; must not be {@literal null}.
+	 * @return new {@link ValkeyCacheManagerBuilder}.
+	 * @throws IllegalArgumentException if the given {@link ValkeyConnectionFactory} is {@literal null}.
+	 * @see org.springframework.data.redis.connection.ValkeyConnectionFactory
 	 */
-	public static RedisCacheManagerBuilder builder(RedisConnectionFactory connectionFactory) {
+	public static ValkeyCacheManagerBuilder builder(ValkeyConnectionFactory connectionFactory) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 
-		return RedisCacheManagerBuilder.fromConnectionFactory(connectionFactory);
+		return ValkeyCacheManagerBuilder.fromConnectionFactory(connectionFactory);
 	}
 
 	/**
-	 * Factory method used to construct a new {@link RedisCacheManager} initialized with the given
-	 * {@link RedisConnectionFactory} and using {@link RedisCacheConfiguration#defaultCacheConfig() defaults} for caching.
+	 * Factory method used to construct a new {@link ValkeyCacheManager} initialized with the given
+	 * {@link ValkeyConnectionFactory} and using {@link ValkeyCacheConfiguration#defaultCacheConfig() defaults} for caching.
 	 * <dl>
 	 * <dt>locking</dt>
 	 * <dd>disabled</dd>
 	 * <dt>batch strategy</dt>
 	 * <dd>{@link BatchStrategies#keys()}</dd>
 	 * <dt>cache configuration</dt>
-	 * <dd>{@link RedisCacheConfiguration#defaultCacheConfig()}</dd>
+	 * <dd>{@link ValkeyCacheConfiguration#defaultCacheConfig()}</dd>
 	 * <dt>initial caches</dt>
 	 * <dd>none</dd>
 	 * <dt>transaction aware</dt>
@@ -297,26 +297,26 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	 * <dd>enabled</dd>
 	 * </dl>
 	 *
-	 * @param connectionFactory {@link RedisConnectionFactory} used by the {@link RedisCacheManager}
-	 * to acquire connections to Redis when performing {@link RedisCache} operations; must not be {@literal null}.
-	 * @return new {@link RedisCacheManager}.
-	 * @throws IllegalArgumentException if the given {@link RedisConnectionFactory} is {@literal null}.
-	 * @see org.springframework.data.redis.connection.RedisConnectionFactory
+	 * @param connectionFactory {@link ValkeyConnectionFactory} used by the {@link ValkeyCacheManager}
+	 * to acquire connections to Valkey when performing {@link ValkeyCache} operations; must not be {@literal null}.
+	 * @return new {@link ValkeyCacheManager}.
+	 * @throws IllegalArgumentException if the given {@link ValkeyConnectionFactory} is {@literal null}.
+	 * @see org.springframework.data.redis.connection.ValkeyConnectionFactory
 	 */
-	public static RedisCacheManager create(RedisConnectionFactory connectionFactory) {
+	public static ValkeyCacheManager create(ValkeyConnectionFactory connectionFactory) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 
-		RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+		ValkeyCacheWriter cacheWriter = ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory);
+		ValkeyCacheConfiguration cacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig();
 
-		return new RedisCacheManager(cacheWriter, cacheConfiguration);
+		return new ValkeyCacheManager(cacheWriter, cacheConfiguration);
 	}
 
 	/**
-	 * Determines whether {@link RedisCache Redis caches} are allowed to be created at runtime.
+	 * Determines whether {@link ValkeyCache Valkey caches} are allowed to be created at runtime.
 	 *
-	 * @return a boolean value indicating whether {@link RedisCache Redis caches} are allowed to be created at runtime.
+	 * @return a boolean value indicating whether {@link ValkeyCache Valkey caches} are allowed to be created at runtime.
 	 */
 	public boolean isAllowRuntimeCacheCreation() {
 		return this.allowRuntimeCacheCreation;
@@ -324,18 +324,18 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 
 	/**
 	 * Return an {@link Collections#unmodifiableMap(Map) unmodifiable Map} containing {@link String caches name} mapped to
-	 * the {@link RedisCache} {@link RedisCacheConfiguration configuration}.
+	 * the {@link ValkeyCache} {@link ValkeyCacheConfiguration configuration}.
 	 *
 	 * @return unmodifiable {@link Map} containing {@link String cache name}
-	 * / {@link RedisCacheConfiguration configuration} pairs.
+	 * / {@link ValkeyCacheConfiguration configuration} pairs.
 	 */
-	public Map<String, RedisCacheConfiguration> getCacheConfigurations() {
+	public Map<String, ValkeyCacheConfiguration> getCacheConfigurations() {
 
-		Map<String, RedisCacheConfiguration> cacheConfigurationMap = new HashMap<>(getCacheNames().size());
+		Map<String, ValkeyCacheConfiguration> cacheConfigurationMap = new HashMap<>(getCacheNames().size());
 
 		getCacheNames().forEach(cacheName -> {
-			RedisCache cache = (RedisCache) lookupCache(cacheName);
-			RedisCacheConfiguration cacheConfiguration = cache != null ? cache.getCacheConfiguration() : null;
+			ValkeyCache cache = (ValkeyCache) lookupCache(cacheName);
+			ValkeyCacheConfiguration cacheConfiguration = cache != null ? cache.getCacheConfiguration() : null;
 			cacheConfigurationMap.put(cacheName, cacheConfiguration);
 		});
 
@@ -343,66 +343,66 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	}
 
 	/**
-	 * Gets the default {@link RedisCacheConfiguration} applied to new {@link RedisCache} instances on creation when
-	 * custom, non-specific {@link RedisCacheConfiguration} was not provided.
+	 * Gets the default {@link ValkeyCacheConfiguration} applied to new {@link ValkeyCache} instances on creation when
+	 * custom, non-specific {@link ValkeyCacheConfiguration} was not provided.
 	 *
-	 * @return the default {@link RedisCacheConfiguration}.
+	 * @return the default {@link ValkeyCacheConfiguration}.
 	 */
-	protected RedisCacheConfiguration getDefaultCacheConfiguration() {
+	protected ValkeyCacheConfiguration getDefaultCacheConfiguration() {
 		return this.defaultCacheConfiguration;
 	}
 
 	/**
-	 * Gets a {@link Map} of {@link String cache names} to {@link RedisCacheConfiguration} objects as the initial set
-	 * of {@link RedisCache Redis caches} to create on startup.
+	 * Gets a {@link Map} of {@link String cache names} to {@link ValkeyCacheConfiguration} objects as the initial set
+	 * of {@link ValkeyCache Valkey caches} to create on startup.
 	 *
-	 * @return a {@link Map} of {@link String cache names} to {@link RedisCacheConfiguration} objects.
+	 * @return a {@link Map} of {@link String cache names} to {@link ValkeyCacheConfiguration} objects.
 	 */
-	protected Map<String, RedisCacheConfiguration> getInitialCacheConfiguration() {
+	protected Map<String, ValkeyCacheConfiguration> getInitialCacheConfiguration() {
 		return Collections.unmodifiableMap(this.initialCacheConfiguration);
 	}
 
 	/**
-	 * Returns a reference to the configured {@link RedisCacheWriter} used to perform {@link RedisCache} operations,
+	 * Returns a reference to the configured {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations,
 	 * such as reading from and writing to the cache.
 	 *
-	 * @return a reference to the configured {@link RedisCacheWriter}.
-	 * @see org.springframework.data.redis.cache.RedisCacheWriter
+	 * @return a reference to the configured {@link ValkeyCacheWriter}.
+	 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 	 */
-	protected RedisCacheWriter getCacheWriter() {
+	protected ValkeyCacheWriter getCacheWriter() {
 		return this.cacheWriter;
 	}
 
 	@Override
-	protected RedisCache getMissingCache(String name) {
-		return isAllowRuntimeCacheCreation() ? createRedisCache(name, getDefaultCacheConfiguration()) : null;
+	protected ValkeyCache getMissingCache(String name) {
+		return isAllowRuntimeCacheCreation() ? createValkeyCache(name, getDefaultCacheConfiguration()) : null;
 	}
 
 	/**
-	 * Creates a new {@link RedisCache} with given {@link String name} and {@link RedisCacheConfiguration}.
+	 * Creates a new {@link ValkeyCache} with given {@link String name} and {@link ValkeyCacheConfiguration}.
 	 *
-	 * @param name {@link String name} for the {@link RedisCache}; must not be {@literal null}.
-	 * @param cacheConfiguration {@link RedisCacheConfiguration} used to configure the {@link RedisCache};
+	 * @param name {@link String name} for the {@link ValkeyCache}; must not be {@literal null}.
+	 * @param cacheConfiguration {@link ValkeyCacheConfiguration} used to configure the {@link ValkeyCache};
 	 * resolves to the {@link #getDefaultCacheConfiguration()} if {@literal null}.
-	 * @return a new {@link RedisCache} instance; never {@literal null}.
+	 * @return a new {@link ValkeyCache} instance; never {@literal null}.
 	 */
-	protected RedisCache createRedisCache(String name, @Nullable RedisCacheConfiguration cacheConfiguration) {
-		return new RedisCache(name, getCacheWriter(), resolveCacheConfiguration(cacheConfiguration));
+	protected ValkeyCache createValkeyCache(String name, @Nullable ValkeyCacheConfiguration cacheConfiguration) {
+		return new ValkeyCache(name, getCacheWriter(), resolveCacheConfiguration(cacheConfiguration));
 	}
 
 	@Override
-	protected Collection<RedisCache> loadCaches() {
+	protected Collection<ValkeyCache> loadCaches() {
 
 		return getInitialCacheConfiguration().entrySet().stream()
-				.map(entry -> createRedisCache(entry.getKey(), entry.getValue())).toList();
+				.map(entry -> createValkeyCache(entry.getKey(), entry.getValue())).toList();
 	}
 
-	private RedisCacheConfiguration resolveCacheConfiguration(@Nullable RedisCacheConfiguration cacheConfiguration) {
+	private ValkeyCacheConfiguration resolveCacheConfiguration(@Nullable ValkeyCacheConfiguration cacheConfiguration) {
 		return cacheConfiguration != null ? cacheConfiguration : getDefaultCacheConfiguration();
 	}
 
 	/**
-	 * {@literal Builder} for creating a {@link RedisCacheManager}.
+	 * {@literal Builder} for creating a {@link ValkeyCacheManager}.
 	 *
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
@@ -410,42 +410,42 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 	 * @author John Blum
 	 * @since 2.0
 	 */
-	public static class RedisCacheManagerBuilder {
+	public static class ValkeyCacheManagerBuilder {
 
 		/**
-		 * Factory method returning a new {@literal Builder} used to create and configure a {@link RedisCacheManager} using
-		 * the given {@link RedisCacheWriter}.
+		 * Factory method returning a new {@literal Builder} used to create and configure a {@link ValkeyCacheManager} using
+		 * the given {@link ValkeyCacheWriter}.
 		 *
-		 * @param cacheWriter {@link RedisCacheWriter} used to perform {@link RedisCache} operations
-		 * by executing appropriate Redis commands; must not be {@literal null}.
-		 * @return new {@link RedisCacheManagerBuilder}.
-		 * @throws IllegalArgumentException if the given {@link RedisCacheWriter} is {@literal null}.
-		 * @see org.springframework.data.redis.cache.RedisCacheWriter
+		 * @param cacheWriter {@link ValkeyCacheWriter} used to perform {@link ValkeyCache} operations
+		 * by executing appropriate Valkey commands; must not be {@literal null}.
+		 * @return new {@link ValkeyCacheManagerBuilder}.
+		 * @throws IllegalArgumentException if the given {@link ValkeyCacheWriter} is {@literal null}.
+		 * @see org.springframework.data.redis.cache.ValkeyCacheWriter
 		 */
-		public static RedisCacheManagerBuilder fromCacheWriter(RedisCacheWriter cacheWriter) {
+		public static ValkeyCacheManagerBuilder fromCacheWriter(ValkeyCacheWriter cacheWriter) {
 
 			Assert.notNull(cacheWriter, "CacheWriter must not be null");
 
-			return new RedisCacheManagerBuilder(cacheWriter);
+			return new ValkeyCacheManagerBuilder(cacheWriter);
 		}
 
 		/**
-		 * Factory method returning a new {@literal Builder} used to create and configure a {@link RedisCacheManager} using
-		 * the given {@link RedisConnectionFactory}.
+		 * Factory method returning a new {@literal Builder} used to create and configure a {@link ValkeyCacheManager} using
+		 * the given {@link ValkeyConnectionFactory}.
 		 *
-		 * @param connectionFactory {@link RedisConnectionFactory} used by the {@link RedisCacheManager}
-		 * to acquire connections to Redis when performing {@link RedisCache} operations; must not be {@literal null}.
-		 * @return new {@link RedisCacheManagerBuilder}.
-		 * @throws IllegalArgumentException if the given {@link RedisConnectionFactory} is {@literal null}.
-		 * @see org.springframework.data.redis.connection.RedisConnectionFactory
+		 * @param connectionFactory {@link ValkeyConnectionFactory} used by the {@link ValkeyCacheManager}
+		 * to acquire connections to Valkey when performing {@link ValkeyCache} operations; must not be {@literal null}.
+		 * @return new {@link ValkeyCacheManagerBuilder}.
+		 * @throws IllegalArgumentException if the given {@link ValkeyConnectionFactory} is {@literal null}.
+		 * @see org.springframework.data.redis.connection.ValkeyConnectionFactory
 		 */
-		public static RedisCacheManagerBuilder fromConnectionFactory(RedisConnectionFactory connectionFactory) {
+		public static ValkeyCacheManagerBuilder fromConnectionFactory(ValkeyConnectionFactory connectionFactory) {
 
 			Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 
-			RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
+			ValkeyCacheWriter cacheWriter = ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory);
 
-			return new RedisCacheManagerBuilder(cacheWriter);
+			return new ValkeyCacheManagerBuilder(cacheWriter);
 		}
 
 		private boolean allowRuntimeCacheCreation = true;
@@ -453,15 +453,15 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 
 		private CacheStatisticsCollector statisticsCollector = CacheStatisticsCollector.none();
 
-		private final Map<String, RedisCacheConfiguration> initialCaches = new LinkedHashMap<>();
+		private final Map<String, ValkeyCacheConfiguration> initialCaches = new LinkedHashMap<>();
 
-		private RedisCacheConfiguration defaultCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+		private ValkeyCacheConfiguration defaultCacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig();
 
-		private @Nullable RedisCacheWriter cacheWriter;
+		private @Nullable ValkeyCacheWriter cacheWriter;
 
-		private RedisCacheManagerBuilder() {}
+		private ValkeyCacheManagerBuilder() {}
 
-		private RedisCacheManagerBuilder(RedisCacheWriter cacheWriter) {
+		private ValkeyCacheManagerBuilder(ValkeyCacheWriter cacheWriter) {
 			this.cacheWriter = cacheWriter;
 		}
 
@@ -470,57 +470,57 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		 *
 		 * @param allowRuntimeCacheCreation boolean to allow creation of undeclared caches at runtime;
 		 * {@literal true} by default.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder allowCreateOnMissingCache(boolean allowRuntimeCacheCreation) {
+		public ValkeyCacheManagerBuilder allowCreateOnMissingCache(boolean allowRuntimeCacheCreation) {
 			this.allowRuntimeCacheCreation = allowRuntimeCacheCreation;
 			return this;
 		}
 
 		/**
-		 * Disable {@link RedisCache} creation at runtime for non-configured, undeclared caches.
+		 * Disable {@link ValkeyCache} creation at runtime for non-configured, undeclared caches.
 		 * <p>
-		 * {@link RedisCacheManager#getMissingCache(String)} returns {@literal null} for any non-configured,
-		 * undeclared {@link Cache} instead of a new {@link RedisCache} instance.
+		 * {@link ValkeyCacheManager#getMissingCache(String)} returns {@literal null} for any non-configured,
+		 * undeclared {@link Cache} instead of a new {@link ValkeyCache} instance.
 		 * This allows the {@link org.springframework.cache.support.CompositeCacheManager} to participate.
 		 *
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 * @see #allowCreateOnMissingCache(boolean)
 		 * @see #enableCreateOnMissingCache()
 		 * @since 2.0.4
 		 */
-		public RedisCacheManagerBuilder disableCreateOnMissingCache() {
+		public ValkeyCacheManagerBuilder disableCreateOnMissingCache() {
 			return allowCreateOnMissingCache(false);
 		}
 
 		/**
-		 * Enables {@link RedisCache} creation at runtime for unconfigured, undeclared caches.
+		 * Enables {@link ValkeyCache} creation at runtime for unconfigured, undeclared caches.
 		 *
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 * @see #allowCreateOnMissingCache(boolean)
 		 * @see #disableCreateOnMissingCache()
 		 * @since 2.0.4
 		 */
-		public RedisCacheManagerBuilder enableCreateOnMissingCache() {
+		public ValkeyCacheManagerBuilder enableCreateOnMissingCache() {
 			return allowCreateOnMissingCache(true);
 		}
 
 		/**
-		 * Returns the default {@link RedisCacheConfiguration}.
+		 * Returns the default {@link ValkeyCacheConfiguration}.
 		 *
-		 * @return the default {@link RedisCacheConfiguration}.
+		 * @return the default {@link ValkeyCacheConfiguration}.
 		 */
-		public RedisCacheConfiguration cacheDefaults() {
+		public ValkeyCacheConfiguration cacheDefaults() {
 			return this.defaultCacheConfiguration;
 		}
 
 		/**
-		 * Define a default {@link RedisCacheConfiguration} applied to dynamically created {@link RedisCache}s.
+		 * Define a default {@link ValkeyCacheConfiguration} applied to dynamically created {@link ValkeyCache}s.
 		 *
 		 * @param defaultCacheConfiguration must not be {@literal null}.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder cacheDefaults(RedisCacheConfiguration defaultCacheConfiguration) {
+		public ValkeyCacheManagerBuilder cacheDefaults(ValkeyCacheConfiguration defaultCacheConfiguration) {
 
 			Assert.notNull(defaultCacheConfiguration, "DefaultCacheConfiguration must not be null");
 
@@ -530,13 +530,13 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		}
 
 		/**
-		 * Configure a {@link RedisCacheWriter}.
+		 * Configure a {@link ValkeyCacheWriter}.
 		 *
 		 * @param cacheWriter must not be {@literal null}.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 * @since 2.3
 		 */
-		public RedisCacheManagerBuilder cacheWriter(RedisCacheWriter cacheWriter) {
+		public ValkeyCacheManagerBuilder cacheWriter(ValkeyCacheWriter cacheWriter) {
 
 			Assert.notNull(cacheWriter, "CacheWriter must not be null");
 
@@ -547,22 +547,22 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		/**
 		 * Enables cache statistics.
 		 *
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder enableStatistics() {
+		public ValkeyCacheManagerBuilder enableStatistics() {
 			this.statisticsCollector = CacheStatisticsCollector.create();
 			return this;
 		}
 
 		/**
-		 * Append a {@link Set} of cache names to be pre initialized with current {@link RedisCacheConfiguration}.
-		 * <strong>NOTE:</strong> This calls depends on {@link #cacheDefaults(RedisCacheConfiguration)} using whatever
-		 * default {@link RedisCacheConfiguration} is present at the time of invoking this method.
+		 * Append a {@link Set} of cache names to be pre initialized with current {@link ValkeyCacheConfiguration}.
+		 * <strong>NOTE:</strong> This calls depends on {@link #cacheDefaults(ValkeyCacheConfiguration)} using whatever
+		 * default {@link ValkeyCacheConfiguration} is present at the time of invoking this method.
 		 *
 		 * @param cacheNames must not be {@literal null}.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder initialCacheNames(Set<String> cacheNames) {
+		public ValkeyCacheManagerBuilder initialCacheNames(Set<String> cacheNames) {
 
 			Assert.notNull(cacheNames, "CacheNames must not be null");
 			Assert.noNullElements(cacheNames, "CacheNames must not be null");
@@ -573,26 +573,26 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		}
 
 		/**
-		 * Enable {@link RedisCache}s to synchronize cache put/evict operations with ongoing Spring-managed transactions.
+		 * Enable {@link ValkeyCache}s to synchronize cache put/evict operations with ongoing Spring-managed transactions.
 		 *
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder transactionAware() {
+		public ValkeyCacheManagerBuilder transactionAware() {
 			this.enableTransactions = true;
 			return this;
 		}
 
 		/**
-		 * Registers the given {@link String cache name} and {@link RedisCacheConfiguration} used to create
-		 * and configure a {@link RedisCache} on startup.
+		 * Registers the given {@link String cache name} and {@link ValkeyCacheConfiguration} used to create
+		 * and configure a {@link ValkeyCache} on startup.
 		 *
 		 * @param cacheName {@link String name} of the cache to register for creation on startup.
-		 * @param cacheConfiguration {@link RedisCacheConfiguration} used to configure the new cache on startup.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @param cacheConfiguration {@link ValkeyCacheConfiguration} used to configure the new cache on startup.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 * @since 2.2
 		 */
-		public RedisCacheManagerBuilder withCacheConfiguration(String cacheName,
-				RedisCacheConfiguration cacheConfiguration) {
+		public ValkeyCacheManagerBuilder withCacheConfiguration(String cacheName,
+				ValkeyCacheConfiguration cacheConfiguration) {
 
 			Assert.notNull(cacheName, "CacheName must not be null");
 			Assert.notNull(cacheConfiguration, "CacheConfiguration must not be null");
@@ -603,17 +603,17 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		}
 
 		/**
-		 * Append a {@link Map} of cache name/{@link RedisCacheConfiguration} pairs to be pre initialized.
+		 * Append a {@link Map} of cache name/{@link ValkeyCacheConfiguration} pairs to be pre initialized.
 		 *
 		 * @param cacheConfigurations must not be {@literal null}.
-		 * @return this {@link RedisCacheManagerBuilder}.
+		 * @return this {@link ValkeyCacheManagerBuilder}.
 		 */
-		public RedisCacheManagerBuilder withInitialCacheConfigurations(
-				Map<String, RedisCacheConfiguration> cacheConfigurations) {
+		public ValkeyCacheManagerBuilder withInitialCacheConfigurations(
+				Map<String, ValkeyCacheConfiguration> cacheConfigurations) {
 
 			Assert.notNull(cacheConfigurations, "CacheConfigurations must not be null!");
 			cacheConfigurations.forEach((cacheName, configuration) -> Assert.notNull(configuration,
-					String.format("RedisCacheConfiguration for cache %s must not be null!", cacheName)));
+					String.format("ValkeyCacheConfiguration for cache %s must not be null!", cacheName)));
 
 			this.initialCaches.putAll(cacheConfigurations);
 
@@ -621,21 +621,21 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		}
 
 		/**
-		 * Get the {@link RedisCacheConfiguration} for a given cache by its name.
+		 * Get the {@link ValkeyCacheConfiguration} for a given cache by its name.
 		 *
 		 * @param cacheName must not be {@literal null}.
-		 * @return {@link Optional#empty()} if no {@link RedisCacheConfiguration} set for the given cache name.
+		 * @return {@link Optional#empty()} if no {@link ValkeyCacheConfiguration} set for the given cache name.
 		 * @since 2.2
 		 */
-		public Optional<RedisCacheConfiguration> getCacheConfigurationFor(String cacheName) {
+		public Optional<ValkeyCacheConfiguration> getCacheConfigurationFor(String cacheName) {
 			return Optional.ofNullable(this.initialCaches.get(cacheName));
 		}
 
 		/**
-		 * Get the {@link Set} of cache names for which the builder holds {@link RedisCacheConfiguration configuration}.
+		 * Get the {@link Set} of cache names for which the builder holds {@link ValkeyCacheConfiguration configuration}.
 		 *
 		 * @return an unmodifiable {@link Set} holding the name of caches
-		 * for which a {@link RedisCacheConfiguration configuration} has been set.
+		 * for which a {@link ValkeyCacheConfiguration configuration} has been set.
 		 * @since 2.2
 		 */
 		public Set<String> getConfiguredCaches() {
@@ -643,28 +643,28 @@ public class RedisCacheManager extends AbstractTransactionSupportingCacheManager
 		}
 
 		/**
-		 * Create new instance of {@link RedisCacheManager} with configuration options applied.
+		 * Create new instance of {@link ValkeyCacheManager} with configuration options applied.
 		 *
-		 * @return new instance of {@link RedisCacheManager}.
+		 * @return new instance of {@link ValkeyCacheManager}.
 		 */
-		public RedisCacheManager build() {
+		public ValkeyCacheManager build() {
 
 			Assert.state(cacheWriter != null, "CacheWriter must not be null;"
-					+ " You can provide one via 'RedisCacheManagerBuilder#cacheWriter(RedisCacheWriter)'");
+					+ " You can provide one via 'ValkeyCacheManagerBuilder#cacheWriter(ValkeyCacheWriter)'");
 
-			RedisCacheWriter resolvedCacheWriter = !CacheStatisticsCollector.none().equals(this.statisticsCollector)
+			ValkeyCacheWriter resolvedCacheWriter = !CacheStatisticsCollector.none().equals(this.statisticsCollector)
 					? this.cacheWriter.withStatisticsCollector(this.statisticsCollector)
 					: this.cacheWriter;
 
-			RedisCacheManager cacheManager = newRedisCacheManager(resolvedCacheWriter);
+			ValkeyCacheManager cacheManager = newValkeyCacheManager(resolvedCacheWriter);
 
 			cacheManager.setTransactionAware(this.enableTransactions);
 
 			return cacheManager;
 		}
 
-		private RedisCacheManager newRedisCacheManager(RedisCacheWriter cacheWriter) {
-			return new RedisCacheManager(cacheWriter, cacheDefaults(), this.allowRuntimeCacheCreation, this.initialCaches);
+		private ValkeyCacheManager newValkeyCacheManager(ValkeyCacheWriter cacheWriter) {
+			return new ValkeyCacheManager(cacheWriter, cacheDefaults(), this.allowRuntimeCacheCreation, this.initialCaches);
 		}
 	}
 }

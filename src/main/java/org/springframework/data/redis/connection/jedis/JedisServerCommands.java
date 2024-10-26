@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisServerCommands;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeyServerCommands;
 import org.springframework.data.redis.connection.convert.Converters;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  * @author Dennis Neufeld
  * @since 2.0
  */
-class JedisServerCommands implements RedisServerCommands {
+class JedisServerCommands implements ValkeyServerCommands {
 
 	private final JedisConnection connection;
 
@@ -178,8 +178,8 @@ class JedisServerCommands implements RedisServerCommands {
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList() {
-		return connection.invokeStatus().from(Jedis::clientList).get(JedisConverters::toListOfRedisClientInformation);
+	public List<ValkeyClientInfo> getClientList() {
+		return connection.invokeStatus().from(Jedis::clientList).get(JedisConverters::toListOfValkeyClientInformation);
 	}
 
 	@Override
@@ -196,12 +196,12 @@ class JedisServerCommands implements RedisServerCommands {
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option) {
 		migrate(key, target, dbIndex, option, Long.MAX_VALUE);
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
 
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(target, "Target node must not be null");

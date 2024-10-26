@@ -26,12 +26,12 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.core.BoundKeyOperations;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.support.atomic.RedisAtomicInteger;
-import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.support.atomic.ValkeyAtomicInteger;
+import org.springframework.data.redis.support.atomic.ValkeyAtomicLong;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Costin Leau
@@ -48,11 +48,11 @@ public class BoundKeyOperationsIntegrationTests {
 	private ObjectFactory<Object> objFactory;
 
 	@SuppressWarnings("rawtypes") //
-	private RedisTemplate template;
+	private ValkeyTemplate template;
 
 	@SuppressWarnings("rawtypes")
 	public BoundKeyOperationsIntegrationTests(BoundKeyOperations<Object> keyOps, ObjectFactory<Object> objFactory,
-			RedisTemplate template) {
+			ValkeyTemplate template) {
 		this.objFactory = objFactory;
 		this.keyOps = keyOps;
 		this.template = template;
@@ -70,14 +70,14 @@ public class BoundKeyOperationsIntegrationTests {
 	@SuppressWarnings("unchecked")
 	@AfterEach
 	void tearDown() {
-		template.execute((RedisCallback<Object>) connection -> {
+		template.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRename() throws Exception {
 
 		Object key = keyOps.getKey();
@@ -90,7 +90,7 @@ public class BoundKeyOperationsIntegrationTests {
 		assertThat(keyOps.getKey()).isEqualTo(key);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-251
+	@ParameterizedValkeyTest // DATAREDIS-251
 	void testExpire() throws Exception {
 
 		assertThat(keyOps.getExpire()).as(keyOps.getClass().getName() + " -> " + keyOps.getKey())
@@ -102,7 +102,7 @@ public class BoundKeyOperationsIntegrationTests {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-251
+	@ParameterizedValkeyTest // DATAREDIS-251
 	void testPersist() throws Exception {
 
 		keyOps.persist();
@@ -123,9 +123,9 @@ public class BoundKeyOperationsIntegrationTests {
 			collection.add("dummy");
 		} else if (keyOps instanceof Map map) {
 			map.put("dummy", "dummy");
-		} else if (keyOps instanceof RedisAtomicInteger atomic) {
+		} else if (keyOps instanceof ValkeyAtomicInteger atomic) {
 			atomic.set(42);
-		} else if (keyOps instanceof RedisAtomicLong atomic) {
+		} else if (keyOps instanceof ValkeyAtomicLong atomic) {
 			atomic.set(42L);
 		}
 	}

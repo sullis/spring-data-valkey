@@ -30,9 +30,9 @@ import org.springframework.data.redis.RawObjectFactory;
 import org.springframework.data.redis.StringObjectFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration test of {@link DefaultHashOperations}
@@ -46,13 +46,13 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @MethodSource("testParams")
 public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 
-	private final RedisTemplate<K, ?> redisTemplate;
+	private final ValkeyTemplate<K, ?> redisTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<HK> hashKeyFactory;
 	private final ObjectFactory<HV> hashValueFactory;
 	private final HashOperations<K, HK, HV> hashOps;
 
-	public DefaultHashOperationsIntegrationTests(RedisTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultHashOperationsIntegrationTests(ValkeyTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<HK> hashKeyFactory, ObjectFactory<HV> hashValueFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -67,13 +67,13 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		ObjectFactory<byte[]> rawFactory = new RawObjectFactory();
 
 		JedisConnectionFactory jedisConnectionFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		RedisTemplate<String, String> stringTemplate = new StringRedisTemplate();
+		ValkeyTemplate<String, String> stringTemplate = new StringValkeyTemplate();
 		stringTemplate.setConnectionFactory(jedisConnectionFactory);
 		stringTemplate.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> rawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> rawTemplate = new ValkeyTemplate<>();
 		rawTemplate.setConnectionFactory(jedisConnectionFactory);
 		rawTemplate.setEnableDefaultSerializer(false);
 		rawTemplate.afterPropertiesSet();
@@ -84,13 +84,13 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testEntries() {
 		K key = keyFactory.instance();
 		HK key1 = hashKeyFactory.instance();
@@ -106,7 +106,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDelete() {
 		K key = keyFactory.instance();
 		HK key1 = hashKeyFactory.instance();
@@ -120,7 +120,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		assertThat(numDeleted.longValue()).isEqualTo(2L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-305
+	@ParameterizedValkeyTest // DATAREDIS-305
 	void testHScanReadsValuesFully() throws IOException {
 
 		K key = keyFactory.instance();
@@ -146,7 +146,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		assertThat(count).isEqualTo(hashOps.size(key));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-698
+	@ParameterizedValkeyTest // DATAREDIS-698
 	void lengthOfValue() throws IOException {
 
 		assumeThat(hashValueFactory instanceof StringObjectFactory).isTrue();
@@ -163,7 +163,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		assertThat(hashOps.lengthOfValue(key, key1)).isEqualTo(Long.valueOf(val1.toString().length()));
 	}
 
-	@ParameterizedRedisTest // GH-2048
+	@ParameterizedValkeyTest // GH-2048
 	void randomField() {
 
 		K key = keyFactory.instance();
@@ -178,7 +178,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 		assertThat(hashOps.randomKeys(key, 2)).hasSize(2).contains(key1, key2);
 	}
 
-	@ParameterizedRedisTest // GH-2048
+	@ParameterizedValkeyTest // GH-2048
 	void randomValue() {
 
 		assumeThat(hashKeyFactory).isNotInstanceOf(RawObjectFactory.class);

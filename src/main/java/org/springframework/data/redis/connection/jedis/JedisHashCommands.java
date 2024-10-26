@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisHashCommands;
+import org.springframework.data.redis.connection.ValkeyHashCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.Cursor.CursorId;
@@ -38,14 +38,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisHashCommands} implementation for Jedis.
+ * {@link ValkeyHashCommands} implementation for Jedis.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author John Blum
  * @since 2.0
  */
-class JedisHashCommands implements RedisHashCommands {
+class JedisHashCommands implements ValkeyHashCommands {
 
 	private final JedisConnection connection;
 

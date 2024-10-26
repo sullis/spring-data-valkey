@@ -20,7 +20,7 @@ import io.lettuce.core.XClaimArgs;
 import io.lettuce.core.XGroupCreateArgs;
 import io.lettuce.core.XReadArgs;
 import io.lettuce.core.XReadArgs.StreamOffset;
-import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
+import io.lettuce.core.cluster.api.reactive.ValkeyClusterReactiveCommands;
 import io.lettuce.core.models.stream.PendingMessage;
 import reactor.core.publisher.Flux;
 
@@ -31,9 +31,9 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.connection.ReactiveStreamCommands;
 import org.springframework.data.redis.connection.ReactiveStreamCommands.GroupCommand.GroupCommandAction;
 import org.springframework.data.redis.connection.stream.ByteBufferRecord;
@@ -60,14 +60,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveStreamCommands implements ReactiveStreamCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveStreamCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveStreamCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveStreamCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 		this.connection = connection;
@@ -282,7 +282,7 @@ class LettuceReactiveStreamCommands implements ReactiveStreamCommands {
 	}
 
 	private static Flux<ByteBufferRecord> doRead(ReadCommand command, StreamReadOptions readOptions,
-			RedisClusterReactiveCommands<ByteBuffer, ByteBuffer> cmd) {
+			ValkeyClusterReactiveCommands<ByteBuffer, ByteBuffer> cmd) {
 
 		StreamOffset<ByteBuffer>[] streamOffsets = toStreamOffsets(command.getStreamOffsets());
 		XReadArgs args = StreamConverters.toReadArgs(readOptions);

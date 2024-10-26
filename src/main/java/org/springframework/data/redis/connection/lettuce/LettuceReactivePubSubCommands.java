@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
+import io.lettuce.core.pubsub.api.reactive.ValkeyPubSubReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -44,13 +44,13 @@ import org.springframework.util.Assert;
  */
 class LettuceReactivePubSubCommands implements ReactivePubSubCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	private final Map<ByteArrayWrapper, Target> channels = new ConcurrentHashMap<>();
 
 	private final Map<ByteArrayWrapper, Target> patterns = new ConcurrentHashMap<>();
 
-	LettuceReactivePubSubCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactivePubSubCommands(LettuceReactiveValkeyConnection connection) {
 		this.connection = connection;
 	}
 
@@ -124,7 +124,7 @@ class LettuceReactivePubSubCommands implements ReactivePubSubCommands {
 		return doWithPubSub(commands -> commands.punsubscribe(actualUnsubscribe));
 	}
 
-	private <T> Mono<T> doWithPubSub(Function<RedisPubSubReactiveCommands<ByteBuffer, ByteBuffer>, Mono<T>> function) {
+	private <T> Mono<T> doWithPubSub(Function<ValkeyPubSubReactiveCommands<ByteBuffer, ByteBuffer>, Mono<T>> function) {
 
 		return connection.getPubSubConnection().flatMap(pubSubConnection -> function.apply(pubSubConnection.reactive()))
 				.onErrorMap(connection.translateException());

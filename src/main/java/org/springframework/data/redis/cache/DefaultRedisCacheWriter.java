@@ -29,13 +29,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.springframework.dao.PessimisticLockingFailureException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveStringCommands;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
@@ -44,15 +44,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link RedisCacheWriter} implementation capable of reading/writing binary data from/to Redis in {@literal standalone}
- * and {@literal cluster} environments, and uses a given {@link RedisConnectionFactory} to obtain the actual
- * {@link RedisConnection}.
+ * {@link ValkeyCacheWriter} implementation capable of reading/writing binary data from/to Valkey in {@literal standalone}
+ * and {@literal cluster} environments, and uses a given {@link ValkeyConnectionFactory} to obtain the actual
+ * {@link ValkeyConnection}.
  * <p>
- * {@link DefaultRedisCacheWriter} can be used in
- * {@link RedisCacheWriter#lockingRedisCacheWriter(RedisConnectionFactory) locking} or
- * {@link RedisCacheWriter#nonLockingRedisCacheWriter(RedisConnectionFactory) non-locking} mode. While
+ * {@link DefaultValkeyCacheWriter} can be used in
+ * {@link ValkeyCacheWriter#lockingValkeyCacheWriter(ValkeyConnectionFactory) locking} or
+ * {@link ValkeyCacheWriter#nonLockingValkeyCacheWriter(ValkeyConnectionFactory) non-locking} mode. While
  * {@literal non-locking} aims for maximum performance it may result in overlapping, non-atomic, command execution for
- * operations spanning multiple Redis interactions like {@code putIfAbsent}. The {@literal locking} counterpart prevents
+ * operations spanning multiple Valkey interactions like {@code putIfAbsent}. The {@literal locking} counterpart prevents
  * command overlap by setting an explicit lock key and checking against presence of this key which leads to additional
  * requests and potential command wait times.
  *
@@ -63,10 +63,10 @@ import org.springframework.util.ObjectUtils;
  * @author ChanYoung Joung
  * @since 2.0
  */
-class DefaultRedisCacheWriter implements RedisCacheWriter {
+class DefaultValkeyCacheWriter implements ValkeyCacheWriter {
 
 	private static final boolean REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT = ClassUtils
-			.isPresent("org.springframework.data.redis.connection.ReactiveRedisConnectionFactory", null);
+			.isPresent("org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory", null);
 
 	private final BatchStrategy batchStrategy;
 
@@ -74,7 +74,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 
 	private final Duration sleepTime;
 
-	private final RedisConnectionFactory connectionFactory;
+	private final ValkeyConnectionFactory connectionFactory;
 
 	private final TtlFunction lockTtl;
 
@@ -84,7 +84,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param batchStrategy must not be {@literal null}.
 	 */
-	DefaultRedisCacheWriter(RedisConnectionFactory connectionFactory, BatchStrategy batchStrategy) {
+	DefaultValkeyCacheWriter(ValkeyConnectionFactory connectionFactory, BatchStrategy batchStrategy) {
 		this(connectionFactory, Duration.ZERO, batchStrategy);
 	}
 
@@ -94,7 +94,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	 *          to disable locking.
 	 * @param batchStrategy must not be {@literal null}.
 	 */
-	DefaultRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime, BatchStrategy batchStrategy) {
+	DefaultValkeyCacheWriter(ValkeyConnectionFactory connectionFactory, Duration sleepTime, BatchStrategy batchStrategy) {
 		this(connectionFactory, sleepTime, TtlFunction.persistent(), CacheStatisticsCollector.none(), batchStrategy);
 	}
 
@@ -106,7 +106,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	 * @param cacheStatisticsCollector must not be {@literal null}.
 	 * @param batchStrategy must not be {@literal null}.
 	 */
-	DefaultRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime, TtlFunction lockTtl,
+	DefaultValkeyCacheWriter(ValkeyConnectionFactory connectionFactory, Duration sleepTime, TtlFunction lockTtl,
 			CacheStatisticsCollector cacheStatisticsCollector, BatchStrategy batchStrategy) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
@@ -121,7 +121,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		this.statistics = cacheStatisticsCollector;
 		this.batchStrategy = batchStrategy;
 
-		if (REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT && this.connectionFactory instanceof ReactiveRedisConnectionFactory) {
+		if (REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT && this.connectionFactory instanceof ReactiveValkeyConnectionFactory) {
 			asyncCacheWriter = new AsynchronousCacheWriterDelegate();
 		} else {
 			asyncCacheWriter = UnsupportedAsyncCacheWriter.INSTANCE;
@@ -143,7 +143,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	}
 
 	@Nullable
-	private byte[] doGet(RedisConnection connection, String name, byte[] key, @Nullable Duration ttl) {
+	private byte[] doGet(ValkeyConnection connection, String name, byte[] key, @Nullable Duration ttl) {
 
 		byte[] result = shouldExpireWithin(ttl) ? connection.stringCommands().getEx(key, Expiration.from(ttl))
 				: connection.stringCommands().get(key);
@@ -241,7 +241,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 
 	}
 
-	private void doPut(RedisConnection connection, String name, byte[] key, byte[] value, @Nullable Duration ttl) {
+	private void doPut(ValkeyConnection connection, String name, byte[] key, byte[] value, @Nullable Duration ttl) {
 
 		if (shouldExpireWithin(ttl)) {
 			connection.stringCommands().set(key, value, Expiration.from(ttl.toMillis(), TimeUnit.MILLISECONDS),
@@ -356,8 +356,8 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	}
 
 	@Override
-	public RedisCacheWriter withStatisticsCollector(CacheStatisticsCollector cacheStatisticsCollector) {
-		return new DefaultRedisCacheWriter(connectionFactory, sleepTime, lockTtl, cacheStatisticsCollector,
+	public ValkeyCacheWriter withStatisticsCollector(CacheStatisticsCollector cacheStatisticsCollector) {
+		return new DefaultValkeyCacheWriter(connectionFactory, sleepTime, lockTtl, cacheStatisticsCollector,
 				this.batchStrategy);
 	}
 
@@ -370,9 +370,9 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		executeWithoutResult(name, connection -> doLock(name, name, null, connection));
 	}
 
-	void doLock(String name, Object contextualKey, @Nullable Object contextualValue, RedisConnection connection) {
+	void doLock(String name, Object contextualKey, @Nullable Object contextualValue, ValkeyConnection connection) {
 
-		RedisStringCommands commands = connection.stringCommands();
+		ValkeyStringCommands commands = connection.stringCommands();
 		Expiration expiration = Expiration.from(this.lockTtl.getTimeToLive(contextualKey, contextualValue));
 		byte[] cacheLockKey = createCacheLockKey(name);
 
@@ -392,43 +392,43 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 	}
 
 	@Nullable
-	Long doUnlock(String name, RedisConnection connection) {
+	Long doUnlock(String name, ValkeyConnection connection) {
 		return connection.keyCommands().del(createCacheLockKey(name));
 	}
 
-	private <T> T execute(String name, Function<RedisConnection, T> callback) {
+	private <T> T execute(String name, Function<ValkeyConnection, T> callback) {
 
-		try (RedisConnection connection = this.connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = this.connectionFactory.getConnection()) {
 			checkAndPotentiallyWaitUntilUnlocked(name, connection);
 			return callback.apply(connection);
 		}
 	}
 
-	private void executeWithoutResult(String name, Consumer<RedisConnection> callback) {
+	private void executeWithoutResult(String name, Consumer<ValkeyConnection> callback) {
 
-		try (RedisConnection connection = this.connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = this.connectionFactory.getConnection()) {
 			checkAndPotentiallyWaitUntilUnlocked(name, connection);
 			callback.accept(connection);
 		}
 	}
 
-	private <T> T executeLockFree(Function<RedisConnection, T> callback) {
+	private <T> T executeLockFree(Function<ValkeyConnection, T> callback) {
 
-		try (RedisConnection connection = this.connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = this.connectionFactory.getConnection()) {
 			return callback.apply(connection);
 		}
 	}
 
 	/**
-	 * Determines whether this {@link RedisCacheWriter} uses locks during caching operations.
+	 * Determines whether this {@link ValkeyCacheWriter} uses locks during caching operations.
 	 *
-	 * @return {@literal true} if {@link RedisCacheWriter} uses locks.
+	 * @return {@literal true} if {@link ValkeyCacheWriter} uses locks.
 	 */
 	private boolean isLockingCacheWriter() {
 		return !this.sleepTime.isZero() && !this.sleepTime.isNegative();
 	}
 
-	private void checkAndPotentiallyWaitUntilUnlocked(String name, RedisConnection connection) {
+	private void checkAndPotentiallyWaitUntilUnlocked(String name, ValkeyConnection connection) {
 
 		if (!isLockingCacheWriter()) {
 			return;
@@ -451,7 +451,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		}
 	}
 
-	boolean doCheckLock(String name, RedisConnection connection) {
+	boolean doCheckLock(String name, ValkeyConnection connection) {
 		return ObjectUtils.nullSafeEquals(connection.keyCommands().exists(createCacheLockKey(name)), true);
 	}
 
@@ -526,7 +526,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 
 	/**
 	 * Delegate implementing {@link AsyncCacheWriter} to provide asynchronous cache retrieval and storage operations using
-	 * {@link ReactiveRedisConnectionFactory}.
+	 * {@link ReactiveValkeyConnectionFactory}.
 	 *
 	 * @since 3.2
 	 */
@@ -566,14 +566,14 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		}
 
 		private Mono<Boolean> doStoreWithLocking(String name, byte[] key, byte[] value, @Nullable Duration ttl,
-				ReactiveRedisConnection connection) {
+				ReactiveValkeyConnection connection) {
 
 			return Mono.usingWhen(doLock(name, key, value, connection), unused -> doStore(key, value, ttl, connection),
 					unused -> doUnlock(name, connection));
 		}
 
 		private Mono<Boolean> doStore(byte[] cacheKey, byte[] value, @Nullable Duration ttl,
-				ReactiveRedisConnection connection) {
+				ReactiveValkeyConnection connection) {
 
 			ByteBuffer wrappedKey = ByteBuffer.wrap(cacheKey);
 			ByteBuffer wrappedValue = ByteBuffer.wrap(value);
@@ -587,7 +587,7 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		}
 
 		private Mono<Object> doLock(String name, Object contextualKey, @Nullable Object contextualValue,
-				ReactiveRedisConnection connection) {
+				ReactiveValkeyConnection connection) {
 
 			ByteBuffer key = ByteBuffer.wrap(createCacheLockKey(name));
 			ByteBuffer value = ByteBuffer.wrap(new byte[0]);
@@ -598,11 +598,11 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 					.thenReturn(Boolean.TRUE);
 		}
 
-		private Mono<Void> doUnlock(String name, ReactiveRedisConnection connection) {
+		private Mono<Void> doUnlock(String name, ReactiveValkeyConnection connection) {
 			return connection.keyCommands().del(ByteBuffer.wrap(createCacheLockKey(name))).then();
 		}
 
-		private Mono<Void> waitForLock(ReactiveRedisConnection connection, String cacheName) {
+		private Mono<Void> waitForLock(ReactiveValkeyConnection connection, String cacheName) {
 
 			AtomicLong lockWaitTimeNs = new AtomicLong();
 			byte[] cacheLockKey = createCacheLockKey(cacheName);
@@ -618,13 +618,13 @@ class DefaultRedisCacheWriter implements RedisCacheWriter {
 		}
 
 		private <T> CompletableFuture<T> doWithConnection(
-				Function<ReactiveRedisConnection, CompletableFuture<T>> callback) {
+				Function<ReactiveValkeyConnection, CompletableFuture<T>> callback) {
 
-			ReactiveRedisConnectionFactory cf = (ReactiveRedisConnectionFactory) connectionFactory;
+			ReactiveValkeyConnectionFactory cf = (ReactiveValkeyConnectionFactory) connectionFactory;
 
 			return Mono.usingWhen(Mono.fromSupplier(cf::getReactiveConnection), //
 					it -> Mono.fromCompletionStage(callback.apply(it)), //
-					ReactiveRedisConnection::closeLater) //
+					ReactiveValkeyConnection::closeLater) //
 					.toFuture();
 		}
 	}

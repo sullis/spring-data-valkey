@@ -39,13 +39,13 @@ import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.DefaultTypedTuple;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
- * Integration test for Redis ZSet.
+ * Integration test for Valkey ZSet.
  *
  * @author Costin Leau
  * @author Jennifer Hickey
@@ -54,18 +54,18 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
  * @author Andrey Shlykov
  * @author Christoph Strobl
  */
-public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisCollectionIntegrationTests<T> {
+public abstract class AbstractValkeyZSetTestIntegration<T> extends AbstractValkeyCollectionIntegrationTests<T> {
 
-	private RedisZSet<T> zSet;
+	private ValkeyZSet<T> zSet;
 
 	/**
-	 * Constructs a new <code>AbstractRedisZSetTest</code> instance.
+	 * Constructs a new <code>AbstractValkeyZSetTest</code> instance.
 	 *
 	 * @param factory
 	 * @param template
 	 */
 	@SuppressWarnings("rawtypes")
-	AbstractRedisZSetTestIntegration(ObjectFactory<T> factory, RedisTemplate template) {
+	AbstractValkeyZSetTestIntegration(ObjectFactory<T> factory, ValkeyTemplate template) {
 		super(factory, template);
 	}
 
@@ -73,10 +73,10 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
-		zSet = (RedisZSet<T>) collection;
+		zSet = (ValkeyZSet<T>) collection;
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddWithScore() {
 		T t1 = getT();
 		T t2 = getT();
@@ -93,7 +93,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.hasNext()).isFalse();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testAdd() {
 		T t1 = getT();
 		T t2 = getT();
@@ -110,7 +110,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.score(t3)).isEqualTo(d);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testFirst() {
 		T t1 = getT();
 		T t2 = getT();
@@ -124,7 +124,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.first()).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest // GH-2038
+	@ParameterizedValkeyTest // GH-2038
 	@EnabledOnCommand("ZPOPMIN")
 	void testPopFirst() {
 
@@ -140,7 +140,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet).hasSize(2);
 	}
 
-	@ParameterizedRedisTest // GH-2038
+	@ParameterizedValkeyTest // GH-2038
 	@EnabledOnCommand("ZPOPMIN")
 	void testPopFirstWithTimeout() {
 
@@ -156,12 +156,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet).hasSize(2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testFirstException() {
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> zSet.first());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLast() {
 
 		T t1 = getT();
@@ -176,7 +176,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.last()).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@EnabledOnCommand("ZPOPMAX")
 	void testPopLast() {
 
@@ -192,7 +192,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet).hasSize(2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@EnabledOnCommand("ZPOPMAX")
 	void testPopLastWithTimeout() {
 
@@ -208,12 +208,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet).hasSize(2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLastException() {
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> zSet.last());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRank() {
 		T t1 = getT();
 		T t2 = getT();
@@ -230,7 +230,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		// assertNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReverseRank() {
 		T t1 = getT();
 		T t2 = getT();
@@ -246,7 +246,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.rank(getT())).isNull();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-729
+	@ParameterizedValkeyTest // DATAREDIS-729
 	void testLexCountUnbounded() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -263,7 +263,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.lexCount(Range.unbounded())).isEqualTo(Long.valueOf(3));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-729
+	@ParameterizedValkeyTest // DATAREDIS-729
 	void testLexCountBounded() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -280,7 +280,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.lexCount(Range.rightUnbounded(Range.Bound.exclusive(t1.toString())))).isEqualTo(Long.valueOf(2));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testScore() {
 		T t1 = getT();
 		T t2 = getT();
@@ -296,17 +296,17 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.score(t3)).isEqualTo(Double.valueOf(5));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDefaultScore() {
 		assertThat(zSet.getDefaultScore()).isCloseTo(1, Offset.offset(0d));
 	}
 
 	@SuppressWarnings("unchecked")
-	private RedisZSet<T> createZSetFor(String key) {
-		return new DefaultRedisZSet<>((BoundZSetOperations<String, T>) zSet.getOperations().boundZSetOps(key));
+	private ValkeyZSet<T> createZSetFor(String key) {
+		return new DefaultValkeyZSet<>((BoundZSetOperations<String, T>) zSet.getOperations().boundZSetOps(key));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRange() {
 		T t1 = getT();
 		T t2 = getT();
@@ -323,7 +323,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRangeWithScores() {
 
 		T t1 = getT();
@@ -347,7 +347,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple2.getScore()).isEqualTo(Double.valueOf(3));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReverseRange() {
 		T t1 = getT();
 		T t2 = getT();
@@ -364,7 +364,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReverseRangeWithScores() {
 
 		T t1 = getT();
@@ -388,7 +388,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple2.getScore()).isEqualTo(Double.valueOf(1));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-407
+	@ParameterizedValkeyTest // DATAREDIS-407
 	void testRangeByLexUnbounded() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -408,7 +408,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-407
+	@ParameterizedValkeyTest // DATAREDIS-407
 	void testRangeByLexBounded() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -428,7 +428,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple).isEqualTo(t2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-407
+	@ParameterizedValkeyTest // DATAREDIS-407
 	void testRangeByLexUnboundedWithLimit() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -448,7 +448,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple).isEqualTo(t2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-407
+	@ParameterizedValkeyTest // DATAREDIS-407
 	void testRangeByLexBoundedWithLimit() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, LongAsStringObjectFactory.class,
@@ -467,7 +467,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuples).hasSize(2).containsSequence(t2, t3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-729
+	@ParameterizedValkeyTest // DATAREDIS-729
 	void testReverseRangeByLexBoundedWithLimit() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -486,7 +486,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuples).hasSize(2).containsSequence(t2, t1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-729
+	@ParameterizedValkeyTest // DATAREDIS-729
 	void testReverseRangeByScore() {
 
 		T t1 = getT();
@@ -504,7 +504,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testReverseRangeByScoreWithScores() {
 
 		T t1 = getT();
@@ -529,7 +529,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRangeByScore() {
 		T t1 = getT();
 		T t2 = getT();
@@ -548,7 +548,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRangeByScoreWithScores() {
 
 		T t1 = getT();
@@ -572,7 +572,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(tuple2.getScore()).isEqualTo(Double.valueOf(3));
 	}
 
-	@ParameterizedRedisTest // GH-2345
+	@ParameterizedValkeyTest // GH-2345
 	void testRangeAndStoreByLex() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -585,12 +585,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		zSet.add(t1, 1);
 		zSet.add(t2, 2);
 		zSet.add(t3, 3);
-		RedisZSet<T> tuples = zSet.rangeAndStoreByLex("dest", Range.closed(t2.toString(), t3.toString()));
+		ValkeyZSet<T> tuples = zSet.rangeAndStoreByLex("dest", Range.closed(t2.toString(), t3.toString()));
 
 		assertThat(tuples).hasSize(2).containsSequence(t2, t3);
 	}
 
-	@ParameterizedRedisTest // GH-2345
+	@ParameterizedValkeyTest // GH-2345
 	void testRangeAndStoreRevByLex() {
 
 		assumeThat(factory).isOfAnyClassIn(DoubleObjectFactory.class, DoubleAsStringObjectFactory.class,
@@ -603,13 +603,13 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		zSet.add(t1, 1);
 		zSet.add(t2, 2);
 		zSet.add(t3, 3);
-		RedisZSet<T> tuples = zSet.reverseRangeAndStoreByLex("dest", Range.closed(t1.toString(), t3.toString()),
+		ValkeyZSet<T> tuples = zSet.reverseRangeAndStoreByLex("dest", Range.closed(t1.toString(), t3.toString()),
 				Limit.limit().count(2).offset(1));
 
 		assertThat(tuples).hasSize(2).containsSequence(t1, t2);
 	}
 
-	@ParameterizedRedisTest // GH-2345
+	@ParameterizedValkeyTest // GH-2345
 	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void testRangeAndStoreByScore() {
 
@@ -620,12 +620,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		zSet.add(t1, 1);
 		zSet.add(t2, 2);
 		zSet.add(t3, 3);
-		RedisZSet<T> tuples = zSet.rangeAndStoreByScore("dest", Range.closed(2, 3));
+		ValkeyZSet<T> tuples = zSet.rangeAndStoreByScore("dest", Range.closed(2, 3));
 
 		assertThat(tuples).hasSize(2).containsSequence(t2, t3);
 	}
 
-	@ParameterizedRedisTest // GH-2345
+	@ParameterizedValkeyTest // GH-2345
 	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void testRangeAndStoreRevByScore() {
 
@@ -636,13 +636,13 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		zSet.add(t1, 1);
 		zSet.add(t2, 2);
 		zSet.add(t3, 3);
-		RedisZSet<T> tuples = zSet.reverseRangeAndStoreByScore("dest", Range.closed(1, 3),
+		ValkeyZSet<T> tuples = zSet.reverseRangeAndStoreByScore("dest", Range.closed(1, 3),
 				Limit.limit().count(2).offset(0));
 
 		assertThat(tuples).hasSize(2).containsSequence(t2, t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemove() {
 		T t1 = getT();
 		T t2 = getT();
@@ -662,7 +662,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t4);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveByScore() {
 		T t1 = getT();
 		T t2 = getT();
@@ -683,12 +683,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.next()).isEqualTo(t4);
 	}
 
-	@ParameterizedRedisTest // GH-2041
+	@ParameterizedValkeyTest // GH-2041
 	@EnabledOnCommand("ZDIFF")
 	void testDifference() {
 
-		RedisZSet<T> set1 = createZSetFor("test:zset:set1");
-		RedisZSet<T> set2 = createZSetFor("test:zset:set2");
+		ValkeyZSet<T> set1 = createZSetFor("test:zset:set1");
+		ValkeyZSet<T> set2 = createZSetFor("test:zset:set2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -708,11 +708,11 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.diffWithScores(Arrays.asList(set1, set2))).containsOnly(new DefaultTypedTuple<>(t1, 1d));
 	}
 
-	@ParameterizedRedisTest // GH-2041
+	@ParameterizedValkeyTest // GH-2041
 	void testDifferenceAndStore() {
 
-		RedisZSet<T> set1 = createZSetFor("test:zset:set1");
-		RedisZSet<T> set2 = createZSetFor("test:zset:set2");
+		ValkeyZSet<T> set1 = createZSetFor("test:zset:set1");
+		ValkeyZSet<T> set2 = createZSetFor("test:zset:set2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -729,17 +729,17 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		set2.add(t3, 3);
 
 		String resultName = "test:zset:inter:result:1";
-		RedisZSet<T> diff = zSet.diffAndStore(Arrays.asList(set1, set2), resultName);
+		ValkeyZSet<T> diff = zSet.diffAndStore(Arrays.asList(set1, set2), resultName);
 
 		assertThat(diff).containsOnly(t1);
 	}
 
-	@ParameterizedRedisTest // GH-2042
+	@ParameterizedValkeyTest // GH-2042
 	@EnabledOnCommand("ZINTER")
 	void testIntersect() {
 
-		RedisZSet<T> interSet1 = createZSetFor("test:zset:inter1");
-		RedisZSet<T> interSet2 = createZSetFor("test:zset:inter");
+		ValkeyZSet<T> interSet1 = createZSetFor("test:zset:inter1");
+		ValkeyZSet<T> interSet2 = createZSetFor("test:zset:inter");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -760,11 +760,11 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 				.containsOnly(new DefaultTypedTuple<>(t2, 6d));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIntersectAndStore() {
 
-		RedisZSet<T> interSet1 = createZSetFor("test:zset:inter1");
-		RedisZSet<T> interSet2 = createZSetFor("test:zset:inter");
+		ValkeyZSet<T> interSet1 = createZSetFor("test:zset:inter1");
+		ValkeyZSet<T> interSet2 = createZSetFor("test:zset:inter");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -781,7 +781,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		interSet2.add(t3, 3);
 
 		String resultName = "test:zset:inter:result:1";
-		RedisZSet<T> inter = zSet.intersectAndStore(Arrays.asList(interSet1, interSet2), resultName);
+		ValkeyZSet<T> inter = zSet.intersectAndStore(Arrays.asList(interSet1, interSet2), resultName);
 
 		assertThat(inter).hasSize(1);
 		assertThat(inter).contains(t2);
@@ -789,12 +789,12 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(inter.getKey()).isEqualTo(resultName);
 	}
 
-	@ParameterizedRedisTest // GH-2042
+	@ParameterizedValkeyTest // GH-2042
 	@EnabledOnCommand("ZUNION")
 	void testUnion() {
 
-		RedisZSet<T> set1 = createZSetFor("test:zset:union1");
-		RedisZSet<T> set2 = createZSetFor("test:zset:union2");
+		ValkeyZSet<T> set1 = createZSetFor("test:zset:union1");
+		ValkeyZSet<T> set2 = createZSetFor("test:zset:union2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -814,11 +814,11 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testUnionAndStore() {
 
-		RedisZSet<T> unionSet1 = createZSetFor("test:zset:union1");
-		RedisZSet<T> unionSet2 = createZSetFor("test:zset:union2");
+		ValkeyZSet<T> unionSet1 = createZSetFor("test:zset:union1");
+		ValkeyZSet<T> unionSet2 = createZSetFor("test:zset:union2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -833,7 +833,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		unionSet2.add(t3, 6);
 
 		String resultName = "test:zset:union:result:1";
-		RedisZSet<T> union = zSet.unionAndStore(Arrays.asList(unionSet1, unionSet2), resultName);
+		ValkeyZSet<T> union = zSet.unionAndStore(Arrays.asList(unionSet1, unionSet2), resultName);
 		assertThat(union).hasSize(4);
 		assertThat(union).contains(t1, t2, t3, t4);
 		assertThat(union.getKey()).isEqualTo(resultName);
@@ -844,7 +844,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(union.score(t4)).isEqualTo(Double.valueOf(5));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testIterator() {
 		T t1 = getT();
 		T t2 = getT();
@@ -865,7 +865,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(iterator.hasNext()).isFalse();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArray() {
 		T t1 = getT();
 		T t2 = getT();
@@ -881,7 +881,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(array).isEqualTo(new Object[] { t1, t2, t3, t4 });
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArrayWithGenerics() {
 		T t1 = getT();
 		T t2 = getT();
@@ -897,7 +897,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(array).isEqualTo(new Object[] { t1, t2, t3, t4 });
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-314
+	@ParameterizedValkeyTest // DATAREDIS-314
 	void testScanWorksCorrectly() throws IOException {
 
 		T t1 = getT();
@@ -919,7 +919,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 
 	}
 
-	@ParameterizedRedisTest // GH-1794
+	@ParameterizedValkeyTest // GH-1794
 	void testZAddIfAbsentWorks() {
 
 		T t1 = getT();
@@ -928,7 +928,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 		assertThat(zSet.addIfAbsent(t1, 1)).isFalse();
 	}
 
-	@ParameterizedRedisTest // GH-2049
+	@ParameterizedValkeyTest // GH-2049
 	@EnabledOnCommand("ZRANDMEMBER")
 	void randMemberReturnsSomething() {
 

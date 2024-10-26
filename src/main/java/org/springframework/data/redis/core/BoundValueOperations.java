@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Value (or String in Redis terminology) operations bound to a certain key.
+ * Value (or String in Valkey terminology) operations bound to a certain key.
  *
  * @author Costin Leau
  * @author Mark Paluch
@@ -35,7 +35,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * Set {@code value} for the bound key.
 	 *
 	 * @param value must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	void set(V value);
 
@@ -45,7 +45,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param value must not be {@literal null}.
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+	 * @see <a href="https://redis.io/commands/setex">Valkey Documentation: SETEX</a>
 	 */
 	void set(V value, long timeout, TimeUnit unit);
 
@@ -55,7 +55,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param value must not be {@literal null}.
 	 * @param timeout must not be {@literal null}.
 	 * @throws IllegalArgumentException if either {@code value} or {@code timeout} is not present.
-	 * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+	 * @see <a href="https://redis.io/commands/setex">Valkey Documentation: SETEX</a>
 	 * @since 2.1
 	 */
 	default void set(V value, Duration timeout) {
@@ -74,7 +74,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
+	 * @see <a href="https://redis.io/commands/setnx">Valkey Documentation: SETNX</a>
 	 */
 	@Nullable
 	Boolean setIfAbsent(V value);
@@ -87,7 +87,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param unit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	@Nullable
 	Boolean setIfAbsent(V value, long timeout, TimeUnit unit);
@@ -99,7 +99,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param timeout must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @throws IllegalArgumentException if either {@code value} or {@code timeout} is not present.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -120,7 +120,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param value must not be {@literal null}.
 	 * @return command result indicating if the key has been set.
 	 * @throws IllegalArgumentException if {@code value} is not present.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -134,7 +134,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param unit must not be {@literal null}.
 	 * @return command result indicating if the key has been set.
 	 * @throws IllegalArgumentException if either {@code value} or {@code timeout} is not present.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -147,7 +147,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param timeout must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @throws IllegalArgumentException if either {@code value} or {@code timeout} is not present.
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -166,7 +166,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * Get the value of the bound key.
 	 *
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/get">Redis Documentation: GET</a>
+	 * @see <a href="https://redis.io/commands/get">Valkey Documentation: GET</a>
 	 */
 	@Nullable
 	V get();
@@ -175,7 +175,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * Return the value at the bound key and delete the key.
 	 *
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getdel">Redis Documentation: GETDEL</a>
+	 * @see <a href="https://redis.io/commands/getdel">Valkey Documentation: GETDEL</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -187,7 +187,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param timeout
 	 * @param unit must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -198,7 +198,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param timeout must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -209,7 +209,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * bound key.
 	 *
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -219,7 +219,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * Set {@code value} of the bound key and return its old value.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getset">Redis Documentation: GETSET</a>
+	 * @see <a href="https://redis.io/commands/getset">Valkey Documentation: GETSET</a>
 	 */
 	@Nullable
 	V getAndSet(V value);
@@ -229,7 +229,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/incr">Redis Documentation: INCR</a>
+	 * @see <a href="https://redis.io/commands/incr">Valkey Documentation: INCR</a>
 	 */
 	@Nullable
 	Long increment();
@@ -239,7 +239,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param delta
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/incrby">Redis Documentation: INCRBY</a>
+	 * @see <a href="https://redis.io/commands/incrby">Valkey Documentation: INCRBY</a>
 	 */
 	@Nullable
 	Long increment(long delta);
@@ -249,7 +249,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param delta
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/incrbyfloat">Redis Documentation: INCRBYFLOAT</a>
+	 * @see <a href="https://redis.io/commands/incrbyfloat">Valkey Documentation: INCRBYFLOAT</a>
 	 */
 	@Nullable
 	Double increment(double delta);
@@ -259,7 +259,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/decr">Redis Documentation: DECR</a>
+	 * @see <a href="https://redis.io/commands/decr">Valkey Documentation: DECR</a>
 	 */
 	@Nullable
 	Long decrement();
@@ -270,7 +270,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param delta
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/decrby">Redis Documentation: DECRBY</a>
+	 * @see <a href="https://redis.io/commands/decrby">Valkey Documentation: DECRBY</a>
 	 */
 	@Nullable
 	Long decrement(long delta);
@@ -280,7 +280,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/append">Redis Documentation: APPEND</a>
+	 * @see <a href="https://redis.io/commands/append">Valkey Documentation: APPEND</a>
 	 */
 	@Nullable
 	Integer append(String value);
@@ -291,7 +291,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param start
 	 * @param end
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/getrange">Redis Documentation: GETRANGE</a>
+	 * @see <a href="https://redis.io/commands/getrange">Valkey Documentation: GETRANGE</a>
 	 */
 	@Nullable
 	String get(long start, long end);
@@ -301,7 +301,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param value must not be {@literal null}.
 	 * @param offset
-	 * @see <a href="https://redis.io/commands/setrange">Redis Documentation: SETRANGE</a>
+	 * @see <a href="https://redis.io/commands/setrange">Valkey Documentation: SETRANGE</a>
 	 */
 	void set(V value, long offset);
 
@@ -309,7 +309,7 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	 * Get the length of the value stored at the bound key.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/strlen">Redis Documentation: STRLEN</a>
+	 * @see <a href="https://redis.io/commands/strlen">Valkey Documentation: STRLEN</a>
 	 */
 	@Nullable
 	Long size();
@@ -317,5 +317,5 @@ public interface BoundValueOperations<K, V> extends BoundKeyOperations<K> {
 	/**
 	 * @return never {@literal null}.
 	 */
-	RedisOperations<K, V> getOperations();
+	ValkeyOperations<K, V> getOperations();
 }

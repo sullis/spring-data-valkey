@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.redis.core.types.RedisClientInfo;
-import org.springframework.data.redis.core.types.RedisClientInfo.RedisClientInfoBuilder;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo.ValkeyClientInfoBuilder;
 
 /**
- * {@link Converter} implementation to create one {@link RedisClientInfo} per line entry in given {@link String} array.
+ * {@link Converter} implementation to create one {@link ValkeyClientInfo} per line entry in given {@link String} array.
  *
  * <pre>
  * ## sample of single line
@@ -33,16 +33,16 @@ import org.springframework.data.redis.core.types.RedisClientInfo.RedisClientInfo
  * @author Christoph Strobl
  * @since 1.3
  */
-public class StringToRedisClientInfoConverter implements Converter<String[], List<RedisClientInfo>> {
+public class StringToValkeyClientInfoConverter implements Converter<String[], List<ValkeyClientInfo>> {
 
-	public static final StringToRedisClientInfoConverter INSTANCE = new StringToRedisClientInfoConverter();
+	public static final StringToValkeyClientInfoConverter INSTANCE = new StringToValkeyClientInfoConverter();
 
 	@Override
-	public List<RedisClientInfo> convert(String[] lines) {
+	public List<ValkeyClientInfo> convert(String[] lines) {
 
-		List<RedisClientInfo> clientInfoList = new ArrayList<>(lines.length);
+		List<ValkeyClientInfo> clientInfoList = new ArrayList<>(lines.length);
 		for (String line : lines) {
-			clientInfoList.add(RedisClientInfoBuilder.fromString(line));
+			clientInfoList.add(ValkeyClientInfoBuilder.fromString(line));
 		}
 
 		return clientInfoList;

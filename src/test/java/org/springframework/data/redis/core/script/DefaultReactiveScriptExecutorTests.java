@@ -30,21 +30,21 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.Person;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializationContext.RedisSerializationContextBuilder;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.ValkeySerializationContextBuilder;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.scripting.support.StaticScriptSource;
 
 /**
@@ -54,22 +54,22 @@ import org.springframework.scripting.support.StaticScriptSource;
 public class DefaultReactiveScriptExecutorTests {
 
 	private static LettuceConnectionFactory connectionFactory;
-	private static StringRedisTemplate stringTemplate;
+	private static StringValkeyTemplate stringTemplate;
 	private static ReactiveScriptExecutor<String> stringScriptExecutor;
 
 	@BeforeAll
 	static void setUp() {
 
-		connectionFactory = LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+		connectionFactory = LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 
-		stringTemplate = new StringRedisTemplate(connectionFactory);
-		stringScriptExecutor = new DefaultReactiveScriptExecutor<>(connectionFactory, RedisSerializationContext.string());
+		stringTemplate = new StringValkeyTemplate(connectionFactory);
+		stringScriptExecutor = new DefaultReactiveScriptExecutor<>(connectionFactory, ValkeySerializationContext.string());
 	}
 
 	@BeforeEach
 	void before() {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		try {
 			connection.scriptingCommands().scriptFlush();
 			connection.flushDb();
@@ -78,14 +78,14 @@ public class DefaultReactiveScriptExecutorTests {
 		}
 	}
 
-	protected RedisConnectionFactory getConnectionFactory() {
+	protected ValkeyConnectionFactory getConnectionFactory() {
 		return connectionFactory;
 	}
 
 	@Test // DATAREDIS-711
 	void shouldReturnLong() {
 
-		DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<Long> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/increment.lua"));
 		script.setResultType(Long.class);
 
@@ -100,11 +100,11 @@ public class DefaultReactiveScriptExecutorTests {
 	@Test // DATAREDIS-711
 	void shouldReturnBoolean() {
 
-		RedisSerializationContextBuilder<String, Long> builder = RedisSerializationContext
-				.newSerializationContext(StringRedisSerializer.UTF_8);
+		ValkeySerializationContextBuilder<String, Long> builder = ValkeySerializationContext
+				.newSerializationContext(StringValkeySerializer.UTF_8);
 		builder.value(new GenericToStringSerializer<>(Long.class));
 
-		DefaultRedisScript<Boolean> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<Boolean> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/cas.lua"));
 		script.setResultType(Boolean.class);
 
@@ -124,15 +124,15 @@ public class DefaultReactiveScriptExecutorTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	void shouldApplyCustomArgsSerializer() {
 
-		DefaultRedisScript<List> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<List> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/bulkpop.lua"));
 		script.setResultType(List.class);
 
 		stringTemplate.boundListOps("mylist").leftPushAll("a", "b", "c", "d");
 
 		Flux<List<String>> mylist = stringScriptExecutor.execute(script, Collections.singletonList("mylist"),
-				Collections.singletonList(1L), RedisElementWriter.from(new GenericToStringSerializer<>(Long.class)),
-				(RedisElementReader) RedisElementReader.from(StringRedisSerializer.UTF_8));
+				Collections.singletonList(1L), ValkeyElementWriter.from(new GenericToStringSerializer<>(Long.class)),
+				(ValkeyElementReader) ValkeyElementReader.from(StringValkeySerializer.UTF_8));
 
 		mylist.as(StepVerifier::create).expectNext(Collections.singletonList("a")).verifyComplete();
 	}
@@ -140,7 +140,7 @@ public class DefaultReactiveScriptExecutorTests {
 	@Test // DATAREDIS-711
 	void testExecuteMixedListResult() {
 
-		DefaultRedisScript<List> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<List> script = new DefaultValkeyScript<>();
 		script.setLocation(new ClassPathResource("org/springframework/data/redis/core/script/popandlength.lua"));
 		script.setResultType(List.class);
 
@@ -156,7 +156,7 @@ public class DefaultReactiveScriptExecutorTests {
 	@Test // DATAREDIS-711
 	void shouldReturnValueResult() {
 
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return redis.call('GET',KEYS[1])");
 		script.setResultType(String.class);
 
@@ -171,11 +171,11 @@ public class DefaultReactiveScriptExecutorTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	void shouldReturnStatusValue() {
 
-		DefaultRedisScript script = new DefaultRedisScript();
+		DefaultValkeyScript script = new DefaultValkeyScript();
 		script.setScriptText("return redis.call('SET',KEYS[1], ARGV[1])");
 
-		RedisSerializationContextBuilder<String, Long> builder = RedisSerializationContext
-				.newSerializationContext(StringRedisSerializer.UTF_8);
+		ValkeySerializationContextBuilder<String, Long> builder = ValkeySerializationContext
+				.newSerializationContext(StringValkeySerializer.UTF_8);
 		builder.value(new GenericToStringSerializer<>(Long.class));
 
 		ReactiveScriptExecutor<String> scriptExecutor = new DefaultReactiveScriptExecutor<>(connectionFactory,
@@ -190,22 +190,22 @@ public class DefaultReactiveScriptExecutorTests {
 	@Test // DATAREDIS-711
 	void shouldApplyCustomResultSerializer() {
 
-		Jackson2JsonRedisSerializer<Person> personSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
+		Jackson2JsonValkeySerializer<Person> personSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
 
-		RedisTemplate<String, Person> template = new RedisTemplate<>();
-		template.setKeySerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, Person> template = new ValkeyTemplate<>();
+		template.setKeySerializer(StringValkeySerializer.UTF_8);
 		template.setValueSerializer(personSerializer);
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
 
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptSource(new StaticScriptSource("redis.call('SET',KEYS[1], ARGV[1])\nreturn 'FOO'"));
 		script.setResultType(String.class);
 
 		Person joe = new Person("Joe", "Schmoe", 23);
 		Flux<String> result = stringScriptExecutor.execute(script, Collections.singletonList("bar"),
-				Collections.singletonList(joe), RedisElementWriter.from(personSerializer),
-				RedisElementReader.from(StringRedisSerializer.UTF_8));
+				Collections.singletonList(joe), ValkeyElementWriter.from(personSerializer),
+				ValkeyElementReader.from(StringValkeySerializer.UTF_8));
 
 		result.as(StepVerifier::create).expectNext("FOO").verifyComplete();
 
@@ -215,21 +215,21 @@ public class DefaultReactiveScriptExecutorTests {
 	@Test // DATAREDIS-711
 	void executeAddsScriptToScriptCache() {
 
-		DefaultRedisScript<String> script = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return 'HELLO'");
 		script.setResultType(String.class);
 
 		// Execute script twice, second time should be from cache
 
 		assertThat(stringTemplate.execute(
-				(RedisCallback<List<Boolean>>) connection -> connection.scriptingCommands().scriptExists(script.getSha1())))
+				(ValkeyCallback<List<Boolean>>) connection -> connection.scriptingCommands().scriptExists(script.getSha1())))
 						.containsExactly(false);
 
 		stringScriptExecutor.execute(script, Collections.emptyList()).as(StepVerifier::create).expectNext("HELLO")
 				.verifyComplete();
 
 		assertThat(stringTemplate.execute(
-				(RedisCallback<List<Boolean>>) connection -> connection.scriptingCommands().scriptExists(script.getSha1())))
+				(ValkeyCallback<List<Boolean>>) connection -> connection.scriptingCommands().scriptExists(script.getSha1())))
 						.containsExactly(true);
 
 		stringScriptExecutor.execute(script, Collections.emptyList()).as(StepVerifier::create).expectNext("HELLO")

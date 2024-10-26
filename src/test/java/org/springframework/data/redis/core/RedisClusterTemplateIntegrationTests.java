@@ -36,113 +36,113 @@ import org.springframework.data.redis.connection.jedis.extension.JedisConnection
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-@EnabledOnRedisClusterAvailable
-public class RedisClusterTemplateIntegrationTests<K, V> extends RedisTemplateIntegrationTests<K, V> {
+@EnabledOnValkeyClusterAvailable
+public class ValkeyClusterTemplateIntegrationTests<K, V> extends ValkeyTemplateIntegrationTests<K, V> {
 
-	public RedisClusterTemplateIntegrationTests(RedisTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public ValkeyClusterTemplateIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 		super(redisTemplate, keyFactory, valueFactory);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Pipeline not supported in cluster mode")
-	public void testExecutePipelinedNonNullRedisCallback() {
+	public void testExecutePipelinedNonNullValkeyCallback() {
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
-				.isThrownBy(super::testExecutePipelinedNonNullRedisCallback);
+				.isThrownBy(super::testExecutePipelinedNonNullValkeyCallback);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Pipeline not supported in cluster mode")
 	public void testExecutePipelinedTx() {
 		super.testExecutePipelinedTx();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Watch only supported on same connection...")
 	public void testWatch() {
 		super.testWatch();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Watch only supported on same connection...")
 	public void testUnwatch() {
 		super.testUnwatch();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("EXEC only supported on same connection...")
 	public void testExec() {
 		super.testExec();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Pipeline not supported in cluster mode")
 	public void testExecutePipelinedNonNullSessionCallback() {
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
 				.isThrownBy(super::testExecutePipelinedNonNullSessionCallback);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("PubSub not supported in cluster mode")
 	public void testConvertAndSend() {
 		super.testConvertAndSend();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Watch only supported on same connection...")
 	public void testExecConversionDisabled() {
 		super.testExecConversionDisabled();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Discard only supported on same connection...")
 	public void testDiscard() {
 		super.testDiscard();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Pipleline not supported in cluster mode")
 	public void testExecutePipelined() {
 		super.testExecutePipelined();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("Watch only supported on same connection...")
 	public void testWatchMultipleKeys() {
 		super.testWatchMultipleKeys();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("This one fails when using GET options on numbers")
 	public void testSortBulkMapper() {
 		super.testSortBulkMapper();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("This one fails when using GET options on numbers")
 	public void testGetExpireMillisUsingTransactions() {
 		super.testGetExpireMillisUsingTransactions();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@Disabled("This one fails when using GET options on numbers")
 	public void testGetExpireMillisUsingPipelining() {
 		super.testGetExpireMillisUsingPipelining();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testScan() {
 
 		// Only Lettuce supports cluster-wide scanning
@@ -160,40 +160,40 @@ public class RedisClusterTemplateIntegrationTests<K, V> extends RedisTemplateInt
 
 
 		OxmSerializer serializer = XstreamOxmSerializerSingleton.getInstance();
-		Jackson2JsonRedisSerializer<Person> jackson2JsonSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
+		Jackson2JsonValkeySerializer<Person> jackson2JsonSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
 
 		// JEDIS
 		JedisConnectionFactory jedisConnectionFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisCluster.class);
+				.getConnectionFactory(ValkeyCluster.class);
 
 		jedisConnectionFactory.afterPropertiesSet();
 
-		RedisTemplate<String, String> jedisStringTemplate = new RedisTemplate<>();
-		jedisStringTemplate.setDefaultSerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, String> jedisStringTemplate = new ValkeyTemplate<>();
+		jedisStringTemplate.setDefaultSerializer(StringValkeySerializer.UTF_8);
 		jedisStringTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Long> jedisLongTemplate = new RedisTemplate<>();
-		jedisLongTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, Long> jedisLongTemplate = new ValkeyTemplate<>();
+		jedisLongTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
 		jedisLongTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		jedisLongTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisLongTemplate.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> jedisRawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> jedisRawTemplate = new ValkeyTemplate<>();
 		jedisRawTemplate.setEnableDefaultSerializer(false);
 		jedisRawTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisRawTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> jedisPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jedisPersonTemplate = new ValkeyTemplate<>();
 		jedisPersonTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisPersonTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, String> jedisXstreamStringTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> jedisXstreamStringTemplate = new ValkeyTemplate<>();
 		jedisXstreamStringTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisXstreamStringTemplate.setDefaultSerializer(serializer);
 		jedisXstreamStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> jedisJackson2JsonPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> jedisJackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		jedisJackson2JsonPersonTemplate.setConnectionFactory(jedisConnectionFactory);
 		jedisJackson2JsonPersonTemplate.setValueSerializer(jackson2JsonSerializer);
 		jedisJackson2JsonPersonTemplate.afterPropertiesSet();
@@ -201,34 +201,34 @@ public class RedisClusterTemplateIntegrationTests<K, V> extends RedisTemplateInt
 		// LETTUCE
 
 		LettuceConnectionFactory lettuceConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisCluster.class);
+				.getConnectionFactory(ValkeyCluster.class);
 
-		RedisTemplate<String, String> lettuceStringTemplate = new RedisTemplate<>();
-		lettuceStringTemplate.setDefaultSerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, String> lettuceStringTemplate = new ValkeyTemplate<>();
+		lettuceStringTemplate.setDefaultSerializer(StringValkeySerializer.UTF_8);
 		lettuceStringTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettuceStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Long> lettuceLongTemplate = new RedisTemplate<>();
-		lettuceLongTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+		ValkeyTemplate<String, Long> lettuceLongTemplate = new ValkeyTemplate<>();
+		lettuceLongTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
 		lettuceLongTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		lettuceLongTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettuceLongTemplate.afterPropertiesSet();
 
-		RedisTemplate<byte[], byte[]> lettuceRawTemplate = new RedisTemplate<>();
+		ValkeyTemplate<byte[], byte[]> lettuceRawTemplate = new ValkeyTemplate<>();
 		lettuceRawTemplate.setEnableDefaultSerializer(false);
 		lettuceRawTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettuceRawTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> lettucePersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> lettucePersonTemplate = new ValkeyTemplate<>();
 		lettucePersonTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettucePersonTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, String> lettuceXstreamStringTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, String> lettuceXstreamStringTemplate = new ValkeyTemplate<>();
 		lettuceXstreamStringTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettuceXstreamStringTemplate.setDefaultSerializer(serializer);
 		lettuceXstreamStringTemplate.afterPropertiesSet();
 
-		RedisTemplate<String, Person> lettuceJackson2JsonPersonTemplate = new RedisTemplate<>();
+		ValkeyTemplate<String, Person> lettuceJackson2JsonPersonTemplate = new ValkeyTemplate<>();
 		lettuceJackson2JsonPersonTemplate.setConnectionFactory(lettuceConnectionFactory);
 		lettuceJackson2JsonPersonTemplate.setValueSerializer(jackson2JsonSerializer);
 		lettuceJackson2JsonPersonTemplate.afterPropertiesSet();

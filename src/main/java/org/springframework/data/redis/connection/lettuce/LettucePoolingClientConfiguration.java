@@ -26,7 +26,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.util.Assert;
 
 /**
- * Redis client configuration for lettuce using a driver level pooled connection by adding pooling specific
+ * Valkey client configuration for lettuce using a driver level pooled connection by adding pooling specific
  * configuration to {@link LettuceClientConfiguration}.
  *
  * @author Mark Paluch
@@ -147,7 +147,7 @@ public interface LettucePoolingClientConfiguration extends LettuceClientConfigur
 
 		@Override
 		public LettucePoolingClientConfigurationBuilder redisCredentialsProviderFactory(
-				RedisCredentialsProviderFactory redisCredentialsProviderFactory) {
+				ValkeyCredentialsProviderFactory redisCredentialsProviderFactory) {
 			super.redisCredentialsProviderFactory(redisCredentialsProviderFactory);
 			return this;
 		}

@@ -22,15 +22,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
- * Parameters for testing implementations of {@link ReactiveRedisMessageListenerContainer}
+ * Parameters for testing implementations of {@link ReactiveValkeyMessageListenerContainer}
  *
  * @author Mark Paluch
  */
@@ -39,9 +39,9 @@ class ReactiveOperationsTestParams {
 	public static Collection<Object[]> testParams() {
 
 		LettuceConnectionFactory lettuceConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class, false);
+				.getConnectionFactory(ValkeyStanalone.class, false);
 		LettuceConnectionFactory poolingConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class, true);
+				.getConnectionFactory(ValkeyStanalone.class, true);
 
 		List<Object[]> list = Arrays.asList(new Object[][] { //
 				{ lettuceConnectionFactory, "Standalone" }, //
@@ -50,11 +50,11 @@ class ReactiveOperationsTestParams {
 
 		if (clusterAvailable()) {
 
-			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-			clusterConfiguration.addClusterNode(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT));
+			ValkeyClusterConfiguration clusterConfiguration = new ValkeyClusterConfiguration();
+			clusterConfiguration.addClusterNode(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT));
 
 			LettuceConnectionFactory lettuceClusterConnectionFactory = LettuceConnectionFactoryExtension
-					.getConnectionFactory(RedisStanalone.class);
+					.getConnectionFactory(ValkeyStanalone.class);
 
 			list = new ArrayList<>(list);
 			list.add(new Object[] { lettuceClusterConnectionFactory, "Cluster" });
@@ -64,7 +64,7 @@ class ReactiveOperationsTestParams {
 	}
 
 	private static boolean clusterAvailable() {
-		return RedisDetector.isClusterAvailable();
+		return ValkeyDetector.isClusterAvailable();
 	}
 
 }

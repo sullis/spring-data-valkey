@@ -22,9 +22,9 @@ import static org.mockito.Mockito.*;
 import io.lettuce.core.EpollProvider;
 import io.lettuce.core.KqueueProvider;
 import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisException;
-import io.lettuce.core.api.async.RedisAsyncCommands;
-import io.lettuce.core.api.reactive.BaseRedisReactiveCommands;
+import io.lettuce.core.ValkeyException;
+import io.lettuce.core.api.async.ValkeyAsyncCommands;
+import io.lettuce.core.api.reactive.BaseValkeyReactiveCommands;
 import reactor.test.StepVerifier;
 
 import java.io.File;
@@ -39,17 +39,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.redis.ConnectionFactoryTracker;
-import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.ClusterCommandExecutor;
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyStaticMasterReplicaConfiguration;
+import org.springframework.data.redis.connection.StringValkeyConnection;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 
 /**
@@ -65,7 +65,7 @@ class LettuceConnectionFactoryTests {
 
 	private LettuceConnectionFactory factory;
 
-	private StringRedisConnection connection;
+	private StringValkeyConnection connection;
 
 	@BeforeEach
 	void setUp() {
@@ -75,7 +75,7 @@ class LettuceConnectionFactoryTests {
 		factory.afterPropertiesSet();
 		factory.setShutdownTimeout(0);
 		factory.start();
-		connection = new DefaultStringRedisConnection(factory.getConnection());
+		connection = new DefaultStringValkeyConnection(factory.getConnection());
 	}
 
 	@AfterEach
@@ -93,7 +93,7 @@ class LettuceConnectionFactoryTests {
 	void testGetNewConnectionOnError() throws Exception {
 		factory.setValidateConnection(true);
 		connection.lPush("alist", "baz");
-		RedisAsyncCommands nativeConn = (RedisAsyncCommands) connection.getNativeConnection();
+		ValkeyAsyncCommands nativeConn = (ValkeyAsyncCommands) connection.getNativeConnection();
 		nativeConn.getStatefulConnection().close();
 		// Give some time for async channel close
 		Thread.sleep(500);
@@ -101,10 +101,10 @@ class LettuceConnectionFactoryTests {
 		try {
 			connection.get("test3");
 			fail("Expected exception using natively closed conn");
-		} catch (RedisSystemException expected) {
+		} catch (ValkeySystemException expected) {
 			// expected, shared conn is closed
 		}
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(factory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(factory.getConnection());
 		assertThat(conn2.getNativeConnection()).isNotSameAs(nativeConn);
 		conn2.set("anotherkey", "anothervalue");
 		assertThat(conn2.get("anotherkey")).isEqualTo("anothervalue");
@@ -115,14 +115,14 @@ class LettuceConnectionFactoryTests {
 	@Test
 	void testConnectionErrorNoValidate() throws Exception {
 		connection.lPush("ablist", "baz");
-		((RedisAsyncCommands) connection.getNativeConnection()).getStatefulConnection().close();
+		((ValkeyAsyncCommands) connection.getNativeConnection()).getStatefulConnection().close();
 		// Give some time for async channel close
 		Thread.sleep(500);
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(factory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(factory.getConnection());
 		try {
 			conn2.set("anotherkey", "anothervalue");
 			fail("Expected exception using natively closed conn");
-		} catch (RedisSystemException expected) {
+		} catch (ValkeySystemException expected) {
 			// expected, as we are re-using the natively closed conn
 		} finally {
 			conn2.close();
@@ -132,7 +132,7 @@ class LettuceConnectionFactoryTests {
 	@Test
 	void testValidateNoError() {
 		factory.setValidateConnection(true);
-		RedisConnection conn2 = factory.getConnection();
+		ValkeyConnection conn2 = factory.getConnection();
 		assertThat(conn2.getNativeConnection()).isSameAs(connection.getNativeConnection());
 	}
 
@@ -169,7 +169,7 @@ class LettuceConnectionFactoryTests {
 
 		ConnectionFactoryTracker.add(factory2);
 
-		StringRedisConnection separateDatabase = new DefaultStringRedisConnection(factory2.getConnection());
+		StringValkeyConnection separateDatabase = new DefaultStringValkeyConnection(factory2.getConnection());
 		separateDatabase.flushDb();
 
 		// put an item in database 0
@@ -188,7 +188,7 @@ class LettuceConnectionFactoryTests {
 
 		ConnectionFactoryTracker.add(factory2);
 
-		LettuceReactiveRedisConnection separateDatabase = factory2.getReactiveConnection();
+		LettuceReactiveValkeyConnection separateDatabase = factory2.getReactiveConnection();
 
 		separateDatabase.serverCommands().flushDb() //
 				.as(StepVerifier::create) //
@@ -225,19 +225,19 @@ class LettuceConnectionFactoryTests {
 	@Test
 	void testDisableSharedConnection() throws Exception {
 		factory.setShareNativeConnection(false);
-		RedisConnection conn2 = factory.getConnection();
+		ValkeyConnection conn2 = factory.getConnection();
 		assertThat(conn2.getNativeConnection()).isNotSameAs(connection.getNativeConnection());
 		Thread.sleep(100);
 		conn2.close();
 		assertThat(conn2.isClosed()).isTrue();
 
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(conn2::getNativeConnection);
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(conn2::getNativeConnection);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void testResetConnection() {
-		RedisAsyncCommands<byte[], byte[]> nativeConn = (RedisAsyncCommands<byte[], byte[]>) connection
+		ValkeyAsyncCommands<byte[], byte[]> nativeConn = (ValkeyAsyncCommands<byte[], byte[]>) connection
 				.getNativeConnection();
 		factory.resetConnection();
 		assertThat(factory.getConnection().getNativeConnection()).isNotSameAs(nativeConn);
@@ -246,10 +246,10 @@ class LettuceConnectionFactoryTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testInitConnection() {
-		RedisAsyncCommands<byte[], byte[]> nativeConn = (RedisAsyncCommands<byte[], byte[]>) connection
+		ValkeyAsyncCommands<byte[], byte[]> nativeConn = (ValkeyAsyncCommands<byte[], byte[]>) connection
 				.getNativeConnection();
 		factory.initConnection();
-		RedisConnection newConnection = factory.getConnection();
+		ValkeyConnection newConnection = factory.getConnection();
 		assertThat(newConnection.getNativeConnection()).isNotSameAs(nativeConn);
 		newConnection.close();
 	}
@@ -257,11 +257,11 @@ class LettuceConnectionFactoryTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testResetAndInitConnection() {
-		RedisAsyncCommands<byte[], byte[]> nativeConn = (RedisAsyncCommands<byte[], byte[]>) connection
+		ValkeyAsyncCommands<byte[], byte[]> nativeConn = (ValkeyAsyncCommands<byte[], byte[]>) connection
 				.getNativeConnection();
 		factory.resetConnection();
 		factory.initConnection();
-		RedisConnection newConnection = factory.getConnection();
+		ValkeyConnection newConnection = factory.getConnection();
 		assertThat(newConnection.getNativeConnection()).isNotSameAs(nativeConn);
 		newConnection.close();
 	}
@@ -274,7 +274,7 @@ class LettuceConnectionFactoryTests {
 		try {
 			factory.getConnection();
 			fail("Expected connection failure exception");
-		} catch (RedisConnectionFailureException expected) {
+		} catch (ValkeyConnectionFailureException expected) {
 		}
 	}
 
@@ -304,7 +304,7 @@ class LettuceConnectionFactoryTests {
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connectionToDbIndex2 = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connectionToDbIndex2 = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 
@@ -328,7 +328,7 @@ class LettuceConnectionFactoryTests {
 
 		ConnectionFactoryTracker.add(factory);
 
-		StringRedisConnection connection = new DefaultStringRedisConnection(factory.getConnection());
+		StringValkeyConnection connection = new DefaultStringValkeyConnection(factory.getConnection());
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -346,7 +346,7 @@ class LettuceConnectionFactoryTests {
 
 		ConnectionFactoryTracker.add(factory);
 
-		assertThat(factory.getReactiveConnection().execute(BaseRedisReactiveCommands::ping).blockFirst()).isEqualTo("PONG");
+		assertThat(factory.getReactiveConnection().execute(BaseValkeyReactiveCommands::ping).blockFirst()).isEqualTo("PONG");
 	}
 
 	@Test // DATAREDIS-667
@@ -358,18 +358,18 @@ class LettuceConnectionFactoryTests {
 				.clientResources(LettuceTestClientResources.getSharedClientResources()).shutdownTimeout(Duration.ZERO)
 				.shutdownQuietPeriod(Duration.ZERO).build();
 
-		LettuceConnectionFactory factory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(), configuration);
+		LettuceConnectionFactory factory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(), configuration);
 		factory.setShareNativeConnection(false);
 		factory.start();
 
 		ConnectionFactoryTracker.add(factory);
 
-		RedisConnection initial = factory.getConnection();
+		ValkeyConnection initial = factory.getConnection();
 		Object initialNativeConnection = initial.getNativeConnection();
 
 		initial.close();
 
-		RedisConnection subsequent = factory.getConnection();
+		ValkeyConnection subsequent = factory.getConnection();
 		Object subsequentNativeConnection = subsequent.getNativeConnection();
 
 		subsequent.close();
@@ -380,7 +380,7 @@ class LettuceConnectionFactoryTests {
 	}
 
 	@Test // DATAREDIS-687
-	void connectsThroughRedisSocket() {
+	void connectsThroughValkeySocket() {
 
 		assumeTrue(EpollProvider.isAvailable() || KqueueProvider.isAvailable());
 		assumeTrue(new File(SettingsUtils.getSocket()).exists());
@@ -392,7 +392,7 @@ class LettuceConnectionFactoryTests {
 		factory.setShareNativeConnection(false);
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 		assertThat(connection.ping()).isEqualTo("PONG");
 
 		connection.close();
@@ -408,13 +408,13 @@ class LettuceConnectionFactoryTests {
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().readFrom(ReadFrom.REPLICA)
 				.clientResources(LettuceTestClientResources.getSharedClientResources()).build();
 
-		RedisStaticMasterReplicaConfiguration elastiCache = new RedisStaticMasterReplicaConfiguration(
+		ValkeyStaticMasterReplicaConfiguration elastiCache = new ValkeyStaticMasterReplicaConfiguration(
 				SettingsUtils.getHost()).node(SettingsUtils.getHost(), SettingsUtils.getPort() + 1);
 
 		LettuceConnectionFactory factory = new LettuceConnectionFactory(elastiCache, configuration);
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -432,17 +432,17 @@ class LettuceConnectionFactoryTests {
 		assumeTrue("No replicas connected to %s:%d".formatted(SettingsUtils.getHost(), SettingsUtils.getPort()),
 				connection.info("replication").getProperty("connected_slaves", "0").compareTo("0") > 0);
 
-		RedisStaticMasterReplicaConfiguration elastiCache = new RedisStaticMasterReplicaConfiguration(
+		ValkeyStaticMasterReplicaConfiguration elastiCache = new ValkeyStaticMasterReplicaConfiguration(
 				SettingsUtils.getHost()).node(SettingsUtils.getHost(), SettingsUtils.getPort() + 1);
 
 		LettuceConnectionFactory factory = new LettuceConnectionFactory(elastiCache,
 				LettuceTestClientConfiguration.defaultConfiguration());
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		assertThatThrownBy(() -> connection.pSubscribe((message, pattern) -> {}, "foo".getBytes()))
-				.isInstanceOf(RedisConnectionFailureException.class).hasCauseInstanceOf(UnsupportedOperationException.class);
+				.isInstanceOf(ValkeyConnectionFailureException.class).hasCauseInstanceOf(UnsupportedOperationException.class);
 
 		connection.close();
 		factory.destroy();
@@ -457,19 +457,19 @@ class LettuceConnectionFactoryTests {
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().readFrom(ReadFrom.MASTER)
 				.build();
 
-		RedisStaticMasterReplicaConfiguration elastiCache = new RedisStaticMasterReplicaConfiguration(
+		ValkeyStaticMasterReplicaConfiguration elastiCache = new ValkeyStaticMasterReplicaConfiguration(
 				SettingsUtils.getHost(), SettingsUtils.getPort() + 1);
 
 		LettuceConnectionFactory factory = new LettuceConnectionFactory(elastiCache, configuration);
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		try {
 			connection.ping();
-			fail("Expected RedisException: Master is currently unknown");
-		} catch (RedisSystemException ex) {
-			assertThat(ex.getCause()).isInstanceOf(RedisException.class);
+			fail("Expected ValkeyException: Master is currently unknown");
+		} catch (ValkeySystemException ex) {
+			assertThat(ex.getCause()).isInstanceOf(ValkeyException.class);
 			assertThat(ex.getCause().getMessage()).contains("Master is currently unknown");
 		} finally {
 			connection.close();
@@ -492,7 +492,7 @@ class LettuceConnectionFactoryTests {
 
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		try {
 			assertThat(connection.ping()).isEqualTo("PONG");
@@ -510,13 +510,13 @@ class LettuceConnectionFactoryTests {
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().clientName("clientName")
 				.build();
 
-		LettuceConnectionFactory factory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(), configuration);
+		LettuceConnectionFactory factory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(), configuration);
 		factory.setShareNativeConnection(false);
 		factory.start();
 
 		ConnectionFactoryTracker.add(factory);
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		assertThat(connection.getClientName()).isEqualTo("clientName");
 		connection.close();
@@ -525,14 +525,14 @@ class LettuceConnectionFactoryTests {
 	@Test // DATAREDIS-576
 	void getClientNameShouldEqualWithFactorySetting() {
 
-		LettuceConnectionFactory factory = new LettuceConnectionFactory(new RedisStandaloneConfiguration());
+		LettuceConnectionFactory factory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration());
 		factory.setClientResources(LettuceTestClientResources.getSharedClientResources());
 		factory.setClientName("clientName");
 		factory.start();
 
 		ConnectionFactoryTracker.add(factory);
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 		assertThat(connection.getClientName()).isEqualTo("clientName");
 
 		connection.close();
@@ -543,7 +543,7 @@ class LettuceConnectionFactoryTests {
 
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().build();
 
-		RedisStaticMasterReplicaConfiguration elastiCache = new RedisStaticMasterReplicaConfiguration(
+		ValkeyStaticMasterReplicaConfiguration elastiCache = new ValkeyStaticMasterReplicaConfiguration(
 				SettingsUtils.getHost()).node(SettingsUtils.getHost(), SettingsUtils.getPort() + 1);
 
 		LettuceConnectionFactory factory = new LettuceConnectionFactory(elastiCache, configuration);
@@ -558,7 +558,7 @@ class LettuceConnectionFactoryTests {
 	}
 
 	@Test // GH-2186
-	@EnabledOnRedisClusterAvailable
+	@EnabledOnValkeyClusterAvailable
 	void shouldInitializeClusterConnectionsEagerly() {
 
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().build();
@@ -576,7 +576,7 @@ class LettuceConnectionFactoryTests {
 	}
 
 	@Test // GH-2594
-	@EnabledOnRedisClusterAvailable
+	@EnabledOnValkeyClusterAvailable
 	void configuresExecutorCorrectly() {
 
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder().build();
@@ -605,7 +605,7 @@ class LettuceConnectionFactoryTests {
 		factory.start();
 		assertThat(factory.isRunning()).isTrue();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 			assertThat(connection.ping()).isEqualTo("PONG");
 		}
 	}

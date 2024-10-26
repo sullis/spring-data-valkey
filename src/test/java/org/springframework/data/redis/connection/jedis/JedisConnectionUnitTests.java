@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.redis.connection.AbstractConnectionUnitTestBase;
-import org.springframework.data.redis.connection.RedisServerCommands.ShutdownOption;
+import org.springframework.data.redis.connection.ValkeyServerCommands.ShutdownOption;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.KeyScanOptions;
@@ -59,7 +59,7 @@ class JedisConnectionUnitTests {
 		@BeforeEach
 		public void setUp() {
 
-			jedisSpy = spy(new Jedis(getNativeRedisConnectionMock()));
+			jedisSpy = spy(new Jedis(getNativeValkeyConnectionMock()));
 			connection = new JedisConnection(jedisSpy);
 		}
 
@@ -124,7 +124,7 @@ class JedisConnectionUnitTests {
 		}
 
 		@Test // DATAREDIS-330
-		void shouldThrowExceptionWhenAccessingRedisSentinelsCommandsWhenNoSentinelsConfigured() {
+		void shouldThrowExceptionWhenAccessingValkeySentinelsCommandsWhenNoSentinelsConfigured() {
 			assertThatExceptionOfType(InvalidDataAccessResourceUsageException.class)
 					.isThrownBy(() -> connection.getSentinelConnection());
 		}
@@ -322,7 +322,7 @@ class JedisConnectionUnitTests {
 		@Test // DATAREDIS-714
 		void doesNotSelectDbWhenCurrentDbMatchesDesiredOne() {
 
-			Jedis jedisSpy = spy(new Jedis(getNativeRedisConnectionMock()));
+			Jedis jedisSpy = spy(new Jedis(getNativeValkeyConnectionMock()));
 			new JedisConnection(jedisSpy);
 
 			verify(jedisSpy, never()).select(anyInt());
@@ -331,7 +331,7 @@ class JedisConnectionUnitTests {
 		@Test // DATAREDIS-714
 		void doesNotSelectDbWhenCurrentDbDoesNotMatchDesiredOne() {
 
-			Jedis jedisSpy = spy(new Jedis(getNativeRedisConnectionMock()));
+			Jedis jedisSpy = spy(new Jedis(getNativeValkeyConnectionMock()));
 			when(jedisSpy.getDB()).thenReturn(3);
 
 			new JedisConnection(jedisSpy);

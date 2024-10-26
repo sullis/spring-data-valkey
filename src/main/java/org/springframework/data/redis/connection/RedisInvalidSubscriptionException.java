@@ -22,24 +22,24 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
  *
  * @author Costin Leau
  */
-public class RedisInvalidSubscriptionException extends InvalidDataAccessResourceUsageException {
+public class ValkeyInvalidSubscriptionException extends InvalidDataAccessResourceUsageException {
 
 	/**
-	 * Constructs a new <code>RedisInvalidSubscriptionException</code> instance.
+	 * Constructs a new <code>ValkeyInvalidSubscriptionException</code> instance.
 	 *
 	 * @param msg
 	 * @param cause
 	 */
-	public RedisInvalidSubscriptionException(String msg, Throwable cause) {
+	public ValkeyInvalidSubscriptionException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
 	/**
-	 * Constructs a new <code>RedisInvalidSubscriptionException</code> instance.
+	 * Constructs a new <code>ValkeyInvalidSubscriptionException</code> instance.
 	 *
 	 * @param msg
 	 */
-	public RedisInvalidSubscriptionException(String msg) {
+	public ValkeyInvalidSubscriptionException(String msg) {
 		super(msg);
 	}
 }

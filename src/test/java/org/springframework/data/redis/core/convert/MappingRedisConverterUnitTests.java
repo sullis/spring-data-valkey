@@ -78,16 +78,16 @@ import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration.KeyspaceSettings;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.test.util.RedisTestData;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
+import org.springframework.data.redis.test.util.ValkeyTestData;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Unit tests for {@link MappingRedisConverter}.
+ * Unit tests for {@link MappingValkeyConverter}.
  *
  * @author Christoph Strobl
  * @author Greg Turnquist
@@ -96,16 +96,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author John Blum
  */
 @ExtendWith(MockitoExtension.class)
-class MappingRedisConverterUnitTests {
+class MappingValkeyConverterUnitTests {
 
 	@Mock ReferenceResolver resolverMock;
-	private MappingRedisConverter converter;
+	private MappingValkeyConverter converter;
 	private Person rand;
 
 	@BeforeEach
 	void setUp() {
 
-		converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		converter.afterPropertiesSet();
 
 		rand = new Person();
@@ -119,7 +119,7 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-543
 	void writeSkipsTypeHintIfConfigured() {
 
-		converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		converter.afterPropertiesSet();
 
 		assertThat(write(rand)).containingTypeHint("_class", Person.class);
@@ -143,7 +143,7 @@ class MappingRedisConverterUnitTests {
 		rand.id = "1";
 		rand.address = address;
 
-		RedisTestData data = write(rand);
+		ValkeyTestData data = write(rand);
 
 		assertThat(data.getId()).isEqualTo("1");
 		assertThat(data).containsEntry("address.id", "tear");
@@ -178,7 +178,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.nicknames = Arrays.asList("dragon reborn", "lews therin");
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("nicknames.[0]", "dragon reborn")
 			.containsEntry("nicknames.[1]", "lews therin");
@@ -192,7 +192,7 @@ class MappingRedisConverterUnitTests {
 		address.country = "andora";
 		rand.address = address;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("address.city", "two rivers").containsEntry("address.country", "andora");
 	}
@@ -213,7 +213,7 @@ class MappingRedisConverterUnitTests {
 		rand.id = UUID.randomUUID().toString();
 		rand.firstname = "rand";
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("coworkers.[0].firstname", "mat") //
 			.containsEntry("coworkers.[0].nicknames.[0]", "prince of the ravens") //
@@ -229,7 +229,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.address = address;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).without("address._class");
 	}
@@ -243,7 +243,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.address = address;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("address._class", "with-post-code");
 	}
@@ -255,7 +255,7 @@ class MappingRedisConverterUnitTests {
 		map.put("address._class", AddressWithPostcode.class.getName());
 		map.put("address.postcode", "1234");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.address).isInstanceOf(AddressWithPostcode.class);
 	}
@@ -273,7 +273,7 @@ class MappingRedisConverterUnitTests {
 		map.put("father.lastname", "Simpson");
 
 		RecursiveConstructorPerson target = converter.read(RecursiveConstructorPerson.class,
-			new RedisData(Bucket.newBucketFromStringMap(map)));
+			new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.id).isEqualTo("bart");
 		assertThat(target.firstname).isEqualTo("Bart");
@@ -293,7 +293,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.coworkers = Collections.singletonList(mat);
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containingTypeHint("coworkers.[0]._class", TaVeren.class);
 	}
@@ -301,7 +301,7 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readConvertsSimplePropertiesCorrectly() {
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("firstname", "rand")));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("firstname", "rand")));
 
 		assertThat(converter.read(Person.class, rdo).firstname).isEqualTo("rand");
 	}
@@ -312,7 +312,7 @@ class MappingRedisConverterUnitTests {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("nicknames.[0]", "dragon reborn");
 		map.put("nicknames.[1]", "lews therin");
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		assertThat(converter.read(Person.class, rdo).nicknames).containsExactly("dragon reborn", "lews therin");
 	}
@@ -324,7 +324,7 @@ class MappingRedisConverterUnitTests {
 		map.put("nicknames.[9]", "car'a'carn");
 		map.put("nicknames.[10]", "lews therin");
 		map.put("nicknames.[1]", "dragon reborn");
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		assertThat(converter.read(Person.class, rdo).nicknames).containsExactly("dragon reborn", "car'a'carn",
 			"lews therin");
@@ -337,7 +337,7 @@ class MappingRedisConverterUnitTests {
 		map.put("positions.[9]", "0");
 		map.put("positions.[10]", "1");
 		map.put("positions.[1]", "2");
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		assertThat(converter.read(Person.class, rdo).positions).containsExactly(2, 0, 1);
 	}
@@ -348,7 +348,7 @@ class MappingRedisConverterUnitTests {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("address.city", "two rivers");
 		map.put("address.country", "andor");
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		Person target = converter.read(Person.class, rdo);
 
@@ -366,7 +366,7 @@ class MappingRedisConverterUnitTests {
 		map.put("coworkers.[0].nicknames.[1]", "gambler");
 		map.put("coworkers.[1].firstname", "perrin");
 		map.put("coworkers.[1].address.city", "two rivers");
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		Person target = converter.read(Person.class, rdo);
 
@@ -390,7 +390,7 @@ class MappingRedisConverterUnitTests {
 		map.put("coworkers.[1].nicknames.[1]", "gambler");
 		map.put("coworkers.[1].nicknames.[0]", "prince of the ravens");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		Person target = converter.read(Person.class, rdo);
 
@@ -411,7 +411,7 @@ class MappingRedisConverterUnitTests {
 		map.put("coworkers.[0]._class", TaVeren.class.getName());
 		map.put("coworkers.[0].firstname", "mat");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		Person target = converter.read(Person.class, rdo);
 
@@ -429,7 +429,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.physicalAttributes = map;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("physicalAttributes.[hair-color]", "red") //
 			.containsEntry("physicalAttributes.[eye-color]", "grey");
@@ -446,7 +446,7 @@ class MappingRedisConverterUnitTests {
 		rand.coworkers.add(new Person());
 		rand.coworkers.get(0).physicalAttributes = map;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("coworkers.[0].physicalAttributes.[hair-color]", "red") //
 			.containsEntry("coworkers.[0].physicalAttributes.[eye-color]", "grey");
@@ -459,7 +459,7 @@ class MappingRedisConverterUnitTests {
 		map.put("physicalAttributes.[hair-color]", "red");
 		map.put("physicalAttributes.[eye-color]", "grey");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		Person target = converter.read(Person.class, rdo);
 
@@ -475,7 +475,7 @@ class MappingRedisConverterUnitTests {
 		map.put("integerMapKeyMapping.[1]", "2");
 		map.put("integerMapKeyMapping.[3]", "4");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		TypeWithMaps target = converter.read(TypeWithMaps.class, rdo);
 
@@ -491,7 +491,7 @@ class MappingRedisConverterUnitTests {
 		map.put("decimalMapKeyMapping.[1.7]", "2");
 		map.put("decimalMapKeyMapping.[3.1]", "4");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		TypeWithMaps target = converter.read(TypeWithMaps.class, rdo);
 
@@ -508,7 +508,7 @@ class MappingRedisConverterUnitTests {
 		source.decimalMapKeyMapping.put(1.7D, "2");
 		source.decimalMapKeyMapping.put(3.1D, "4");
 
-		RedisTestData target = write(source);
+		ValkeyTestData target = write(source);
 
 		assertThat(target).containsEntry("decimalMapKeyMapping.[1.7]", "2") //
 			.containsEntry("decimalMapKeyMapping.[3.1]", "4");
@@ -522,7 +522,7 @@ class MappingRedisConverterUnitTests {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("dateMapKeyMapping.[" + judgmentDay.getTime() + "]", "skynet");
 
-		RedisData rdo = new RedisData(Bucket.newBucketFromStringMap(map));
+		ValkeyData rdo = new ValkeyData(Bucket.newBucketFromStringMap(map));
 
 		TypeWithMaps target = converter.read(TypeWithMaps.class, rdo);
 
@@ -554,7 +554,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.relatives = map;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("relatives.[father].firstname", "janduin") //
 			.containsEntry("relatives.[step-father].firstname", "tam");
@@ -567,7 +567,7 @@ class MappingRedisConverterUnitTests {
 		map.put("relatives.[father].firstname", "janduin");
 		map.put("relatives.[step-father].firstname", "tam");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.relatives).isNotNull();
 		assertThat(target.relatives.get("father")).isNotNull();
@@ -583,7 +583,7 @@ class MappingRedisConverterUnitTests {
 		map.put("favoredRelatives.[1].firstname", "janduin");
 		map.put("favoredRelatives.[2].firstname", "tam");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.favoredRelatives).isNotNull();
 		assertThat(target.favoredRelatives.get(1)).isNotNull();
@@ -602,7 +602,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.relatives = map;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containingTypeHint("relatives.[previous-incarnation]._class", TaVeren.class);
 	}
@@ -614,7 +614,7 @@ class MappingRedisConverterUnitTests {
 		map.put("relatives.[previous-incarnation]._class", TaVeren.class.getName());
 		map.put("relatives.[previous-incarnation].firstname", "lews");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.relatives.get("previous-incarnation")).isNotNull();
 		assertThat(target.relatives.get("previous-incarnation")).isInstanceOf(TaVeren.class);
@@ -641,7 +641,7 @@ class MappingRedisConverterUnitTests {
 	void readsLocalDateTimeValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(
+			new ValkeyData(
 				Bucket.newBucketFromStringMap(Collections.singletonMap("localDateTime", "2016-02-19T10:18:01"))));
 
 		assertThat(target.localDateTime).isEqualTo(LocalDateTime.parse("2016-02-19T10:18:01"));
@@ -659,7 +659,7 @@ class MappingRedisConverterUnitTests {
 	void readsLocalDateValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("localDate", "2016-02-19"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("localDate", "2016-02-19"))));
 
 		assertThat(target.localDate).isEqualTo(LocalDate.parse("2016-02-19"));
 	}
@@ -676,7 +676,7 @@ class MappingRedisConverterUnitTests {
 	void readsLocalTimeValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("localTime", "11:12"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("localTime", "11:12"))));
 
 		assertThat(target.localTime).isEqualTo(LocalTime.parse("11:12:00"));
 	}
@@ -692,7 +692,7 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readsZonedDateTimeValuesCorrectly() {
 
-		Person target = converter.read(Person.class, new RedisData(Bucket
+		Person target = converter.read(Person.class, new ValkeyData(Bucket
 			.newBucketFromStringMap(
 				Collections.singletonMap("zonedDateTime", "2007-12-03T10:15:30+01:00[Europe/Paris]"))));
 
@@ -711,7 +711,7 @@ class MappingRedisConverterUnitTests {
 	void readsInstantValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(
+			new ValkeyData(
 				Bucket.newBucketFromStringMap(Collections.singletonMap("instant", "2007-12-03T10:15:30.01Z"))));
 
 		assertThat(target.instant).isEqualTo(Instant.parse("2007-12-03T10:15:30.01Z"));
@@ -732,7 +732,7 @@ class MappingRedisConverterUnitTests {
 		map.put("zoneId", "Europe/Paris");
 		map.put("zoneId._class", "java.time.ZoneRegion");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.zoneId).isEqualTo(ZoneId.of("Europe/Paris"));
 	}
@@ -749,7 +749,7 @@ class MappingRedisConverterUnitTests {
 	void readsDurationValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("duration", "PT51H4M"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("duration", "PT51H4M"))));
 
 		assertThat(target.duration).isEqualTo(Duration.parse("P2DT3H4M"));
 	}
@@ -766,7 +766,7 @@ class MappingRedisConverterUnitTests {
 	void readsPeriodValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("period", "P1Y2M25D"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("period", "P1Y2M25D"))));
 
 		assertThat(target.period).isEqualTo(Period.parse("P1Y2M25D"));
 	}
@@ -783,7 +783,7 @@ class MappingRedisConverterUnitTests {
 	void readsEnumValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("gender", "FEMALE"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("gender", "FEMALE"))));
 
 		assertThat(target.gender).isEqualTo(Gender.FEMALE);
 	}
@@ -800,7 +800,7 @@ class MappingRedisConverterUnitTests {
 	void readsBooleanValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("alive", "1"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("alive", "1"))));
 
 		assertThat(target.alive).isEqualTo(Boolean.TRUE);
 	}
@@ -809,7 +809,7 @@ class MappingRedisConverterUnitTests {
 	void readsStringBooleanValuesCorrectly() {
 
 		Person target = converter.read(Person.class,
-			new RedisData(Bucket.newBucketFromStringMap(Collections.singletonMap("alive", "true"))));
+			new ValkeyData(Bucket.newBucketFromStringMap(Collections.singletonMap("alive", "true"))));
 
 		assertThat(target.alive).isEqualTo(Boolean.TRUE);
 	}
@@ -833,7 +833,7 @@ class MappingRedisConverterUnitTests {
 
 		Date date = cal.getTime();
 
-		Person target = converter.read(Person.class, new RedisData(
+		Person target = converter.read(Person.class, new ValkeyData(
 			Bucket.newBucketFromStringMap(
 				Collections.singletonMap("birthdate", Long.valueOf(date.getTime()).toString()))));
 
@@ -849,7 +849,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.location = location;
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("location", "locations:1") //
 			.without("location.id") //
@@ -873,7 +873,7 @@ class MappingRedisConverterUnitTests {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("location", "locations:1");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.location).isEqualTo(location);
 	}
@@ -912,7 +912,7 @@ class MappingRedisConverterUnitTests {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("coworkers.[0].location", "locations:1");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.coworkers.get(0).location).isEqualTo(location);
 	}
@@ -934,7 +934,7 @@ class MappingRedisConverterUnitTests {
 
 		rand.visited = Arrays.asList(tarValon, falme, tear);
 
-		RedisTestData target = write(rand);
+		ValkeyTestData target = write(rand);
 
 		assertThat(target).containsEntry("visited.[0]", "locations:1") //
 			.containsEntry("visited.[1]", "locations:2") //
@@ -982,7 +982,7 @@ class MappingRedisConverterUnitTests {
 		map.put("visited.[1]", "locations:2");
 		map.put("visited.[2]", "locations:3");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.visited.get(0)).isEqualTo(tarValon);
 		assertThat(target.visited.get(1)).isEqualTo(falme);
@@ -996,7 +996,7 @@ class MappingRedisConverterUnitTests {
 		birgitte.id = "birgitte";
 		birgitte.name = "Birgitte Silverbow";
 
-		assertThat(write(birgitte).getRedisData().getTimeToLive()).isEqualTo(5L);
+		assertThat(write(birgitte).getValkeyData().getTimeToLive()).isEqualTo(5L);
 	}
 
 	@Test // DATAREDIS-425
@@ -1006,7 +1006,7 @@ class MappingRedisConverterUnitTests {
 		tear.id = "tear";
 		tear.name = "Tear";
 
-		assertThat(write(tear).getRedisData().getTimeToLive()).isNull();
+		assertThat(write(tear).getValkeyData().getTimeToLive()).isNull();
 	}
 
 	@Test // DATAREDIS-425
@@ -1018,7 +1018,7 @@ class MappingRedisConverterUnitTests {
 		Address address = new Address();
 		address.city = "Tear";
 
-		assertThat(write(address).getRedisData().getKeyspace()).isEqualTo("o_O");
+		assertThat(write(address).getValkeyData().getKeyspace()).isEqualTo("o_O");
 	}
 
 	@Test // DATAREDIS-425
@@ -1033,19 +1033,19 @@ class MappingRedisConverterUnitTests {
 		Address address = new Address();
 		address.city = "Tear";
 
-		assertThat(write(address).getRedisData().getTimeToLive()).isEqualTo(5L);
+		assertThat(write(address).getValkeyData().getTimeToLive()).isEqualTo(5L);
 	}
 
 	@Test // DATAREDIS-425, DATAREDIS-634
 	void writeShouldHonorCustomConversionOnRootType() {
 
-		RedisCustomConversions customConversions = new RedisCustomConversions(
+		ValkeyCustomConversions customConversions = new ValkeyCustomConversions(
 			Collections.singletonList(new AddressToBytesConverter()));
 
-		RedisMappingContext mappingContext = new RedisMappingContext();
+		ValkeyMappingContext mappingContext = new ValkeyMappingContext();
 		mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
 
-		this.converter = new MappingRedisConverter(mappingContext, null, resolverMock);
+		this.converter = new MappingValkeyConverter(mappingContext, null, resolverMock);
 		this.converter.setCustomConversions(customConversions);
 		this.converter.afterPropertiesSet();
 
@@ -1059,13 +1059,13 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425, DATAREDIS-634
 	void writeShouldHonorCustomConversionOnNestedType() {
 
-		RedisCustomConversions customConversions = new RedisCustomConversions(
+		ValkeyCustomConversions customConversions = new ValkeyCustomConversions(
 			Collections.singletonList(new AddressToBytesConverter()));
 
-		RedisMappingContext mappingContext = new RedisMappingContext();
+		ValkeyMappingContext mappingContext = new ValkeyMappingContext();
 		mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
 
-		this.converter = new MappingRedisConverter(mappingContext, null, resolverMock);
+		this.converter = new MappingValkeyConverter(mappingContext, null, resolverMock);
 		this.converter.setCustomConversions(customConversions);
 		this.converter.afterPropertiesSet();
 
@@ -1080,25 +1080,25 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void writeShouldHonorIndexOnCustomConversionForNestedType() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
 		this.converter.afterPropertiesSet();
 
 		Address address = new Address();
 		address.country = "andor";
 		rand.address = address;
 
-		assertThat(write(rand).getRedisData().getIndexedData())
+		assertThat(write(rand).getValkeyData().getIndexedData())
 			.contains(new SimpleIndexedPropertyValue(KEYSPACE_PERSON, "address.country", "andor"));
 	}
 
 	@Test // DATAREDIS-425
 	void writeShouldHonorIndexAnnotationsOnWhenCustomConversionOnNestedype() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
 		this.converter.afterPropertiesSet();
 
 		Address address = new Address();
@@ -1106,21 +1106,21 @@ class MappingRedisConverterUnitTests {
 		address.city = "unknown";
 		rand.address = address;
 
-		assertThat(write(rand).getRedisData().getIndexedData().isEmpty()).isFalse();
+		assertThat(write(rand).getValkeyData().getIndexedData().isEmpty()).isFalse();
 	}
 
 	@Test // DATAREDIS-425
 	void readShouldHonorCustomConversionOnRootType() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
 		this.converter.afterPropertiesSet();
 
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("_raw", "{\"city\":\"unknown\",\"country\":\"Tel'aran'rhiod\"}");
 
-		Address target = converter.read(Address.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Address target = converter.read(Address.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.city).isEqualTo("unknown");
 		assertThat(target.country).isEqualTo("Tel'aran'rhiod");
@@ -1129,15 +1129,15 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readShouldHonorCustomConversionOnNestedType() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
 		this.converter.afterPropertiesSet();
 
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("address", "{\"city\":\"unknown\",\"country\":\"Tel'aran'rhiod\"}");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.address).isNotNull();
 		assertThat(target.address.city).isEqualTo("unknown");
@@ -1147,16 +1147,16 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-544
 	void readShouldHonorCustomConversionOnNestedTypeViaConstructorCreation() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new BytesToAddressConverter())));
 		this.converter.afterPropertiesSet();
 
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("address", "{\"city\":\"unknown\",\"country\":\"Tel'aran'rhiod\"}");
 
 		PersonWithConstructorAndAddress target = converter.read(PersonWithConstructorAndAddress.class,
-			new RedisData(Bucket.newBucketFromStringMap(map)));
+			new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target.address).isNotNull();
 		assertThat(target.address.city).isEqualTo("unknown");
@@ -1170,7 +1170,7 @@ class MappingRedisConverterUnitTests {
 		aviendha.id = "aviendha";
 		aviendha.ttl = 2L;
 
-		assertThat(write(aviendha).getRedisData().getTimeToLive()).isEqualTo(120L);
+		assertThat(write(aviendha).getValkeyData().getTimeToLive()).isEqualTo(120L);
 	}
 
 	@Test // DATAREDIS-425
@@ -1179,15 +1179,15 @@ class MappingRedisConverterUnitTests {
 		ExipringPersonWithExplicitProperty aviendha = new ExipringPersonWithExplicitProperty();
 		aviendha.id = "aviendha";
 
-		assertThat(write(aviendha).getRedisData().getTimeToLive()).isEqualTo(5L);
+		assertThat(write(aviendha).getValkeyData().getTimeToLive()).isEqualTo(5L);
 	}
 
 	@Test // DATAREDIS-425
 	void writeShouldConsiderMapConvertersForRootType() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
 		this.converter.afterPropertiesSet();
 
 		Species myrddraal = new Species();
@@ -1201,9 +1201,9 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void writeShouldConsiderMapConvertersForNestedType() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
 		this.converter.afterPropertiesSet();
 
 		rand.species = new Species();
@@ -1215,14 +1215,14 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readShouldConsiderMapConvertersForRootType() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
 		this.converter.afterPropertiesSet();
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("species-name", "trolloc");
 
-		Species target = converter.read(Species.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Species target = converter.read(Species.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target).isNotNull();
 		assertThat(target.name).isEqualTo("trolloc");
@@ -1231,15 +1231,15 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readShouldConsiderMapConvertersForNestedType() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
 		this.converter.afterPropertiesSet();
 
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("species.species-name", "trolloc");
 
-		Person target = converter.read(Person.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		Person target = converter.read(Person.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target).isNotNull();
 		assertThat(target.species.name).isEqualTo("trolloc");
@@ -1248,9 +1248,9 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void writeShouldConsiderMapConvertersInsideLists() {
 
-		this.converter = new MappingRedisConverter(new RedisMappingContext(), null, resolverMock);
+		this.converter = new MappingValkeyConverter(new ValkeyMappingContext(), null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new SpeciesToMapConverter())));
 		this.converter.afterPropertiesSet();
 
 		TheWheelOfTime twot = new TheWheelOfTime();
@@ -1268,15 +1268,15 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-425
 	void readShouldConsiderMapConvertersForValuesInList() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new MapToSpeciesConverter())));
 		this.converter.afterPropertiesSet();
 
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("species.[0].species-name", "trolloc");
 
-		TheWheelOfTime target = converter.read(TheWheelOfTime.class, new RedisData(Bucket.newBucketFromStringMap(map)));
+		TheWheelOfTime target = converter.read(TheWheelOfTime.class, new ValkeyData(Bucket.newBucketFromStringMap(map)));
 
 		assertThat(target).isNotNull();
 		assertThat(target.species).isNotNull();
@@ -1425,7 +1425,7 @@ class MappingRedisConverterUnitTests {
 		TypeWithObjectValueTypes sample = new TypeWithObjectValueTypes();
 		sample.object = "bar";
 
-		RedisTestData bucket = write(sample);
+		ValkeyTestData bucket = write(sample);
 
 		assertThat(bucket).containsEntry("object", "bar").containsEntry("object._class", "java.lang.String");
 	}
@@ -1436,9 +1436,9 @@ class MappingRedisConverterUnitTests {
 		TypeWithObjectValueTypes di = new TypeWithObjectValueTypes();
 		di.object = "foo";
 
-		RedisTestData rd = write(di);
+		ValkeyTestData rd = write(di);
 
-		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getRedisData());
+		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getValkeyData());
 		assertThat(result.object).isInstanceOf(String.class);
 	}
 
@@ -1450,7 +1450,7 @@ class MappingRedisConverterUnitTests {
 		sample.map.put("long", 1L);
 		sample.map.put("date", new Date());
 
-		RedisTestData bucket = write(sample);
+		ValkeyTestData bucket = write(sample);
 
 		assertThat(bucket).containsEntry("map.[string]", "bar")
 			.containsEntry("map.[string]._class", "java.lang.String");
@@ -1466,9 +1466,9 @@ class MappingRedisConverterUnitTests {
 		sample.map.put("long", 1L);
 		sample.map.put("date", new Date());
 
-		RedisTestData rd = write(sample);
+		ValkeyTestData rd = write(sample);
 
-		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getRedisData());
+		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getValkeyData());
 		assertThat(result.map.get("string")).isInstanceOf(String.class);
 		assertThat(result.map.get("long")).isInstanceOf(Long.class);
 		assertThat(result.map.get("date")).isInstanceOf(Date.class);
@@ -1482,7 +1482,7 @@ class MappingRedisConverterUnitTests {
 		sample.list.add(1L);
 		sample.list.add(new Date());
 
-		RedisTestData bucket = write(sample);
+		ValkeyTestData bucket = write(sample);
 
 		assertThat(bucket).containsEntry("list.[0]", "string").containsEntry("list.[0]._class", "java.lang.String");
 		assertThat(bucket).containsEntry("list.[1]", "1").containsEntry("list.[1]._class", "java.lang.Long");
@@ -1497,9 +1497,9 @@ class MappingRedisConverterUnitTests {
 		sample.list.add(1L);
 		sample.list.add(new Date());
 
-		RedisTestData rd = write(sample);
+		ValkeyTestData rd = write(sample);
 
-		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getRedisData());
+		TypeWithObjectValueTypes result = converter.read(TypeWithObjectValueTypes.class, rd.getValkeyData());
 		assertThat(result.list.get(0)).isInstanceOf(String.class);
 		assertThat(result.list.get(1)).isInstanceOf(Long.class);
 		assertThat(result.list.get(2)).isInstanceOf(Date.class);
@@ -1510,9 +1510,9 @@ class MappingRedisConverterUnitTests {
 
 		Device sample = new Device(Instant.now(), Collections.singleton("foo"));
 
-		RedisTestData rd = write(sample);
+		ValkeyTestData rd = write(sample);
 
-		Device result = converter.read(Device.class, rd.getRedisData());
+		Device result = converter.read(Device.class, rd.getValkeyData());
 		assertThat(result.now).isEqualTo(sample.now);
 		assertThat(result.profiles).isEqualTo(sample.profiles);
 	}
@@ -1758,9 +1758,9 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-471
 	void writeShouldWritePartialUpdatePathWithRegisteredCustomConversionCorrectly() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
-			.setCustomConversions(new RedisCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
+			.setCustomConversions(new ValkeyCustomConversions(Collections.singletonList(new AddressToBytesConverter())));
 		this.converter.afterPropertiesSet();
 
 		Address address = new Address();
@@ -1929,10 +1929,10 @@ class MappingRedisConverterUnitTests {
 	@Test // DATAREDIS-911
 	void writeEntityWithCustomConverter() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
 			.setCustomConversions(
-				new RedisCustomConversions(Collections.singletonList(new AccountInfoToBytesConverter())));
+				new ValkeyCustomConversions(Collections.singletonList(new AccountInfoToBytesConverter())));
 		this.converter.afterPropertiesSet();
 
 		AccountInfo accountInfo = new AccountInfo();
@@ -1940,22 +1940,22 @@ class MappingRedisConverterUnitTests {
 		accountInfo.setAccount("123456");
 		accountInfo.setAccountName("Inamur Rahman Sadid");
 
-		assertThat(write(accountInfo).getRedisData().getId()).isEqualTo(accountInfo.getId());
+		assertThat(write(accountInfo).getValkeyData().getId()).isEqualTo(accountInfo.getId());
 	}
 
 	@Test // DATAREDIS-911
 	void readEntityWithCustomConverter() {
 
-		this.converter = new MappingRedisConverter(null, null, resolverMock);
+		this.converter = new MappingValkeyConverter(null, null, resolverMock);
 		this.converter
 			.setCustomConversions(
-				new RedisCustomConversions(Collections.singletonList(new BytesToAccountInfoConverter())));
+				new ValkeyCustomConversions(Collections.singletonList(new BytesToAccountInfoConverter())));
 		this.converter.afterPropertiesSet();
 
 		Bucket bucket = new Bucket();
 		bucket.put("_raw", "ai-id-1|123456|Golam Mazid Sajib".getBytes(StandardCharsets.UTF_8));
 
-		RedisData redisData = new RedisData(bucket);
+		ValkeyData redisData = new ValkeyData(bucket);
 		redisData.setKeyspace(KEYSPACE_ACCOUNT);
 		redisData.setId("ai-id-1");
 
@@ -1973,10 +1973,10 @@ class MappingRedisConverterUnitTests {
 
 		assertThat(write(generic)).hasSize(3) //
 			.containsEntry("_class",
-				"org.springframework.data.redis.core.convert.MappingRedisConverterUnitTests$WithGenericEntity")
+				"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$WithGenericEntity")
 			.containsEntry("entity.name", "hello") //
 			.containsEntry("entity._class",
-				"org.springframework.data.redis.core.convert.MappingRedisConverterUnitTests$User");
+				"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$User");
 	}
 
 	@Test // GH-2349
@@ -1985,9 +1985,9 @@ class MappingRedisConverterUnitTests {
 		Bucket bucket = new Bucket();
 		bucket.put("entity.name", "hello".getBytes());
 		bucket.put("entity._class",
-			"org.springframework.data.redis.core.convert.MappingRedisConverterUnitTests$User".getBytes());
+			"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$User".getBytes());
 
-		RedisData redisData = new RedisData(bucket);
+		ValkeyData redisData = new ValkeyData(bucket);
 		redisData.setKeyspace(KEYSPACE_ACCOUNT);
 		redisData.setId("ai-id-1");
 
@@ -2003,7 +2003,7 @@ class MappingRedisConverterUnitTests {
 	void writePlainList() {
 
 		List<Object> source = Arrays.asList("Hello", "stream", "message", 100L);
-		RedisTestData target = write(source);
+		ValkeyTestData target = write(source);
 
 		assertThat(target).containsEntry("[0]", "Hello") //
 			.containsEntry("[1]", "stream") //
@@ -2029,22 +2029,22 @@ class MappingRedisConverterUnitTests {
 		assertThat(target).containsExactly("Hello", "stream", "message", 100L);
 	}
 
-	private RedisTestData write(Object source) {
+	private ValkeyTestData write(Object source) {
 
-		RedisData rdo = new RedisData();
+		ValkeyData rdo = new ValkeyData();
 		converter.write(source, rdo);
-		return RedisTestData.from(rdo);
+		return ValkeyTestData.from(rdo);
 	}
 
 	private <T> T read(Class<T> type, Map<String, String> source) {
-		return converter.read(type, new RedisData(Bucket.newBucketFromStringMap(source)));
+		return converter.read(type, new ValkeyData(Bucket.newBucketFromStringMap(source)));
 	}
 
 	@WritingConverter
 	static class AddressToBytesConverter implements Converter<Address, byte[]> {
 
 		private final ObjectMapper mapper;
-		private final Jackson2JsonRedisSerializer<Address> serializer;
+		private final Jackson2JsonValkeySerializer<Address> serializer;
 
 		AddressToBytesConverter() {
 
@@ -2053,7 +2053,7 @@ class MappingRedisConverterUnitTests {
 				.withFieldVisibility(Visibility.ANY).withGetterVisibility(Visibility.NONE)
 				.withSetterVisibility(Visibility.NONE).withCreatorVisibility(Visibility.NONE));
 
-			serializer = new Jackson2JsonRedisSerializer<>(Address.class);
+			serializer = new Jackson2JsonValkeySerializer<>(Address.class);
 			serializer.setObjectMapper(mapper);
 		}
 
@@ -2111,7 +2111,7 @@ class MappingRedisConverterUnitTests {
 	static class BytesToAddressConverter implements Converter<byte[], Address> {
 
 		private final ObjectMapper mapper;
-		private final Jackson2JsonRedisSerializer<Address> serializer;
+		private final Jackson2JsonValkeySerializer<Address> serializer;
 
 		BytesToAddressConverter() {
 
@@ -2120,7 +2120,7 @@ class MappingRedisConverterUnitTests {
 				.withFieldVisibility(Visibility.ANY).withGetterVisibility(Visibility.NONE)
 				.withSetterVisibility(Visibility.NONE).withCreatorVisibility(Visibility.NONE));
 
-			serializer = new Jackson2JsonRedisSerializer<>(Address.class);
+			serializer = new Jackson2JsonValkeySerializer<>(Address.class);
 			serializer.setObjectMapper(mapper);
 		}
 

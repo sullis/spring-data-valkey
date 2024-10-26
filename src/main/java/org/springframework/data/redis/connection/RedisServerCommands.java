@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.lang.Nullable;
 
 /**
- * Server-specific commands supported by Redis.
+ * Server-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
  * @author Mark Paluch
  * @author Dennis Neufeld
  */
-public interface RedisServerCommands {
+public interface ValkeyServerCommands {
 
 	enum ShutdownOption {
 		SAVE, NOSAVE;
@@ -55,14 +55,14 @@ public interface RedisServerCommands {
 	 * Start an {@literal Append Only File} rewrite process on server.
 	 *
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/bgrewriteaof">Redis Documentation: BGREWRITEAOF</a>
+	 * @see <a href="https://redis.io/commands/bgrewriteaof">Valkey Documentation: BGREWRITEAOF</a>
 	 */
 	void bgReWriteAof();
 
 	/**
 	 * Start background saving of db on server.
 	 *
-	 * @see <a href="https://redis.io/commands/bgsave">Redis Documentation: BGSAVE</a>
+	 * @see <a href="https://redis.io/commands/bgsave">Valkey Documentation: BGSAVE</a>
 	 */
 	void bgSave();
 
@@ -70,7 +70,7 @@ public interface RedisServerCommands {
 	 * Get time of last {@link #bgSave()} operation in seconds.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/lastsave">Redis Documentation: LASTSAVE</a>
+	 * @see <a href="https://redis.io/commands/lastsave">Valkey Documentation: LASTSAVE</a>
 	 */
 	@Nullable
 	Long lastSave();
@@ -78,7 +78,7 @@ public interface RedisServerCommands {
 	/**
 	 * Synchronous save current db snapshot on server.
 	 *
-	 * @see <a href="https://redis.io/commands/save">Redis Documentation: SAVE</a>
+	 * @see <a href="https://redis.io/commands/save">Valkey Documentation: SAVE</a>
 	 */
 	void save();
 
@@ -86,7 +86,7 @@ public interface RedisServerCommands {
 	 * Get the total number of available keys in currently selected database.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/dbsize">Redis Documentation: DBSIZE</a>
+	 * @see <a href="https://redis.io/commands/dbsize">Valkey Documentation: DBSIZE</a>
 	 */
 	@Nullable
 	Long dbSize();
@@ -94,7 +94,7 @@ public interface RedisServerCommands {
 	/**
 	 * Delete all keys of the currently selected database.
 	 *
-	 * @see <a href="https://redis.io/commands/flushdb">Redis Documentation: FLUSHDB</a>
+	 * @see <a href="https://redis.io/commands/flushdb">Valkey Documentation: FLUSHDB</a>
 	 */
 	void flushDb();
 
@@ -102,7 +102,7 @@ public interface RedisServerCommands {
 	 * Delete all keys of the currently selected database using the specified {@link FlushOption}.
 	 *
 	 * @param option
-	 * @see <a href="https://redis.io/commands/flushdb">Redis Documentation: FLUSHDB</a>
+	 * @see <a href="https://redis.io/commands/flushdb">Valkey Documentation: FLUSHDB</a>
 	 * @since 2.7
 	 */
 	void flushDb(FlushOption option);
@@ -110,7 +110,7 @@ public interface RedisServerCommands {
 	/**
 	 * Delete all <b>all keys</b> from <b>all databases</b>.
 	 *
-	 * @see <a href="https://redis.io/commands/flushall">Redis Documentation: FLUSHALL</a>
+	 * @see <a href="https://redis.io/commands/flushall">Valkey Documentation: FLUSHALL</a>
 	 */
 	void flushAll();
 
@@ -118,7 +118,7 @@ public interface RedisServerCommands {
 	 * Delete all <b>all keys</b> from <b>all databases</b> using the specified {@link FlushOption}.
 	 *
 	 * @param option
-	 * @see <a href="https://redis.io/commands/flushall">Redis Documentation: FLUSHALL</a>
+	 * @see <a href="https://redis.io/commands/flushall">Valkey Documentation: FLUSHALL</a>
 	 * @since 2.7
 	 */
 	void flushAll(FlushOption option);
@@ -132,7 +132,7 @@ public interface RedisServerCommands {
 	 * </ul>
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/info">Redis Documentation: INFO</a>
+	 * @see <a href="https://redis.io/commands/info">Valkey Documentation: INFO</a>
 	 */
 	@Nullable
 	Properties info();
@@ -141,7 +141,7 @@ public interface RedisServerCommands {
 	 * Load server information for given {@code selection}.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/info">Redis Documentation: INFO</a>
+	 * @see <a href="https://redis.io/commands/info">Valkey Documentation: INFO</a>
 	 */
 	@Nullable
 	Properties info(String section);
@@ -149,14 +149,14 @@ public interface RedisServerCommands {
 	/**
 	 * Shutdown server.
 	 *
-	 * @see <a href="https://redis.io/commands/shutdown">Redis Documentation: SHUTDOWN</a>
+	 * @see <a href="https://redis.io/commands/shutdown">Valkey Documentation: SHUTDOWN</a>
 	 */
 	void shutdown();
 
 	/**
 	 * Shutdown server.
 	 *
-	 * @see <a href="https://redis.io/commands/shutdown">Redis Documentation: SHUTDOWN</a>
+	 * @see <a href="https://redis.io/commands/shutdown">Valkey Documentation: SHUTDOWN</a>
 	 * @since 1.3
 	 */
 	void shutdown(ShutdownOption option);
@@ -166,7 +166,7 @@ public interface RedisServerCommands {
 	 *
 	 * @param pattern must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/config-get">Redis Documentation: CONFIG GET</a>
+	 * @see <a href="https://redis.io/commands/config-get">Valkey Documentation: CONFIG GET</a>
 	 */
 	@Nullable
 	Properties getConfig(String pattern);
@@ -176,7 +176,7 @@ public interface RedisServerCommands {
 	 *
 	 * @param param must not be {@literal null}.
 	 * @param value must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/config-set">Redis Documentation: CONFIG SET</a>
+	 * @see <a href="https://redis.io/commands/config-set">Valkey Documentation: CONFIG SET</a>
 	 */
 	void setConfig(String param, String value);
 
@@ -184,7 +184,7 @@ public interface RedisServerCommands {
 	 * Reset statistic counters on server. <br>
 	 * Counters can be retrieved using {@link #info()}.
 	 *
-	 * @see <a href="https://redis.io/commands/config-resetstat">Redis Documentation: CONFIG RESETSTAT</a>
+	 * @see <a href="https://redis.io/commands/config-resetstat">Valkey Documentation: CONFIG RESETSTAT</a>
 	 */
 	void resetConfigStats();
 
@@ -192,7 +192,7 @@ public interface RedisServerCommands {
 	 * Rewrites the {@code redis.conf} file.
 	 *
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/config-rewrite">Redis Documentation: CONFIG REWRITE</a>
+	 * @see <a href="https://redis.io/commands/config-rewrite">Valkey Documentation: CONFIG REWRITE</a>
 	 */
 	void rewriteConfig();
 
@@ -201,7 +201,7 @@ public interface RedisServerCommands {
 	 *
 	 * @return current server time in milliseconds or {@literal null} when used in pipeline / transaction.
 	 * @since 1.1
-	 * @see <a href="https://redis.io/commands/time">Redis Documentation: TIME</a>
+	 * @see <a href="https://redis.io/commands/time">Valkey Documentation: TIME</a>
 	 */
 	@Nullable
 	default Long time() {
@@ -214,7 +214,7 @@ public interface RedisServerCommands {
 	 * @param timeUnit target unit.
 	 * @return current server time in {@link TimeUnit} or {@literal null} when used in pipeline / transaction.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/time">Redis Documentation: TIME</a>
+	 * @see <a href="https://redis.io/commands/time">Valkey Documentation: TIME</a>
 	 */
 	@Nullable
 	Long time(TimeUnit timeUnit);
@@ -225,7 +225,7 @@ public interface RedisServerCommands {
 	 * @param host of connection to close.
 	 * @param port of connection to close
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/client-kill">Redis Documentation: CLIENT KILL</a>
+	 * @see <a href="https://redis.io/commands/client-kill">Valkey Documentation: CLIENT KILL</a>
 	 */
 	void killClient(String host, int port);
 
@@ -234,14 +234,14 @@ public interface RedisServerCommands {
 	 *
 	 * @param name
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/client-setname">Redis Documentation: CLIENT SETNAME</a>
+	 * @see <a href="https://redis.io/commands/client-setname">Valkey Documentation: CLIENT SETNAME</a>
 	 */
 	void setClientName(byte[] name);
 
 	/**
 	 * Returns the name of the current connection.
 	 *
-	 * @see <a href="https://redis.io/commands/client-getname">Redis Documentation: CLIENT GETNAME</a>
+	 * @see <a href="https://redis.io/commands/client-getname">Valkey Documentation: CLIENT GETNAME</a>
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.3
 	 */
@@ -251,12 +251,12 @@ public interface RedisServerCommands {
 	/**
 	 * Request information and statistics about connected clients.
 	 *
-	 * @return {@link List} of {@link RedisClientInfo} objects or {@literal null} when used in pipeline / transaction.
+	 * @return {@link List} of {@link ValkeyClientInfo} objects or {@literal null} when used in pipeline / transaction.
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/client-list">Redis Documentation: CLIENT LIST</a>
+	 * @see <a href="https://redis.io/commands/client-list">Valkey Documentation: CLIENT LIST</a>
 	 */
 	@Nullable
-	List<RedisClientInfo> getClientList();
+	List<ValkeyClientInfo> getClientList();
 
 	/**
 	 * Change redis replication setting to new master.
@@ -264,7 +264,7 @@ public interface RedisServerCommands {
 	 * @param host must not be {@literal null}.
 	 * @param port
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/replicaof">Redis Documentation: REPLICAOF</a>
+	 * @see <a href="https://redis.io/commands/replicaof">Valkey Documentation: REPLICAOF</a>
 	 */
 	void replicaOf(String host, int port);
 
@@ -272,12 +272,12 @@ public interface RedisServerCommands {
 	 * Change server into master.
 	 *
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/replicaof">Redis Documentation: REPLICAOF</a>
+	 * @see <a href="https://redis.io/commands/replicaof">Valkey Documentation: REPLICAOF</a>
 	 */
 	void replicaOfNoOne();
 
 	/**
-	 * Atomically transfer a key from a source Redis instance to a destination Redis instance. On success the key is
+	 * Atomically transfer a key from a source Valkey instance to a destination Valkey instance. On success the key is
 	 * deleted from the original instance and is guaranteed to exist in the target instance.
 	 *
 	 * @param key must not be {@literal null}.
@@ -285,12 +285,12 @@ public interface RedisServerCommands {
 	 * @param dbIndex
 	 * @param option can be {@literal null}. Defaulted to {@link MigrateOption#COPY}.
 	 * @since 1.7
-	 * @see <a href="https://redis.io/commands/migrate">Redis Documentation: MIGRATE</a>
+	 * @see <a href="https://redis.io/commands/migrate">Valkey Documentation: MIGRATE</a>
 	 */
-	void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option);
+	void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option);
 
 	/**
-	 * Atomically transfer a key from a source Redis instance to a destination Redis instance. On success the key is
+	 * Atomically transfer a key from a source Valkey instance to a destination Valkey instance. On success the key is
 	 * deleted from the original instance and is guaranteed to exist in the target instance.
 	 *
 	 * @param key must not be {@literal null}.
@@ -299,8 +299,8 @@ public interface RedisServerCommands {
 	 * @param option can be {@literal null}. Defaulted to {@link MigrateOption#COPY}.
 	 * @param timeout
 	 * @since 1.7
-	 * @see <a href="https://redis.io/commands/migrate">Redis Documentation: MIGRATE</a>
+	 * @see <a href="https://redis.io/commands/migrate">Valkey Documentation: MIGRATE</a>
 	 */
-	void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option, long timeout);
+	void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option, long timeout);
 
 }

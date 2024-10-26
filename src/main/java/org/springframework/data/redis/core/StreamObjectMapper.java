@@ -27,7 +27,7 @@ import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
+import org.springframework.data.redis.core.convert.ValkeyCustomConversions;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
 import org.springframework.lang.Nullable;
@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
  */
 class StreamObjectMapper {
 
-	private static final RedisCustomConversions customConversions = new RedisCustomConversions();
+	private static final ValkeyCustomConversions customConversions = new ValkeyCustomConversions();
 	private static final ConversionService conversionService;
 
 	private final HashMapper<Object, Object, Object> mapper;

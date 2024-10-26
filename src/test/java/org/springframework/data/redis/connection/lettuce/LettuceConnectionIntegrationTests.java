@@ -24,15 +24,15 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.AbstractConnectionIntegrationTests;
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
+import org.springframework.data.redis.connection.StringValkeyConnection;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
 import org.springframework.data.redis.test.condition.LongRunningTest;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,7 +55,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 	@LongRunningTest
 	void testMultiThreadsOneBlocking() throws Exception {
 		Thread th = new Thread(() -> {
-			DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+			DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 			conn2.openPipeline();
 			conn2.bLPop(3, "multilist");
 			conn2.closePipeline();
@@ -73,7 +73,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 		connection.set("txs1", "rightnow");
 		connection.multi();
 		connection.set("txs1", "delay");
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 
 		// We get immediate results executing command in separate conn (not part
 		// of tx)
@@ -97,7 +97,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 		try {
 			connection.exec();
 			fail("Expected exception resuming tx");
-		} catch (RedisSystemException expected) {
+		} catch (ValkeySystemException expected) {
 			// expected, can't resume tx after closing conn
 		}
 	}
@@ -115,7 +115,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 			// can't do blocking ops after closing
 			connection.bLPop(1, "what".getBytes());
 			fail("Expected exception using a closed conn for dedicated ops");
-		} catch (RedisSystemException expected) {
+		} catch (ValkeySystemException expected) {
 		}
 	}
 
@@ -127,7 +127,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 		factory2.setShareNativeConnection(false);
 		factory2.afterPropertiesSet();
 		factory2.start();
-		RedisConnection connection = factory2.getConnection();
+		ValkeyConnection connection = factory2.getConnection();
 		// Use the connection to make sure the channel is initialized, else nothing happens on close
 		connection.ping();
 		connection.close();
@@ -135,7 +135,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 		try {
 			connection.set("foo".getBytes(), "bar".getBytes());
 			fail("Exception should be thrown trying to use a closed connection");
-		} catch (RedisSystemException expected) {
+		} catch (ValkeySystemException expected) {
 		} finally {
 
 		factory2.destroy();
@@ -159,7 +159,7 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 		factory2.setDatabase(1);
 		factory2.afterPropertiesSet();
 		factory2.start();
-		StringRedisConnection conn2 = new DefaultStringRedisConnection(factory2.getConnection());
+		StringValkeyConnection conn2 = new DefaultStringValkeyConnection(factory2.getConnection());
 		try {
 			assertThat(conn2.get("foo")).isEqualTo("bar");
 		} finally {
@@ -221,11 +221,11 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 	}
 
 	@Test // DATAREDIS-348
-	@EnabledOnRedisSentinelAvailable
+	@EnabledOnValkeySentinelAvailable
 	void shouldReturnSentinelCommandsWhenWhenActiveSentinelFound() {
 
 		((LettuceConnection) byteConnection).setSentinelConfiguration(
-				new RedisSentinelConfiguration().master("mymaster").sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380));
+				new ValkeySentinelConfiguration().master("mymaster").sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380));
 		assertThat(connection.getSentinelConnection()).isNotNull();
 	}
 }

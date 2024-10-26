@@ -22,10 +22,10 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 
 import io.lettuce.core.GetExArgs;
 import io.lettuce.core.Limit;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SetArgs;
 import io.lettuce.core.cluster.models.partitions.Partitions;
-import io.lettuce.core.cluster.models.partitions.RedisClusterNode.NodeFlag;
+import io.lettuce.core.cluster.models.partitions.ValkeyClusterNode.NodeFlag;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,14 +34,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.Flag;
-import org.springframework.data.redis.connection.RedisClusterNode.LinkState;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.Flag;
+import org.springframework.data.redis.connection.ValkeyClusterNode.LinkState;
+import org.springframework.data.redis.connection.ValkeyPassword;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 
 /**
  * Unit tests for {@link LettuceConverters}.
@@ -56,26 +56,26 @@ class LettuceConvertersUnitTests {
 	private static final String MASTER_NAME = "mymaster";
 
 	@Test // DATAREDIS-268
-	void convertingEmptyStringToListOfRedisClientInfoShouldReturnEmptyList() {
-		assertThat(LettuceConverters.toListOfRedisClientInformation(""))
-				.isEqualTo(Collections.<RedisClientInfo> emptyList());
+	void convertingEmptyStringToListOfValkeyClientInfoShouldReturnEmptyList() {
+		assertThat(LettuceConverters.toListOfValkeyClientInformation(""))
+				.isEqualTo(Collections.<ValkeyClientInfo> emptyList());
 	}
 
 	@Test // DATAREDIS-268
-	void convertingNullToListOfRedisClientInfoShouldReturnEmptyList() {
-		assertThat(LettuceConverters.toListOfRedisClientInformation(null))
-				.isEqualTo(Collections.<RedisClientInfo> emptyList());
+	void convertingNullToListOfValkeyClientInfoShouldReturnEmptyList() {
+		assertThat(LettuceConverters.toListOfValkeyClientInformation(null))
+				.isEqualTo(Collections.<ValkeyClientInfo> emptyList());
 	}
 
 	@Test // DATAREDIS-268
-	void convertingMultipleLiesToListOfRedisClientInfoReturnsListCorrectly() {
+	void convertingMultipleLiesToListOfValkeyClientInfoReturnsListCorrectly() {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(CLIENT_ALL_SINGLE_LINE_RESPONSE);
 		sb.append("\r\n");
 		sb.append(CLIENT_ALL_SINGLE_LINE_RESPONSE);
 
-		assertThat(LettuceConverters.toListOfRedisClientInformation(sb.toString()).size()).isEqualTo(2);
+		assertThat(LettuceConverters.toListOfValkeyClientInformation(sb.toString()).size()).isEqualTo(2);
 	}
 
 	@Test // DATAREDIS-315
@@ -88,19 +88,19 @@ class LettuceConvertersUnitTests {
 
 		Partitions partitions = new Partitions();
 
-		io.lettuce.core.cluster.models.partitions.RedisClusterNode partition = new io.lettuce.core.cluster.models.partitions.RedisClusterNode();
+		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition.setNodeId(CLUSTER_NODE_1.getId());
 		partition.setConnected(true);
 		partition.setFlags(new HashSet<>(Arrays.asList(NodeFlag.MASTER, NodeFlag.MYSELF)));
-		partition.setUri(RedisURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
+		partition.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
 		partition.setSlots(Arrays.asList(1, 2, 3, 4, 5));
 
 		partitions.add(partition);
 
-		List<RedisClusterNode> nodes = LettuceConverters.partitionsToClusterNodes(partitions);
+		List<ValkeyClusterNode> nodes = LettuceConverters.partitionsToClusterNodes(partitions);
 		assertThat(nodes.size()).isEqualTo(1);
 
-		RedisClusterNode node = nodes.get(0);
+		ValkeyClusterNode node = nodes.get(0);
 		assertThat(node.getHost()).isEqualTo(CLUSTER_HOST);
 		assertThat(node.getPort()).isEqualTo(MASTER_NODE_1_PORT);
 		assertThat(node.getFlags()).contains(Flag.MASTER, Flag.MYSELF);
@@ -260,10 +260,10 @@ class LettuceConvertersUnitTests {
 	@Test // GH-2218
 	void sentinelConfigurationWithAuth() {
 
-		RedisPassword dataPassword = RedisPassword.of("data-secret");
-		RedisPassword sentinelPassword = RedisPassword.of("sentinel-secret");
+		ValkeyPassword dataPassword = ValkeyPassword.of("data-secret");
+		ValkeyPassword sentinelPassword = ValkeyPassword.of("sentinel-secret");
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration()
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration()
 				.master(MASTER_NAME)
 				.sentinel("127.0.0.1", 26379)
 				.sentinel("127.0.0.1", 26380);
@@ -273,7 +273,7 @@ class LettuceConvertersUnitTests {
 		sentinelConfiguration.setSentinelUsername("admin");
 		sentinelConfiguration.setSentinelPassword(sentinelPassword);
 
-		RedisURI redisURI = LettuceConverters.sentinelConfigurationToRedisURI(sentinelConfiguration);
+		ValkeyURI redisURI = LettuceConverters.sentinelConfigurationToValkeyURI(sentinelConfiguration);
 
 		assertThat(redisURI.getUsername()).isEqualTo("app");
 		assertThat(redisURI.getPassword()).isEqualTo(dataPassword.get());
@@ -287,9 +287,9 @@ class LettuceConvertersUnitTests {
 	@Test // GH-2218
 	void sentinelConfigurationSetSentinelPasswordIfUsernameNotPresent() {
 
-		RedisPassword password = RedisPassword.of("88888888-8x8-getting-creative-now");
+		ValkeyPassword password = ValkeyPassword.of("88888888-8x8-getting-creative-now");
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration()
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration()
 				.master(MASTER_NAME)
 				.sentinel("127.0.0.1", 26379)
 				.sentinel("127.0.0.1", 26380);
@@ -297,7 +297,7 @@ class LettuceConvertersUnitTests {
 		sentinelConfiguration.setPassword(password);
 		sentinelConfiguration.setSentinelPassword(password);
 
-		RedisURI redisURI = LettuceConverters.sentinelConfigurationToRedisURI(sentinelConfiguration);
+		ValkeyURI redisURI = LettuceConverters.sentinelConfigurationToValkeyURI(sentinelConfiguration);
 
 		assertThat(redisURI.getUsername()).isEqualTo("app");
 
@@ -310,9 +310,9 @@ class LettuceConvertersUnitTests {
 	@Test // GH-2218
 	void sentinelConfigurationShouldNotSetSentinelAuthIfUsernameIsPresentWithNoPassword() {
 
-		RedisPassword password = RedisPassword.of("88888888-8x8-getting-creative-now");
+		ValkeyPassword password = ValkeyPassword.of("88888888-8x8-getting-creative-now");
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration()
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration()
 				.master(MASTER_NAME)
 				.sentinel("127.0.0.1", 26379)
 				.sentinel("127.0.0.1", 26380);
@@ -320,7 +320,7 @@ class LettuceConvertersUnitTests {
 		sentinelConfiguration.setPassword(password);
 		sentinelConfiguration.setSentinelUsername("admin");
 
-		RedisURI redisURI = LettuceConverters.sentinelConfigurationToRedisURI(sentinelConfiguration);
+		ValkeyURI redisURI = LettuceConverters.sentinelConfigurationToValkeyURI(sentinelConfiguration);
 
 		assertThat(redisURI.getUsername()).isEqualTo("app");
 

@@ -28,31 +28,31 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.springframework.data.redis.ConnectionFactoryTracker;
 import org.springframework.data.redis.SettingsUtils;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisSentinel;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeySentinel;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.ShutdownQueue;
 import org.springframework.data.util.Lazy;
 
 /**
  * JUnit {@link ParameterResolver} providing pre-cached {@link LettuceConnectionFactory} instances. Connection factories
- * can be qualified with {@code @RedisStanalone} (default), {@code @RedisSentinel} or {@code @RedisCluster} to obtain a
+ * can be qualified with {@code @ValkeyStanalone} (default), {@code @ValkeySentinel} or {@code @ValkeyCluster} to obtain a
  * specific factory instance. Instances are managed by this extension and will be shut down on JVM shutdown.
  *
  * @author Mark Paluch
- * @see RedisStanalone
- * @see RedisSentinel
- * @see RedisCluster
+ * @see ValkeyStanalone
+ * @see ValkeySentinel
+ * @see ValkeyCluster
  */
 public class LettuceConnectionFactoryExtension implements ParameterResolver {
 
@@ -155,21 +155,21 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 	static {
 
 		pooledFactories = new HashMap<>();
-		pooledFactories.put(RedisStanalone.class, STANDALONE);
-		pooledFactories.put(RedisSentinel.class, SENTINEL);
-		pooledFactories.put(RedisCluster.class, CLUSTER);
+		pooledFactories.put(ValkeyStanalone.class, STANDALONE);
+		pooledFactories.put(ValkeySentinel.class, SENTINEL);
+		pooledFactories.put(ValkeyCluster.class, CLUSTER);
 
 		unpooledFactories = new HashMap<>();
-		unpooledFactories.put(RedisStanalone.class, STANDALONE_UNPOOLED);
-		unpooledFactories.put(RedisSentinel.class, SENTINEL_UNPOOLED);
-		unpooledFactories.put(RedisCluster.class, CLUSTER_UNPOOLED);
+		unpooledFactories.put(ValkeyStanalone.class, STANDALONE_UNPOOLED);
+		unpooledFactories.put(ValkeySentinel.class, SENTINEL_UNPOOLED);
+		unpooledFactories.put(ValkeyCluster.class, CLUSTER_UNPOOLED);
 	}
 
 	/**
 	 * Obtain a {@link LettuceConnectionFactory} described by {@code qualifier}. Instances are managed by this extension
 	 * and will be shut down on JVM shutdown.
 	 *
-	 * @param qualifier an be any of {@link RedisStanalone}, {@link RedisSentinel}, {@link RedisCluster}.
+	 * @param qualifier an be any of {@link ValkeyStanalone}, {@link ValkeySentinel}, {@link ValkeyCluster}.
 	 * @return the managed {@link LettuceConnectionFactory}.
 	 */
 	public static LettuceConnectionFactory getConnectionFactory(Class<? extends Annotation> qualifier) {
@@ -180,7 +180,7 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 	 * Obtain a {@link LettuceConnectionFactory} described by {@code qualifier}. Instances are managed by this extension
 	 * and will be shut down on JVM shutdown.
 	 *
-	 * @param qualifier an be any of {@link RedisStanalone}, {@link RedisSentinel}, {@link RedisCluster}.
+	 * @param qualifier an be any of {@link ValkeyStanalone}, {@link ValkeySentinel}, {@link ValkeyCluster}.
 	 * @return the managed {@link LettuceConnectionFactory}.
 	 */
 	public static LettuceConnectionFactory getConnectionFactory(Class<? extends Annotation> qualifier, boolean pooled) {
@@ -190,8 +190,8 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
 			throws ParameterResolutionException {
-		return RedisConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType())
-				|| ReactiveRedisConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType());
+		return ValkeyConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType())
+				|| ReactiveValkeyConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType());
 	}
 
 	@Override
@@ -207,15 +207,15 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 
 	private static Class<? extends Annotation> getQualifier(ParameterContext parameterContext) {
 
-		if (parameterContext.isAnnotated(RedisSentinel.class)) {
-			return RedisSentinel.class;
+		if (parameterContext.isAnnotated(ValkeySentinel.class)) {
+			return ValkeySentinel.class;
 		}
 
-		if (parameterContext.isAnnotated(RedisCluster.class)) {
-			return RedisCluster.class;
+		if (parameterContext.isAnnotated(ValkeyCluster.class)) {
+			return ValkeyCluster.class;
 		}
 
-		return RedisStanalone.class;
+		return ValkeyStanalone.class;
 	}
 
 	static class ManagedLettuceConnectionFactory extends LettuceConnectionFactory
@@ -223,17 +223,17 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 
 		private volatile boolean mayClose;
 
-		ManagedLettuceConnectionFactory(RedisStandaloneConfiguration standaloneConfig,
+		ManagedLettuceConnectionFactory(ValkeyStandaloneConfiguration standaloneConfig,
 				LettuceClientConfiguration clientConfig) {
 			super(standaloneConfig, clientConfig);
 		}
 
-		ManagedLettuceConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
+		ManagedLettuceConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration,
 				LettuceClientConfiguration clientConfig) {
 			super(sentinelConfiguration, clientConfig);
 		}
 
-		ManagedLettuceConnectionFactory(RedisClusterConfiguration clusterConfiguration,
+		ManagedLettuceConnectionFactory(ValkeyClusterConfiguration clusterConfiguration,
 				LettuceClientConfiguration clientConfig) {
 			super(clusterConfiguration, clientConfig);
 		}
@@ -258,7 +258,7 @@ public class LettuceConnectionFactoryExtension implements ParameterResolver {
 				builder.append(" Cluster");
 			}
 
-			if (isRedisSentinelAware()) {
+			if (isValkeySentinelAware()) {
 				builder.append(" Sentinel");
 			}
 

@@ -31,12 +31,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.data.redis.Person;
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveScriptingCommands;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 
 /**
  * Unit tests for {@link DefaultReactiveScriptExecutor}.
@@ -47,10 +47,10 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 @ExtendWith(MockitoExtension.class)
 class DefaultReactiveScriptExecutorUnitTests {
 
-	private final DefaultRedisScript<String> SCRIPT = new DefaultRedisScript<>("return KEYS[0]", String.class);
+	private final DefaultValkeyScript<String> SCRIPT = new DefaultValkeyScript<>("return KEYS[0]", String.class);
 
-	@Mock ReactiveRedisConnectionFactory connectionFactoryMock;
-	@Mock ReactiveRedisConnection connectionMock;
+	@Mock ReactiveValkeyConnectionFactory connectionFactoryMock;
+	@Mock ReactiveValkeyConnection connectionMock;
 	@Mock ReactiveScriptingCommands scriptingCommandsMock;
 
 	private DefaultReactiveScriptExecutor<String> executor;
@@ -62,7 +62,7 @@ class DefaultReactiveScriptExecutorUnitTests {
 		when(connectionMock.scriptingCommands()).thenReturn(scriptingCommandsMock);
 		when(connectionMock.closeLater()).thenReturn(Mono.empty());
 
-		executor = new DefaultReactiveScriptExecutor<>(connectionFactoryMock, RedisSerializationContext.string());
+		executor = new DefaultReactiveScriptExecutor<>(connectionFactoryMock, ValkeySerializationContext.string());
 	}
 
 	@Test // DATAREDIS-683
@@ -81,7 +81,7 @@ class DefaultReactiveScriptExecutorUnitTests {
 	void executeShouldUseEvalInCaseNoSha1PresentForGivenScript() {
 
 		when(scriptingCommandsMock.evalSha(anyString(), any(ReturnType.class), anyInt())).thenReturn(
-				Flux.error(new RedisSystemException("NOSCRIPT No matching script; Please use EVAL.", new Exception())));
+				Flux.error(new ValkeySystemException("NOSCRIPT No matching script; Please use EVAL.", new Exception())));
 
 		when(scriptingCommandsMock.eval(any(), any(ReturnType.class), anyInt()))
 				.thenReturn(Flux.just(ByteBuffer.wrap("FOO".getBytes())));
@@ -93,7 +93,7 @@ class DefaultReactiveScriptExecutorUnitTests {
 	}
 
 	@Test // DATAREDIS-683
-	void executeShouldThrowExceptionInCaseEvalShaFailsWithOtherThanRedisSystemException() {
+	void executeShouldThrowExceptionInCaseEvalShaFailsWithOtherThanValkeySystemException() {
 
 		when(scriptingCommandsMock.evalSha(anyString(), any(ReturnType.class), anyInt())).thenReturn(Flux
 				.error(new UnsupportedOperationException("NOSCRIPT No matching script; Please use EVAL.", new Exception())));
@@ -137,7 +137,7 @@ class DefaultReactiveScriptExecutorUnitTests {
 		when(scriptingCommandsMock.evalSha(anyString(), any(ReturnType.class), anyInt()))
 				.thenReturn(Flux.just(returnValue));
 
-		executor.execute(RedisScript.of("return KEYS[0]")).as(StepVerifier::create).expectNext(returnValue)
+		executor.execute(ValkeyScript.of("return KEYS[0]")).as(StepVerifier::create).expectNext(returnValue)
 				.verifyComplete();
 	}
 }

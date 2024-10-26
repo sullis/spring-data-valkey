@@ -21,13 +21,13 @@ import static org.springframework.data.redis.connection.BitFieldSubCommands.*;
 import static org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldIncrBy.Overflow.*;
 import static org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldType.*;
 import static org.springframework.data.redis.connection.ClusterTestVariables.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.*;
-import static org.springframework.data.redis.connection.RedisZSetCommands.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.*;
+import static org.springframework.data.redis.connection.ValkeyZSetCommands.*;
 import static org.springframework.data.redis.core.ScanOptions.*;
 
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.sync.ValkeyAdvancedClusterCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
 
 import java.nio.charset.StandardCharsets;
@@ -50,20 +50,20 @@ import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.connection.RedisStringCommands.BitOperation;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
-import org.springframework.data.redis.connection.ValueEncoding.RedisValueEncoding;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.connection.ValkeyStringCommands.BitOperation;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValueEncoding.ValkeyValueEncoding;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.data.redis.test.extension.LettuceExtension;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 import org.springframework.data.redis.test.util.HexStringUtils;
@@ -75,7 +75,7 @@ import org.springframework.data.redis.util.ConnectionVerifier;
  * @author Dennis Neufeld
  */
 @SuppressWarnings("deprecation")
-@EnabledOnRedisClusterAvailable
+@EnabledOnValkeyClusterAvailable
 @ExtendWith(LettuceExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LettuceClusterConnectionTests implements ClusterConnectionTests {
@@ -105,13 +105,13 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 	private static final GeoLocation<byte[]> PALERMO_BYTES = new GeoLocation<>("palermo".getBytes(StandardCharsets.UTF_8),
 			POINT_PALERMO);
 
-	private final RedisClusterClient client;
+	private final ValkeyClusterClient client;
 
-	private static RedisAdvancedClusterCommands<String, String> nativeConnection;
-	private static RedisAdvancedClusterCommands<byte[], byte[]> binaryConnection;
+	private static ValkeyAdvancedClusterCommands<String, String> nativeConnection;
+	private static ValkeyAdvancedClusterCommands<byte[], byte[]> binaryConnection;
 	private static LettuceClusterConnection clusterConnection;
 
-	public LettuceClusterConnectionTests(RedisClusterClient client) {
+	public LettuceClusterConnectionTests(ValkeyClusterClient client) {
 		this.client = client;
 		nativeConnection = client.connect().sync();
 		binaryConnection = client.connect(ByteArrayCodec.INSTANCE).sync();
@@ -149,7 +149,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 				.shutdownQuietPeriod(Duration.ZERO) //
 				.build();
 
-		RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+		ValkeyClusterConfiguration clusterConfiguration = new ValkeyClusterConfiguration();
 		clusterConfiguration.addClusterNode(ClusterTestVariables.CLUSTER_NODE_1);
 
 		return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
@@ -174,7 +174,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		try {
 
 			factory.start();
-			RedisClusterConnection clusterConnection = factory.getClusterConnection();
+			ValkeyClusterConnection clusterConnection = factory.getClusterConnection();
 
 			assertThat(clusterConnection.ping(ClusterTestVariables.CLUSTER_NODE_1)).isEqualTo("PONG");
 			clusterConnection.close();
@@ -320,25 +320,25 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 	@Test // DATAREDIS-315
 	public void clusterGetMasterReplicaMapShouldListMastersAndReplicasCorrectly() {
 
-		Map<RedisClusterNode, Collection<RedisClusterNode>> masterReplicaMap = clusterConnection
+		Map<ValkeyClusterNode, Collection<ValkeyClusterNode>> masterReplicaMap = clusterConnection
 				.clusterGetMasterReplicaMap();
 
 		assertThat(masterReplicaMap).isNotNull();
 		assertThat(masterReplicaMap).hasSize(3);
-		assertThat(masterReplicaMap.get(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT)))
-				.contains(new RedisClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT));
-		assertThat(masterReplicaMap.get(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT)).isEmpty()).isTrue();
-		assertThat(masterReplicaMap.get(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_3_PORT)).isEmpty()).isTrue();
+		assertThat(masterReplicaMap.get(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT)))
+				.contains(new ValkeyClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT));
+		assertThat(masterReplicaMap.get(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT)).isEmpty()).isTrue();
+		assertThat(masterReplicaMap.get(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_3_PORT)).isEmpty()).isTrue();
 	}
 
 	@Test // DATAREDIS-315
 	public void clusterGetReplicasShouldReturnReplicaCorrectly() {
 
-		Set<RedisClusterNode> replicas = clusterConnection
-				.clusterGetReplicas(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT));
+		Set<ValkeyClusterNode> replicas = clusterConnection
+				.clusterGetReplicas(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT));
 
 		assertThat(replicas).hasSize(1);
-		assertThat(replicas).contains(new RedisClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT));
+		assertThat(replicas).contains(new ValkeyClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT));
 	}
 
 	@Test // DATAREDIS-315
@@ -357,9 +357,9 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		assertThat(clusterConnection.dbSize(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()))).isEqualTo(1L);
-		assertThat(clusterConnection.dbSize(new RedisClusterNode("127.0.0.1", 7380, SlotRange.empty()))).isEqualTo(1L);
-		assertThat(clusterConnection.dbSize(new RedisClusterNode("127.0.0.1", 7381, SlotRange.empty()))).isEqualTo(0L);
+		assertThat(clusterConnection.dbSize(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()))).isEqualTo(1L);
+		assertThat(clusterConnection.dbSize(new ValkeyClusterNode("127.0.0.1", 7380, SlotRange.empty()))).isEqualTo(1L);
+		assertThat(clusterConnection.dbSize(new ValkeyClusterNode("127.0.0.1", 7381, SlotRange.empty()))).isEqualTo(0L);
 	}
 
 	@Test // DATAREDIS-315
@@ -513,7 +513,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushDb(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()));
+		clusterConnection.flushDb(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()));
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -525,7 +525,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushDb(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.SYNC);
+		clusterConnection.flushDb(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.SYNC);
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -537,7 +537,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushDb(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.ASYNC);
+		clusterConnection.flushDb(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.ASYNC);
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -585,7 +585,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushAll(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()));
+		clusterConnection.flushAll(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()));
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -597,7 +597,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushAll(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.SYNC);
+		clusterConnection.flushAll(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.SYNC);
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -609,7 +609,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		clusterConnection.flushAll(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.ASYNC);
+		clusterConnection.flushAll(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()), FlushOption.ASYNC);
 
 		assertThat(nativeConnection.get(KEY_1)).isNotNull();
 		assertThat(nativeConnection.get(KEY_2)).isNull();
@@ -846,14 +846,14 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 
 	@Test // DATAREDIS-315
 	public void getClusterNodeForKeyShouldReturnNodeCorrectly() {
-		assertThat((RedisNode) clusterConnection.clusterGetNodeForKey(KEY_1_BYTES))
-				.isEqualTo(new RedisNode("127.0.0.1", 7380));
+		assertThat((ValkeyNode) clusterConnection.clusterGetNodeForKey(KEY_1_BYTES))
+				.isEqualTo(new ValkeyNode("127.0.0.1", 7380));
 	}
 
 	@Test // DATAREDIS-315, DATAREDIS-661
 	public void getConfigShouldLoadConfigurationOfSpecificNode() {
 
-		Properties result = clusterConnection.getConfig(new RedisClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT), "*");
+		Properties result = clusterConnection.getConfig(new ValkeyClusterNode(CLUSTER_HOST, REPLICAOF_NODE_1_PORT), "*");
 
 		assertThat(result.getProperty("slaveof")).endsWith("7379");
 	}
@@ -1131,7 +1131,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 	@Test // DATAREDIS-315
 	public void infoShouldCollectInfoForSpecificNode() {
 
-		Properties properties = clusterConnection.info(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT));
+		Properties properties = clusterConnection.info(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT));
 
 		assertThat(properties.getProperty("tcp_port")).isEqualTo(Integer.toString(MASTER_NODE_2_PORT));
 	}
@@ -1139,7 +1139,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 	@Test // DATAREDIS-315
 	public void infoShouldCollectInfoForSpecificNodeAndSection() {
 
-		Properties properties = clusterConnection.info(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT), "server");
+		Properties properties = clusterConnection.info(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT), "server");
 
 		assertThat(properties.getProperty("tcp_port")).isEqualTo(Integer.toString(MASTER_NODE_2_PORT));
 		assertThat(properties.getProperty("used_memory")).isNull();
@@ -1148,7 +1148,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 	@Test // DATAREDIS-315, DATAREDIS-685
 	public void infoShouldCollectionInfoFromAllClusterNodes() {
 
-		Properties singleNodeInfo = clusterConnection.serverCommands().info(new RedisClusterNode("127.0.0.1", 7380));
+		Properties singleNodeInfo = clusterConnection.serverCommands().info(new ValkeyClusterNode("127.0.0.1", 7380));
 		assertThat(Double.valueOf(clusterConnection.serverCommands().info().size())).isCloseTo(singleNodeInfo.size() * 3,
 				offset(12d));
 	}
@@ -1168,7 +1168,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		Set<byte[]> keysOnNode = clusterConnection.keys(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()),
+		Set<byte[]> keysOnNode = clusterConnection.keys(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()),
 				LettuceConverters.toBytes("*"));
 
 		assertThat(keysOnNode).contains(KEY_2_BYTES);
@@ -1194,7 +1194,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		nativeConnection.set(KEY_1, VALUE_1);
 		nativeConnection.set(KEY_2, VALUE_2);
 
-		Cursor<byte[]> scan = clusterConnection.scan(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()),
+		Cursor<byte[]> scan = clusterConnection.scan(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()),
 				ScanOptions.NONE);
 		List<byte[]> keysOnNode = new ArrayList<>();
 		scan.forEachRemaining(keysOnNode::add);
@@ -1227,10 +1227,10 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 
 		nativeConnection.rpush(SAME_SLOT_KEY_1, VALUE_1, VALUE_2, VALUE_3);
 
-		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, RedisListCommands.Direction.RIGHT,
-				RedisListCommands.Direction.LEFT)).isEqualTo(VALUE_3_BYTES);
-		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, RedisListCommands.Direction.RIGHT,
-				RedisListCommands.Direction.LEFT)).isEqualTo(VALUE_2_BYTES);
+		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, ValkeyListCommands.Direction.RIGHT,
+				ValkeyListCommands.Direction.LEFT)).isEqualTo(VALUE_3_BYTES);
+		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, ValkeyListCommands.Direction.RIGHT,
+				ValkeyListCommands.Direction.LEFT)).isEqualTo(VALUE_2_BYTES);
 
 		assertThat(nativeConnection.lrange(SAME_SLOT_KEY_1, 0, -1)).containsExactly(VALUE_1);
 		assertThat(nativeConnection.lrange(SAME_SLOT_KEY_2, 0, -1)).containsExactly(VALUE_2, VALUE_3);
@@ -1242,12 +1242,12 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 
 		nativeConnection.rpush(SAME_SLOT_KEY_1, VALUE_2, VALUE_3);
 
-		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, RedisListCommands.Direction.RIGHT,
-				RedisListCommands.Direction.LEFT)).isEqualTo(VALUE_3_BYTES);
-		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, RedisListCommands.Direction.RIGHT,
-				RedisListCommands.Direction.LEFT)).isEqualTo(VALUE_2_BYTES);
-		assertThat(clusterConnection.bLMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, RedisListCommands.Direction.RIGHT,
-				RedisListCommands.Direction.LEFT, 0.01)).isNull();
+		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, ValkeyListCommands.Direction.RIGHT,
+				ValkeyListCommands.Direction.LEFT)).isEqualTo(VALUE_3_BYTES);
+		assertThat(clusterConnection.lMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, ValkeyListCommands.Direction.RIGHT,
+				ValkeyListCommands.Direction.LEFT)).isEqualTo(VALUE_2_BYTES);
+		assertThat(clusterConnection.bLMove(SAME_SLOT_KEY_1_BYTES, SAME_SLOT_KEY_2_BYTES, ValkeyListCommands.Direction.RIGHT,
+				ValkeyListCommands.Direction.LEFT, 0.01)).isNull();
 
 		assertThat(nativeConnection.lrange(SAME_SLOT_KEY_1, 0, -1)).isEmpty();
 		assertThat(nativeConnection.lrange(SAME_SLOT_KEY_2, 0, -1)).containsExactly(VALUE_2, VALUE_3);
@@ -1563,13 +1563,13 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 
 	@Test // DATAREDIS-315
 	public void pingShouldRetrunPongForExistingNode() {
-		assertThat(clusterConnection.ping(new RedisClusterNode("127.0.0.1", 7379, SlotRange.empty()))).isEqualTo("PONG");
+		assertThat(clusterConnection.ping(new ValkeyClusterNode("127.0.0.1", 7379, SlotRange.empty()))).isEqualTo("PONG");
 	}
 
 	@Test // DATAREDIS-315
 	public void pingShouldThrowExceptionWhenNodeNotKnownToCluster() {
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> clusterConnection.ping(new RedisClusterNode("127.0.0.1", 1234, SlotRange.empty())));
+				.isThrownBy(() -> clusterConnection.ping(new ValkeyClusterNode("127.0.0.1", 1234, SlotRange.empty())));
 	}
 
 	@Test // DATAREDIS-315
@@ -2795,12 +2795,12 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 
 		nativeConnection.set(KEY_1, "1000");
 
-		assertThat(clusterConnection.keyCommands().encodingOf(KEY_1_BYTES)).isEqualTo(RedisValueEncoding.INT);
+		assertThat(clusterConnection.keyCommands().encodingOf(KEY_1_BYTES)).isEqualTo(ValkeyValueEncoding.INT);
 	}
 
 	@Test // DATAREDIS-716
 	void encodingReturnsVacantWhenKeyDoesNotExist() {
-		assertThat(clusterConnection.keyCommands().encodingOf(KEY_2_BYTES)).isEqualTo(RedisValueEncoding.VACANT);
+		assertThat(clusterConnection.keyCommands().encodingOf(KEY_2_BYTES)).isEqualTo(ValkeyValueEncoding.VACANT);
 	}
 
 	@Test // DATAREDIS-716

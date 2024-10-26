@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.jedis;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
-import org.springframework.data.redis.connection.RedisHyperLogLogCommands;
+import org.springframework.data.redis.connection.ValkeyHyperLogLogCommands;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.util.Assert;
 
@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class JedisClusterHyperLogLogCommands implements RedisHyperLogLogCommands {
+class JedisClusterHyperLogLogCommands implements ValkeyHyperLogLogCommands {
 
 	private final JedisClusterConnection connection;
 

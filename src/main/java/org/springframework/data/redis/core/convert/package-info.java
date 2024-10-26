@@ -1,5 +1,5 @@
 /**
- * Converters for Redis repository support utilizing mapping metadata.
+ * Converters for Valkey repository support utilizing mapping metadata.
  */
 @org.springframework.lang.NonNullApi
 @org.springframework.lang.NonNullFields

@@ -28,19 +28,19 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
- * Integration tests confirming that {@link RedisMessageListenerContainer} closes connections after unsubscribing
+ * Integration tests confirming that {@link ValkeyMessageListenerContainer} closes connections after unsubscribing
  *
  * @author Jennifer Hickey
  * @author Thomas Darimont
@@ -53,9 +53,9 @@ public class SubscriptionConnectionTests {
 	private static final Log logger = LogFactory.getLog(SubscriptionConnectionTests.class);
 	private static final String CHANNEL = "pubsub::test";
 
-	private RedisConnectionFactory connectionFactory;
+	private ValkeyConnectionFactory connectionFactory;
 
-	private List<RedisMessageListenerContainer> containers = new ArrayList<>();
+	private List<ValkeyMessageListenerContainer> containers = new ArrayList<>();
 
 	private final Object handler = new Object() {
 		@SuppressWarnings("unused")
@@ -64,7 +64,7 @@ public class SubscriptionConnectionTests {
 		}
 	};
 
-	public SubscriptionConnectionTests(RedisConnectionFactory connectionFactory) {
+	public SubscriptionConnectionTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
@@ -72,31 +72,31 @@ public class SubscriptionConnectionTests {
 
 		// Jedis
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		return Arrays.asList(new Object[][] { { jedisConnFactory }, { lettuceConnFactory } });
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-		for (RedisMessageListenerContainer container : containers) {
+		for (ValkeyMessageListenerContainer container : containers) {
 			if (container.isActive()) {
 				container.destroy();
 			}
 		}
 	}
 
-	@ParameterizedRedisTest // GH-964
+	@ParameterizedValkeyTest // GH-964
 	void testStopMessageListenerContainers() throws Exception {
 
 		// Grab all 8 connections from the pool. They should be released on
 		// container stop
 		for (int i = 0; i < 8; i++) {
-			RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+			ValkeyMessageListenerContainer container = new ValkeyMessageListenerContainer();
 			container.setConnectionFactory(connectionFactory);
 			container.setBeanName("container" + i);
 			container.addMessageListener(new MessageListenerAdapter(handler),
@@ -111,17 +111,17 @@ public class SubscriptionConnectionTests {
 		}
 
 		// verify we can now get a connection from the pool
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveLastListener() throws Exception {
 
 		// Grab all 8 connections from the pool
 		MessageListener listener = new MessageListenerAdapter(handler);
 		for (int i = 0; i < 8; i++) {
-			RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+			ValkeyMessageListenerContainer container = new ValkeyMessageListenerContainer();
 			container.setConnectionFactory(connectionFactory);
 			container.setBeanName("container" + i);
 			container.addMessageListener(listener, Arrays.asList(new ChannelTopic(CHANNEL)));
@@ -137,17 +137,17 @@ public class SubscriptionConnectionTests {
 		containers.get(0).removeMessageListener(listener);
 
 		// verify we can now get a connection from the pool
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testStopListening() throws InterruptedException {
 
 		// Grab all 8 connections from the pool.
 		MessageListener listener = new MessageListenerAdapter(handler);
 		for (int i = 0; i < 8; i++) {
-			RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+			ValkeyMessageListenerContainer container = new ValkeyMessageListenerContainer();
 			container.setConnectionFactory(connectionFactory);
 			container.setBeanName("container" + i);
 			container.addMessageListener(listener, Arrays.asList(new ChannelTopic(CHANNEL)));
@@ -162,7 +162,7 @@ public class SubscriptionConnectionTests {
 		containers.get(0).stop();
 
 		// verify we can now get a connection from the pool
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.close();
 	}
 

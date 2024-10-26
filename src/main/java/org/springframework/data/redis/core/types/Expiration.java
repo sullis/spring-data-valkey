@@ -70,7 +70,7 @@ public class Expiration {
 	 * Creates new {@link Expiration} with the provided {@link TimeUnit}. Greater units than {@link TimeUnit#SECONDS} are
 	 * converted to {@link TimeUnit#SECONDS}. Units smaller than {@link TimeUnit#MILLISECONDS} are converted to
 	 * {@link TimeUnit#MILLISECONDS} and can lose precision since {@link TimeUnit#MILLISECONDS} is the smallest
-	 * granularity supported by Redis.
+	 * granularity supported by Valkey.
 	 *
 	 * @param expirationTime {@link Long length of time} for the {@link Expiration}.
 	 * @param timeUnit {@link TimeUnit} used to measure the {@link Long expiration time}; can be {@literal null}.

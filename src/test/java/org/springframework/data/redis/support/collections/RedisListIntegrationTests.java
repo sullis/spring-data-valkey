@@ -16,31 +16,31 @@
 package org.springframework.data.redis.support.collections;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 
 /**
- * Parameterized instance of Redis tests.
+ * Parameterized instance of Valkey tests.
  *
  * @author Costin Leau
  * @author John Blum
  */
-public class RedisListIntegrationTests extends AbstractRedisListIntegrationTests<Object> {
+public class ValkeyListIntegrationTests extends AbstractValkeyListIntegrationTests<Object> {
 
 	/**
-	 * Constructs a new, parameterized {@link RedisListIntegrationTests}.
+	 * Constructs a new, parameterized {@link ValkeyListIntegrationTests}.
 	 *
 	 * @param factory {@link ObjectFactory} used to create different types of elements to store in the list.
-	 * @param template {@link RedisTemplate} used to perform operations on Redis.
+	 * @param template {@link ValkeyTemplate} used to perform operations on Valkey.
 	 */
-	public RedisListIntegrationTests(ObjectFactory<Object> factory, RedisTemplate<Object, Object> template) {
+	public ValkeyListIntegrationTests(ObjectFactory<Object> factory, ValkeyTemplate<Object, Object> template) {
 		super(factory, template);
 	}
 
-	RedisStore copyStore(RedisStore store) {
-		return RedisList.create(store.getKey(), store.getOperations());
+	ValkeyStore copyStore(ValkeyStore store) {
+		return ValkeyList.create(store.getKey(), store.getOperations());
 	}
 
-	AbstractRedisCollection<Object> createCollection() {
-		return new DefaultRedisList<Object>(getClass().getName(), this.template);
+	AbstractValkeyCollection<Object> createCollection() {
+		return new DefaultValkeyList<Object>(getClass().getName(), this.template);
 	}
 }

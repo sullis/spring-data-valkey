@@ -27,19 +27,19 @@ import reactor.core.publisher.Mono;
 public interface ReactiveClusterKeyCommands extends ReactiveKeyCommands {
 
 	/**
-	 * Retrieve all {@literal keys} for a given {@literal pattern} from {@link RedisNode}.
+	 * Retrieve all {@literal keys} for a given {@literal pattern} from {@link ValkeyNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param pattern must not be {@literal null}.
 	 * @return
 	 */
-	Mono<List<ByteBuffer>> keys(RedisClusterNode node, ByteBuffer pattern);
+	Mono<List<ByteBuffer>> keys(ValkeyClusterNode node, ByteBuffer pattern);
 
 	/**
-	 * Retrieve a random {@literal key} from {@link RedisNode}.
+	 * Retrieve a random {@literal key} from {@link ValkeyNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return
 	 */
-	Mono<ByteBuffer> randomKey(RedisClusterNode node);
+	Mono<ByteBuffer> randomKey(ValkeyClusterNode node);
 }

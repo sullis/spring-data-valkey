@@ -43,42 +43,42 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
 import org.springframework.data.redis.connection.ReactiveSubscription;
 import org.springframework.data.redis.connection.ReactiveSubscription.ChannelMessage;
 import org.springframework.data.redis.connection.ReactiveSubscription.PatternMessage;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.core.ReactiveValkeyTemplate;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
- * Integration tests for {@link ReactiveRedisMessageListenerContainer} via Lettuce.
+ * Integration tests for {@link ReactiveValkeyMessageListenerContainer} via Lettuce.
  *
  * @author Mark Paluch
  */
 @MethodSource("testParams")
-public class ReactiveRedisMessageListenerContainerIntegrationTests {
+public class ReactiveValkeyMessageListenerContainerIntegrationTests {
 
 	private static final String CHANNEL1 = "my-channel";
 	private static final String PATTERN1 = "my-chan*";
 	private static final String MESSAGE = "hello world";
 
 	private final LettuceConnectionFactory connectionFactory;
-	private @Nullable RedisConnection connection;
-	private @Nullable ReactiveRedisConnection reactiveConnection;
+	private @Nullable ValkeyConnection connection;
+	private @Nullable ReactiveValkeyConnection reactiveConnection;
 
 	/**
 	 * @param connectionFactory
 	 * @param label parameterized test label, no further use besides that.
 	 */
-	public ReactiveRedisMessageListenerContainerIntegrationTests(LettuceConnectionFactory connectionFactory,
+	public ReactiveValkeyMessageListenerContainerIntegrationTests(LettuceConnectionFactory connectionFactory,
 			String label) {
 		this.connectionFactory = connectionFactory;
 	}
@@ -105,10 +105,10 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-612, GH-1622
+	@ParameterizedValkeyTest // DATAREDIS-612, GH-1622
 	void shouldReceiveChannelMessages() {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
 
 		container.receiveLater(ChannelTopic.of(CHANNEL1)) //
 				.doOnNext(it -> doPublish(CHANNEL1.getBytes(), MESSAGE.getBytes())) //
@@ -124,10 +124,10 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // GH-1622
+	@ParameterizedValkeyTest // GH-1622
 	void receiveChannelShouldNotifySubscriptionListener() throws Exception {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
 
 		AtomicReference<String> onSubscribe = new AtomicReference<>();
 		AtomicReference<String> onUnsubscribe = new AtomicReference<>();
@@ -172,10 +172,10 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-612, GH-1622
+	@ParameterizedValkeyTest // DATAREDIS-612, GH-1622
 	void shouldReceivePatternMessages() {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
 
 		container.receiveLater(PatternTopic.of(PATTERN1)) //
 				.doOnNext(it -> doPublish(CHANNEL1.getBytes(), MESSAGE.getBytes())).flatMapMany(Function.identity()) //
@@ -191,10 +191,10 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // GH-1622
+	@ParameterizedValkeyTest // GH-1622
 	void receivePatternShouldNotifySubscriptionListener() throws Exception {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
 
 		AtomicReference<String> onPsubscribe = new AtomicReference<>();
 		AtomicReference<String> onPunsubscribe = new AtomicReference<>();
@@ -241,12 +241,12 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-612, GH-1622
+	@ParameterizedValkeyTest // DATAREDIS-612, GH-1622
 	void shouldPublishAndReceiveMessage() throws Exception {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
-		ReactiveRedisTemplate<String, String> template = new ReactiveRedisTemplate<>(connectionFactory,
-				RedisSerializationContext.string());
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
+		ReactiveValkeyTemplate<String, String> template = new ReactiveValkeyTemplate<>(connectionFactory,
+				ValkeySerializationContext.string());
 
 		BlockingQueue<PatternMessage<String, String, String>> messages = new LinkedBlockingDeque<>();
 		CompletableFuture<Void> subscribed = new CompletableFuture<>();
@@ -270,11 +270,11 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 		container.destroy();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-612
+	@ParameterizedValkeyTest // DATAREDIS-612
 	void listenToChannelShouldReceiveChannelMessagesCorrectly() throws InterruptedException {
 
-		ReactiveRedisTemplate<String, String> template = new ReactiveRedisTemplate<>(connectionFactory,
-				RedisSerializationContext.string());
+		ReactiveValkeyTemplate<String, String> template = new ReactiveValkeyTemplate<>(connectionFactory,
+				ValkeySerializationContext.string());
 
 		template.listenToChannel(CHANNEL1).as(StepVerifier::create) //
 				.thenAwait(Duration.ofMillis(100)) // just make sure we the subscription completed
@@ -289,11 +289,11 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 				.verify();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-612
+	@ParameterizedValkeyTest // DATAREDIS-612
 	void listenToPatternShouldReceiveMessagesCorrectly() {
 
-		ReactiveRedisTemplate<String, String> template = new ReactiveRedisTemplate<>(connectionFactory,
-				RedisSerializationContext.string());
+		ReactiveValkeyTemplate<String, String> template = new ReactiveValkeyTemplate<>(connectionFactory,
+				ValkeySerializationContext.string());
 
 		template.listenToPattern(PATTERN1).as(StepVerifier::create) //
 				.thenAwait(Duration.ofMillis(100)) // just make sure we the subscription completed
@@ -309,17 +309,17 @@ public class ReactiveRedisMessageListenerContainerIntegrationTests {
 				.verify();
 	}
 
-	@ParameterizedRedisTest // GH-2386
+	@ParameterizedValkeyTest // GH-2386
 	void multipleListenShouldTrackSubscriptions() throws Exception {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(connectionFactory);
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(connectionFactory);
 
 		Flux<? extends ReactiveSubscription.Message<String, String>> c1 = container.receiveLater(ChannelTopic.of(CHANNEL1))
 				.block();
 		Flux<? extends ReactiveSubscription.Message<String, String>> c1p1 = container
 				.receiveLater(Arrays.asList(ChannelTopic.of(CHANNEL1), PatternTopic.of(PATTERN1)),
-						SerializationPair.fromSerializer(RedisSerializer.string()),
-						SerializationPair.fromSerializer(RedisSerializer.string()))
+						SerializationPair.fromSerializer(ValkeySerializer.string()),
+						SerializationPair.fromSerializer(ValkeySerializer.string()))
 				.block();
 
 		BlockingQueue<ReactiveSubscription.Message<String, String>> c1Collector = new LinkedBlockingDeque<>();

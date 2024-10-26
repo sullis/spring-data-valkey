@@ -23,13 +23,13 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.support.atomic.RedisAtomicInteger;
-import org.springframework.data.redis.support.atomic.RedisAtomicLong;
-import org.springframework.data.redis.support.collections.DefaultRedisMap;
-import org.springframework.data.redis.support.collections.DefaultRedisSet;
-import org.springframework.data.redis.support.collections.RedisList;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.support.atomic.ValkeyAtomicInteger;
+import org.springframework.data.redis.support.atomic.ValkeyAtomicLong;
+import org.springframework.data.redis.support.collections.DefaultValkeyMap;
+import org.springframework.data.redis.support.collections.DefaultValkeySet;
+import org.springframework.data.redis.support.collections.ValkeyList;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Costin Leau
@@ -41,30 +41,30 @@ public class BoundKeyParams {
 	public static Collection<Object[]> testParams() {
 		// Jedis
 		JedisConnectionFactory jedisConnFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		StringRedisTemplate templateJS = new StringRedisTemplate(jedisConnFactory);
-		DefaultRedisMap mapJS = new DefaultRedisMap("bound:key:map", templateJS);
-		DefaultRedisSet setJS = new DefaultRedisSet("bound:key:set", templateJS);
-		RedisList list = RedisList.create("bound:key:list", templateJS);
+		StringValkeyTemplate templateJS = new StringValkeyTemplate(jedisConnFactory);
+		DefaultValkeyMap mapJS = new DefaultValkeyMap("bound:key:map", templateJS);
+		DefaultValkeySet setJS = new DefaultValkeySet("bound:key:set", templateJS);
+		ValkeyList list = ValkeyList.create("bound:key:list", templateJS);
 
 		// Lettuce
 		LettuceConnectionFactory lettuceConnFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		StringRedisTemplate templateLT = new StringRedisTemplate(lettuceConnFactory);
-		DefaultRedisMap mapLT = new DefaultRedisMap("bound:key:mapLT", templateLT);
-		DefaultRedisSet setLT = new DefaultRedisSet("bound:key:setLT", templateLT);
-		RedisList listLT = RedisList.create("bound:key:listLT", templateLT);
+		StringValkeyTemplate templateLT = new StringValkeyTemplate(lettuceConnFactory);
+		DefaultValkeyMap mapLT = new DefaultValkeyMap("bound:key:mapLT", templateLT);
+		DefaultValkeySet setLT = new DefaultValkeySet("bound:key:setLT", templateLT);
+		ValkeyList listLT = ValkeyList.create("bound:key:listLT", templateLT);
 
 		StringObjectFactory sof = new StringObjectFactory();
 
 		return Arrays
-				.asList(new Object[][] { { new RedisAtomicInteger("bound:key:int", jedisConnFactory), sof, templateJS },
-						{ new RedisAtomicLong("bound:key:long", jedisConnFactory), sof, templateJS }, { list, sof, templateJS },
+				.asList(new Object[][] { { new ValkeyAtomicInteger("bound:key:int", jedisConnFactory), sof, templateJS },
+						{ new ValkeyAtomicLong("bound:key:long", jedisConnFactory), sof, templateJS }, { list, sof, templateJS },
 						{ setJS, sof, templateJS }, { mapJS, sof, templateJS },
-						{ new RedisAtomicInteger("bound:key:intLT", lettuceConnFactory), sof, templateLT },
-						{ new RedisAtomicLong("bound:key:longLT", lettuceConnFactory), sof, templateLT },
+						{ new ValkeyAtomicInteger("bound:key:intLT", lettuceConnFactory), sof, templateLT },
+						{ new ValkeyAtomicLong("bound:key:longLT", lettuceConnFactory), sof, templateLT },
 						{ listLT, sof, templateLT }, { setLT, sof, templateLT }, { mapLT, sof, templateLT } });
 	}
 }

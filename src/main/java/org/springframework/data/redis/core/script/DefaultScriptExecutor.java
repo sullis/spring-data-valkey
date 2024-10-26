@@ -17,16 +17,16 @@ package org.springframework.data.redis.core.script;
 
 import java.util.List;
 
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
  * Default implementation of {@link ScriptExecutor}. Optimizes performance by attempting to execute script first using
- * evalsha, then falling back to eval if Redis has not yet cached the script. Evalsha is not attempted if the script is
+ * evalsha, then falling back to eval if Valkey has not yet cached the script. Evalsha is not attempted if the script is
  * executed in a pipeline or transaction.
  *
  * @author Jennifer Hickey
@@ -37,25 +37,25 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 public class DefaultScriptExecutor<K> implements ScriptExecutor<K> {
 
-	private final RedisTemplate<K, ?> template;
+	private final ValkeyTemplate<K, ?> template;
 
 	/**
-	 * @param template The {@link RedisTemplate} to use
+	 * @param template The {@link ValkeyTemplate} to use
 	 */
-	public DefaultScriptExecutor(RedisTemplate<K, ?> template) {
+	public DefaultScriptExecutor(ValkeyTemplate<K, ?> template) {
 		this.template = template;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T execute(final RedisScript<T> script, final List<K> keys, final Object... args) {
+	public <T> T execute(final ValkeyScript<T> script, final List<K> keys, final Object... args) {
 		// use the Template's value serializer for args and result
-		return execute(script, template.getValueSerializer(), (RedisSerializer<T>) template.getValueSerializer(), keys,
+		return execute(script, template.getValueSerializer(), (ValkeySerializer<T>) template.getValueSerializer(), keys,
 				args);
 	}
 
-	public <T> T execute(final RedisScript<T> script, final RedisSerializer<?> argsSerializer,
-			final RedisSerializer<T> resultSerializer, final List<K> keys, final Object... args) {
-		return template.execute((RedisCallback<T>) connection -> {
+	public <T> T execute(final ValkeyScript<T> script, final ValkeySerializer<?> argsSerializer,
+			final ValkeySerializer<T> resultSerializer, final List<K> keys, final Object... args) {
+		return template.execute((ValkeyCallback<T>) connection -> {
 			final ReturnType returnType = ReturnType.fromJavaType(script.getResultType());
 			final byte[][] keysAndArgs = keysAndArgs(argsSerializer, keys, args);
 			final int keySize = keys != null ? keys.size() : 0;
@@ -69,8 +69,8 @@ public class DefaultScriptExecutor<K> implements ScriptExecutor<K> {
 		});
 	}
 
-	protected <T> T eval(RedisConnection connection, RedisScript<T> script, ReturnType returnType, int numKeys,
-			byte[][] keysAndArgs, RedisSerializer<T> resultSerializer) {
+	protected <T> T eval(ValkeyConnection connection, ValkeyScript<T> script, ReturnType returnType, int numKeys,
+			byte[][] keysAndArgs, ValkeySerializer<T> resultSerializer) {
 
 		Object result;
 		try {
@@ -79,7 +79,7 @@ public class DefaultScriptExecutor<K> implements ScriptExecutor<K> {
 
 			if (!ScriptUtils.exceptionContainsNoScriptError(ex)) {
 				throw ex instanceof RuntimeException runtimeException ? runtimeException
-						: new RedisSystemException(ex.getMessage(), ex);
+						: new ValkeySystemException(ex.getMessage(), ex);
 			}
 
 			result = connection.eval(scriptBytes(script), returnType, numKeys, keysAndArgs);
@@ -93,7 +93,7 @@ public class DefaultScriptExecutor<K> implements ScriptExecutor<K> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected byte[][] keysAndArgs(RedisSerializer argsSerializer, List<K> keys, Object[] args) {
+	protected byte[][] keysAndArgs(ValkeySerializer argsSerializer, List<K> keys, Object[] args) {
 		final int keySize = keys != null ? keys.size() : 0;
 		byte[][] keysAndArgs = new byte[args.length + keySize][];
 		int i = 0;
@@ -116,16 +116,16 @@ public class DefaultScriptExecutor<K> implements ScriptExecutor<K> {
 		return keysAndArgs;
 	}
 
-	protected byte[] scriptBytes(RedisScript<?> script) {
+	protected byte[] scriptBytes(ValkeyScript<?> script) {
 		return template.getStringSerializer().serialize(script.getScriptAsString());
 	}
 
-	protected <T> T deserializeResult(RedisSerializer<T> resultSerializer, Object result) {
+	protected <T> T deserializeResult(ValkeySerializer<T> resultSerializer, Object result) {
 		return ScriptUtils.deserializeResult(resultSerializer, result);
 	}
 
 	@SuppressWarnings("rawtypes")
-	protected RedisSerializer keySerializer() {
+	protected ValkeySerializer keySerializer() {
 		return template.getKeySerializer();
 	}
 }

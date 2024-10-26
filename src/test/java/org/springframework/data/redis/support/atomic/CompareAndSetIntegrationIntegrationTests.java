@@ -21,14 +21,14 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration tests for {@link CompareAndSet}.
@@ -41,17 +41,17 @@ public class CompareAndSetIntegrationIntegrationTests {
 
 	private static final String KEY = "key";
 
-	private final RedisConnectionFactory factory;
-	private final RedisTemplate<String, Long> template;
+	private final ValkeyConnectionFactory factory;
+	private final ValkeyTemplate<String, Long> template;
 	private final ValueOperations<String, Long> valueOps;
 
-	public CompareAndSetIntegrationIntegrationTests(RedisConnectionFactory factory) {
+	public CompareAndSetIntegrationIntegrationTests(ValkeyConnectionFactory factory) {
 
 		this.factory = factory;
 
-		this.template = new RedisTemplate<>();
+		this.template = new ValkeyTemplate<>();
 		this.template.setConnectionFactory(factory);
-		this.template.setKeySerializer(StringRedisSerializer.UTF_8);
+		this.template.setKeySerializer(StringValkeySerializer.UTF_8);
 		this.template.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		this.template.afterPropertiesSet();
 
@@ -65,12 +65,12 @@ public class CompareAndSetIntegrationIntegrationTests {
 	@BeforeEach
 	void setUp() {
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 		connection.flushDb();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-843
+	@ParameterizedValkeyTest // DATAREDIS-843
 	void shouldUpdateCounter() {
 
 		long expected = 5;
@@ -84,7 +84,7 @@ public class CompareAndSetIntegrationIntegrationTests {
 		assertThat(valueOps.get(KEY)).isEqualTo(update);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-843
+	@ParameterizedValkeyTest // DATAREDIS-843
 	void expectationNotMet() {
 
 		long expected = 5;
@@ -98,7 +98,7 @@ public class CompareAndSetIntegrationIntegrationTests {
 		assertThat(valueOps.get(KEY)).isNull();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-843
+	@ParameterizedValkeyTest // DATAREDIS-843
 	void concurrentUpdate() {
 
 		long expected = 5;
@@ -108,7 +108,7 @@ public class CompareAndSetIntegrationIntegrationTests {
 
 		CompareAndSet<Long> cas = new CompareAndSet<>(() -> actual, newValue -> {
 
-			RedisConnection connection = factory.getConnection();
+			ValkeyConnection connection = factory.getConnection();
 			connection.set(KEY.getBytes(), Long.toString(concurrentlyUpdated).getBytes());
 			connection.close();
 

@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.api.StatefulConnection;
 
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +30,7 @@ import java.util.concurrent.CompletionStage;
  * Connection providers may create a new connection on each invocation or return pooled instances. Each obtained
  * connection must be released through its connection provider to allow disposal or release back to the pool.
  * <p>
- * Connection providers are usually associated with a {@link io.lettuce.core.codec.RedisCodec} to create connections
+ * Connection providers are usually associated with a {@link io.lettuce.core.codec.ValkeyCodec} to create connections
  * with an appropriate codec.
  *
  * @author Mark Paluch
@@ -94,19 +94,19 @@ public interface LettuceConnectionProvider {
 	interface TargetAware {
 
 		/**
-		 * Request a connection given {@code connectionType} for a specific {@link RedisURI}. Providing a connection type
+		 * Request a connection given {@code connectionType} for a specific {@link ValkeyURI}. Providing a connection type
 		 * allows specialization to provide a more specific connection type.
 		 *
 		 * @param connectionType must not be {@literal null}.
 		 * @param redisURI must not be {@literal null}.
 		 * @return the requested connection.
 		 */
-		default <T extends StatefulConnection<?, ?>> T getConnection(Class<T> connectionType, RedisURI redisURI) {
+		default <T extends StatefulConnection<?, ?>> T getConnection(Class<T> connectionType, ValkeyURI redisURI) {
 			return LettuceFutureUtils.join(getConnectionAsync(connectionType, redisURI));
 		}
 
 		/**
-		 * Request asynchronously a connection given {@code connectionType} for a specific {@link RedisURI}. Providing a
+		 * Request asynchronously a connection given {@code connectionType} for a specific {@link ValkeyURI}. Providing a
 		 * connection type allows specialization to provide a more specific connection type.
 		 *
 		 * @param connectionType must not be {@literal null}.
@@ -115,6 +115,6 @@ public interface LettuceConnectionProvider {
 		 * @since 2.2
 		 */
 		<T extends StatefulConnection<?, ?>> CompletionStage<T> getConnectionAsync(Class<T> connectionType,
-				RedisURI redisURI);
+				ValkeyURI redisURI);
 	}
 }

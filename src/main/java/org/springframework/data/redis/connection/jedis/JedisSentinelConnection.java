@@ -21,21 +21,21 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.redis.connection.NamedNode;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisSentinelCommands;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.connection.RedisServer;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeySentinelCommands;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.connection.ValkeyServer;
 import org.springframework.util.Assert;
 
 /**
  * @author Christoph Strobl
  * @since 1.4
  */
-public class JedisSentinelConnection implements RedisSentinelConnection {
+public class JedisSentinelConnection implements ValkeySentinelConnection {
 
 	private Jedis jedis;
 
-	public JedisSentinelConnection(RedisNode sentinel) {
+	public JedisSentinelConnection(ValkeyNode sentinel) {
 		this(sentinel.getHost(), sentinel.getPort());
 	}
 
@@ -53,18 +53,18 @@ public class JedisSentinelConnection implements RedisSentinelConnection {
 	@Override
 	public void failover(NamedNode master) {
 
-		Assert.notNull(master, "Redis node master must not be 'null' for failover");
-		Assert.hasText(master.getName(), "Redis master name must not be 'null' or empty for failover");
+		Assert.notNull(master, "Valkey node master must not be 'null' for failover");
+		Assert.hasText(master.getName(), "Valkey master name must not be 'null' or empty for failover");
 		jedis.sentinelFailover(master.getName());
 	}
 
 	@Override
-	public List<RedisServer> masters() {
-		return JedisConverters.toListOfRedisServer(jedis.sentinelMasters());
+	public List<ValkeyServer> masters() {
+		return JedisConverters.toListOfValkeyServer(jedis.sentinelMasters());
 	}
 
 	@Override
-	public List<RedisServer> replicas(NamedNode master) {
+	public List<ValkeyServer> replicas(NamedNode master) {
 
 		Assert.notNull(master, "Master node cannot be 'null' when loading replicas");
 		return replicas(master.getName());
@@ -72,13 +72,13 @@ public class JedisSentinelConnection implements RedisSentinelConnection {
 
 	/**
 	 * @param masterName
-	 * @see RedisSentinelCommands#replicas(NamedNode)
+	 * @see ValkeySentinelCommands#replicas(NamedNode)
 	 * @return
 	 */
-	public List<RedisServer> replicas(String masterName) {
+	public List<ValkeyServer> replicas(String masterName) {
 
 		Assert.hasText(masterName, "Name of redis master cannot be 'null' or empty when loading replicas");
-		return JedisConverters.toListOfRedisServer(jedis.sentinelReplicas(masterName));
+		return JedisConverters.toListOfValkeyServer(jedis.sentinelReplicas(masterName));
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class JedisSentinelConnection implements RedisSentinelConnection {
 
 	/**
 	 * @param masterName
-	 * @see RedisSentinelCommands#remove(NamedNode)
+	 * @see ValkeySentinelCommands#remove(NamedNode)
 	 */
 	public void remove(String masterName) {
 
@@ -99,7 +99,7 @@ public class JedisSentinelConnection implements RedisSentinelConnection {
 	}
 
 	@Override
-	public void monitor(RedisServer server) {
+	public void monitor(ValkeyServer server) {
 
 		Assert.notNull(server, "Cannot monitor 'null' server");
 		Assert.hasText(server.getName(), "Name of server to monitor must not be 'null' or empty");

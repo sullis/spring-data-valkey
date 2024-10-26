@@ -32,8 +32,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -53,12 +53,12 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class AbstractTransactionalTestBase {
 
 	@Configuration
-	public abstract static class RedisContextConfiguration {
+	public abstract static class ValkeyContextConfiguration {
 
 		@Bean
-		public StringRedisTemplate redisTemplate() {
+		public StringValkeyTemplate redisTemplate() {
 
-			StringRedisTemplate template = new StringRedisTemplate(redisConnectionFactory());
+			StringValkeyTemplate template = new StringValkeyTemplate(redisConnectionFactory());
 
 			// explicitly enable transaction support
 			template.setEnableTransactionSupport(true);
@@ -66,7 +66,7 @@ public abstract class AbstractTransactionalTestBase {
 		}
 
 		@Bean
-		public abstract RedisConnectionFactory redisConnectionFactory();
+		public abstract ValkeyConnectionFactory redisConnectionFactory();
 
 		@Bean
 		public PlatformTransactionManager transactionManager() throws SQLException {
@@ -82,9 +82,9 @@ public abstract class AbstractTransactionalTestBase {
 		}
 	}
 
-	private @Autowired StringRedisTemplate template;
+	private @Autowired StringValkeyTemplate template;
 
-	private @Autowired RedisConnectionFactory factory;
+	private @Autowired ValkeyConnectionFactory factory;
 
 	private List<String> KEYS = Arrays.asList("spring", "data", "redis");
 	private boolean valuesShouldHaveBeenPersisted = false;
@@ -97,7 +97,7 @@ public abstract class AbstractTransactionalTestBase {
 
 	private void cleanDataStore() {
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 		connection.flushDb();
 		connection.close();
 	}
@@ -105,7 +105,7 @@ public abstract class AbstractTransactionalTestBase {
 	@AfterTransaction
 	public void verifyTransactionResult() {
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 		for (String key : KEYS) {
 			assertThat(connection.exists(key.getBytes()))
 					.as("Values for " + key + " should " + (valuesShouldHaveBeenPersisted ? "" : "NOT ") + "have been found.")
@@ -137,7 +137,7 @@ public abstract class AbstractTransactionalTestBase {
 	@Test // GH-2886
 	public void shouldReturnReadOnlyCommandResultInTransaction() {
 
-		RedisTemplate<String, String> template = new RedisTemplate<>();
+		ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(factory);
 		template.setEnableTransactionSupport(true);
 		template.afterPropertiesSet();

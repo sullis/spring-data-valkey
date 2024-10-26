@@ -30,15 +30,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.redis.connection.RedisClusterCommands.AddSlots;
-import org.springframework.data.redis.connection.RedisClusterConnection;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.connection.RedisServerCommands.MigrateOption;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.connection.ValkeyClusterCommands.AddSlots;
+import org.springframework.data.redis.connection.ValkeyClusterConnection;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.connection.ValkeyServerCommands.MigrateOption;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
 /**
  * @author Christoph Strobl
@@ -49,16 +49,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class DefaultClusterOperationsUnitTests {
 
-	private static final RedisClusterNode NODE_1 = RedisClusterNode.newRedisClusterNode().listeningAt("127.0.0.1", 6379)
+	private static final ValkeyClusterNode NODE_1 = ValkeyClusterNode.newValkeyClusterNode().listeningAt("127.0.0.1", 6379)
 			.withId("d1861060fe6a534d42d8a19aeb36600e18785e04").build();
 
-	private static final RedisClusterNode NODE_2 = RedisClusterNode.newRedisClusterNode().listeningAt("127.0.0.1", 6380)
+	private static final ValkeyClusterNode NODE_2 = ValkeyClusterNode.newValkeyClusterNode().listeningAt("127.0.0.1", 6380)
 			.withId("0f2ee5df45d18c50aca07228cc18b1da96fd5e84").build();
 
-	@Mock RedisConnectionFactory connectionFactory;
-	@Mock RedisClusterConnection connection;
+	@Mock ValkeyConnectionFactory connectionFactory;
+	@Mock ValkeyClusterConnection connection;
 
-	private RedisSerializer<String> serializer;
+	private ValkeySerializer<String> serializer;
 
 	private DefaultClusterOperations<String, String> clusterOps;
 
@@ -68,9 +68,9 @@ class DefaultClusterOperationsUnitTests {
 		when(connectionFactory.getConnection()).thenReturn(connection);
 		when(connectionFactory.getClusterConnection()).thenReturn(connection);
 
-		serializer = StringRedisSerializer.UTF_8;
+		serializer = StringValkeySerializer.UTF_8;
 
-		RedisTemplate<String, String> template = new RedisTemplate<>();
+		ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 		template.setValueSerializer(serializer);
 		template.setKeySerializer(serializer);
@@ -83,7 +83,7 @@ class DefaultClusterOperationsUnitTests {
 	void keysShouldDelegateToConnectionCorrectly() {
 
 		Set<byte[]> keys = new HashSet<>(Arrays.asList(serializer.serialize("key-1"), serializer.serialize("key-2")));
-		when(connection.keys(any(RedisClusterNode.class), any(byte[].class))).thenReturn(keys);
+		when(connection.keys(any(ValkeyClusterNode.class), any(byte[].class))).thenReturn(keys);
 
 		assertThat(clusterOps.keys(NODE_1, "*")).contains("key-1", "key-2");
 	}
@@ -96,7 +96,7 @@ class DefaultClusterOperationsUnitTests {
 	@Test // DATAREDIS-315
 	void keysShouldReturnEmptySetWhenNoKeysAvailable() {
 
-		when(connection.keys(any(RedisClusterNode.class), any(byte[].class))).thenReturn(null);
+		when(connection.keys(any(ValkeyClusterNode.class), any(byte[].class))).thenReturn(null);
 
 		assertThat(clusterOps.keys(NODE_1, "*")).isNotNull();
 	}
@@ -104,7 +104,7 @@ class DefaultClusterOperationsUnitTests {
 	@Test // DATAREDIS-315
 	void randomKeyShouldDelegateToConnection() {
 
-		when(connection.randomKey(any(RedisClusterNode.class))).thenReturn(serializer.serialize("key-1"));
+		when(connection.randomKey(any(ValkeyClusterNode.class))).thenReturn(serializer.serialize("key-1"));
 
 		assertThat(clusterOps.randomKey(NODE_1)).isEqualTo("key-1");
 	}
@@ -117,7 +117,7 @@ class DefaultClusterOperationsUnitTests {
 	@Test // DATAREDIS-315
 	void randomKeyShouldReturnNullWhenNoKeyAvailable() {
 
-		when(connection.randomKey(any(RedisClusterNode.class))).thenReturn(null);
+		when(connection.randomKey(any(ValkeyClusterNode.class))).thenReturn(null);
 
 		assertThat(clusterOps.randomKey(NODE_1)).isNull();
 	}
@@ -125,7 +125,7 @@ class DefaultClusterOperationsUnitTests {
 	@Test // DATAREDIS-315
 	void pingShouldDelegateToConnection() {
 
-		when(connection.ping(any(RedisClusterNode.class))).thenReturn("PONG");
+		when(connection.ping(any(ValkeyClusterNode.class))).thenReturn("PONG");
 
 		assertThat(clusterOps.ping(NODE_1)).isEqualTo("PONG");
 	}

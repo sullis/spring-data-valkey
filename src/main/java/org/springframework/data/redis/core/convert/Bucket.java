@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.NullSafeComparator;
 
 /**
- * Bucket is the data bag for Redis hash structures to be used with {@link RedisData}.
+ * Bucket is the data bag for Valkey hash structures to be used with {@link ValkeyData}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -55,7 +55,7 @@ public class Bucket {
 			true);
 
 	/**
-	 * The Redis data as {@link Map} sorted by the keys.
+	 * The Valkey data as {@link Map} sorted by the keys.
 	 */
 	private final NavigableMap<String, byte[]> data = new TreeMap<>(
 			COMPARATOR);

@@ -24,7 +24,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.ReactiveSubscription.ChannelMessage;
 
 /**
- * Redis <a href="https://redis.io/commands/#pubsub">Pub/Sub</a> commands executed using reactive infrastructure.
+ * Valkey <a href="https://redis.io/commands/#pubsub">Pub/Sub</a> commands executed using reactive infrastructure.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -58,7 +58,7 @@ public interface ReactivePubSubCommands {
 	 * @param channel the channel to publish to. Must not be {@literal null}.
 	 * @param message message to publish. Must not be {@literal null}.
 	 * @return the number of clients that received the message.
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
 	 */
 	default Mono<Long> publish(ByteBuffer channel, ByteBuffer message) {
 		return publish(Mono.just(new ChannelMessage<>(channel, message))).next();
@@ -69,7 +69,7 @@ public interface ReactivePubSubCommands {
 	 *
 	 * @param messageStream the messages to publish to. Must not be {@literal null}.
 	 * @return the number of clients that received the message.
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
 	 */
 	Flux<Long> publish(Publisher<ChannelMessage<ByteBuffer, ByteBuffer>> messageStream);
 
@@ -81,7 +81,7 @@ public interface ReactivePubSubCommands {
 	 * Note that cancellation of the {@link Flux} will unsubscribe from {@code channels}.
 	 *
 	 * @param channels channel names, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/subscribe">Redis Documentation: SUBSCRIBE</a>
+	 * @see <a href="https://redis.io/commands/subscribe">Valkey Documentation: SUBSCRIBE</a>
 	 */
 	Mono<Void> subscribe(ByteBuffer... channels);
 
@@ -93,7 +93,7 @@ public interface ReactivePubSubCommands {
 	 * Note that cancellation of the {@link Flux} will unsubscribe from {@code patterns}.
 	 *
 	 * @param patterns channel name patterns, must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/psubscribe">Redis Documentation: PSUBSCRIBE</a>
+	 * @see <a href="https://redis.io/commands/psubscribe">Valkey Documentation: PSUBSCRIBE</a>
 	 */
 	Mono<Void> pSubscribe(ByteBuffer... patterns);
 

@@ -16,20 +16,20 @@
 package org.springframework.data.redis.support.collections;
 
 import org.springframework.data.redis.core.BoundKeyOperations;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 
 /**
- * Basic interface for Redis-based collections. Offers access to the {@link RedisOperations} entity used for executing
+ * Basic interface for Valkey-based collections. Offers access to the {@link ValkeyOperations} entity used for executing
  * commands against the backing store.
  *
  * @author Costin Leau
  */
-public interface RedisStore extends BoundKeyOperations<String> {
+public interface ValkeyStore extends BoundKeyOperations<String> {
 
 	/**
-	 * Returns the underlying Redis operations used by the backing implementation.
+	 * Returns the underlying Valkey operations used by the backing implementation.
 	 *
 	 * @return operations never {@literal null}.
 	 */
-	RedisOperations<String, ?> getOperations();
+	ValkeyOperations<String, ?> getOperations();
 }

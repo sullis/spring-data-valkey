@@ -25,18 +25,18 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.query.SortQuery;
-import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.script.ValkeyScript;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Interface that specified a basic set of Redis operations, implemented by {@link RedisTemplate}. Not often used but a
+ * Interface that specified a basic set of Valkey operations, implemented by {@link ValkeyTemplate}. Not often used but a
  * useful option for extensibility and testability (as it can be easily mocked or stubbed).
  *
  * @author Costin Leau
@@ -48,26 +48,26 @@ import org.springframework.util.Assert;
  * @author Chen Li
  * @author Vedran Pavic
  */
-public interface RedisOperations<K, V> {
+public interface ValkeyOperations<K, V> {
 
 	/**
-	 * Executes the given action within a Redis connection. Application exceptions thrown by the action object get
-	 * propagated to the caller (can only be unchecked) whenever possible. Redis exceptions are transformed into
+	 * Executes the given action within a Valkey connection. Application exceptions thrown by the action object get
+	 * propagated to the caller (can only be unchecked) whenever possible. Valkey exceptions are transformed into
 	 * appropriate DAO ones. Allows for returning a result object, that is a domain object or a collection of domain
 	 * objects. Performs automatic serialization/deserialization for the given objects to and from binary data suitable
-	 * for the Redis storage. Note: Callback code is not supposed to handle transactions itself! Use an appropriate
+	 * for the Valkey storage. Note: Callback code is not supposed to handle transactions itself! Use an appropriate
 	 * transaction manager. Generally, callback code must not touch any Connection lifecycle methods, like close, to let
 	 * the template do its work.
 	 *
 	 * @param <T> return type
-	 * @param action callback object that specifies the Redis action. Must not be {@literal null}.
+	 * @param action callback object that specifies the Valkey action. Must not be {@literal null}.
 	 * @return a result object returned by the action or {@literal null}
 	 */
 	@Nullable
-	<T> T execute(RedisCallback<T> action);
+	<T> T execute(ValkeyCallback<T> action);
 
 	/**
-	 * Executes a Redis session. Allows multiple operations to be executed in the same session enabling 'transactional'
+	 * Executes a Valkey session. Allows multiple operations to be executed in the same session enabling 'transactional'
 	 * capabilities through {@link #multi()} and {@link #watch(Collection)} operations.
 	 *
 	 * @param <T> return type
@@ -85,7 +85,7 @@ public interface RedisOperations<K, V> {
 	 * @param action callback object to execute
 	 * @return list of objects returned by the pipeline
 	 */
-	List<Object> executePipelined(RedisCallback<?> action);
+	List<Object> executePipelined(ValkeyCallback<?> action);
 
 	/**
 	 * Executes the given action object on a pipelined connection, returning the results using a dedicated serializer.
@@ -96,10 +96,10 @@ public interface RedisOperations<K, V> {
 	 *          values are hashes, this serializer will be used to deserialize both the key and value
 	 * @return list of objects returned by the pipeline
 	 */
-	List<Object> executePipelined(RedisCallback<?> action, RedisSerializer<?> resultSerializer);
+	List<Object> executePipelined(ValkeyCallback<?> action, ValkeySerializer<?> resultSerializer);
 
 	/**
-	 * Executes the given Redis session on a pipelined connection. Allows transactions to be pipelined. Note that the
+	 * Executes the given Valkey session on a pipelined connection. Allows transactions to be pipelined. Note that the
 	 * callback <b>cannot</b> return a non-null value as it gets overwritten by the pipeline.
 	 *
 	 * @param session Session callback
@@ -108,7 +108,7 @@ public interface RedisOperations<K, V> {
 	List<Object> executePipelined(SessionCallback<?> session);
 
 	/**
-	 * Executes the given Redis session on a pipelined connection, returning the results using a dedicated serializer.
+	 * Executes the given Valkey session on a pipelined connection, returning the results using a dedicated serializer.
 	 * Allows transactions to be pipelined. Note that the callback <b>cannot</b> return a non-null value as it gets
 	 * overwritten by the pipeline.
 	 *
@@ -116,38 +116,38 @@ public interface RedisOperations<K, V> {
 	 * @param resultSerializer
 	 * @return list of objects returned by the pipeline
 	 */
-	List<Object> executePipelined(SessionCallback<?> session, RedisSerializer<?> resultSerializer);
+	List<Object> executePipelined(SessionCallback<?> session, ValkeySerializer<?> resultSerializer);
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script The script to execute
 	 * @param keys Any keys that need to be passed to the script
 	 * @param args Any args that need to be passed to the script
-	 * @return The return value of the script or null if {@link RedisScript#getResultType()} is null, likely indicating a
+	 * @return The return value of the script or null if {@link ValkeyScript#getResultType()} is null, likely indicating a
 	 *         throw-away status reply (i.e. "OK")
 	 */
 	@Nullable
-	<T> T execute(RedisScript<T> script, List<K> keys, Object... args);
+	<T> T execute(ValkeyScript<T> script, List<K> keys, Object... args);
 
 	/**
-	 * Executes the given {@link RedisScript}, using the provided {@link RedisSerializer}s to serialize the script
+	 * Executes the given {@link ValkeyScript}, using the provided {@link ValkeySerializer}s to serialize the script
 	 * arguments and result.
 	 *
 	 * @param script The script to execute
-	 * @param argsSerializer The {@link RedisSerializer} to use for serializing args
-	 * @param resultSerializer The {@link RedisSerializer} to use for serializing the script return value
+	 * @param argsSerializer The {@link ValkeySerializer} to use for serializing args
+	 * @param resultSerializer The {@link ValkeySerializer} to use for serializing the script return value
 	 * @param keys Any keys that need to be passed to the script
 	 * @param args Any args that need to be passed to the script
-	 * @return The return value of the script or null if {@link RedisScript#getResultType()} is null, likely indicating a
+	 * @return The return value of the script or null if {@link ValkeyScript#getResultType()} is null, likely indicating a
 	 *         throw-away status reply (i.e. "OK")
 	 */
 	@Nullable
-	<T> T execute(RedisScript<T> script, RedisSerializer<?> argsSerializer, RedisSerializer<T> resultSerializer,
+	<T> T execute(ValkeyScript<T> script, ValkeySerializer<?> argsSerializer, ValkeySerializer<T> resultSerializer,
 			List<K> keys, Object... args);
 
 	/**
-	 * Allocates and binds a new {@link RedisConnection} to the actual return type of the method. It is up to the caller
+	 * Allocates and binds a new {@link ValkeyConnection} to the actual return type of the method. It is up to the caller
 	 * to free resources after use.
 	 *
 	 * @param callback must not be {@literal null}.
@@ -155,10 +155,10 @@ public interface RedisOperations<K, V> {
 	 * @since 1.8
 	 */
 	@Nullable
-	<T extends Closeable> T executeWithStickyConnection(RedisCallback<T> callback);
+	<T extends Closeable> T executeWithStickyConnection(ValkeyCallback<T> callback);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Keys
+	// Methods dealing with Valkey Keys
 	// -------------------------------------------------------------------------
 
 	/**
@@ -168,7 +168,7 @@ public interface RedisOperations<K, V> {
 	 * @param targetKey must not be {@literal null}.
 	 * @param replace whether the key was copied. {@literal null} when used in pipeline / transaction.
 	 * @return
-	 * @see <a href="https://redis.io/commands/copy">Redis Documentation: COPY</a>
+	 * @see <a href="https://redis.io/commands/copy">Valkey Documentation: COPY</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -179,7 +179,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
 	 */
 	@Nullable
 	Boolean hasKey(K key);
@@ -190,7 +190,7 @@ public interface RedisOperations<K, V> {
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys existing among the ones specified as arguments. Keys mentioned multiple times and
 	 *         existing are counted multiple times.
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -201,7 +201,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal true} if the key was removed.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
 	 */
 	@Nullable
 	Boolean delete(K key);
@@ -211,7 +211,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
 	 */
 	@Nullable
 	Long delete(Collection<K> keys);
@@ -222,7 +222,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -234,7 +234,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -245,7 +245,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/type">Redis Documentation: TYPE</a>
+	 * @see <a href="https://redis.io/commands/type">Valkey Documentation: TYPE</a>
 	 */
 	@Nullable
 	DataType type(K key);
@@ -255,7 +255,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param pattern must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/keys">Redis Documentation: KEYS</a>
+	 * @see <a href="https://redis.io/commands/keys">Valkey Documentation: KEYS</a>
 	 */
 	@Nullable
 	Set<K> keys(K pattern);
@@ -268,7 +268,7 @@ public interface RedisOperations<K, V> {
 	 * @return the result cursor providing access to the scan result. Must be closed once fully processed (e.g. through a
 	 *         try-with-resources clause).
 	 * @since 2.7
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 */
 	Cursor<K> scan(ScanOptions options);
 
@@ -276,7 +276,7 @@ public interface RedisOperations<K, V> {
 	 * Return a random key from the keyspace.
 	 *
 	 * @return {@literal null} no keys exist or when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/randomkey">Redis Documentation: RANDOMKEY</a>
+	 * @see <a href="https://redis.io/commands/randomkey">Valkey Documentation: RANDOMKEY</a>
 	 */
 	@Nullable
 	K randomKey();
@@ -286,7 +286,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/rename">Redis Documentation: RENAME</a>
+	 * @see <a href="https://redis.io/commands/rename">Valkey Documentation: RENAME</a>
 	 */
 	void rename(K oldKey, K newKey);
 
@@ -296,7 +296,7 @@ public interface RedisOperations<K, V> {
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/renamenx">Redis Documentation: RENAMENX</a>
+	 * @see <a href="https://redis.io/commands/renamenx">Valkey Documentation: RENAMENX</a>
 	 */
 	@Nullable
 	Boolean renameIfAbsent(K oldKey, K newKey);
@@ -362,7 +362,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/persist">Redis Documentation: PERSIST</a>
+	 * @see <a href="https://redis.io/commands/persist">Valkey Documentation: PERSIST</a>
 	 */
 	@Nullable
 	Boolean persist(K key);
@@ -372,7 +372,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/ttl">Redis Documentation: TTL</a>
+	 * @see <a href="https://redis.io/commands/ttl">Valkey Documentation: TTL</a>
 	 */
 	@Nullable
 	Long getExpire(K key);
@@ -394,7 +394,7 @@ public interface RedisOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param dbIndex
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/move">Redis Documentation: MOVE</a>
+	 * @see <a href="https://redis.io/commands/move">Valkey Documentation: MOVE</a>
 	 */
 	@Nullable
 	Boolean move(K key, int dbIndex);
@@ -404,7 +404,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/dump">Redis Documentation: DUMP</a>
+	 * @see <a href="https://redis.io/commands/dump">Valkey Documentation: DUMP</a>
 	 */
 	@Nullable
 	byte[] dump(K key);
@@ -416,7 +416,7 @@ public interface RedisOperations<K, V> {
 	 * @param value must not be {@literal null}.
 	 * @param timeToLive
 	 * @param unit must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/restore">Redis Documentation: RESTORE</a>
+	 * @see <a href="https://redis.io/commands/restore">Valkey Documentation: RESTORE</a>
 	 */
 	default void restore(K key, byte[] value, long timeToLive, TimeUnit unit) {
 		restore(key, value, timeToLive, unit, false);
@@ -431,7 +431,7 @@ public interface RedisOperations<K, V> {
 	 * @param unit must not be {@literal null}.
 	 * @param replace use {@literal true} to replace a potentially existing value instead of erroring.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/restore">Redis Documentation: RESTORE</a>
+	 * @see <a href="https://redis.io/commands/restore">Valkey Documentation: RESTORE</a>
 	 */
 	void restore(K key, byte[] value, long timeToLive, TimeUnit unit, boolean replace);
 
@@ -440,40 +440,40 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param query must not be {@literal null}.
 	 * @return the results of sort. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
 	List<V> sort(SortQuery<K> query);
 
 	/**
-	 * Sort the elements for {@code query} applying {@link RedisSerializer}.
+	 * Sort the elements for {@code query} applying {@link ValkeySerializer}.
 	 *
 	 * @param query must not be {@literal null}.
 	 * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
-	<T> List<T> sort(SortQuery<K> query, RedisSerializer<T> resultSerializer);
+	<T> List<T> sort(SortQuery<K> query, ValkeySerializer<T> resultSerializer);
 
 	/**
 	 * Sort the elements for {@code query} applying {@link BulkMapper}.
 	 *
 	 * @param query must not be {@literal null}.
 	 * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
 	<T> List<T> sort(SortQuery<K> query, BulkMapper<T, V> bulkMapper);
 
 	/**
-	 * Sort the elements for {@code query} applying {@link BulkMapper} and {@link RedisSerializer}.
+	 * Sort the elements for {@code query} applying {@link BulkMapper} and {@link ValkeySerializer}.
 	 *
 	 * @param query must not be {@literal null}.
 	 * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
-	<T, S> List<T> sort(SortQuery<K> query, BulkMapper<T, S> bulkMapper, RedisSerializer<S> resultSerializer);
+	<T, S> List<T> sort(SortQuery<K> query, BulkMapper<T, S> bulkMapper, ValkeySerializer<S> resultSerializer);
 
 	/**
 	 * Sort the elements for {@code query} and store result in {@code storeKey}.
@@ -481,20 +481,20 @@ public interface RedisOperations<K, V> {
 	 * @param query must not be {@literal null}.
 	 * @param storeKey must not be {@literal null}.
 	 * @return number of values. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
 	Long sort(SortQuery<K> query, K storeKey);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Transactions
+	// Methods dealing with Valkey Transactions
 	// -------------------------------------------------------------------------
 
 	/**
 	 * Watch given {@code key} for modifications during transaction started with {@link #multi()}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/watch">Redis Documentation: WATCH</a>
+	 * @see <a href="https://redis.io/commands/watch">Valkey Documentation: WATCH</a>
 	 */
 	void watch(K key);
 
@@ -502,14 +502,14 @@ public interface RedisOperations<K, V> {
 	 * Watch given {@code keys} for modifications during transaction started with {@link #multi()}.
 	 *
 	 * @param keys must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/watch">Redis Documentation: WATCH</a>
+	 * @see <a href="https://redis.io/commands/watch">Valkey Documentation: WATCH</a>
 	 */
 	void watch(Collection<K> keys);
 
 	/**
 	 * Flushes all the previously {@link #watch(Object)} keys.
 	 *
-	 * @see <a href="https://redis.io/commands/unwatch">Redis Documentation: UNWATCH</a>
+	 * @see <a href="https://redis.io/commands/unwatch">Valkey Documentation: UNWATCH</a>
 	 */
 	void unwatch();
 
@@ -517,14 +517,14 @@ public interface RedisOperations<K, V> {
 	 * Mark the start of a transaction block. <br>
 	 * Commands will be queued and can then be executed by calling {@link #exec()} or rolled back using {@link #discard()}
 	 *
-	 * @see <a href="https://redis.io/commands/multi">Redis Documentation: MULTI</a>
+	 * @see <a href="https://redis.io/commands/multi">Valkey Documentation: MULTI</a>
 	 */
 	void multi();
 
 	/**
 	 * Discard all commands issued after {@link #multi()}.
 	 *
-	 * @see <a href="https://redis.io/commands/discard">Redis Documentation: DISCARD</a>
+	 * @see <a href="https://redis.io/commands/discard">Valkey Documentation: DISCARD</a>
 	 */
 	void discard();
 
@@ -533,33 +533,33 @@ public interface RedisOperations<K, V> {
 	 * If used along with {@link #watch(Object)} the operation will fail if any of watched keys has been modified.
 	 *
 	 * @return List of replies for each executed command.
-	 * @see <a href="https://redis.io/commands/exec">Redis Documentation: EXEC</a>
+	 * @see <a href="https://redis.io/commands/exec">Valkey Documentation: EXEC</a>
 	 */
 	List<Object> exec();
 
 	/**
-	 * Execute a transaction, using the provided {@link RedisSerializer} to deserialize any results that are byte[]s or
-	 * Collections of byte[]s. If a result is a Map, the provided {@link RedisSerializer} will be used for both the keys
+	 * Execute a transaction, using the provided {@link ValkeySerializer} to deserialize any results that are byte[]s or
+	 * Collections of byte[]s. If a result is a Map, the provided {@link ValkeySerializer} will be used for both the keys
 	 * and values. Other result types (Long, Boolean, etc) are left as-is in the converted results. Tuple results are
 	 * automatically converted to TypedTuples.
 	 *
-	 * @param valueSerializer The {@link RedisSerializer} to use for deserializing the results of transaction exec
+	 * @param valueSerializer The {@link ValkeySerializer} to use for deserializing the results of transaction exec
 	 * @return The deserialized results of transaction exec
 	 */
-	List<Object> exec(RedisSerializer<?> valueSerializer);
+	List<Object> exec(ValkeySerializer<?> valueSerializer);
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Server Commands
+	// Methods dealing with Valkey Server Commands
 	// -------------------------------------------------------------------------
 
 	/**
 	 * Request information and statistics about connected clients.
 	 *
-	 * @return {@link List} of {@link RedisClientInfo} objects.
+	 * @return {@link List} of {@link ValkeyClientInfo} objects.
 	 * @since 1.3
 	 */
 	@Nullable
-	List<RedisClientInfo> getClientList();
+	List<ValkeyClientInfo> getClientList();
 
 	/**
 	 * Closes a given client connection identified by {@literal ip:port} given in {@code client}.
@@ -576,7 +576,7 @@ public interface RedisOperations<K, V> {
 	 * @param host must not be {@literal null}.
 	 * @param port
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/replicaof">Redis Documentation: REPLICAOF</a>
+	 * @see <a href="https://redis.io/commands/replicaof">Valkey Documentation: REPLICAOF</a>
 	 */
 	void replicaOf(String host, int port);
 
@@ -584,7 +584,7 @@ public interface RedisOperations<K, V> {
 	 * Change server into master.
 	 *
 	 * @since 1.3
-	 * @see <a href="https://redis.io/commands/replicaof">Redis Documentation: REPLICAOF</a>
+	 * @see <a href="https://redis.io/commands/replicaof">Valkey Documentation: REPLICAOF</a>
 	 */
 	void replicaOfNoOne();
 
@@ -594,7 +594,7 @@ public interface RedisOperations<K, V> {
 	 * @param destination the channel to publish to, must not be {@literal null}.
 	 * @param message message to publish.
 	 * @return the number of clients that received the message. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/publish">Redis Documentation: PUBLISH</a>
+	 * @see <a href="https://redis.io/commands/publish">Valkey Documentation: PUBLISH</a>
 	 */
 	@Nullable
 	Long convertAndSend(String destination, Object message);
@@ -644,7 +644,7 @@ public interface RedisOperations<K, V> {
 	 *
 	 * @param <HK> hash key (or field) type
 	 * @param <HV> hash value type
-	 * @param key Redis key
+	 * @param key Valkey key
 	 * @return hash operations bound to the given key.
 	 */
 	<HK, HV> BoundHashOperations<K, HK, HV> boundHashOps(K key);
@@ -665,7 +665,7 @@ public interface RedisOperations<K, V> {
 	/**
 	 * Returns the operations performed on list values bound to the given key.
 	 *
-	 * @param key Redis key
+	 * @param key Valkey key
 	 * @return list operations bound to the given key
 	 */
 	BoundListOperations<K, V> boundListOps(K key);
@@ -680,7 +680,7 @@ public interface RedisOperations<K, V> {
 	/**
 	 * Returns the operations performed on set values bound to the given key.
 	 *
-	 * @param key Redis key
+	 * @param key Valkey key
 	 * @return set operations bound to the given key
 	 */
 	BoundSetOperations<K, V> boundSetOps(K key);
@@ -711,16 +711,16 @@ public interface RedisOperations<K, V> {
 	<HK, HV> BoundStreamOperations<K, HK, HV> boundStreamOps(K key);
 
 	/**
-	 * Returns the operations performed on simple values (or Strings in Redis terminology).
+	 * Returns the operations performed on simple values (or Strings in Valkey terminology).
 	 *
 	 * @return value operations
 	 */
 	ValueOperations<K, V> opsForValue();
 
 	/**
-	 * Returns the operations performed on simple values (or Strings in Redis terminology) bound to the given key.
+	 * Returns the operations performed on simple values (or Strings in Valkey terminology) bound to the given key.
 	 *
-	 * @param key Redis key
+	 * @param key Valkey key
 	 * @return value operations bound to the given key
 	 */
 	BoundValueOperations<K, V> boundValueOps(K key);
@@ -735,29 +735,29 @@ public interface RedisOperations<K, V> {
 	/**
 	 * Returns the operations performed on zset values (also known as sorted sets) bound to the given key.
 	 *
-	 * @param key Redis key
+	 * @param key Valkey key
 	 * @return zset operations bound to the given key.
 	 */
 	BoundZSetOperations<K, V> boundZSetOps(K key);
 
 	/**
-	 * @return the key {@link RedisSerializer}.
+	 * @return the key {@link ValkeySerializer}.
 	 */
-	RedisSerializer<?> getKeySerializer();
+	ValkeySerializer<?> getKeySerializer();
 
 	/**
-	 * @return the value {@link RedisSerializer}.
+	 * @return the value {@link ValkeySerializer}.
 	 */
-	RedisSerializer<?> getValueSerializer();
+	ValkeySerializer<?> getValueSerializer();
 
 	/**
-	 * @return the hash key {@link RedisSerializer}.
+	 * @return the hash key {@link ValkeySerializer}.
 	 */
-	RedisSerializer<?> getHashKeySerializer();
+	ValkeySerializer<?> getHashKeySerializer();
 
 	/**
-	 * @return the hash value {@link RedisSerializer}.
+	 * @return the hash value {@link ValkeySerializer}.
 	 */
-	RedisSerializer<?> getHashValueSerializer();
+	ValkeySerializer<?> getHashValueSerializer();
 
 }

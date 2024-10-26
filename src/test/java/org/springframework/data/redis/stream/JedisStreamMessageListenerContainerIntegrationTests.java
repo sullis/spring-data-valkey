@@ -18,7 +18,7 @@ package org.springframework.data.redis.stream;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 
@@ -33,7 +33,7 @@ import org.springframework.data.redis.test.condition.EnabledOnCommand;
 public class JedisStreamMessageListenerContainerIntegrationTests
 		extends AbstractStreamMessageListenerContainerIntegrationTests {
 
-	public JedisStreamMessageListenerContainerIntegrationTests(RedisConnectionFactory connectionFactory) {
+	public JedisStreamMessageListenerContainerIntegrationTests(ValkeyConnectionFactory connectionFactory) {
 		super(connectionFactory);
 	}
 

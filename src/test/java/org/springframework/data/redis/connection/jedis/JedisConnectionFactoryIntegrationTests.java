@@ -23,9 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.ClusterCommandExecutor;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.lang.Nullable;
 
 /**
@@ -50,12 +50,12 @@ class JedisConnectionFactoryIntegrationTests {
 	void shouldInitializeWithStandaloneConfiguration() {
 
 		factory = new JedisConnectionFactory(
-				new RedisStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
+				new ValkeyStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
 				JedisClientConfiguration.defaultConfiguration());
 		factory.afterPropertiesSet();
 		factory.start();
 
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 			assertThat(connection.ping()).isEqualTo("PONG");
 		}
 	}
@@ -64,12 +64,12 @@ class JedisConnectionFactoryIntegrationTests {
 	void connectionAppliesClientName() {
 
 		factory = new JedisConnectionFactory(
-				new RedisStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
+				new ValkeyStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
 				JedisClientConfiguration.builder().clientName("clientName").build());
 		factory.afterPropertiesSet();
 		factory.start();
 
-		RedisConnection connection = factory.getConnection();
+		ValkeyConnection connection = factory.getConnection();
 
 		assertThat(connection.getClientName()).isEqualTo("clientName");
 	}
@@ -78,7 +78,7 @@ class JedisConnectionFactoryIntegrationTests {
 	void startStopStartConnectionFactory() {
 
 		factory = new JedisConnectionFactory(
-				new RedisStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
+				new ValkeyStandaloneConfiguration(SettingsUtils.getHost(), SettingsUtils.getPort()),
 				JedisClientConfiguration.defaultConfiguration());
 		factory.afterPropertiesSet();
 
@@ -91,7 +91,7 @@ class JedisConnectionFactoryIntegrationTests {
 
 		factory.start();
 		assertThat(factory.isRunning()).isTrue();
-		try (RedisConnection connection = factory.getConnection()) {
+		try (ValkeyConnection connection = factory.getConnection()) {
 			assertThat(connection.ping()).isEqualTo("PONG");
 		}
 
@@ -99,7 +99,7 @@ class JedisConnectionFactoryIntegrationTests {
 	}
 
 	@Test // GH-2594
-	@EnabledOnRedisClusterAvailable
+	@EnabledOnValkeyClusterAvailable
 	void configuresExecutorCorrectly() {
 
 		AsyncTaskExecutor mockTaskExecutor = mock(AsyncTaskExecutor.class);

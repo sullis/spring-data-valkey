@@ -20,12 +20,12 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Compare-and-set (CAS) operation using Redis Transactions ({@literal WATCH} and {@literal MULTI}) to atomically update
+ * Compare-and-set (CAS) operation using Valkey Transactions ({@literal WATCH} and {@literal MULTI}) to atomically update
  * the value at {@code key}.
  * <p>
  * The CAS block registers a {@literal WATCH} on the key holding the expected value which guarantees that changes after
@@ -33,9 +33,9 @@ import org.springframework.util.CollectionUtils;
  *
  * @author Mark Paluch
  * @since 2.0.8
- * @see RedisAtomicDouble
- * @see RedisAtomicInteger
- * @see RedisAtomicLong
+ * @see ValkeyAtomicDouble
+ * @see ValkeyAtomicInteger
+ * @see ValkeyAtomicLong
  */
 class CompareAndSet<T> implements SessionCallback<Boolean> {
 
@@ -56,7 +56,7 @@ class CompareAndSet<T> implements SessionCallback<Boolean> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <K, V> Boolean execute(RedisOperations<K, V> operations) throws DataAccessException {
+	public <K, V> Boolean execute(ValkeyOperations<K, V> operations) throws DataAccessException {
 
 		operations.watch((K) key);
 

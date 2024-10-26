@@ -20,20 +20,20 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RedisStaticMasterReplicaConfiguration}.
+ * Unit tests for {@link ValkeyStaticMasterReplicaConfiguration}.
  *
  * @author Mark Paluch
  */
-class RedisElastiCacheConfigurationUnitTests {
+class ValkeyElastiCacheConfigurationUnitTests {
 
 	@Test // DATAREDIS-762
 	void shouldCreateSingleHostConfiguration() {
 
-		RedisStaticMasterReplicaConfiguration singleHost = new RedisStaticMasterReplicaConfiguration("localhost");
+		ValkeyStaticMasterReplicaConfiguration singleHost = new ValkeyStaticMasterReplicaConfiguration("localhost");
 
 		assertThat(singleHost.getNodes()).hasSize(1);
 
-		RedisStandaloneConfiguration node = singleHost.getNodes().get(0);
+		ValkeyStandaloneConfiguration node = singleHost.getNodes().get(0);
 
 		assertThat(node.getHostName()).isEqualToIgnoringCase("localhost");
 		assertThat(node.getPort()).isEqualTo(6379);
@@ -42,17 +42,17 @@ class RedisElastiCacheConfigurationUnitTests {
 	@Test // DATAREDIS-762
 	void shouldCreateMultiHostConfiguration() {
 
-		RedisStaticMasterReplicaConfiguration multiHost = new RedisStaticMasterReplicaConfiguration("localhost");
+		ValkeyStaticMasterReplicaConfiguration multiHost = new ValkeyStaticMasterReplicaConfiguration("localhost");
 		multiHost.node("other-host", 6479);
 
 		assertThat(multiHost.getNodes()).hasSize(2);
 
-		RedisStandaloneConfiguration firstNode = multiHost.getNodes().get(0);
+		ValkeyStandaloneConfiguration firstNode = multiHost.getNodes().get(0);
 
 		assertThat(firstNode.getHostName()).isEqualToIgnoringCase("localhost");
 		assertThat(firstNode.getPort()).isEqualTo(6379);
 
-		RedisStandaloneConfiguration secondNode = multiHost.getNodes().get(1);
+		ValkeyStandaloneConfiguration secondNode = multiHost.getNodes().get(1);
 
 		assertThat(secondNode.getHostName()).isEqualToIgnoringCase("other-host");
 		assertThat(secondNode.getPort()).isEqualTo(6479);
@@ -61,19 +61,19 @@ class RedisElastiCacheConfigurationUnitTests {
 	@Test // DATAREDIS-762
 	void shouldApplyPasswordToNodes() {
 
-		RedisStaticMasterReplicaConfiguration multiHost = new RedisStaticMasterReplicaConfiguration("localhost").node("other-host", 6479);
+		ValkeyStaticMasterReplicaConfiguration multiHost = new ValkeyStaticMasterReplicaConfiguration("localhost").node("other-host", 6479);
 
-		multiHost.setPassword(RedisPassword.of("foobar"));
+		multiHost.setPassword(ValkeyPassword.of("foobar"));
 		multiHost.node("third", 1234);
 
-		assertThat(multiHost.getNodes()).extracting("password").containsExactly(RedisPassword.of("foobar"),
-				RedisPassword.of("foobar"), RedisPassword.of("foobar"));
+		assertThat(multiHost.getNodes()).extracting("password").containsExactly(ValkeyPassword.of("foobar"),
+				ValkeyPassword.of("foobar"), ValkeyPassword.of("foobar"));
 	}
 
 	@Test // DATAREDIS-762
 	void shouldApplyDatabaseToNodes() {
 
-		RedisStaticMasterReplicaConfiguration multiHost = new RedisStaticMasterReplicaConfiguration("localhost").node("other-host", 6479);
+		ValkeyStaticMasterReplicaConfiguration multiHost = new ValkeyStaticMasterReplicaConfiguration("localhost").node("other-host", 6479);
 
 		multiHost.setDatabase(4);
 		multiHost.node("third", 1234);

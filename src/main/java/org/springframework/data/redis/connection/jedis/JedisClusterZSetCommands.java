@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
-import org.springframework.data.redis.connection.RedisZSetCommands;
+import org.springframework.data.redis.connection.ValkeyZSetCommands;
 import org.springframework.data.redis.connection.convert.SetConverter;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
@@ -46,7 +46,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Cluster {@link RedisZSetCommands} implementation for Jedis.
+ * Cluster {@link ValkeyZSetCommands} implementation for Jedis.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class JedisClusterZSetCommands implements RedisZSetCommands {
+class JedisClusterZSetCommands implements ValkeyZSetCommands {
 
 	private static final SetConverter<redis.clients.jedis.resps.Tuple, Tuple> TUPLE_SET_CONVERTER =
 			new SetConverter<>(JedisConverters::toTuple);

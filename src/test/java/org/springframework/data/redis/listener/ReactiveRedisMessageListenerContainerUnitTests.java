@@ -37,26 +37,26 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.data.redis.connection.ReactivePubSubCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveSubscription;
 import org.springframework.data.redis.connection.ReactiveSubscription.ChannelMessage;
 import org.springframework.data.redis.connection.ReactiveSubscription.Message;
 import org.springframework.data.redis.connection.ReactiveSubscription.PatternMessage;
 
 /**
- * Unit tests for {@link ReactiveRedisMessageListenerContainer}.
+ * Unit tests for {@link ReactiveValkeyMessageListenerContainer}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class ReactiveRedisMessageListenerContainerUnitTests {
+class ReactiveValkeyMessageListenerContainerUnitTests {
 
-	private ReactiveRedisMessageListenerContainer container;
+	private ReactiveValkeyMessageListenerContainer container;
 
-	@Mock ReactiveRedisConnectionFactory connectionFactoryMock;
-	@Mock ReactiveRedisConnection connectionMock;
+	@Mock ReactiveValkeyConnectionFactory connectionFactoryMock;
+	@Mock ReactiveValkeyConnection connectionMock;
 	@Mock ReactivePubSubCommands commandsMock;
 	@Mock ReactiveSubscription subscriptionMock;
 
@@ -265,8 +265,8 @@ class ReactiveRedisMessageListenerContainerUnitTests {
 		assertThat(sink.currentSubscriberCount()).isEqualTo(0);
 	}
 
-	private ReactiveRedisMessageListenerContainer createContainer() {
-		return new ReactiveRedisMessageListenerContainer(connectionFactoryMock);
+	private ReactiveValkeyMessageListenerContainer createContainer() {
+		return new ReactiveValkeyMessageListenerContainer(connectionFactoryMock);
 	}
 
 	private static ChannelMessage<ByteBuffer, ByteBuffer> createChannelMessage(String channel, String body) {

@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
 
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.ReactiveHyperLogLogCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.util.Assert;
 
 /**
@@ -32,14 +32,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveHyperLogLogCommands implements ReactiveHyperLogLogCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveHyperLogLogCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveHyperLogLogCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveHyperLogLogCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -84,7 +84,7 @@ class LettuceReactiveHyperLogLogCommands implements ReactiveHyperLogLogCommands 
 		}));
 	}
 
-	protected LettuceReactiveRedisConnection getConnection() {
+	protected LettuceReactiveValkeyConnection getConnection() {
 		return connection;
 	}
 }

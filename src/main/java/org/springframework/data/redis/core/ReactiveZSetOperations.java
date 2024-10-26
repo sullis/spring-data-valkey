@@ -33,17 +33,17 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.lang.Nullable;
 
 /**
- * Reactive Redis operations for Sorted (ZSet) Commands.
+ * Reactive Valkey operations for Sorted (ZSet) Commands.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Andrey Shlykov
- * @see <a href="https://redis.io/commands#zset">Redis Documentation: Sorted Set Commands</a>
+ * @see <a href="https://redis.io/commands#zset">Valkey Documentation: Sorted Set Commands</a>
  * @since 2.0
  */
 public interface ReactiveZSetOperations<K, V> {
@@ -55,7 +55,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param value the value.
 	 * @param score the score.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	Mono<Boolean> add(K key, V value, double score);
 
@@ -65,7 +65,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param tuples the score.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zadd">Redis Documentation: ZADD</a>
+	 * @see <a href="https://redis.io/commands/zadd">Valkey Documentation: ZADD</a>
 	 */
 	Mono<Long> addAll(K key, Collection<? extends TypedTuple<V>> tuples);
 
@@ -75,7 +75,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	Mono<Long> remove(K key, Object... values);
 
@@ -86,7 +86,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param value the value.
 	 * @param delta the delta to add. Can be negative.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zincrby">Redis Documentation: ZINCRBY</a>
+	 * @see <a href="https://redis.io/commands/zincrby">Valkey Documentation: ZINCRBY</a>
 	 */
 	Mono<Double> incrementScore(K key, V value, double delta);
 
@@ -96,7 +96,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Mono<V> randomMember(K key);
 
@@ -108,7 +108,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return
 	 * @throws IllegalArgumentException if count is negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<V> distinctRandomMembers(K key, long count);
 
@@ -120,7 +120,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return
 	 * @throws IllegalArgumentException if count is negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<V> randomMembers(K key, long count);
 
@@ -130,7 +130,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Mono<TypedTuple<V>> randomMemberWithScore(K key);
 
@@ -142,7 +142,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return
 	 * @throws IllegalArgumentException if count is negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<TypedTuple<V>> distinctRandomMembersWithScore(K key, long count);
 
@@ -154,7 +154,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return
 	 * @throws IllegalArgumentException if count is negative.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zrandmember">Redis Documentation: ZRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/zrandmember">Valkey Documentation: ZRANDMEMBER</a>
 	 */
 	Flux<TypedTuple<V>> randomMembersWithScore(K key, long count);
 
@@ -164,7 +164,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param o the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrank">Redis Documentation: ZRANK</a>
+	 * @see <a href="https://redis.io/commands/zrank">Valkey Documentation: ZRANK</a>
 	 */
 	Mono<Long> rank(K key, Object o);
 
@@ -174,7 +174,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param o the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrank">Redis Documentation: ZREVRANK</a>
+	 * @see <a href="https://redis.io/commands/zrevrank">Valkey Documentation: ZREVRANK</a>
 	 */
 	Mono<Long> reverseRank(K key, Object o);
 
@@ -184,7 +184,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	Flux<V> range(K key, Range<Long> range);
 
@@ -194,7 +194,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrange">Redis Documentation: ZRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrange">Valkey Documentation: ZRANGE</a>
 	 */
 	Flux<TypedTuple<V>> rangeWithScores(K key, Range<Long> range);
 
@@ -204,7 +204,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	Flux<V> rangeByScore(K key, Range<Double> range);
 
@@ -214,7 +214,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	Flux<TypedTuple<V>> rangeByScoreWithScores(K key, Range<Double> range);
 
@@ -226,7 +226,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range
 	 * @param limit
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	Flux<V> rangeByScore(K key, Range<Double> range, Limit limit);
 
@@ -238,7 +238,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range
 	 * @param limit
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebyscore">Redis Documentation: ZRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrangebyscore">Valkey Documentation: ZRANGEBYSCORE</a>
 	 */
 	Flux<TypedTuple<V>> rangeByScoreWithScores(K key, Range<Double> range, Limit limit);
 
@@ -248,7 +248,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	Flux<V> reverseRange(K key, Range<Long> range);
 
@@ -258,7 +258,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrange">Redis Documentation: ZREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/zrevrange">Valkey Documentation: ZREVRANGE</a>
 	 */
 	Flux<TypedTuple<V>> reverseRangeWithScores(K key, Range<Long> range);
 
@@ -268,7 +268,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	Flux<V> reverseRangeByScore(K key, Range<Double> range);
 
@@ -279,7 +279,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	Flux<TypedTuple<V>> reverseRangeByScoreWithScores(K key, Range<Double> range);
 
@@ -291,7 +291,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range
 	 * @param limit
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	Flux<V> reverseRangeByScore(K key, Range<Double> range, Limit limit);
 
@@ -303,7 +303,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range
 	 * @param limit
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Redis Documentation: ZREVRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebyscore">Valkey Documentation: ZREVRANGEBYSCORE</a>
 	 */
 	Flux<TypedTuple<V>> reverseRangeByScoreWithScores(K key, Range<Double> range, Limit limit);
 
@@ -316,7 +316,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> rangeAndStoreByLex(K srcKey, K dstKey, Range<String> range) {
 		return rangeAndStoreByLex(srcKey, dstKey, range, Limit.unlimited());
@@ -333,7 +333,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param limit must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	Mono<Long> rangeAndStoreByLex(K srcKey, K dstKey, Range<String> range, Limit limit);
 
@@ -346,7 +346,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> reverseRangeAndStoreByLex(K srcKey, K dstKey, Range<String> range) {
 		return reverseRangeAndStoreByLex(srcKey, dstKey, range, Limit.unlimited());
@@ -364,7 +364,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return the number of stored elements.
 	 * @since 3.0
 	 * @see #reverseRangeByLex(Object, Range, Limit)
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	Mono<Long> reverseRangeAndStoreByLex(K srcKey, K dstKey, Range<String> range, Limit limit);
 
@@ -377,7 +377,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	@Nullable
 	default Mono<Long> rangeAndStoreByScore(K srcKey, K dstKey, Range<Double> range) {
@@ -395,7 +395,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param limit must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	Mono<Long> rangeAndStoreByScore(K srcKey, K dstKey, Range<Double> range, Limit limit);
 
@@ -408,7 +408,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	default Mono<Long> reverseRangeAndStoreByScore(K srcKey, K dstKey, Range<Double> range) {
 		return reverseRangeAndStoreByScore(srcKey, dstKey, range, Limit.unlimited());
@@ -425,7 +425,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param limit must not be {@literal null}.
 	 * @return the number of stored elements.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/zrangestore">Redis Documentation: ZRANGESTORE</a>
+	 * @see <a href="https://redis.io/commands/zrangestore">Valkey Documentation: ZRANGESTORE</a>
 	 */
 	Mono<Long> reverseRangeAndStoreByScore(K srcKey, K dstKey, Range<Double> range, Limit limit);
 
@@ -437,7 +437,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return the {@link Flux} emitting the {@literal values} one by one or an {@link Flux#empty() empty Flux} if none
 	 *         exist.
 	 * @throws IllegalArgumentException when given {@code key} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<TypedTuple<V>> scan(K key) {
@@ -454,7 +454,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @return the {@link Flux} emitting the {@literal values} one by one or an {@link Flux#empty() empty Flux} if none
 	 *         exist.
 	 * @throws IllegalArgumentException when one of the required arguments is {@literal null}.
-	 * @see <a href="https://redis.io/commands/zscan">Redis Documentation: ZSCAN</a>
+	 * @see <a href="https://redis.io/commands/zscan">Valkey Documentation: ZSCAN</a>
 	 * @since 2.1
 	 */
 	Flux<TypedTuple<V>> scan(K key, ScanOptions options);
@@ -465,7 +465,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcount">Redis Documentation: ZCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zcount">Valkey Documentation: ZCOUNT</a>
 	 */
 	Mono<Long> count(K key, Range<Double> range);
 
@@ -477,7 +477,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/ZLEXCOUNT">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/ZLEXCOUNT">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	Mono<Long> lexCount(K key, Range<String> range);
 
@@ -486,7 +486,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	Mono<TypedTuple<V>> popMin(K key);
@@ -497,7 +497,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	Flux<TypedTuple<V>> popMin(K key, long count);
@@ -510,7 +510,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *          {@link Duration#ZERO} or greater {@link 1 second}, must not be {@literal null}. A timeout of zero can be
 	 *          used to wait indefinitely. Durations between zero and one second are not supported.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	Mono<TypedTuple<V>> popMin(K key, Duration timeout);
@@ -520,7 +520,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	Mono<TypedTuple<V>> popMax(K key);
@@ -531,7 +531,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param count number of elements to pop.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmax">Redis Documentation: ZPOPMAX</a>
+	 * @see <a href="https://redis.io/commands/zpopmax">Valkey Documentation: ZPOPMAX</a>
 	 * @since 2.6
 	 */
 	Flux<TypedTuple<V>> popMax(K key, long count);
@@ -544,7 +544,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *          {@link Duration#ZERO} or greater {@link 1 second}, must not be {@literal null}. A timeout of zero can be
 	 *          used to wait indefinitely. Durations between zero and one second are not supported.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zpopmin">Redis Documentation: ZPOPMIN</a>
+	 * @see <a href="https://redis.io/commands/zpopmin">Valkey Documentation: ZPOPMIN</a>
 	 * @since 2.6
 	 */
 	Mono<TypedTuple<V>> popMax(K key, Duration timeout);
@@ -554,7 +554,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *
 	 * @param key
 	 * @return
-	 * @see <a href="https://redis.io/commands/zcard">Redis Documentation: ZCARD</a>
+	 * @see <a href="https://redis.io/commands/zcard">Valkey Documentation: ZCARD</a>
 	 */
 	Mono<Long> size(K key);
 
@@ -564,7 +564,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param o the value.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zscore">Redis Documentation: ZSCORE</a>
+	 * @see <a href="https://redis.io/commands/zscore">Valkey Documentation: ZSCORE</a>
 	 */
 	Mono<Double> score(K key, Object o);
 
@@ -574,7 +574,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param o the values.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zmscore">Redis Documentation: ZMSCORE</a>
+	 * @see <a href="https://redis.io/commands/zmscore">Valkey Documentation: ZMSCORE</a>
 	 * @since 2.6
 	 */
 	Mono<List<Double>> score(K key, Object... o);
@@ -585,7 +585,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	Mono<Long> removeRange(K key, Range<Long> range);
 
@@ -596,7 +596,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @return a {@link Mono} emitting the number or removed elements.
 	 * @since 2.5
-	 * @see <a href="https://redis.io/commands/zremrangebyrank">Redis Documentation: ZREMRANGEBYRANK</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyrank">Valkey Documentation: ZREMRANGEBYRANK</a>
 	 */
 	Mono<Long> removeRangeByLex(K key, Range<String> range);
 
@@ -606,7 +606,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param range
 	 * @return
-	 * @see <a href="https://redis.io/commands/zremrangebyscore">Redis Documentation: ZREMRANGEBYSCORE</a>
+	 * @see <a href="https://redis.io/commands/zremrangebyscore">Valkey Documentation: ZREMRANGEBYSCORE</a>
 	 */
 	Mono<Long> removeRangeByScore(K key, Range<Double> range);
 
@@ -617,7 +617,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	default Flux<V> difference(K key, K otherKey) {
 		return difference(key, Collections.singleton(otherKey));
@@ -630,7 +630,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	Flux<V> difference(K key, Collection<K> otherKeys);
 
@@ -641,7 +641,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	default Flux<TypedTuple<V>> differenceWithScores(K key, K otherKey) {
 		return differenceWithScores(key, Collections.singleton(otherKey));
@@ -654,7 +654,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiff">Redis Documentation: ZDIFF</a>
+	 * @see <a href="https://redis.io/commands/zdiff">Valkey Documentation: ZDIFF</a>
 	 */
 	Flux<TypedTuple<V>> differenceWithScores(K key, Collection<K> otherKeys);
 
@@ -666,7 +666,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param destKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	default Mono<Long> differenceAndStore(K key, K otherKey, K destKey) {
 		return differenceAndStore(key, Collections.singleton(otherKey), destKey);
@@ -680,7 +680,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param destKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zdiffstore">Redis Documentation: ZDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/zdiffstore">Valkey Documentation: ZDIFFSTORE</a>
 	 */
 	Mono<Long> differenceAndStore(K key, Collection<K> otherKeys, K destKey);
 
@@ -691,7 +691,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<V> intersect(K key, K otherKey) {
 		return intersect(key, Collections.singleton(otherKey));
@@ -704,7 +704,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	Flux<V> intersect(K key, Collection<K> otherKeys);
 
@@ -715,7 +715,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<TypedTuple<V>> intersectWithScores(K key, K otherKey) {
 		return intersectWithScores(key, Collections.singleton(otherKey));
@@ -728,7 +728,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	Flux<TypedTuple<V>> intersectWithScores(K key, Collection<K> otherKeys);
 
@@ -740,7 +740,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param aggregate must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	default Flux<TypedTuple<V>> intersectWithScores(K key, Collection<K> otherKeys, Aggregate aggregate) {
 		return intersectWithScores(key, otherKeys, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
@@ -755,7 +755,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zinter">Redis Documentation: ZINTER</a>
+	 * @see <a href="https://redis.io/commands/zinter">Valkey Documentation: ZINTER</a>
 	 */
 	Flux<TypedTuple<V>> intersectWithScores(K key, Collection<K> otherKeys, Aggregate aggregate, Weights weights);
 
@@ -766,7 +766,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> intersectAndStore(K key, K otherKey, K destKey) {
 		return intersectAndStore(key, Collections.singleton(otherKey), destKey);
@@ -779,7 +779,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	Mono<Long> intersectAndStore(K key, Collection<K> otherKeys, K destKey);
 
@@ -792,7 +792,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param aggregate must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	default Mono<Long> intersectAndStore(K key, Collection<K> otherKeys, K destKey, Aggregate aggregate) {
 		return intersectAndStore(key, otherKeys, destKey, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
@@ -808,7 +808,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zinterstore">Redis Documentation: ZINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/zinterstore">Valkey Documentation: ZINTERSTORE</a>
 	 */
 	Mono<Long> intersectAndStore(K key, Collection<K> otherKeys, K destKey, Aggregate aggregate, Weights weights);
 
@@ -819,7 +819,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<V> union(K key, K otherKey) {
 		return union(key, Collections.singleton(otherKey));
@@ -832,7 +832,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	Flux<V> union(K key, Collection<K> otherKeys);
 
@@ -843,7 +843,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<TypedTuple<V>> unionWithScores(K key, K otherKey) {
 		return unionWithScores(key, Collections.singleton(otherKey));
@@ -856,7 +856,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	Flux<TypedTuple<V>> unionWithScores(K key, Collection<K> otherKeys);
 
@@ -868,7 +868,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param aggregate must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	default Flux<TypedTuple<V>> unionWithScores(K key, Collection<K> otherKeys, Aggregate aggregate) {
 		return unionWithScores(key, otherKeys, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
@@ -883,7 +883,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/zunion">Redis Documentation: ZUNION</a>
+	 * @see <a href="https://redis.io/commands/zunion">Valkey Documentation: ZUNION</a>
 	 */
 	Flux<TypedTuple<V>> unionWithScores(K key, Collection<K> otherKeys, Aggregate aggregate, Weights weights);
 
@@ -894,7 +894,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKey must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	Mono<Long> unionAndStore(K key, K otherKey, K destKey);
 
@@ -905,7 +905,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param otherKeys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	Mono<Long> unionAndStore(K key, Collection<K> otherKeys, K destKey);
 
@@ -918,7 +918,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param aggregate must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	default Mono<Long> unionAndStore(K key, Collection<K> otherKeys, K destKey, Aggregate aggregate) {
 		return unionAndStore(key, otherKeys, destKey, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
@@ -934,7 +934,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param weights must not be {@literal null}.
 	 * @return
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/zunionstore">Redis Documentation: ZUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/zunionstore">Valkey Documentation: ZUNIONSTORE</a>
 	 */
 	Mono<Long> unionAndStore(K key, Collection<K> otherKeys, K destKey, Aggregate aggregate, Weights weights);
 
@@ -944,7 +944,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	Flux<V> rangeByLex(K key, Range<String> range);
 
@@ -957,7 +957,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @param limit can be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrangebylex">Redis Documentation: ZRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrangebylex">Valkey Documentation: ZRANGEBYLEX</a>
 	 */
 	Flux<V> rangeByLex(K key, Range<String> range, Limit limit);
 
@@ -967,7 +967,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	Flux<V> reverseRangeByLex(K key, Range<String> range);
 
@@ -980,7 +980,7 @@ public interface ReactiveZSetOperations<K, V> {
 	 * @param range must not be {@literal null}.
 	 * @param limit can be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/zrevrangebylex">Redis Documentation: ZREVRANGEBYLEX</a>
+	 * @see <a href="https://redis.io/commands/zrevrangebylex">Valkey Documentation: ZREVRANGEBYLEX</a>
 	 */
 	Flux<V> reverseRangeByLex(K key, Range<String> range, Limit limit);
 

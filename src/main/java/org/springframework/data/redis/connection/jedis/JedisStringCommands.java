@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * @author dengliming
  * @since 2.0
  */
-class JedisStringCommands implements RedisStringCommands {
+class JedisStringCommands implements ValkeyStringCommands {
 
 	private final JedisConnection connection;
 

@@ -31,49 +31,49 @@ import org.springframework.lang.Nullable;
  *
  * @author Costin Leau
  */
-public class RedisPipelineException extends InvalidDataAccessResourceUsageException {
+public class ValkeyPipelineException extends InvalidDataAccessResourceUsageException {
 
 	private final List<Object> results;
 
 	/**
-	 * Constructs a new <code>RedisPipelineException</code> instance.
+	 * Constructs a new <code>ValkeyPipelineException</code> instance.
 	 *
 	 * @param msg the message
 	 * @param cause the cause
 	 * @param pipelineResult the pipeline result
 	 */
-	public RedisPipelineException(@Nullable String msg, @Nullable Throwable cause, List<Object> pipelineResult) {
+	public ValkeyPipelineException(@Nullable String msg, @Nullable Throwable cause, List<Object> pipelineResult) {
 		super(msg, cause);
 		results = Collections.unmodifiableList(pipelineResult);
 	}
 
 	/**
-	 * Constructs a new <code>RedisPipelineException</code> instance using a default message.
+	 * Constructs a new <code>ValkeyPipelineException</code> instance using a default message.
 	 *
 	 * @param cause the cause
 	 * @param pipelineResult the pipeline result
 	 */
-	public RedisPipelineException(Exception cause, List<Object> pipelineResult) {
+	public ValkeyPipelineException(Exception cause, List<Object> pipelineResult) {
 		this("Pipeline contained one or more invalid commands", cause, pipelineResult);
 	}
 
 	/**
-	 * Constructs a new <code>RedisPipelineException</code> instance using a default message and an empty pipeline result
+	 * Constructs a new <code>ValkeyPipelineException</code> instance using a default message and an empty pipeline result
 	 * list.
 	 *
 	 * @param cause the cause
 	 */
-	public RedisPipelineException(Exception cause) {
+	public ValkeyPipelineException(Exception cause) {
 		this("Pipeline contained one or more invalid commands", cause, Collections.emptyList());
 	}
 
 	/**
-	 * Constructs a new <code>RedisPipelineException</code> instance.
+	 * Constructs a new <code>ValkeyPipelineException</code> instance.
 	 *
 	 * @param msg message
 	 * @param pipelineResult pipeline partial results
 	 */
-	public RedisPipelineException(String msg, List<Object> pipelineResult) {
+	public ValkeyPipelineException(String msg, List<Object> pipelineResult) {
 		super(msg);
 		results = Collections.unmodifiableList(pipelineResult);
 	}

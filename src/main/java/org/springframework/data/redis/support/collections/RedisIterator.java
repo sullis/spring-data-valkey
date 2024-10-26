@@ -20,23 +20,23 @@ import java.util.Iterator;
 import org.springframework.lang.Nullable;
 
 /**
- * Iterator extension for Redis collection removal.
+ * Iterator extension for Valkey collection removal.
  *
  * @param <E> the type of elements in this collection.
  * @author Costin Leau
  */
-abstract class RedisIterator<E> implements Iterator<E> {
+abstract class ValkeyIterator<E> implements Iterator<E> {
 
 	private final Iterator<E> delegate;
 
 	private @Nullable E item;
 
 	/**
-	 * Constructs a new <code>RedisIterator</code> instance.
+	 * Constructs a new <code>ValkeyIterator</code> instance.
 	 *
 	 * @param delegate
 	 */
-	RedisIterator(Iterator<E> delegate) {
+	ValkeyIterator(Iterator<E> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -65,9 +65,9 @@ abstract class RedisIterator<E> implements Iterator<E> {
 	@Override
 	public void remove() {
 		delegate.remove();
-		removeFromRedisStorage(item);
+		removeFromValkeyStorage(item);
 		item = null;
 	}
 
-	protected abstract void removeFromRedisStorage(E item);
+	protected abstract void removeFromValkeyStorage(E item);
 }

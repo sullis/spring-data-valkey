@@ -15,8 +15,8 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisException;
-import io.lettuce.core.api.reactive.RedisKeyReactiveCommands;
+import io.lettuce.core.ValkeyException;
+import io.lettuce.core.api.reactive.ValkeyKeyReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,11 +26,11 @@ import java.util.List;
 import org.reactivestreams.Publisher;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.ReactiveClusterKeyCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 import org.springframework.util.Assert;
 
 /**
@@ -40,14 +40,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveClusterKeyCommands extends LettuceReactiveKeyCommands implements ReactiveClusterKeyCommands {
 
-	private LettuceReactiveRedisClusterConnection connection;
+	private LettuceReactiveValkeyClusterConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveClusterKeyCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterKeyCommands(LettuceReactiveRedisClusterConnection connection) {
+	LettuceReactiveClusterKeyCommands(LettuceReactiveValkeyClusterConnection connection) {
 
 		super(connection);
 
@@ -55,7 +55,7 @@ class LettuceReactiveClusterKeyCommands extends LettuceReactiveKeyCommands imple
 	}
 
 	@Override
-	public Mono<List<ByteBuffer>> keys(RedisClusterNode node, ByteBuffer pattern) {
+	public Mono<List<ByteBuffer>> keys(ValkeyClusterNode node, ByteBuffer pattern) {
 
 		return connection.execute(node, cmd -> {
 
@@ -66,9 +66,9 @@ class LettuceReactiveClusterKeyCommands extends LettuceReactiveKeyCommands imple
 	}
 
 	@Override
-	public Mono<ByteBuffer> randomKey(RedisClusterNode node) {
+	public Mono<ByteBuffer> randomKey(ValkeyClusterNode node) {
 
-		return connection.execute(node, RedisKeyReactiveCommands::randomkey).next();
+		return connection.execute(node, ValkeyKeyReactiveCommands::randomkey).next();
 	}
 
 	@Override
@@ -84,8 +84,8 @@ class LettuceReactiveClusterKeyCommands extends LettuceReactiveKeyCommands imple
 			}
 
 			Mono<Boolean> result = cmd.dump(command.getKey())
-					.switchIfEmpty(Mono.error(new RedisSystemException("Cannot rename key that does not exist",
-							new RedisException("ERR no such key."))))
+					.switchIfEmpty(Mono.error(new ValkeySystemException("Cannot rename key that does not exist",
+							new ValkeyException("ERR no such key."))))
 					.flatMap(value -> cmd.restore(command.getNewKey(), 0, value).flatMap(res -> cmd.del(command.getKey())))
 					.map(LettuceConverters.longToBooleanConverter()::convert);
 
@@ -112,8 +112,8 @@ class LettuceReactiveClusterKeyCommands extends LettuceReactiveKeyCommands imple
 				}
 
 				return cmd.dump(command.getKey())
-						.switchIfEmpty(Mono.error(new RedisSystemException("Cannot rename key that does not exist",
-								new RedisException("ERR no such key."))))
+						.switchIfEmpty(Mono.error(new ValkeySystemException("Cannot rename key that does not exist",
+								new ValkeyException("ERR no such key."))))
 						.flatMap(value -> cmd.restore(command.getNewKey(), 0, value).flatMap(res -> cmd.del(command.getKey())))
 						.map(LettuceConverters::toBoolean);
 			});

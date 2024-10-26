@@ -27,18 +27,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Mark Paluch
@@ -47,23 +47,23 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @MethodSource("params")
 public class ScanTests {
 
-	private RedisConnectionFactory factory;
-	private RedisTemplate<String, String> redisOperations;
+	private ValkeyConnectionFactory factory;
+	private ValkeyTemplate<String, String> redisOperations;
 
 	private ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1, TimeUnit.MINUTES,
 			new LinkedBlockingDeque<>());
 
-	public ScanTests(RedisConnectionFactory factory) {
+	public ScanTests(ValkeyConnectionFactory factory) {
 		this.factory = factory;
 	}
 
-	public static List<RedisConnectionFactory> params() {
+	public static List<ValkeyConnectionFactory> params() {
 
 		JedisConnectionFactory jedisConnectionFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		LettuceConnectionFactory lettuceConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
 		return Arrays.asList(jedisConnectionFactory, lettuceConnectionFactory);
 	}
@@ -71,11 +71,11 @@ public class ScanTests {
 	@BeforeEach
 	void setUp() {
 
-		redisOperations = new StringRedisTemplate(factory);
+		redisOperations = new StringValkeyTemplate(factory);
 		redisOperations.afterPropertiesSet();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void contextLoads() throws InterruptedException {
 
 		BoundHashOperations<String, String, String> hash = redisOperations.boundHashOps("hash");

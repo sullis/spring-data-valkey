@@ -30,8 +30,8 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.EntityInstantiators;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.convert.RedisConverter;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
 import org.springframework.data.repository.query.ParameterAccessor;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
@@ -45,19 +45,19 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Redis-specific implementation of {@link KeyValuePartTreeQuery} supporting projections.
+ * Valkey-specific implementation of {@link KeyValuePartTreeQuery} supporting projections.
  *
  * @author Mark Paluch
  * @since 3.2.4
  */
-public class RedisPartTreeQuery extends KeyValuePartTreeQuery {
+public class ValkeyPartTreeQuery extends KeyValuePartTreeQuery {
 
-	private final RedisKeyValueAdapter adapter;
+	private final ValkeyKeyValueAdapter adapter;
 
-	public RedisPartTreeQuery(QueryMethod queryMethod, QueryMethodEvaluationContextProvider evaluationContextProvider,
+	public ValkeyPartTreeQuery(QueryMethod queryMethod, QueryMethodEvaluationContextProvider evaluationContextProvider,
 			KeyValueOperations template, Class<? extends AbstractQueryCreator<?, ?>> queryCreator) {
 		super(queryMethod, evaluationContextProvider, template, queryCreator);
-		this.adapter = (RedisKeyValueAdapter) template.getKeyValueAdapter();
+		this.adapter = (ValkeyKeyValueAdapter) template.getKeyValueAdapter();
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class RedisPartTreeQuery extends KeyValuePartTreeQuery {
 		KeyValueQuery<?> query = prepareQuery(parameters);
 		ResultProcessor processor = getQueryMethod().getResultProcessor().withDynamicProjection(accessor);
 
-		RedisConverter converter = adapter.getConverter();
+		ValkeyConverter converter = adapter.getConverter();
 		Converter<Object, Object> resultPostProcessor = new ResultProcessingConverter(processor,
 				converter.getMappingContext(), converter.getEntityInstantiators());
 

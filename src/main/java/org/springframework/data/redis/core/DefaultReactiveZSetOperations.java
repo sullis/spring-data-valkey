@@ -37,7 +37,7 @@ import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -52,11 +52,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveZSetOperations<K, V> implements ReactiveZSetOperations<K, V> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, V> serializationContext;
 
-	public DefaultReactiveZSetOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, V> serializationContext) {
+	public DefaultReactiveZSetOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, V> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;

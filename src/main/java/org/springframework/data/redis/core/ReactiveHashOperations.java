@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reactive Redis operations for Hash Commands.
+ * Reactive Valkey operations for Hash Commands.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
@@ -100,7 +100,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Mono<HK> randomKey(H key);
 
@@ -110,7 +110,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Mono<Map.Entry<HK, HV>> randomEntry(H key);
 
@@ -124,7 +124,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @param count number of fields to return.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Flux<HK> randomKeys(H key, long count);
 
@@ -138,7 +138,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @param count number of fields to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Flux<Map.Entry<HK, HV>> randomEntries(H key, long count);
 
@@ -209,7 +209,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @return the {@link Flux} emitting the {@link java.util.Map.Entry entries} on by one or an {@link Flux#empty() empty
 	 *         flux} if the key does not exist.
 	 * @throws IllegalArgumentException when the given {@code key} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<Map.Entry<HK, HV>> scan(H key) {
@@ -225,7 +225,7 @@ public interface ReactiveHashOperations<H, HK, HV> {
 	 * @return the {@link Flux} emitting the {@link java.util.Map.Entry entries} on by one or an {@link Flux#empty() empty
 	 *         flux} if the key does not exist.
 	 * @throws IllegalArgumentException when one of the required arguments is {@literal null}.
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
 	 * @since 2.1
 	 */
 	Flux<Map.Entry<HK, HV>> scan(H key, ScanOptions options);

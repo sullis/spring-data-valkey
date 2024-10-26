@@ -18,8 +18,8 @@ package org.springframework.data.redis.core;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assumptions.*;
 import static org.assertj.core.data.Offset.offset;
-import static org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,15 +35,15 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.domain.geo.BoundingBox;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
@@ -66,12 +66,12 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	private static final double DISTANCE_PALERMO_CATANIA_MILES = 103.31822459492733;
 	private static final double DISTANCE_PALERMO_CATANIA_FEET = 545518.8699790037;
 
-	private final RedisTemplate<K, M> redisTemplate;
+	private final ValkeyTemplate<K, M> redisTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<M> valueFactory;
 	private final GeoOperations<K, M> geoOperations;
 
-	public DefaultGeoOperationsIntegrationTests(RedisTemplate<K, M> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultGeoOperationsIntegrationTests(ValkeyTemplate<K, M> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<M> valueFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -86,13 +86,13 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void testGeoAdd() {
 
 		Long numAdded = geoOperations.add(keyFactory.instance(), POINT_PALERMO, valueFactory.instance());
@@ -100,7 +100,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(numAdded).isEqualTo(1L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void testGeoAddWithLocationMap() {
 
 		Map<M, Point> memberCoordinateMap = new HashMap<>();
@@ -112,7 +112,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(numAdded).isEqualTo(2L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoDistShouldReturnDistanceInMetersByDefault() {
 
 		K key = keyFactory.instance();
@@ -127,7 +127,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(dist.getUnit()).isEqualTo("m");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoDistShouldReturnDistanceInKilometersCorrectly() {
 
 		K key = keyFactory.instance();
@@ -142,7 +142,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(dist.getUnit()).isEqualTo("km");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoDistShouldReturnDistanceInMilesCorrectly() {
 
 		K key = keyFactory.instance();
@@ -157,7 +157,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(dist.getUnit()).isEqualTo("mi");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoDistShouldReturnDistanceInFeeCorrectly() {
 
 		K key = keyFactory.instance();
@@ -172,7 +172,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(dist.getUnit()).isEqualTo("ft");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1214
+	@ParameterizedValkeyTest // DATAREDIS-1214
 	void geoDistShouldReturnNullIfNoDistanceCalculable() {
 
 		K key = keyFactory.instance();
@@ -188,7 +188,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(dist).isNull();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void testGeoHash() {
 
 		K key = keyFactory.instance();
@@ -205,7 +205,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.get(1)).isEqualTo("sqdtr74hyu0");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void testGeoPos() {
 
 		K key = keyFactory.instance();
@@ -228,7 +228,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.get(2)).isNull();
 	}
 
-	@ParameterizedRedisTest // GH-2279
+	@ParameterizedValkeyTest // GH-2279
 	void geoRadius() {
 
 		K key = keyFactory.instance();
@@ -239,7 +239,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		List<Object> result = redisTemplate.executePipelined(new SessionCallback<GeoResults>() {
 			@Nullable
 			@Override
-			public <K, V> GeoResults execute(RedisOperations<K, V> operations) throws DataAccessException {
+			public <K, V> GeoResults execute(ValkeyOperations<K, V> operations) throws DataAccessException {
 
 				return operations.opsForGeo().radius((K) key, new Circle(POINT_PALERMO, new Distance(1, KILOMETERS)));
 			}
@@ -250,7 +250,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(results.getContent().get(0).getDistance().getValue()).isCloseTo(0, Offset.offset(0.005));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusShouldReturnMembersCorrectly() {
 
 		K key = keyFactory.instance();
@@ -266,7 +266,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent()).hasSize(2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusShouldReturnLocationsWithDistance() {
 
 		K key = keyFactory.instance();
@@ -290,7 +290,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusShouldReturnLocationsWithCoordinates() {
 
 		K key = keyFactory.instance();
@@ -318,7 +318,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusShouldReturnLocationsWithCoordinatesAndDistance() {
 
 		K key = keyFactory.instance();
@@ -350,7 +350,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusByMemberShouldReturnMembersCorrectly() {
 
 		K key = keyFactory.instance();
@@ -366,7 +366,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent()).hasSize(3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusByMemberShouldReturnDistanceCorrectly() {
 
 		K key = keyFactory.instance();
@@ -388,7 +388,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusByMemberShouldReturnCoordinates() {
 
 		K key = keyFactory.instance();
@@ -417,7 +417,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void geoRadiusByMemberShouldReturnCoordinatesAndDistance() {
 
 		K key = keyFactory.instance();
@@ -449,7 +449,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-438, DATAREDIS-614
+	@ParameterizedValkeyTest // DATAREDIS-438, DATAREDIS-614
 	void testGeoRemove() {
 
 		K key = keyFactory.instance();
@@ -460,7 +460,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(geoOperations.remove(key, member1)).isEqualTo(1L);
 	}
 
-	@ParameterizedRedisTest // GH-2043
+	@ParameterizedValkeyTest // GH-2043
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchWithinShouldReturnMembers() {
 
@@ -491,7 +491,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // GH-2043
+	@ParameterizedValkeyTest // GH-2043
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByMemberShouldReturnResults() {
 
@@ -522,7 +522,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // GH-2043
+	@ParameterizedValkeyTest // GH-2043
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByPointWithinBoundingBoxShouldReturnMembers() {
 
@@ -554,7 +554,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // GH-2043
+	@ParameterizedValkeyTest // GH-2043
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByMemberWithinBoundingBoxShouldReturnMembers() {
 
@@ -585,7 +585,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		assertThat(result.getContent().get(1).getContent().getName()).isEqualTo(member3);
 	}
 
-	@ParameterizedRedisTest // GH-2043
+	@ParameterizedValkeyTest // GH-2043
 	@EnabledOnCommand("GEOSEARCHSTORE")
 	void geoSearchAndStoreWithinShouldReturnMembers() {
 
@@ -603,7 +603,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 
 		Long result = geoOperations.searchAndStore(key, destKey,
 				GeoReference.fromCoordinate(POINT_PALERMO), new Distance(150, KILOMETERS),
-				RedisGeoCommands.GeoSearchStoreCommandArgs.newGeoSearchStoreArgs().sortAscending());
+				ValkeyGeoCommands.GeoSearchStoreCommandArgs.newGeoSearchStoreArgs().sortAscending());
 
 		assertThat(result).isEqualTo(2);
 		assertThat(redisTemplate.boundZSetOps(destKey).size()).isEqualTo(2);

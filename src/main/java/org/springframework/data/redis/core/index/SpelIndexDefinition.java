@@ -27,7 +27,7 @@ import org.springframework.util.ObjectUtils;
  * @author Christoph Strobl
  * @since 1.7
  */
-public class SpelIndexDefinition extends RedisIndexDefinition {
+public class SpelIndexDefinition extends ValkeyIndexDefinition {
 
 	private final String expression;
 

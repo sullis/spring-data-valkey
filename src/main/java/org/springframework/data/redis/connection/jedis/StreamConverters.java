@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisStreamCommands;
+import org.springframework.data.redis.connection.ValkeyStreamCommands;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.PendingMessage;
@@ -48,7 +48,7 @@ import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 
 /**
- * Converters for Redis Stream-specific types.
+ * Converters for Valkey Stream-specific types.
  * <p>
  * Converters typically convert between value objects/argument objects retaining the actual types of values (i.e. no
  * serialization/deserialization happens here).
@@ -202,7 +202,7 @@ class StreamConverters {
 		return new PendingMessages(groupName, messages).withinRange(range);
 	}
 
-	public static XAddParams toXAddParams(RecordId recordId, RedisStreamCommands.XAddOptions options) {
+	public static XAddParams toXAddParams(RecordId recordId, ValkeyStreamCommands.XAddOptions options) {
 
 		XAddParams params = new XAddParams();
 		params.id(toStreamEntryId(recordId.getValue()));
@@ -243,7 +243,7 @@ class StreamConverters {
 		return new StreamEntryID(value);
 	}
 
-	public static XClaimParams toXClaimParams(RedisStreamCommands.XClaimOptions options) {
+	public static XClaimParams toXClaimParams(ValkeyStreamCommands.XClaimOptions options) {
 
 		XClaimParams params = XClaimParams.xClaimParams();
 
@@ -297,7 +297,7 @@ class StreamConverters {
 
 	}
 
-	public static XPendingParams toXPendingParams(RedisStreamCommands.XPendingOptions options) {
+	public static XPendingParams toXPendingParams(ValkeyStreamCommands.XPendingOptions options) {
 
 		Range<String> range = (Range<String>) options.getRange();
 		XPendingParams xPendingParams = XPendingParams.xPendingParams(StreamConverters.getLowerValue(range),

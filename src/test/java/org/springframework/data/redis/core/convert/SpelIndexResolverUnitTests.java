@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration.KeyspaceSettings;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.core.index.SpelIndexDefinition;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.spel.SpelEvaluationException;
 
@@ -52,9 +52,9 @@ public class SpelIndexResolverUnitTests {
 
 	private String securityContextAttrName;
 
-	private RedisMappingContext mappingContext;
+	private ValkeyMappingContext mappingContext;
 
-	RedisPersistentEntity<?> entity;
+	ValkeyPersistentEntity<?> entity;
 
 	@BeforeEach
 	void setup() {
@@ -71,7 +71,7 @@ public class SpelIndexResolverUnitTests {
 	}
 
 	@Test // DATAREDIS-425
-	void constructorNullRedisMappingContext() {
+	void constructorNullValkeyMappingContext() {
 
 		mappingContext = null;
 		assertThatIllegalArgumentException().isThrownBy(() -> new SpelIndexResolver(mappingContext));
@@ -153,7 +153,7 @@ public class SpelIndexResolverUnitTests {
 
 		MappingConfiguration mapping = new MappingConfiguration(configuration, keyspaceConfiguration);
 
-		mappingContext = new RedisMappingContext(mapping);
+		mappingContext = new ValkeyMappingContext(mapping);
 
 		return new SpelIndexResolver(mappingContext);
 	}

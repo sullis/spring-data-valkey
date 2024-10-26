@@ -25,7 +25,7 @@ import java.util.Arrays;
  */
 class DefaultHyperLogLogOperations<K, V> extends AbstractOperations<K, V> implements HyperLogLogOperations<K, V> {
 
-	DefaultHyperLogLogOperations(RedisTemplate<K, V> template) {
+	DefaultHyperLogLogOperations(ValkeyTemplate<K, V> template) {
 		super(template);
 	}
 

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration test of {@link DefaultSetOperations}
@@ -42,12 +42,12 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @SuppressWarnings("unchecked")
 public class DefaultSetOperationsIntegrationTests<K, V> {
 
-	private final RedisTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> redisTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final SetOperations<K, V> setOps;
 
-	public DefaultSetOperationsIntegrationTests(RedisTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultSetOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -62,14 +62,14 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDistinctRandomMembers() {
 
 		K setKey = keyFactory.instance();
@@ -84,7 +84,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(members).contains(v1, v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRandomMembersWithDuplicates() {
 
 		K setKey = keyFactory.instance();
@@ -97,7 +97,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(members).hasSize(2).contains(v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRandomMembersNegative() {
 
 		try {
@@ -107,7 +107,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		}
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDistinctRandomMembersNegative() {
 
 		try {
@@ -118,7 +118,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testMove() {
 
 		K key1 = keyFactory.instance();
@@ -135,7 +135,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPop() {
 
 		K key = keyFactory.instance();
@@ -147,7 +147,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.members(key)).isEmpty();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-668
+	@ParameterizedValkeyTest // DATAREDIS-668
 	void testPopWithCount() {
 
 		K key = keyFactory.instance();
@@ -162,7 +162,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(result.get(0)).isInstanceOf(v1.getClass());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRandomMember() {
 
 		K key = keyFactory.instance();
@@ -173,7 +173,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.randomMember(key)).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAdd() {
 
 		K key = keyFactory.instance();
@@ -185,7 +185,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemove() {
 
 		K key = keyFactory.instance();
@@ -200,7 +200,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.members(key)).containsOnly(v3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-304
+	@ParameterizedValkeyTest // DATAREDIS-304
 	@SuppressWarnings("unchecked")
 	void testSSCanReadsValuesFully() throws IOException {
 
@@ -221,7 +221,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(count).isEqualTo(setOps.size(key));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-873
 	void diffShouldReturnDifference() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -238,7 +238,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.difference(Arrays.asList(sourceKey1, sourceKey2))).contains(v1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-873
 	void diffAndStoreShouldReturnDifferenceShouldReturnNumberOfElementsInDestination() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -256,7 +256,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.differenceAndStore(Arrays.asList(sourceKey1, sourceKey2), destinationKey)).isEqualTo(1L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-873
 	void unionShouldConcatSets() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -273,7 +273,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.union(Arrays.asList(sourceKey1, sourceKey2))).contains(v1, v2, v3, v4);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-873
 	void unionAndStoreShouldReturnDifferenceShouldReturnNumberOfElementsInDestination() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -291,7 +291,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.unionAndStore(Arrays.asList(sourceKey1, sourceKey2), destinationKey)).isEqualTo(4L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-873
 	void intersectShouldReturnElements() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -308,7 +308,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.intersect(Arrays.asList(sourceKey1, sourceKey2))).hasSize(2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-448, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-448, DATAREDIS-873
 	void intersectAndStoreShouldReturnNumberOfElementsInDestination() {
 
 		K sourceKey1 = keyFactory.instance();
@@ -327,7 +327,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 		assertThat(setOps.intersectAndStore(Arrays.asList(sourceKey1, sourceKey2), destinationKey)).isEqualTo(2L);
 	}
 
-	@ParameterizedRedisTest // GH-2037
+	@ParameterizedValkeyTest // GH-2037
 	@EnabledOnCommand("SMISMEMBER")
 	void isMember() {
 

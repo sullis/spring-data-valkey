@@ -40,7 +40,7 @@ import org.junit.platform.commons.util.ReflectionUtils;
 /**
  * Copy of {@code org.junit.jupiter.params.ParameterizedTestExtension}.
  */
-class ParameterizedRedisTestExtension implements TestTemplateInvocationContextProvider {
+class ParameterizedValkeyTestExtension implements TestTemplateInvocationContextProvider {
 
 	private static final String METHOD_CONTEXT_KEY = "method-context";
 	private static final String CONSTRUCTOR_CONTEXT_KEY = "constructor-context";
@@ -53,7 +53,7 @@ class ParameterizedRedisTestExtension implements TestTemplateInvocationContextPr
 		}
 
 		Method testMethod = context.getTestMethod().get();
-		if (!isAnnotated(testMethod, ParameterizedRedisTest.class)) {
+		if (!isAnnotated(testMethod, ParameterizedValkeyTest.class)) {
 			return false;
 		}
 
@@ -62,7 +62,7 @@ class ParameterizedRedisTestExtension implements TestTemplateInvocationContextPr
 		ParameterizedTestContext constructorContext = new ParameterizedTestContext(declaredConstructor);
 
 		Preconditions.condition(methodContext.hasPotentiallyValidSignature(), () ->
-				("@ParameterizedRedisTest method [%s] declares formal parameters in an invalid order: "
+				("@ParameterizedValkeyTest method [%s] declares formal parameters in an invalid order: "
 						+ "argument aggregators must be declared after any indexed arguments "
 						+ "and before any arguments resolved by another ParameterResolver.")
 						.formatted(testMethod.toGenericString()));
@@ -106,7 +106,7 @@ class ParameterizedRedisTestExtension implements TestTemplateInvocationContextPr
 				.map(arguments -> createInvocationContext(formatter, constructorContext, methodContext, arguments))
 				.peek(invocationContext -> invocationCount.incrementAndGet())
 				.onClose(() -> Preconditions.condition(invocationCount.get() > 0,
-						"Configuration error: You must configure at least one set of arguments for this @ParameterizedRedisTest class"));
+						"Configuration error: You must configure at least one set of arguments for this @ParameterizedValkeyTest class"));
 		// @formatter:on
 	}
 
@@ -125,7 +125,7 @@ class ParameterizedRedisTestExtension implements TestTemplateInvocationContextPr
 	}
 
 	private ExtensionContext.Store getStore(ExtensionContext context) {
-		return context.getStore(Namespace.create(ParameterizedRedisTestExtension.class, context.getRequiredTestMethod()));
+		return context.getStore(Namespace.create(ParameterizedValkeyTestExtension.class, context.getRequiredTestMethod()));
 	}
 
 	private TestTemplateInvocationContext createInvocationContext(ParameterizedTestNameFormatter formatter,
@@ -136,10 +136,10 @@ class ParameterizedRedisTestExtension implements TestTemplateInvocationContextPr
 	private ParameterizedTestNameFormatter createNameFormatter(Method templateMethod,
 			ParameterizedTestContext methodContext, String displayName, int argumentMaxLength) {
 
-		ParameterizedRedisTest parameterizedTest = findAnnotation(templateMethod, ParameterizedRedisTest.class).get();
+		ParameterizedValkeyTest parameterizedTest = findAnnotation(templateMethod, ParameterizedValkeyTest.class).get();
 
 		String pattern = Preconditions.notBlank(parameterizedTest.name().trim(), () ->
-				"Configuration error: @ParameterizedRedisTest on method [%s] must be declared with a non-empty name"
+				"Configuration error: @ParameterizedValkeyTest on method [%s] must be declared with a non-empty name"
 						.formatted(templateMethod));
 
 		return new ParameterizedTestNameFormatter(pattern, displayName, methodContext, argumentMaxLength);

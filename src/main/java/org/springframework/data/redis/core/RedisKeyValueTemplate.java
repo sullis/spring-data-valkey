@@ -24,31 +24,31 @@ import org.springframework.data.keyvalue.core.KeyValueCallback;
 import org.springframework.data.keyvalue.core.KeyValueTemplate;
 import org.springframework.data.keyvalue.core.mapping.KeyValuePersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
-import org.springframework.data.redis.core.convert.RedisConverter;
-import org.springframework.data.redis.core.convert.RedisData;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyData;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Redis specific implementation of {@link KeyValueTemplate}.
+ * Valkey specific implementation of {@link KeyValueTemplate}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisKeyValueTemplate extends KeyValueTemplate {
+public class ValkeyKeyValueTemplate extends KeyValueTemplate {
 
-	private final RedisKeyValueAdapter adapter;
+	private final ValkeyKeyValueAdapter adapter;
 
 	/**
-	 * Create new {@link RedisKeyValueTemplate}.
+	 * Create new {@link ValkeyKeyValueTemplate}.
 	 *
 	 * @param adapter must not be {@literal null}.
 	 * @param mappingContext must not be {@literal null}.
 	 */
-	public RedisKeyValueTemplate(RedisKeyValueAdapter adapter, RedisMappingContext mappingContext) {
+	public ValkeyKeyValueTemplate(ValkeyKeyValueAdapter adapter, ValkeyMappingContext mappingContext) {
 		super(adapter, mappingContext);
 		this.adapter = adapter;
 	}
@@ -59,29 +59,29 @@ public class RedisKeyValueTemplate extends KeyValueTemplate {
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	public RedisConverter getConverter() {
+	public ValkeyConverter getConverter() {
 		return adapter.getConverter();
 	}
 
 	@Override
-	public RedisMappingContext getMappingContext() {
-		return (RedisMappingContext) super.getMappingContext();
+	public ValkeyMappingContext getMappingContext() {
+		return (ValkeyMappingContext) super.getMappingContext();
 	}
 
 	/**
 	 * Retrieve entities by resolving their {@literal id}s and converting them into required type. <br />
 	 * The callback provides either a single {@literal id} or an {@link Iterable} of {@literal id}s, used for retrieving
-	 * the actual domain types and shortcuts manual retrieval and conversion of {@literal id}s via {@link RedisTemplate}.
+	 * the actual domain types and shortcuts manual retrieval and conversion of {@literal id}s via {@link ValkeyTemplate}.
 	 *
 	 * <pre>
 	 * <code>
-	 * List&#60;RedisSession&#62; sessions = template.find(new RedisCallback&#60;Set&#60;byte[]&#62;&#62;() {
-	 *   public Set&#60;byte[]&#60; doInRedis(RedisConnection connection) throws DataAccessException {
+	 * List&#60;ValkeySession&#62; sessions = template.find(new ValkeyCallback&#60;Set&#60;byte[]&#62;&#62;() {
+	 *   public Set&#60;byte[]&#60; doInValkey(ValkeyConnection connection) throws DataAccessException {
 	 *     return connection
 	 *       .sMembers("spring:session:sessions:securityContext.authentication.principal.username:user"
 	 *         .getBytes());
 	 *   }
-	 * }, RedisSession.class);
+	 * }, ValkeySession.class);
 	 * </code>
 	 * </pre>
 	 *
@@ -89,14 +89,14 @@ public class RedisKeyValueTemplate extends KeyValueTemplate {
 	 * @param type must not be {@literal null}.
 	 * @return empty list if not elements found.
 	 */
-	public <T> List<T> find(RedisCallback<?> callback, Class<T> type) {
+	public <T> List<T> find(ValkeyCallback<?> callback, Class<T> type) {
 
 		Assert.notNull(callback, "Callback must not be null");
 
-		return execute(new RedisKeyValueCallback<List<T>>() {
+		return execute(new ValkeyKeyValueCallback<List<T>>() {
 
 			@Override
-			public List<T> doInRedis(RedisKeyValueAdapter adapter) {
+			public List<T> doInValkey(ValkeyKeyValueAdapter adapter) {
 
 				Object callbackResult = adapter.execute(callback);
 
@@ -129,11 +129,11 @@ public class RedisKeyValueTemplate extends KeyValueTemplate {
 			return objectToInsert;
 		}
 
-		if (!(objectToInsert instanceof RedisData)) {
+		if (!(objectToInsert instanceof ValkeyData)) {
 
-			RedisConverter converter = adapter.getConverter();
+			ValkeyConverter converter = adapter.getConverter();
 
-			RedisPersistentEntity<?> entity = converter.getMappingContext()
+			ValkeyPersistentEntity<?> entity = converter.getMappingContext()
 					.getRequiredPersistentEntity(objectToInsert.getClass());
 
 			KeyValuePersistentProperty idProperty = entity.getRequiredIdProperty();
@@ -168,10 +168,10 @@ public class RedisKeyValueTemplate extends KeyValueTemplate {
 
 	protected void doPartialUpdate(final PartialUpdate<?> update) {
 
-		execute(new RedisKeyValueCallback<Void>() {
+		execute(new ValkeyKeyValueCallback<Void>() {
 
 			@Override
-			public Void doInRedis(RedisKeyValueAdapter adapter) {
+			public Void doInValkey(ValkeyKeyValueAdapter adapter) {
 
 				adapter.update(update);
 				return null;
@@ -180,20 +180,20 @@ public class RedisKeyValueTemplate extends KeyValueTemplate {
 	}
 
 	/**
-	 * Redis specific {@link KeyValueCallback}.
+	 * Valkey specific {@link KeyValueCallback}.
 	 *
 	 * @author Christoph Strobl
 	 * @param <T>
 	 * @since 1.7
 	 */
-	public static abstract class RedisKeyValueCallback<T> implements KeyValueCallback<T> {
+	public static abstract class ValkeyKeyValueCallback<T> implements KeyValueCallback<T> {
 
 		@Override
 		public T doInKeyValue(KeyValueAdapter adapter) {
-			return doInRedis((RedisKeyValueAdapter) adapter);
+			return doInValkey((ValkeyKeyValueAdapter) adapter);
 		}
 
-		public abstract T doInRedis(RedisKeyValueAdapter adapter);
+		public abstract T doInValkey(ValkeyKeyValueAdapter adapter);
 	}
 
 }

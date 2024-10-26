@@ -37,11 +37,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
 import org.springframework.data.mapping.model.EntityInstantiators;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
+import org.springframework.data.redis.core.ValkeyKeyValueTemplate;
 import org.springframework.data.redis.core.convert.IndexResolver;
 import org.springframework.data.redis.core.convert.PathIndexResolver;
 import org.springframework.data.redis.repository.query.ExampleQueryMapper;
-import org.springframework.data.redis.repository.query.RedisOperationChain;
+import org.springframework.data.redis.repository.query.ValkeyOperationChain;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.data.repository.query.ListQueryByExampleExecutor;
@@ -52,7 +52,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Repository fragment implementing Redis {@link QueryByExampleExecutor Query-by-Example} operations.
+ * Repository fragment implementing Valkey {@link QueryByExampleExecutor Query-by-Example} operations.
  * <p>
  * This executor uses {@link ExampleQueryMapper} to map {@link Example}s into {@link KeyValueQuery} to execute its query
  * methods.
@@ -62,24 +62,24 @@ import org.springframework.util.Assert;
  * @since 2.1
  */
 @SuppressWarnings("unchecked")
-public class QueryByExampleRedisExecutor<T>
+public class QueryByExampleValkeyExecutor<T>
 		implements ListQueryByExampleExecutor<T>, BeanFactoryAware, BeanClassLoaderAware {
 
 	private final EntityInformation<T, ?> entityInformation;
-	private final RedisKeyValueTemplate keyValueTemplate;
+	private final ValkeyKeyValueTemplate keyValueTemplate;
 	private final ExampleQueryMapper mapper;
 	private final SpelAwareProxyProjectionFactory projectionFactory;
 	private final EntityInstantiators entityInstantiators = new EntityInstantiators();
 
 	/**
-	 * Create a new {@link QueryByExampleRedisExecutor} given {@link EntityInformation} and {@link RedisKeyValueTemplate}.
+	 * Create a new {@link QueryByExampleValkeyExecutor} given {@link EntityInformation} and {@link ValkeyKeyValueTemplate}.
 	 * This constructor uses the configured {@link IndexResolver} from the converter.
 	 *
 	 * @param entityInformation must not be {@literal null}.
 	 * @param keyValueTemplate must not be {@literal null}.
 	 */
-	public QueryByExampleRedisExecutor(EntityInformation<T, ?> entityInformation,
-			RedisKeyValueTemplate keyValueTemplate) {
+	public QueryByExampleValkeyExecutor(EntityInformation<T, ?> entityInformation,
+			ValkeyKeyValueTemplate keyValueTemplate) {
 
 		this(entityInformation, keyValueTemplate,
 				keyValueTemplate.getConverter().getIndexResolver() != null ? keyValueTemplate.getConverter().getIndexResolver()
@@ -87,16 +87,16 @@ public class QueryByExampleRedisExecutor<T>
 	}
 
 	/**
-	 * Create a new {@link QueryByExampleRedisExecutor} given {@link EntityInformation} and {@link RedisKeyValueTemplate}.
+	 * Create a new {@link QueryByExampleValkeyExecutor} given {@link EntityInformation} and {@link ValkeyKeyValueTemplate}.
 	 *
 	 * @param entityInformation must not be {@literal null}.
 	 * @param keyValueTemplate must not be {@literal null}.
 	 */
-	public QueryByExampleRedisExecutor(EntityInformation<T, ?> entityInformation, RedisKeyValueTemplate keyValueTemplate,
+	public QueryByExampleValkeyExecutor(EntityInformation<T, ?> entityInformation, ValkeyKeyValueTemplate keyValueTemplate,
 			IndexResolver indexResolver) {
 
 		Assert.notNull(entityInformation, "EntityInformation must not be null");
-		Assert.notNull(keyValueTemplate, "RedisKeyValueTemplate must not be null");
+		Assert.notNull(keyValueTemplate, "ValkeyKeyValueTemplate must not be null");
 		Assert.notNull(indexResolver, "IndexResolver must not be null");
 
 		this.entityInformation = entityInformation;
@@ -141,16 +141,16 @@ public class QueryByExampleRedisExecutor<T>
 
 	private <S extends T> Iterator<S> doFind(Example<S> example) {
 
-		RedisOperationChain operationChain = createQuery(example);
+		ValkeyOperationChain operationChain = createQuery(example);
 
-		KeyValueQuery<RedisOperationChain> query = new KeyValueQuery<>(operationChain);
+		KeyValueQuery<ValkeyOperationChain> query = new KeyValueQuery<>(operationChain);
 		return (Iterator<S>) keyValueTemplate.find(query.limit(2), entityInformation.getJavaType()).iterator();
 	}
 
 	@Override
 	public <S extends T> List<S> findAll(Example<S> example) {
 
-		RedisOperationChain operationChain = createQuery(example);
+		ValkeyOperationChain operationChain = createQuery(example);
 
 		Iterable<T> result = keyValueTemplate.find(new KeyValueQuery<>(operationChain), entityInformation.getJavaType());
 
@@ -167,9 +167,9 @@ public class QueryByExampleRedisExecutor<T>
 
 		Assert.notNull(pageable, "Pageable must not be null");
 
-		RedisOperationChain operationChain = createQuery(example);
+		ValkeyOperationChain operationChain = createQuery(example);
 
-		KeyValueQuery<RedisOperationChain> query = new KeyValueQuery<>(operationChain);
+		KeyValueQuery<ValkeyOperationChain> query = new KeyValueQuery<>(operationChain);
 		List<S> result = (List<S>) keyValueTemplate.find(
 				query.orderBy(pageable.getSort()).skip(pageable.getOffset()).limit(pageable.getPageSize()),
 				entityInformation.getJavaType());
@@ -182,7 +182,7 @@ public class QueryByExampleRedisExecutor<T>
 	@Override
 	public <S extends T> long count(Example<S> example) {
 
-		RedisOperationChain operationChain = createQuery(example);
+		ValkeyOperationChain operationChain = createQuery(example);
 
 		return keyValueTemplate.count(new KeyValueQuery<>(operationChain), entityInformation.getJavaType());
 	}
@@ -202,7 +202,7 @@ public class QueryByExampleRedisExecutor<T>
 		return queryFunction.apply(new FluentQueryByExample<>(example, example.getProbeType()));
 	}
 
-	private <S extends T> RedisOperationChain createQuery(Example<S> example) {
+	private <S extends T> ValkeyOperationChain createQuery(Example<S> example) {
 
 		Assert.notNull(example, "Example must not be null");
 
@@ -304,12 +304,12 @@ public class QueryByExampleRedisExecutor<T>
 
 		@Override
 		public long count() {
-			return QueryByExampleRedisExecutor.this.count(example);
+			return QueryByExampleValkeyExecutor.this.count(example);
 		}
 
 		@Override
 		public boolean exists() {
-			return QueryByExampleRedisExecutor.this.exists(example);
+			return QueryByExampleValkeyExecutor.this.exists(example);
 		}
 
 		private <P> Function<Object, P> getConversionFunction(Class<?> inputType, Class<P> targetType) {

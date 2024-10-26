@@ -18,19 +18,19 @@ This section contains details about migration steps, deprecations, and removals.
 |o.s.d.redis.VersionParser
 |-
 
-|o.s.d.redis.connection.RedisZSetCommands.Aggregate
+|o.s.d.redis.connection.ValkeyZSetCommands.Aggregate
 |o.s.d.redis.connection.zset.Aggregate
 
-|o.s.d.redis.connection.RedisZSetCommands.Tuple
+|o.s.d.redis.connection.ValkeyZSetCommands.Tuple
 |o.s.d.redis.connection.zset.Tuple
 
-|o.s.d.redis.connection.RedisZSetCommands.Weights
+|o.s.d.redis.connection.ValkeyZSetCommands.Weights
 |o.s.d.redis.connection.zset.Weights
 
-|o.s.d.redis.connection.RedisZSetCommands.Range
+|o.s.d.redis.connection.ValkeyZSetCommands.Range
 |o.s.d.domain.Range
 
-|o.s.d.redis.connection.RedisZSetCommands.Limit
+|o.s.d.redis.connection.ValkeyZSetCommands.Limit
 |o.s.d.redis.connection.Limit.java
 
 |o.s.d.redis.connection.jedis.JedisUtils
@@ -55,7 +55,7 @@ This section contains details about migration steps, deprecations, and removals.
 |open
 |-
 
-|o.s.d.redis.core.RedisTemplate
+|o.s.d.redis.core.ValkeyTemplate
 |execute
 |doWithKeys
 
@@ -69,7 +69,7 @@ This section contains details about migration steps, deprecations, and removals.
 
 |===
 
-.Redis Connection
+.Valkey Connection
 |===
 |Type |Method |Replacement
 
@@ -77,15 +77,15 @@ This section contains details about migration steps, deprecations, and removals.
 |getCauses
 |getSuppressed
 
-|o.s.d.redis.connection.RedisConnection
+|o.s.d.redis.connection.ValkeyConnection
 |bgWriteAof
 |bgReWriteAof
 
-|o.s.d.redis.connection.RedisConnection
+|o.s.d.redis.connection.ValkeyConnection
 |slaveOf
 |replicaOf
 
-|o.s.d.redis.connection.RedisConnection
+|o.s.d.redis.connection.ValkeyConnection
 |slaveOfNoOne
 |replicaOfNoOne
 
@@ -101,27 +101,27 @@ This section contains details about migration steps, deprecations, and removals.
 |getNewName
 |getNewKey
 
-|o.s.d.redis.connection.RedisClusterNode.Flag
+|o.s.d.redis.connection.ValkeyClusterNode.Flag
 |SLAVE
 |REPLICA
 
-|o.s.d.redis.connection.RedisClusterNode.Builder
+|o.s.d.redis.connection.ValkeyClusterNode.Builder
 |slaveOf
 |replicaOf
 
-|o.s.d.redis.connection.RedisNode
+|o.s.d.redis.connection.ValkeyNode
 |isSlave
 |isReplica
 
-|o.s.d.redis.connection.RedisSentinelCommands
+|o.s.d.redis.connection.ValkeySentinelCommands
 |slaves
 |replicas
 
-|o.s.d.redis.connection.RedisServer
+|o.s.d.redis.connection.ValkeyServer
 |getNumberSlaves
 |getNumberReplicas
 
-|o.s.d.redis.connection.RedisServerCommands
+|o.s.d.redis.connection.ValkeyServerCommands
 |slaveOf
 |replicaOf
 
@@ -129,13 +129,13 @@ This section contains details about migration steps, deprecations, and removals.
 |getSlaves
 |getReplicas
 
-|o.s.d.redis.core.RedisOperations
+|o.s.d.redis.core.ValkeyOperations
 |slaveOf
 |replicaOf
 
 |===
 
-.Redis Operations
+.Valkey Operations
 |===
 |Type |Method |Replacement
 
@@ -169,15 +169,15 @@ This section contains details about migration steps, deprecations, and removals.
 
 |===
 
-.Redis Cache
+.Valkey Cache
 |===
 |Type |Method |Replacement
 
-|o.s.d.redis.cache.RedisCacheConfiguration
+|o.s.d.redis.cache.ValkeyCacheConfiguration
 |prefixKeysWith
 |prefixCacheNameWith
 
-|o.s.d.redis.cache.RedisCacheConfiguration
+|o.s.d.redis.cache.ValkeyCacheConfiguration
 |getKeyPrefix
 |getKeyPrefixFor
 
@@ -188,7 +188,7 @@ This section contains details about migration steps, deprecations, and removals.
 
 Please read the Jedis https://github.com/redis/jedis/blob/v4.0.0/docs/3to4.md[upgrading guide] which covers important driver changes.
 
-.Jedis Redis Connection
+.Jedis Valkey Connection
 |===
 |Type |Method |Replacement
 
@@ -262,7 +262,7 @@ This effects methods on `LettuceConnectionFactory` and `LettuceConnection`.
 [[upgrading.2-to-3.lettuce.authentication]]
 ==== Lettuce Authentication
 
-`AuthenticatingRedisClient` has been removed without replacement.
-Please refer to the https://lettuce.io/core/release/reference/index.html#basic.redisuri[driver documentation] for `RedisURI` to set authentication data.
+`AuthenticatingValkeyClient` has been removed without replacement.
+Please refer to the https://lettuce.io/core/release/reference/index.html#basic.redisuri[driver documentation] for `ValkeyURI` to set authentication data.
 
 

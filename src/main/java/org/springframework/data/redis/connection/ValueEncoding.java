@@ -21,21 +21,21 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link ValueEncoding} is used for the Redis internal data representation used in order to store the value associated
+ * {@link ValueEncoding} is used for the Valkey internal data representation used in order to store the value associated
  * with a key. <br />
  * <dl>
  * <dt>Strings</dt>
- * <dd>{@link RedisValueEncoding#RAW} or {@link RedisValueEncoding#INT}</dd>
+ * <dd>{@link ValkeyValueEncoding#RAW} or {@link ValkeyValueEncoding#INT}</dd>
  * <dt>Lists</dt>
- * <dd>{@link RedisValueEncoding#ZIPLIST} or {@link RedisValueEncoding#LINKEDLIST}</dd>
+ * <dd>{@link ValkeyValueEncoding#ZIPLIST} or {@link ValkeyValueEncoding#LINKEDLIST}</dd>
  * <dt>Sets</dt>
- * <dd>{@link RedisValueEncoding#INTSET} or {@link RedisValueEncoding#HASHTABLE}</dd>
+ * <dd>{@link ValkeyValueEncoding#INTSET} or {@link ValkeyValueEncoding#HASHTABLE}</dd>
  * <dt>Hashes</dt>
- * <dd>{@link RedisValueEncoding#ZIPLIST} or {@link RedisValueEncoding#HASHTABLE}</dd>
+ * <dd>{@link ValkeyValueEncoding#ZIPLIST} or {@link ValkeyValueEncoding#HASHTABLE}</dd>
  * <dt>Sorted Sets</dt>
- * <dd>{@link RedisValueEncoding#ZIPLIST} or {@link RedisValueEncoding#SKIPLIST}</dd>
+ * <dd>{@link ValkeyValueEncoding#ZIPLIST} or {@link ValkeyValueEncoding#SKIPLIST}</dd>
  * <dt>Absent keys</dt>
- * <dd>{@link RedisValueEncoding#VACANT}</dd>
+ * <dd>{@link ValkeyValueEncoding#VACANT}</dd>
  * </dl>
  *
  * @author Christoph Strobl
@@ -53,16 +53,16 @@ public interface ValueEncoding {
 	 * @return never {@literal null}.
 	 */
 	static ValueEncoding of(@Nullable String encoding) {
-		return RedisValueEncoding.lookup(encoding).orElse(() -> encoding);
+		return ValkeyValueEncoding.lookup(encoding).orElse(() -> encoding);
 	}
 
 	/**
-	 * Default {@link ValueEncoding} implementation of encodings used in Redis.
+	 * Default {@link ValueEncoding} implementation of encodings used in Valkey.
 	 *
 	 * @author Christoph Strobl
 	 * @since 2.1
 	 */
-	enum RedisValueEncoding implements ValueEncoding {
+	enum ValkeyValueEncoding implements ValueEncoding {
 
 		/**
 		 * Normal string encoding.
@@ -99,7 +99,7 @@ public interface ValueEncoding {
 
 		private final @Nullable String raw;
 
-		RedisValueEncoding(@Nullable String raw) {
+		ValkeyValueEncoding(@Nullable String raw) {
 			this.raw = raw;
 		}
 

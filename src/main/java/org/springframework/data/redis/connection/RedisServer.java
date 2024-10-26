@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
  * @author Franjo Zilic
  * @since 1.4
  */
-public class RedisServer extends RedisNode {
+public class ValkeyServer extends ValkeyNode {
 
 	public static enum INFO {
 
@@ -63,23 +63,23 @@ public class RedisServer extends RedisNode {
 	private Properties properties;
 
 	/**
-	 * Creates a new {@link RedisServer} with the given {@code host}, {@code port}.
+	 * Creates a new {@link ValkeyServer} with the given {@code host}, {@code port}.
 	 *
 	 * @param host must not be {@literal null}
 	 * @param port
 	 */
-	public RedisServer(String host, int port) {
+	public ValkeyServer(String host, int port) {
 		this(host, port, new Properties());
 	}
 
 	/**
-	 * Creates a new {@link RedisServer} with the given {@code host}, {@code port} and {@code properties}.
+	 * Creates a new {@link ValkeyServer} with the given {@code host}, {@code port} and {@code properties}.
 	 *
 	 * @param host must not be {@literal null}
 	 * @param port
 	 * @param properties may be {@literal null}
 	 */
-	public RedisServer(String host, int port, Properties properties) {
+	public ValkeyServer(String host, int port, Properties properties) {
 
 		super(host, port);
 		this.properties = properties;
@@ -93,17 +93,17 @@ public class RedisServer extends RedisNode {
 	}
 
 	/**
-	 * Creates a new {@link RedisServer} from the given properties.
+	 * Creates a new {@link ValkeyServer} from the given properties.
 	 *
 	 * @param properties
 	 * @return
 	 */
-	public static RedisServer newServerFrom(Properties properties) {
+	public static ValkeyServer newServerFrom(Properties properties) {
 
 		String host = properties.getProperty(INFO.HOST.key, "127.0.0.1");
 		int port = Integer.parseInt(properties.getProperty(INFO.PORT.key, "26379"));
 
-		return new RedisServer(host, port, properties);
+		return new ValkeyServer(host, port, properties);
 	}
 
 	public void setQuorum(Long quorum) {

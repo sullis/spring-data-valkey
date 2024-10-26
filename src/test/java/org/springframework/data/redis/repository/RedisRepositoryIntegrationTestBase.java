@@ -41,7 +41,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.keyvalue.core.KeyValueTemplate;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.index.GeoIndexed;
 import org.springframework.data.redis.core.index.IndexConfiguration;
@@ -55,13 +55,13 @@ import org.springframework.data.util.Streamable;
 import org.springframework.lang.Nullable;
 
 /**
- * Base for testing Redis repository support in different configurations.
+ * Base for testing Valkey repository support in different configurations.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author John Blum
  */
-public abstract class RedisRepositoryIntegrationTestBase {
+public abstract class ValkeyRepositoryIntegrationTestBase {
 
 	@Autowired PersonRepository repo;
 	@Autowired CityRepository cityRepo;
@@ -668,7 +668,7 @@ public abstract class RedisRepositoryIntegrationTestBase {
 	public interface UserRepository extends CrudRepository<User, String> {}
 
 	/**
-	 * Custom Redis {@link IndexConfiguration} forcing index of {@link Person#lastname}.
+	 * Custom Valkey {@link IndexConfiguration} forcing index of {@link Person#lastname}.
 	 *
 	 * @author Christoph Strobl
 	 */
@@ -681,7 +681,7 @@ public abstract class RedisRepositoryIntegrationTestBase {
 	}
 
 	/**
-	 * Custom Redis {@link IndexConfiguration} forcing index of {@link Person#lastname}.
+	 * Custom Valkey {@link IndexConfiguration} forcing index of {@link Person#lastname}.
 	 *
 	 * @author Christoph Strobl
 	 */
@@ -693,7 +693,7 @@ public abstract class RedisRepositoryIntegrationTestBase {
 		}
 	}
 
-	@RedisHash("persons")
+	@ValkeyHash("persons")
 	public static class Person {
 
 		@Id String id;
@@ -883,7 +883,7 @@ public abstract class RedisRepositoryIntegrationTestBase {
 
 		public String toString() {
 
-			return "RedisRepositoryIntegrationTestBase.Immutable(id=" + this.getId() + ", name=" + this.getName()
+			return "ValkeyRepositoryIntegrationTestBase.Immutable(id=" + this.getId() + ", name=" + this.getName()
 					+ ", nested=" + this.getNested() + ")";
 		}
 
@@ -900,7 +900,7 @@ public abstract class RedisRepositoryIntegrationTestBase {
 		}
 	}
 
-	@RedisHash("Users")
+	@ValkeyHash("Users")
 	static class User {
 
 		@Id private final String name;

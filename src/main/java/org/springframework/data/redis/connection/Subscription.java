@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection;
 import java.util.Collection;
 
 /**
- * Subscription for Redis channels. Just like the underlying {@link RedisConnection}, it should not be used by multiple
+ * Subscription for Valkey channels. Just like the underlying {@link ValkeyConnection}, it should not be used by multiple
  * threads. Note that once a subscription died, it cannot accept any more subscriptions.
  *
  * @author Costin Leau
@@ -31,14 +31,14 @@ public interface Subscription {
 	 *
 	 * @param channels channel names. Must not be empty.
 	 */
-	void subscribe(byte[]... channels) throws RedisInvalidSubscriptionException;
+	void subscribe(byte[]... channels) throws ValkeyInvalidSubscriptionException;
 
 	/**
 	 * Adds the given channel patterns to the current subscription.
 	 *
 	 * @param patterns channel patterns. Must not be empty.
 	 */
-	void pSubscribe(byte[]... patterns) throws RedisInvalidSubscriptionException;
+	void pSubscribe(byte[]... patterns) throws ValkeyInvalidSubscriptionException;
 
 	/**
 	 * Cancels the current subscription for all channels given by name.

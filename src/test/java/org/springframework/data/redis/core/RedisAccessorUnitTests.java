@@ -27,21 +27,21 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 
 /**
- * Unit tests for {@link RedisAccessor}.
+ * Unit tests for {@link ValkeyAccessor}.
  *
  * @author John Blum
  */
-class RedisAccessorUnitTests {
+class ValkeyAccessorUnitTests {
 
 	@Test
 	void setAndGetConnectionFactory() {
 
-		RedisConnectionFactory mockConnectionFactory = mock(RedisConnectionFactory.class);
+		ValkeyConnectionFactory mockConnectionFactory = mock(ValkeyConnectionFactory.class);
 
-		RedisAccessor redisAccessor = new TestRedisAccessor();
+		ValkeyAccessor redisAccessor = new TestValkeyAccessor();
 
 		assertThat(redisAccessor.getConnectionFactory()).isNull();
 
@@ -61,17 +61,17 @@ class RedisAccessorUnitTests {
 	void getRequiredConnectionFactoryWhenNull() {
 
 		assertThatIllegalStateException()
-			.isThrownBy(() -> new TestRedisAccessor().getRequiredConnectionFactory())
-			.withMessage("RedisConnectionFactory is required")
+			.isThrownBy(() -> new TestValkeyAccessor().getRequiredConnectionFactory())
+			.withMessage("ValkeyConnectionFactory is required")
 			.withNoCause();
 	}
 
 	@Test
 	void afterPropertiesSetCallsGetRequiredConnectionFactory() {
 
-		RedisConnectionFactory mockConnectionFactory = mock(RedisConnectionFactory.class);
+		ValkeyConnectionFactory mockConnectionFactory = mock(ValkeyConnectionFactory.class);
 
-		RedisAccessor redisAccessor = spy(new TestRedisAccessor());
+		ValkeyAccessor redisAccessor = spy(new TestValkeyAccessor());
 
 		doReturn(mockConnectionFactory).when(redisAccessor).getRequiredConnectionFactory();
 
@@ -82,6 +82,6 @@ class RedisAccessorUnitTests {
 		verifyNoMoreInteractions(redisAccessor);
 	}
 
-	static class TestRedisAccessor extends RedisAccessor { }
+	static class TestValkeyAccessor extends ValkeyAccessor { }
 
 }

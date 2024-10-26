@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ClusterTopology} holds snapshot like information about {@link RedisClusterNode}s.
+ * {@link ClusterTopology} holds snapshot like information about {@link ValkeyClusterNode}s.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -34,23 +34,23 @@ import org.springframework.util.StringUtils;
  */
 public class ClusterTopology {
 
-	private final Set<RedisClusterNode> nodes;
+	private final Set<ValkeyClusterNode> nodes;
 
 	/**
 	 * Creates new instance of {@link ClusterTopology}.
 	 *
 	 * @param nodes can be {@literal null}.
 	 */
-	public ClusterTopology(@Nullable Set<RedisClusterNode> nodes) {
+	public ClusterTopology(@Nullable Set<ValkeyClusterNode> nodes) {
 		this.nodes = nodes != null ? nodes : Collections.emptySet();
 	}
 
 	/**
-	 * Get all {@link RedisClusterNode}s.
+	 * Get all {@link ValkeyClusterNode}s.
 	 *
 	 * @return never {@literal null}.
 	 */
-	public Set<RedisClusterNode> getNodes() {
+	public Set<ValkeyClusterNode> getNodes() {
 		return Collections.unmodifiableSet(nodes);
 	}
 
@@ -60,10 +60,10 @@ public class ClusterTopology {
 	 *
 	 * @return never {@literal null}.
 	 */
-	public Set<RedisClusterNode> getActiveNodes() {
+	public Set<ValkeyClusterNode> getActiveNodes() {
 
-		Set<RedisClusterNode> activeNodes = new LinkedHashSet<>(nodes.size());
-		for (RedisClusterNode node : nodes) {
+		Set<ValkeyClusterNode> activeNodes = new LinkedHashSet<>(nodes.size());
+		for (ValkeyClusterNode node : nodes) {
 			if (node.isConnected() && !node.isMarkedAsFail()) {
 				activeNodes.add(node);
 			}
@@ -77,10 +77,10 @@ public class ClusterTopology {
 	 *
 	 * @return never {@literal null}.
 	 */
-	public Set<RedisClusterNode> getActiveMasterNodes() {
+	public Set<ValkeyClusterNode> getActiveMasterNodes() {
 
-		Set<RedisClusterNode> activeMasterNodes = new LinkedHashSet<>(nodes.size());
-		for (RedisClusterNode node : nodes) {
+		Set<ValkeyClusterNode> activeMasterNodes = new LinkedHashSet<>(nodes.size());
+		for (ValkeyClusterNode node : nodes) {
 			if (node.isMaster() && node.isConnected() && !node.isMarkedAsFail()) {
 				activeMasterNodes.add(node);
 			}
@@ -93,10 +93,10 @@ public class ClusterTopology {
 	 *
 	 * @return never {@literal null}.
 	 */
-	public Set<RedisClusterNode> getMasterNodes() {
+	public Set<ValkeyClusterNode> getMasterNodes() {
 
-		Set<RedisClusterNode> masterNodes = new LinkedHashSet<>(nodes.size());
-		for (RedisClusterNode node : nodes) {
+		Set<ValkeyClusterNode> masterNodes = new LinkedHashSet<>(nodes.size());
+		for (ValkeyClusterNode node : nodes) {
 			if (node.isMaster()) {
 				masterNodes.add(node);
 			}
@@ -105,15 +105,15 @@ public class ClusterTopology {
 	}
 
 	/**
-	 * Get the {@link RedisClusterNode}s (master and replica) serving s specific slot.
+	 * Get the {@link ValkeyClusterNode}s (master and replica) serving s specific slot.
 	 *
 	 * @param slot
 	 * @return never {@literal null}.
 	 */
-	public Set<RedisClusterNode> getSlotServingNodes(int slot) {
+	public Set<ValkeyClusterNode> getSlotServingNodes(int slot) {
 
-		Set<RedisClusterNode> slotServingNodes = new LinkedHashSet<>(nodes.size());
-		for (RedisClusterNode node : nodes) {
+		Set<ValkeyClusterNode> slotServingNodes = new LinkedHashSet<>(nodes.size());
+		for (ValkeyClusterNode node : nodes) {
 			if (node.servesSlot(slot)) {
 				slotServingNodes.add(node);
 			}
@@ -122,19 +122,19 @@ public class ClusterTopology {
 	}
 
 	/**
-	 * Get the {@link RedisClusterNode} that is the current master serving the given key.
+	 * Get the {@link ValkeyClusterNode} that is the current master serving the given key.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @throws ClusterStateFailureException
 	 */
-	public RedisClusterNode getKeyServingMasterNode(byte[] key) {
+	public ValkeyClusterNode getKeyServingMasterNode(byte[] key) {
 
 		Assert.notNull(key, "Key for node lookup must not be null");
 
 		int slot = ClusterSlotHashUtil.calculateSlot(key);
 
-		for (RedisClusterNode node : nodes) {
+		for (ValkeyClusterNode node : nodes) {
 			if (node.isMaster() && node.servesSlot(slot)) {
 				return node;
 			}
@@ -145,16 +145,16 @@ public class ClusterTopology {
 	}
 
 	/**
-	 * Get the {@link RedisClusterNode} matching given {@literal host} and {@literal port}.
+	 * Get the {@link ValkeyClusterNode} matching given {@literal host} and {@literal port}.
 	 *
 	 * @param host must not be {@literal null}.
 	 * @param port
 	 * @return never {@literal null}.
 	 * @throws ClusterStateFailureException
 	 */
-	public RedisClusterNode lookup(String host, int port) {
+	public ValkeyClusterNode lookup(String host, int port) {
 
-		for (RedisClusterNode node : nodes) {
+		for (ValkeyClusterNode node : nodes) {
 			if (host.equals(node.getHost()) && (node.getPort() != null && port == node.getPort())) {
 				return node;
 			}
@@ -165,17 +165,17 @@ public class ClusterTopology {
 	}
 
 	/**
-	 * Get the {@link RedisClusterNode} matching given {@literal nodeId}.
+	 * Get the {@link ValkeyClusterNode} matching given {@literal nodeId}.
 	 *
 	 * @param nodeId must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @throws ClusterStateFailureException
 	 */
-	public RedisClusterNode lookup(String nodeId) {
+	public ValkeyClusterNode lookup(String nodeId) {
 
 		Assert.notNull(nodeId, "NodeId must not be null");
 
-		for (RedisClusterNode node : nodes) {
+		for (ValkeyClusterNode node : nodes) {
 			if (nodeId.equals(node.getId())) {
 				return node;
 			}
@@ -186,16 +186,16 @@ public class ClusterTopology {
 	}
 
 	/**
-	 * Get the {@link RedisClusterNode} matching matching either {@link RedisClusterNode#getHost() host} and
-	 * {@link RedisClusterNode#getPort() port} or {@link RedisClusterNode#getId() nodeId}
+	 * Get the {@link ValkeyClusterNode} matching matching either {@link ValkeyClusterNode#getHost() host} and
+	 * {@link ValkeyClusterNode#getPort() port} or {@link ValkeyClusterNode#getId() nodeId}
 	 *
 	 * @param node must not be {@literal null}
 	 * @return never {@literal null}.
 	 * @throws ClusterStateFailureException
 	 */
-	public RedisClusterNode lookup(RedisClusterNode node) {
+	public ValkeyClusterNode lookup(ValkeyClusterNode node) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 
 		if (nodes.contains(node) && node.hasValidHost() && StringUtils.hasText(node.getId())) {
 			return node;
@@ -217,7 +217,7 @@ public class ClusterTopology {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null}.
 	 */
-	public Set<RedisClusterNode> getKeyServingNodes(byte[] key) {
+	public Set<ValkeyClusterNode> getKeyServingNodes(byte[] key) {
 
 		Assert.notNull(key, "Key must not be null for Cluster Node lookup.");
 		return getSlotServingNodes(ClusterSlotHashUtil.calculateSlot(key));

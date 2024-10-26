@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
@@ -29,7 +29,7 @@ import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis stream specific operations bound to a certain key.
+ * Valkey stream specific operations bound to a certain key.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -44,7 +44,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param group name of the consumer group.
 	 * @param recordIds record Id's to acknowledge.
 	 * @return length of acknowledged records. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xack">Redis Documentation: XACK</a>
+	 * @see <a href="https://redis.io/commands/xack">Valkey Documentation: XACK</a>
 	 */
 	@Nullable
 	Long acknowledge(String group, String... recordIds);
@@ -54,7 +54,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param body record body.
 	 * @return the record Id. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xadd">Redis Documentation: XADD</a>
+	 * @see <a href="https://redis.io/commands/xadd">Valkey Documentation: XADD</a>
 	 */
 	@Nullable
 	RecordId add(Map<HK, HV> body);
@@ -65,7 +65,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param content record content as Map.
 	 * @param xAddOptions additional parameters for the {@literal XADD} call.
 	 * @return the record Id. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xadd">Redis Documentation: XADD</a>
+	 * @see <a href="https://redis.io/commands/xadd">Valkey Documentation: XADD</a>
 	 * @since 3.4
 	 */
 	@Nullable
@@ -77,7 +77,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param recordIds stream record Id's.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xdel">Redis Documentation: XDEL</a>
+	 * @see <a href="https://redis.io/commands/xdel">Valkey Documentation: XDEL</a>
 	 */
 	@Nullable
 	Long delete(String... recordIds);
@@ -114,7 +114,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * Get the length of a stream.
 	 *
 	 * @return length of the stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xlen">Redis Documentation: XLEN</a>
+	 * @see <a href="https://redis.io/commands/xlen">Valkey Documentation: XLEN</a>
 	 */
 	@Nullable
 	Long size();
@@ -124,7 +124,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param range must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	default List<MapRecord<K, HK, HV>> range(Range<String> range) {
@@ -137,7 +137,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrange">Redis Documentation: XRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrange">Valkey Documentation: XRANGE</a>
 	 */
 	@Nullable
 	List<MapRecord<K, HK, HV>> range(Range<String> range, Limit limit);
@@ -147,7 +147,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param readOffset the offset to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	default List<MapRecord<K, HK, HV>> read(ReadOffset readOffset) {
@@ -160,7 +160,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param readOptions read arguments.
 	 * @param readOffset the offset to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xread">Redis Documentation: XREAD</a>
+	 * @see <a href="https://redis.io/commands/xread">Valkey Documentation: XREAD</a>
 	 */
 	@Nullable
 	List<MapRecord<K, HK, HV>> read(StreamReadOptions readOptions, ReadOffset readOffset);
@@ -171,7 +171,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param consumer consumer/group.
 	 * @param readOffset the offset to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	default List<MapRecord<K, HK, HV>> read(Consumer consumer, ReadOffset readOffset) {
@@ -185,7 +185,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param readOptions read arguments.
 	 * @param readOffset the offset to read from.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xreadgroup">Redis Documentation: XREADGROUP</a>
+	 * @see <a href="https://redis.io/commands/xreadgroup">Valkey Documentation: XREADGROUP</a>
 	 */
 	@Nullable
 	List<MapRecord<K, HK, HV>> read(Consumer consumer, StreamReadOptions readOptions, ReadOffset readOffset);
@@ -195,7 +195,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param range must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	default List<MapRecord<K, HK, HV>> reverseRange(Range<String> range) {
@@ -208,7 +208,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
 	 * @return list with members of the resulting stream. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xrevrange">Redis Documentation: XREVRANGE</a>
+	 * @see <a href="https://redis.io/commands/xrevrange">Valkey Documentation: XREVRANGE</a>
 	 */
 	@Nullable
 	List<MapRecord<K, HK, HV>> reverseRange(Range<String> range, Limit limit);
@@ -218,7 +218,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 *
 	 * @param count length of the stream.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long trim(long count);
@@ -230,7 +230,7 @@ public interface BoundStreamOperations<K, HK, HV> {
 	 * @param approximateTrimming the trimming must be performed in a approximated way in order to maximize performances.
 	 * @return number of removed entries. {@literal null} when used in pipeline / transaction.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/xtrim">Redis Documentation: XTRIM</a>
+	 * @see <a href="https://redis.io/commands/xtrim">Valkey Documentation: XTRIM</a>
 	 */
 	@Nullable
 	Long trim(long count, boolean approximateTrimming);

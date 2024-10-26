@@ -23,22 +23,22 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoSearchCommandArgs;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoSearchStoreCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoSearchCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoSearchStoreCommandArgs;
 import org.springframework.data.redis.domain.geo.BoundingBox;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis operations for geo commands.
+ * Valkey operations for geo commands.
  *
  * @author Ninad Divadkar
  * @author Christoph Strobl
  * @author Mark Paluch
- * @see <a href="https://redis.io/commands#geo">Redis Documentation: Geo Commands</a>
+ * @see <a href="https://redis.io/commands#geo">Valkey Documentation: Geo Commands</a>
  * @since 1.8
  */
 public interface GeoOperations<K, M> {
@@ -51,7 +51,7 @@ public interface GeoOperations<K, M> {
 	 * @param member must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long add(K key, Point point, M member);
@@ -63,7 +63,7 @@ public interface GeoOperations<K, M> {
 	 * @param location must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long add(K key, GeoLocation<M> location);
@@ -75,7 +75,7 @@ public interface GeoOperations<K, M> {
 	 * @param memberCoordinateMap must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long add(K key, Map<M, Point> memberCoordinateMap);
@@ -87,7 +87,7 @@ public interface GeoOperations<K, M> {
 	 * @param locations must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long add(K key, Iterable<GeoLocation<M>> locations);
@@ -100,7 +100,7 @@ public interface GeoOperations<K, M> {
 	 * @param member2 must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	@Nullable
 	Distance distance(K key, M member1, M member2);
@@ -114,7 +114,7 @@ public interface GeoOperations<K, M> {
 	 * @param metric must not be {@literal null}.
 	 * @return can be {@literal null}.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	@Nullable
 	Distance distance(K key, M member1, M member2, Metric metric);
@@ -126,7 +126,7 @@ public interface GeoOperations<K, M> {
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	@Nullable
 	List<String> hash(K key, M... members);
@@ -138,7 +138,7 @@ public interface GeoOperations<K, M> {
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	@Nullable
 	List<Point> position(K key, M... members);
@@ -150,7 +150,7 @@ public interface GeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> radius(K key, Circle within);
@@ -163,7 +163,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> radius(K key, Circle within, GeoRadiusCommandArgs args);
@@ -177,7 +177,7 @@ public interface GeoOperations<K, M> {
 	 * @param radius
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> radius(K key, M member, double radius);
@@ -191,7 +191,7 @@ public interface GeoOperations<K, M> {
 	 * @param distance must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> radius(K key, M member, Distance distance);
@@ -206,7 +206,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.0
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> radius(K key, M member, Distance distance, GeoRadiusCommandArgs args);
@@ -229,7 +229,7 @@ public interface GeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<M>> search(K key, Circle within) {
@@ -246,7 +246,7 @@ public interface GeoOperations<K, M> {
 	 * @param radius must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference, Distance radius) {
@@ -263,7 +263,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference, Distance radius,
@@ -280,7 +280,7 @@ public interface GeoOperations<K, M> {
 	 * @param boundingBox must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference,
@@ -298,7 +298,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference, BoundingBox boundingBox,
@@ -316,7 +316,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<M>> search(K key, GeoReference<M> reference,
@@ -329,7 +329,7 @@ public interface GeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	default Long searchAndStore(K key, K destKey, Circle within) {
@@ -346,7 +346,7 @@ public interface GeoOperations<K, M> {
 	 * @param radius must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	default Long searchAndStore(K key, K destKey, GeoReference<M> reference, Distance radius) {
@@ -363,7 +363,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	default Long searchAndStore(K key, K destKey, GeoReference<M> reference, Distance radius,
@@ -380,7 +380,7 @@ public interface GeoOperations<K, M> {
 	 * @param boundingBox must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	default Long searchAndStore(K key, K destKey, GeoReference<M> reference, BoundingBox boundingBox) {
@@ -397,7 +397,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	default Long searchAndStore(K key, K destKey, GeoReference<M> reference, BoundingBox boundingBox,
@@ -415,7 +415,7 @@ public interface GeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null} unless used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	@Nullable
 	Long searchAndStore(K key, K destKey, GeoReference<M> reference, GeoShape geoPredicate,

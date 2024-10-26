@@ -26,20 +26,20 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.springframework.data.geo.GeoResults;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.serializer.SerializationUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Internal base class used by various RedisTemplate XXXOperations implementations.
+ * Internal base class used by various ValkeyTemplate XXXOperations implementations.
  *
  * @author Costin Leau
  * @author Jennifer Hickey
@@ -51,73 +51,73 @@ import org.springframework.util.CollectionUtils;
 abstract class AbstractOperations<K, V> {
 
 	// utility methods for the template internal methods
-	abstract class ValueDeserializingRedisCallback implements RedisCallback<V> {
+	abstract class ValueDeserializingValkeyCallback implements ValkeyCallback<V> {
 		private final Object key;
 
-		public ValueDeserializingRedisCallback(Object key) {
+		public ValueDeserializingValkeyCallback(Object key) {
 			this.key = key;
 		}
 
-		public final V doInRedis(RedisConnection connection) {
-			byte[] result = inRedis(rawKey(key), connection);
+		public final V doInValkey(ValkeyConnection connection) {
+			byte[] result = inValkey(rawKey(key), connection);
 			return deserializeValue(result);
 		}
 
 		@Nullable
-		protected abstract byte[] inRedis(byte[] rawKey, RedisConnection connection);
+		protected abstract byte[] inValkey(byte[] rawKey, ValkeyConnection connection);
 	}
 
-	private class FunctionalValueDeserializingRedisCallback extends ValueDeserializingRedisCallback {
+	private class FunctionalValueDeserializingValkeyCallback extends ValueDeserializingValkeyCallback {
 
-		private final BiFunction<RedisConnection, byte[], byte[]> function;
+		private final BiFunction<ValkeyConnection, byte[], byte[]> function;
 
-		public FunctionalValueDeserializingRedisCallback(Object key, BiFunction<RedisConnection, byte[], byte[]> function) {
+		public FunctionalValueDeserializingValkeyCallback(Object key, BiFunction<ValkeyConnection, byte[], byte[]> function) {
 			super(key);
 			this.function = function;
 		}
 
 		@Nullable
-		protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
+		protected byte[] inValkey(byte[] rawKey, ValkeyConnection connection) {
 			return function.apply(connection, rawKey);
 		}
 	}
 
-	final RedisTemplate<K, V> template;
+	final ValkeyTemplate<K, V> template;
 
-	AbstractOperations(RedisTemplate<K, V> template) {
+	AbstractOperations(ValkeyTemplate<K, V> template) {
 		this.template = template;
 	}
 
-	ValueDeserializingRedisCallback valueCallbackFor(Object key, BiFunction<RedisConnection, byte[], byte[]> function) {
-		return new FunctionalValueDeserializingRedisCallback(key, function);
+	ValueDeserializingValkeyCallback valueCallbackFor(Object key, BiFunction<ValkeyConnection, byte[], byte[]> function) {
+		return new FunctionalValueDeserializingValkeyCallback(key, function);
 	}
 
-	RedisSerializer keySerializer() {
+	ValkeySerializer keySerializer() {
 		return template.getKeySerializer();
 	}
 
-	RedisSerializer valueSerializer() {
+	ValkeySerializer valueSerializer() {
 		return template.getValueSerializer();
 	}
 
-	RedisSerializer hashKeySerializer() {
+	ValkeySerializer hashKeySerializer() {
 		return template.getHashKeySerializer();
 	}
 
-	RedisSerializer hashValueSerializer() {
+	ValkeySerializer hashValueSerializer() {
 		return template.getHashValueSerializer();
 	}
 
-	RedisSerializer stringSerializer() {
+	ValkeySerializer stringSerializer() {
 		return template.getStringSerializer();
 	}
 
 	@Nullable
-	<T> T execute(RedisCallback<T> callback) {
+	<T> T execute(ValkeyCallback<T> callback) {
 		return template.execute(callback, true);
 	}
 
-	public RedisOperations<K, V> getOperations() {
+	public ValkeyOperations<K, V> getOperations() {
 		return template;
 	}
 
@@ -418,6 +418,6 @@ abstract class AbstractOperations<K, V> {
 			return (GeoResults<GeoLocation<V>>) (Object) source;
 		}
 
-		return Converters.deserializingGeoResultsConverter((RedisSerializer<V>) valueSerializer()).convert(source);
+		return Converters.deserializingGeoResultsConverter((ValkeySerializer<V>) valueSerializer()).convert(source);
 	}
 }

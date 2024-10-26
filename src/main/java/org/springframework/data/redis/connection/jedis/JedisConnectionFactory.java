@@ -52,11 +52,11 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.redis.ExceptionTranslationStrategy;
 import org.springframework.data.redis.PassThroughExceptionTranslationStrategy;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.*;
-import org.springframework.data.redis.connection.RedisConfiguration.SentinelConfiguration;
-import org.springframework.data.redis.connection.RedisConfiguration.WithDatabaseIndex;
-import org.springframework.data.redis.connection.RedisConfiguration.WithPassword;
+import org.springframework.data.redis.connection.ValkeyConfiguration.SentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithDatabaseIndex;
+import org.springframework.data.redis.connection.ValkeyConfiguration.WithPassword;
 import org.springframework.data.redis.connection.jedis.JedisClusterConnection.JedisClusterTopologyProvider;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -70,9 +70,9 @@ import org.springframework.util.ObjectUtils;
  * {@link JedisConnectionFactory} should be configured using an environmental configuration and the
  * {@link JedisClientConfiguration client configuration}. Jedis supports the following environmental configurations:
  * <ul>
- * <li>{@link RedisStandaloneConfiguration}</li>
- * <li>{@link RedisSentinelConfiguration}</li>
- * <li>{@link RedisClusterConfiguration}</li>
+ * <li>{@link ValkeyStandaloneConfiguration}</li>
+ * <li>{@link ValkeySentinelConfiguration}</li>
+ * <li>{@link ValkeyClusterConfiguration}</li>
  * </ul>
  * <p>
  * This connection factory implements {@link InitializingBean} and {@link SmartLifecycle} for flexible lifecycle
@@ -97,7 +97,7 @@ import org.springframework.util.ObjectUtils;
  * @see Jedis
  */
 public class JedisConnectionFactory
-		implements RedisConnectionFactory, InitializingBean, DisposableBean, SmartLifecycle {
+		implements ValkeyConnectionFactory, InitializingBean, DisposableBean, SmartLifecycle {
 
 	private static final Log log = LogFactory.getLog(JedisConnectionFactory.class);
 
@@ -125,9 +125,9 @@ public class JedisConnectionFactory
 
 	private @Nullable Pool<Jedis> pool;
 
-	private @Nullable RedisConfiguration configuration;
+	private @Nullable ValkeyConfiguration configuration;
 
-	private RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration("localhost",
+	private ValkeyStandaloneConfiguration standaloneConfig = new ValkeyStandaloneConfiguration("localhost",
 			Protocol.DEFAULT_PORT);
 
 	/**
@@ -163,48 +163,48 @@ public class JedisConnectionFactory
 	 * @param poolConfig pool configuration
 	 */
 	public JedisConnectionFactory(JedisPoolConfig poolConfig) {
-		this((RedisSentinelConfiguration) null, poolConfig);
+		this((ValkeySentinelConfiguration) null, poolConfig);
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisClusterConfiguration} applied
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeyClusterConfiguration} applied
 	 * to create a {@link JedisCluster}.
 	 *
 	 * @param clusterConfiguration must not be {@literal null}.
 	 * @since 1.7
 	 */
-	public JedisConnectionFactory(RedisClusterConfiguration clusterConfiguration) {
+	public JedisConnectionFactory(ValkeyClusterConfiguration clusterConfiguration) {
 		this(clusterConfiguration, new MutableJedisClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisClusterConfiguration} and
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeyClusterConfiguration} and
 	 * {@link JedisClientConfiguration}.
 	 *
 	 * @param clusterConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public JedisConnectionFactory(RedisClusterConfiguration clusterConfiguration,
+	public JedisConnectionFactory(ValkeyClusterConfiguration clusterConfiguration,
 			JedisClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(clusterConfiguration, "RedisClusterConfiguration must not be null");
+		Assert.notNull(clusterConfiguration, "ValkeyClusterConfiguration must not be null");
 
 		this.configuration = clusterConfiguration;
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisClusterConfiguration} applied
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeyClusterConfiguration} applied
 	 * to create a {@link JedisCluster}.
 	 *
 	 * @param clusterConfiguration must not be {@literal null}.
 	 * @since 1.7
 	 */
-	public JedisConnectionFactory(RedisClusterConfiguration clusterConfiguration, JedisPoolConfig poolConfig) {
+	public JedisConnectionFactory(ValkeyClusterConfiguration clusterConfiguration, JedisPoolConfig poolConfig) {
 
-		Assert.notNull(clusterConfiguration, "RedisClusterConfiguration must not be null");
+		Assert.notNull(clusterConfiguration, "ValkeyClusterConfiguration must not be null");
 
 		this.configuration = clusterConfiguration;
 		this.clientConfiguration = MutableJedisClientConfiguration.create(poolConfig);
@@ -217,24 +217,24 @@ public class JedisConnectionFactory
 	 * @param sentinelConfiguration must not be {@literal null}.
 	 * @since 1.4
 	 */
-	public JedisConnectionFactory(RedisSentinelConfiguration sentinelConfiguration) {
+	public JedisConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration) {
 		this(sentinelConfiguration, new MutableJedisClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisSentinelConfiguration} and
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeySentinelConfiguration} and
 	 * {@link JedisClientConfiguration}.
 	 *
 	 * @param sentinelConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public JedisConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
+	public JedisConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration,
 			JedisClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(sentinelConfiguration, "RedisSentinelConfiguration must not be null");
+		Assert.notNull(sentinelConfiguration, "ValkeySentinelConfiguration must not be null");
 
 		this.configuration = sentinelConfiguration;
 	}
@@ -247,7 +247,7 @@ public class JedisConnectionFactory
 	 * @param poolConfig pool configuration. Defaulted to new instance if {@literal null}.
 	 * @since 1.4
 	 */
-	public JedisConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
+	public JedisConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration,
 			@Nullable JedisPoolConfig poolConfig) {
 
 		this.configuration = sentinelConfiguration;
@@ -256,29 +256,29 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisStandaloneConfiguration}.
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeyStandaloneConfiguration}.
 	 *
 	 * @param standaloneConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public JedisConnectionFactory(RedisStandaloneConfiguration standaloneConfiguration) {
+	public JedisConnectionFactory(ValkeyStandaloneConfiguration standaloneConfiguration) {
 		this(standaloneConfiguration, new MutableJedisClientConfiguration());
 	}
 
 	/**
-	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link RedisStandaloneConfiguration} and
+	 * Constructs a new {@link JedisConnectionFactory} instance using the given {@link ValkeyStandaloneConfiguration} and
 	 * {@link JedisClientConfiguration}.
 	 *
 	 * @param standaloneConfiguration must not be {@literal null}.
 	 * @param clientConfiguration must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public JedisConnectionFactory(RedisStandaloneConfiguration standaloneConfiguration,
+	public JedisConnectionFactory(ValkeyStandaloneConfiguration standaloneConfiguration,
 			JedisClientConfiguration clientConfiguration) {
 
 		this(clientConfiguration);
 
-		Assert.notNull(standaloneConfiguration, "RedisStandaloneConfiguration must not be null");
+		Assert.notNull(standaloneConfiguration, "ValkeyStandaloneConfiguration must not be null");
 
 		this.standaloneConfig = standaloneConfiguration;
 	}
@@ -306,7 +306,7 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Returns the Redis hostname.
+	 * Returns the Valkey hostname.
 	 *
 	 * @return the hostName.
 	 */
@@ -315,10 +315,10 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Sets the Redis hostname.
+	 * Sets the Valkey hostname.
 	 *
 	 * @param hostName the hostname to set.
-	 * @deprecated since 2.0, configure the hostname using {@link RedisStandaloneConfiguration}.
+	 * @deprecated since 2.0, configure the hostname using {@link ValkeyStandaloneConfiguration}.
 	 */
 	@Deprecated
 	public void setHostName(String hostName) {
@@ -349,57 +349,57 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Returns the password used for authenticating with the Redis server.
+	 * Returns the password used for authenticating with the Valkey server.
 	 *
 	 * @return password for authentication.
 	 */
 	@Nullable
 	public String getPassword() {
-		return getRedisPassword().map(String::new).orElse(null);
+		return getValkeyPassword().map(String::new).orElse(null);
 	}
 
 	@Nullable
-	private String getRedisUsername() {
-		return RedisConfiguration.getUsernameOrElse(this.configuration, standaloneConfig::getUsername);
+	private String getValkeyUsername() {
+		return ValkeyConfiguration.getUsernameOrElse(this.configuration, standaloneConfig::getUsername);
 	}
 
-	private RedisPassword getRedisPassword() {
-		return RedisConfiguration.getPasswordOrElse(this.configuration, standaloneConfig::getPassword);
+	private ValkeyPassword getValkeyPassword() {
+		return ValkeyConfiguration.getPasswordOrElse(this.configuration, standaloneConfig::getPassword);
 	}
 
 	/**
-	 * Sets the password used for authenticating with the Redis server.
+	 * Sets the password used for authenticating with the Valkey server.
 	 *
 	 * @param password the password to set.
-	 * @deprecated since 2.0, configure the password using {@link RedisStandaloneConfiguration},
-	 *             {@link RedisSentinelConfiguration} or {@link RedisClusterConfiguration}.
+	 * @deprecated since 2.0, configure the password using {@link ValkeyStandaloneConfiguration},
+	 *             {@link ValkeySentinelConfiguration} or {@link ValkeyClusterConfiguration}.
 	 */
 	@Deprecated
 	public void setPassword(String password) {
 
-		if (RedisConfiguration.isAuthenticationAware(configuration)) {
+		if (ValkeyConfiguration.isAuthenticationAware(configuration)) {
 
 			((WithPassword) configuration).setPassword(password);
 			return;
 		}
 
-		standaloneConfig.setPassword(RedisPassword.of(password));
+		standaloneConfig.setPassword(ValkeyPassword.of(password));
 	}
 
 	/**
-	 * Returns the port used to connect to the Redis instance.
+	 * Returns the port used to connect to the Valkey instance.
 	 *
-	 * @return the Redis port.
+	 * @return the Valkey port.
 	 */
 	public int getPort() {
 		return standaloneConfig.getPort();
 	}
 
 	/**
-	 * Sets the port used to connect to the Redis instance.
+	 * Sets the port used to connect to the Valkey instance.
 	 *
-	 * @param port the Redis port.
-	 * @deprecated since 2.0, configure the port using {@link RedisStandaloneConfiguration}.
+	 * @param port the Valkey port.
+	 * @deprecated since 2.0, configure the port using {@link ValkeyStandaloneConfiguration}.
 	 */
 	@Deprecated
 	public void setPort(int port) {
@@ -432,14 +432,14 @@ public class JedisConnectionFactory
 	/**
 	 * Indicates the use of a connection pool.
 	 * <p>
-	 * Applies only to single node Redis. Sentinel and Cluster modes use always connection-pooling regardless of the
+	 * Applies only to single node Valkey. Sentinel and Cluster modes use always connection-pooling regardless of the
 	 * pooling setting.
 	 *
 	 * @return the use of connection pooling.
 	 */
 	public boolean getUsePool() {
 		// Jedis Sentinel cannot operate without a pool.
-		return isRedisSentinelAware() || getClientConfiguration().isUsePooling();
+		return isValkeySentinelAware() || getClientConfiguration().isUsePooling();
 	}
 
 	/**
@@ -449,13 +449,13 @@ public class JedisConnectionFactory
 	 * @deprecated since 2.0, configure pooling usage with {@link JedisClientConfiguration}.
 	 * @throws IllegalStateException if {@link JedisClientConfiguration} is immutable.
 	 * @throws IllegalStateException if configured to use sentinel and {@code usePool} is {@literal false} as Jedis
-	 *           requires pooling for Redis sentinel use.
+	 *           requires pooling for Valkey sentinel use.
 	 */
 	@Deprecated
 	public void setUsePool(boolean usePool) {
 
-		if (isRedisSentinelAware() && !usePool) {
-			throw new IllegalStateException("Jedis requires pooling for Redis Sentinel use");
+		if (isValkeySentinelAware() && !usePool) {
+			throw new IllegalStateException("Jedis requires pooling for Valkey Sentinel use");
 		}
 
 		getMutableConfiguration().setUsePooling(usePool);
@@ -489,22 +489,22 @@ public class JedisConnectionFactory
 	 * @return the database index.
 	 */
 	public int getDatabase() {
-		return RedisConfiguration.getDatabaseOrElse(configuration, standaloneConfig::getDatabase);
+		return ValkeyConfiguration.getDatabaseOrElse(configuration, standaloneConfig::getDatabase);
 	}
 
 	/**
 	 * Sets the index of the database used by this connection factory. Default is 0.
 	 *
 	 * @param index database index.
-	 * @deprecated since 2.0, configure the database index using {@link RedisStandaloneConfiguration} or
-	 *             {@link RedisSentinelConfiguration}.
+	 * @deprecated since 2.0, configure the database index using {@link ValkeyStandaloneConfiguration} or
+	 *             {@link ValkeySentinelConfiguration}.
 	 */
 	@Deprecated
 	public void setDatabase(int index) {
 
 		Assert.isTrue(index >= 0, "invalid DB index (a positive index required)");
 
-		if (RedisConfiguration.isDatabaseIndexAware(configuration)) {
+		if (ValkeyConfiguration.isDatabaseIndexAware(configuration)) {
 
 			((WithDatabaseIndex) configuration).setDatabase(index);
 			return;
@@ -546,31 +546,31 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * @return the {@link RedisStandaloneConfiguration}.
+	 * @return the {@link ValkeyStandaloneConfiguration}.
 	 * @since 2.0
 	 */
 	@Nullable
-	public RedisStandaloneConfiguration getStandaloneConfiguration() {
+	public ValkeyStandaloneConfiguration getStandaloneConfiguration() {
 		return this.standaloneConfig;
 	}
 
 	/**
-	 * @return the {@link RedisStandaloneConfiguration}, may be {@literal null}.
+	 * @return the {@link ValkeyStandaloneConfiguration}, may be {@literal null}.
 	 * @since 2.0
 	 */
 	@Nullable
-	public RedisSentinelConfiguration getSentinelConfiguration() {
-		return RedisConfiguration.isSentinelConfiguration(configuration) ? (RedisSentinelConfiguration) configuration
+	public ValkeySentinelConfiguration getSentinelConfiguration() {
+		return ValkeyConfiguration.isSentinelConfiguration(configuration) ? (ValkeySentinelConfiguration) configuration
 				: null;
 	}
 
 	/**
-	 * @return the {@link RedisClusterConfiguration}, may be {@literal null}.
+	 * @return the {@link ValkeyClusterConfiguration}, may be {@literal null}.
 	 * @since 2.0
 	 */
 	@Nullable
-	public RedisClusterConfiguration getClusterConfiguration() {
-		return RedisConfiguration.isClusterConfiguration(configuration) ? (RedisClusterConfiguration) configuration : null;
+	public ValkeyClusterConfiguration getClusterConfiguration() {
+		return ValkeyConfiguration.isClusterConfiguration(configuration) ? (ValkeyClusterConfiguration) configuration : null;
 	}
 
 	@Override
@@ -601,7 +601,7 @@ public class JedisConnectionFactory
 	 * the containing ApplicationContext gets refreshed.
 	 * <p>
 	 * This connection factory defaults to early auto-startup during {@link #afterPropertiesSet()} and can potentially
-	 * create Redis connections early on in the lifecycle. See {@link #setEarlyStartup(boolean)} for delaying connection
+	 * create Valkey connections early on in the lifecycle. See {@link #setEarlyStartup(boolean)} for delaying connection
 	 * creation to the ApplicationContext refresh if auto-startup is enabled.
 	 *
 	 * @param autoStartup {@literal true} to automatically {@link #start()} the connection factory; {@literal false}
@@ -626,7 +626,7 @@ public class JedisConnectionFactory
 	 * Configure if this InitializingBean's component Lifecycle should get started early by {@link #afterPropertiesSet()}
 	 * at the time that the bean is initialized. The component defaults to auto-startup.
 	 * <p>
-	 * This method is related to {@link #setAutoStartup(boolean) auto-startup} and can be used to delay Redis client
+	 * This method is related to {@link #setAutoStartup(boolean) auto-startup} and can be used to delay Valkey client
 	 * startup until the ApplicationContext refresh. Disabling early startup does not disable auto-startup.
 	 *
 	 * @param earlyStartup {@literal true} to early {@link #start()} the component; {@literal false} otherwise.
@@ -662,32 +662,32 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * @return true when {@link RedisSentinelConfiguration} is present.
+	 * @return true when {@link ValkeySentinelConfiguration} is present.
 	 * @since 1.4
 	 */
-	public boolean isRedisSentinelAware() {
-		return RedisConfiguration.isSentinelConfiguration(configuration);
+	public boolean isValkeySentinelAware() {
+		return ValkeyConfiguration.isSentinelConfiguration(configuration);
 	}
 
 	/**
-	 * @return true when {@link RedisClusterConfiguration} is present.
+	 * @return true when {@link ValkeyClusterConfiguration} is present.
 	 * @since 2.0
 	 */
-	public boolean isRedisClusterAware() {
-		return RedisConfiguration.isClusterConfiguration(configuration);
+	public boolean isValkeyClusterAware() {
+		return ValkeyConfiguration.isClusterConfiguration(configuration);
 	}
 
 	@Override
 	public void afterPropertiesSet() {
 
-		this.clientConfig = createClientConfig(getDatabase(), getRedisUsername(), getRedisPassword());
+		this.clientConfig = createClientConfig(getDatabase(), getValkeyUsername(), getValkeyPassword());
 
 		if (isEarlyStartup()) {
 			start();
 		}
 	}
 
-	private JedisClientConfig createClientConfig(int database, @Nullable String username, RedisPassword password) {
+	private JedisClientConfig createClientConfig(int database, @Nullable String username, ValkeyPassword password) {
 
 		DefaultJedisClientConfig.Builder builder = DefaultJedisClientConfig.builder();
 
@@ -728,11 +728,11 @@ public class JedisConnectionFactory
 
 		if (isCreatedOrStopped(current)) {
 
-			if (getUsePool() && !isRedisClusterAware()) {
+			if (getUsePool() && !isValkeyClusterAware()) {
 				this.pool = createPool();
 			}
 
-			if (isRedisClusterAware()) {
+			if (isValkeyClusterAware()) {
 
 				this.cluster = createCluster(getClusterConfiguration(), getPoolConfig());
 				this.topologyProvider = createTopologyProvider(this.cluster);
@@ -754,7 +754,7 @@ public class JedisConnectionFactory
 
 		if (this.state.compareAndSet(State.STARTED, State.STOPPING)) {
 
-			if (getUsePool() && !isRedisClusterAware()) {
+			if (getUsePool() && !isValkeyClusterAware()) {
 				if (this.pool != null) {
 					try {
 						this.pool.close();
@@ -799,20 +799,20 @@ public class JedisConnectionFactory
 
 	private Pool<Jedis> createPool() {
 
-		if (isRedisSentinelAware()) {
-			return createRedisSentinelPool(getSentinelConfiguration());
+		if (isValkeySentinelAware()) {
+			return createValkeySentinelPool(getSentinelConfiguration());
 		}
-		return createRedisPool();
+		return createValkeyPool();
 	}
 
 	/**
 	 * Creates {@link JedisSentinelPool}.
 	 *
-	 * @param config the actual {@link RedisSentinelConfiguration}. Never {@literal null}.
+	 * @param config the actual {@link ValkeySentinelConfiguration}. Never {@literal null}.
 	 * @return the {@link Pool} to use. Never {@literal null}.
 	 * @since 1.4
 	 */
-	protected Pool<Jedis> createRedisSentinelPool(RedisSentinelConfiguration config) {
+	protected Pool<Jedis> createValkeySentinelPool(ValkeySentinelConfiguration config) {
 
 		GenericObjectPoolConfig<Jedis> poolConfig = getPoolConfig() != null ? getPoolConfig() : new JedisPoolConfig();
 
@@ -828,7 +828,7 @@ public class JedisConnectionFactory
 	 * @return the {@link Pool} to use. Never {@literal null}.
 	 * @since 1.4
 	 */
-	protected Pool<Jedis> createRedisPool() {
+	protected Pool<Jedis> createValkeyPool() {
 		return new JedisPool(getPoolConfig(), new HostAndPort(getHostName(), getPort()), this.clientConfig);
 	}
 
@@ -846,21 +846,21 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Creates {@link JedisCluster} for given {@link RedisClusterConfiguration} and {@link GenericObjectPoolConfig}.
+	 * Creates {@link JedisCluster} for given {@link ValkeyClusterConfiguration} and {@link GenericObjectPoolConfig}.
 	 *
 	 * @param clusterConfig must not be {@literal null}.
 	 * @param poolConfig can be {@literal null}.
 	 * @return the actual {@link JedisCluster}.
 	 * @since 1.7
 	 */
-	protected JedisCluster createCluster(RedisClusterConfiguration clusterConfig,
+	protected JedisCluster createCluster(ValkeyClusterConfiguration clusterConfig,
 			GenericObjectPoolConfig<Connection> poolConfig) {
 
 		Assert.notNull(clusterConfig, "Cluster configuration must not be null");
 
 		Set<HostAndPort> hostAndPort = new HashSet<>();
 
-		for (RedisNode node : clusterConfig.getClusterNodes()) {
+		for (ValkeyNode node : clusterConfig.getClusterNodes()) {
 			hostAndPort.add(new HostAndPort(node.getHost(), node.getPort()));
 		}
 
@@ -877,11 +877,11 @@ public class JedisConnectionFactory
 	}
 
 	@Override
-	public RedisConnection getConnection() {
+	public ValkeyConnection getConnection() {
 
 		assertInitialized();
 
-		if (isRedisClusterAware()) {
+		if (isValkeyClusterAware()) {
 			return getClusterConnection();
 		}
 
@@ -903,10 +903,10 @@ public class JedisConnectionFactory
 	}
 
 	/**
-	 * Returns a Jedis instance to be used as a Redis connection. The instance can be newly created or retrieved from a
+	 * Returns a Jedis instance to be used as a Valkey connection. The instance can be newly created or retrieved from a
 	 * pool.
 	 *
-	 * @return Jedis instance ready for wrapping into a {@link RedisConnection}.
+	 * @return Jedis instance ready for wrapping into a {@link ValkeyConnection}.
 	 */
 	protected Jedis fetchJedisConnector() {
 
@@ -923,7 +923,7 @@ public class JedisConnectionFactory
 
 			return jedis;
 		} catch (Exception ex) {
-			throw new RedisConnectionFailureException("Cannot get Jedis connection", ex);
+			throw new ValkeyConnectionFailureException("Cannot get Jedis connection", ex);
 		}
 	}
 
@@ -943,11 +943,11 @@ public class JedisConnectionFactory
 	}
 
 	@Override
-	public RedisClusterConnection getClusterConnection() {
+	public ValkeyClusterConnection getClusterConnection() {
 
 		assertInitialized();
 
-		if (!isRedisClusterAware()) {
+		if (!isValkeyClusterAware()) {
 			throw new InvalidDataAccessApiUsageException("Cluster is not configured");
 		}
 
@@ -975,11 +975,11 @@ public class JedisConnectionFactory
 	}
 
 	@Override
-	public RedisSentinelConnection getSentinelConnection() {
+	public ValkeySentinelConnection getSentinelConnection() {
 
 		assertInitialized();
 
-		if (!isRedisSentinelAware()) {
+		if (!isValkeySentinelAware()) {
 			throw new InvalidDataAccessResourceUsageException("No Sentinels configured");
 		}
 
@@ -988,11 +988,11 @@ public class JedisConnectionFactory
 
 	private Jedis getActiveSentinel() {
 
-		Assert.isTrue(RedisConfiguration.isSentinelConfiguration(configuration), "SentinelConfig must not be null");
+		Assert.isTrue(ValkeyConfiguration.isSentinelConfiguration(configuration), "SentinelConfig must not be null");
 		SentinelConfiguration sentinelConfiguration = (SentinelConfiguration) configuration;
 
 		JedisClientConfig clientConfig = createSentinelClientConfig(sentinelConfiguration);
-		for (RedisNode node : sentinelConfiguration.getSentinels()) {
+		for (ValkeyNode node : sentinelConfiguration.getSentinels()) {
 
 			Jedis jedis = null;
 			boolean success = false;
@@ -1016,14 +1016,14 @@ public class JedisConnectionFactory
 		throw new InvalidDataAccessResourceUsageException("No Sentinel found");
 	}
 
-	private static Set<HostAndPort> convertToJedisSentinelSet(Collection<RedisNode> nodes) {
+	private static Set<HostAndPort> convertToJedisSentinelSet(Collection<ValkeyNode> nodes) {
 
 		if (CollectionUtils.isEmpty(nodes)) {
 			return Collections.emptySet();
 		}
 
 		Set<HostAndPort> convertedNodes = new LinkedHashSet<>(nodes.size());
-		for (RedisNode node : nodes) {
+		for (ValkeyNode node : nodes) {
 			if (node != null) {
 				convertedNodes.add(new HostAndPort(node.getHost(), node.getPort()));
 			}

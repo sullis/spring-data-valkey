@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 
 /**
  * {@link CacheKeyPrefix} is a callback hook for creating custom prefixes prepended to the actual {@literal key}
- * stored in Redis.
+ * stored in Valkey.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -37,11 +37,11 @@ public interface CacheKeyPrefix {
 	String SEPARATOR = "::";
 
 	/**
-	 * Compute the {@link String prefix} for the actual {@literal cache key} stored in Redis.
+	 * Compute the {@link String prefix} for the actual {@literal cache key} stored in Valkey.
 	 *
 	 * @param cacheName {@link String name} of the cache in which the key is stored;
 	 * will never be {@literal null}.
-	 * @return the computed {@link String prefix} of the {@literal cache key} stored in Redis;
+	 * @return the computed {@link String prefix} of the {@literal cache key} stored in Valkey;
 	 * never {@literal null}.
 	 */
 	String compute(String cacheName);

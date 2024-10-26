@@ -27,35 +27,35 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyCallback;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
- * Base test for Redis collections.
+ * Base test for Valkey collections.
  *
  * @author Costin Leau
  * @author Mark Paluch
  */
 @MethodSource("testParams")
-public abstract class AbstractRedisCollectionIntegrationTests<T> {
+public abstract class AbstractValkeyCollectionIntegrationTests<T> {
 
-	protected AbstractRedisCollection<T> collection;
+	protected AbstractValkeyCollection<T> collection;
 	protected ObjectFactory<T> factory;
-	@SuppressWarnings("rawtypes") protected RedisTemplate template;
+	@SuppressWarnings("rawtypes") protected ValkeyTemplate template;
 
 	@BeforeEach
 	public void setUp() throws Exception {
 		collection = createCollection();
 	}
 
-	abstract AbstractRedisCollection<T> createCollection();
+	abstract AbstractValkeyCollection<T> createCollection();
 
-	abstract RedisStore copyStore(RedisStore store);
+	abstract ValkeyStore copyStore(ValkeyStore store);
 
 	@SuppressWarnings("rawtypes")
-	AbstractRedisCollectionIntegrationTests(ObjectFactory<T> factory, RedisTemplate template) {
+	AbstractValkeyCollectionIntegrationTests(ObjectFactory<T> factory, ValkeyTemplate template) {
 		this.factory = factory;
 		this.template = template;
 	}
@@ -78,13 +78,13 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	void tearDown() throws Exception {
 		// remove the collection entirely since clear() doesn't always work
 		collection.getOperations().delete(Collections.singleton(collection.getKey()));
-		template.execute((RedisCallback<Object>) connection -> {
+		template.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testAdd() {
 		T t1 = getT();
 		assertThat(collection.add(t1)).isTrue();
@@ -93,7 +93,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddAll() {
 		T t1 = getT();
 		T t2 = getT();
@@ -108,7 +108,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(3).isEqualTo(collection.size());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testClear() {
 		T t1 = getT();
 		assertThat(collection).isEmpty();
@@ -118,7 +118,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(collection).isEmpty();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainsObject() {
 		T t1 = getT();
 		assertThat(collection).doesNotContain(t1);
@@ -127,7 +127,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testContainsAll() {
 		T t1 = getT();
 		T t2 = getT();
@@ -140,17 +140,17 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(collection).contains(t1, t2, t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testEquals() {
 		// assertEquals(collection, copyStore(collection));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testHashCode() {
 		assertThat(collection.hashCode()).isNotEqualTo(collection.getKey().hashCode());
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIsEmpty() {
 		assertThat(collection).isEmpty();
 		assertThat(collection.isEmpty()).isTrue();
@@ -162,7 +162,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testIterator() {
 		T t1 = getT();
 		T t2 = getT();
@@ -181,7 +181,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(iterator.hasNext()).isFalse();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveObject() {
 		T t1 = getT();
 		T t2 = getT();
@@ -200,7 +200,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void removeAll() {
 		T t1 = getT();
 		T t2 = getT();
@@ -223,7 +223,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(collection).doesNotContain(t2, t3);
 	}
 
-	// @ParameterizedRedisTest(expected = UnsupportedOperationException.class)
+	// @ParameterizedValkeyTest(expected = UnsupportedOperationException.class)
 	@SuppressWarnings("unchecked")
 	public void testRetainAll() {
 		T t1 = getT();
@@ -240,7 +240,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(collection).contains(t2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testSize() {
 		assertThat(collection).isEmpty();
 		assertThat(collection.isEmpty()).isTrue();
@@ -252,7 +252,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArray() {
 		Object[] expectedArray = new Object[] { getT(), getT(), getT() };
 		List<T> list = (List<T>) Arrays.asList(expectedArray);
@@ -264,7 +264,7 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArrayWithGenerics() {
 		Object[] expectedArray = new Object[] { getT(), getT(), getT() };
 		List<T> list = (List<T>) Arrays.asList(expectedArray);
@@ -275,14 +275,14 @@ public abstract class AbstractRedisCollectionIntegrationTests<T> {
 		assertThat(array).isEqualTo(expectedArray);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testToString() {
 		String name = collection.toString();
 		collection.add(getT());
 		assertThat(collection.toString()).isEqualTo(name);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGetKey() throws Exception {
 		assertThat(collection.getKey()).isNotNull();
 	}

@@ -29,7 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class TransactionalJedisIntegrationTests extends AbstractTransactionalTestBase {
 
 	@Configuration
-	public static class JedisContextConfiguration extends RedisContextConfiguration {
+	public static class JedisContextConfiguration extends ValkeyContextConfiguration {
 
 		@Override
 		@Bean

@@ -17,33 +17,33 @@ package org.springframework.data.redis.core;
 
 import org.reactivestreams.Publisher;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
 
 /**
- * Generic callback interface for code that operates on a low-level {@link ReactiveRedisConnection}. Allows to execute
- * any number of operations on a single {@link ReactiveRedisConnection}, using any type and number of commands.
+ * Generic callback interface for code that operates on a low-level {@link ReactiveValkeyConnection}. Allows to execute
+ * any number of operations on a single {@link ReactiveValkeyConnection}, using any type and number of commands.
  * <p>
  * This is particularly useful for delegating to existing data access code that expects a
- * {@link ReactiveRedisConnection} to work on. For newly written code, it is strongly recommended to use
- * {@link ReactiveRedisOperations}'s more specific operations.
+ * {@link ReactiveValkeyConnection} to work on. For newly written code, it is strongly recommended to use
+ * {@link ReactiveValkeyOperations}'s more specific operations.
  *
  * @param <T>
  * @author Mark Paluch
  * @since 2.0
- * @see ReactiveRedisOperations#execute(ReactiveRedisCallback)
+ * @see ReactiveValkeyOperations#execute(ReactiveValkeyCallback)
  */
-public interface ReactiveRedisCallback<T> {
+public interface ReactiveValkeyCallback<T> {
 
 	/**
-	 * Gets called by {@link ReactiveRedisTemplate#execute(ReactiveRedisCallback)} with an active Redis connection. Does
-	 * not need to care about activating or closing the {@link ReactiveRedisConnection}.
+	 * Gets called by {@link ReactiveValkeyTemplate#execute(ReactiveValkeyCallback)} with an active Valkey connection. Does
+	 * not need to care about activating or closing the {@link ReactiveValkeyConnection}.
 	 * <p>
 	 * Allows for returning a result object created within the callback, i.e. a domain object or a collection of domain
 	 * objects.
 	 *
-	 * @param connection active Redis connection.
+	 * @param connection active Valkey connection.
 	 * @return a result object publisher
 	 * @throws DataAccessException in case of custom exceptions
 	 */
-	Publisher<T> doInRedis(ReactiveRedisConnection connection) throws DataAccessException;
+	Publisher<T> doInValkey(ReactiveValkeyConnection connection) throws DataAccessException;
 }

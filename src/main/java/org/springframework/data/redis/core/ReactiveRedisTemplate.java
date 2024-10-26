@@ -29,50 +29,50 @@ import java.util.stream.Collectors;
 import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveSubscription.Message;
 import org.springframework.data.redis.core.script.DefaultReactiveScriptExecutor;
 import org.springframework.data.redis.core.script.ReactiveScriptExecutor;
-import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.core.script.ValkeyScript;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
-import org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer;
+import org.springframework.data.redis.listener.ReactiveValkeyMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Central abstraction for reactive Redis data access implementing {@link ReactiveRedisOperations}.
+ * Central abstraction for reactive Valkey data access implementing {@link ReactiveValkeyOperations}.
  * <p>
  * Performs automatic serialization/deserialization between the given objects and the underlying binary data in the
- * Redis store.
+ * Valkey store.
  * <p>
  * Note that while the template is generified, it is up to the serializers/deserializers to properly convert the given
  * Objects to and from binary data.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Petromir Dzhunev
  * @author John Blum
- * @param <K> the Redis key type against which the template works (usually a String)
- * @param <V> the Redis value type against which the template works
+ * @param <K> the Valkey key type against which the template works (usually a String)
+ * @param <V> the Valkey value type against which the template works
  * @since 2.0
  */
-public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V> {
+public class ReactiveValkeyTemplate<K, V> implements ReactiveValkeyOperations<K, V> {
 
-	private final ReactiveRedisConnectionFactory connectionFactory;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyConnectionFactory connectionFactory;
+	private final ValkeySerializationContext<K, V> serializationContext;
 	private final boolean exposeConnection;
 	private final ReactiveScriptExecutor<K> reactiveScriptExecutor;
 	private final ReactiveGeoOperations<K, V> geoOps;
@@ -85,27 +85,27 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	private final ReactiveZSetOperations<K, V> zsetOps;
 
 	/**
-	 * Creates new {@link ReactiveRedisTemplate} using given {@link ReactiveRedisConnectionFactory} and
-	 * {@link RedisSerializationContext}.
+	 * Creates new {@link ReactiveValkeyTemplate} using given {@link ReactiveValkeyConnectionFactory} and
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param serializationContext must not be {@literal null}.
 	 */
-	public ReactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory,
-			RedisSerializationContext<K, V> serializationContext) {
+	public ReactiveValkeyTemplate(ReactiveValkeyConnectionFactory connectionFactory,
+			ValkeySerializationContext<K, V> serializationContext) {
 		this(connectionFactory, serializationContext, false);
 	}
 
 	/**
-	 * Creates new {@link ReactiveRedisTemplate} using given {@link ReactiveRedisConnectionFactory} and
-	 * {@link RedisSerializationContext}.
+	 * Creates new {@link ReactiveValkeyTemplate} using given {@link ReactiveValkeyConnectionFactory} and
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param serializationContext must not be {@literal null}.
 	 * @param exposeConnection flag indicating to expose the connection used.
 	 */
-	public ReactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory,
-			RedisSerializationContext<K, V> serializationContext, boolean exposeConnection) {
+	public ReactiveValkeyTemplate(ReactiveValkeyConnectionFactory connectionFactory,
+			ValkeySerializationContext<K, V> serializationContext, boolean exposeConnection) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 		Assert.notNull(serializationContext, "SerializationContext must not be null");
@@ -130,7 +130,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	 *
 	 * @return Returns the connectionFactory
 	 */
-	public ReactiveRedisConnectionFactory getConnectionFactory() {
+	public ReactiveValkeyConnectionFactory getConnectionFactory() {
 		return connectionFactory;
 	}
 
@@ -139,7 +139,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	// -------------------------------------------------------------------------
 
 	@Override
-	public <T> Flux<T> execute(ReactiveRedisCallback<T> action) {
+	public <T> Flux<T> execute(ReactiveValkeyCallback<T> action) {
 		return execute(action, exposeConnection);
 	}
 
@@ -149,17 +149,17 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	 *
 	 * @param <T> return type
 	 * @param action callback object to execute
-	 * @param exposeConnection whether to enforce exposure of the native Redis Connection to callback code
+	 * @param exposeConnection whether to enforce exposure of the native Valkey Connection to callback code
 	 * @return object returned by the action
 	 */
-	public <T> Flux<T> execute(ReactiveRedisCallback<T> action, boolean exposeConnection) {
+	public <T> Flux<T> execute(ReactiveValkeyCallback<T> action, boolean exposeConnection) {
 
 		Assert.notNull(action, "Callback object must not be null");
 		return Flux.from(doInConnection(action, exposeConnection));
 	}
 
 	@Override
-	public <T> Flux<T> executeInSession(ReactiveRedisSessionCallback<K, V, T> action) {
+	public <T> Flux<T> executeInSession(ReactiveValkeySessionCallback<K, V, T> action) {
 
 		Assert.notNull(action, "Callback object must not be null");
 		return Flux
@@ -167,61 +167,61 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	/**
-	 * Create a reusable Flux for a {@link ReactiveRedisCallback}. Callback is executed within a connection context. The
+	 * Create a reusable Flux for a {@link ReactiveValkeyCallback}. Callback is executed within a connection context. The
 	 * connection is released outside the callback.
 	 *
 	 * @param callback must not be {@literal null}
-	 * @return a {@link Flux} wrapping the {@link ReactiveRedisCallback}.
+	 * @return a {@link Flux} wrapping the {@link ReactiveValkeyCallback}.
 	 */
-	public <T> Flux<T> createFlux(ReactiveRedisCallback<T> callback) {
+	public <T> Flux<T> createFlux(ReactiveValkeyCallback<T> callback) {
 
-		Assert.notNull(callback, "ReactiveRedisCallback must not be null");
+		Assert.notNull(callback, "ReactiveValkeyCallback must not be null");
 
 		return Flux.from(doInConnection(callback, exposeConnection));
 	}
 
 	/**
-	 * Internal variant of {@link #createFlux(ReactiveRedisCallback)} bypassing proxy creation. Create a reusable Flux for
-	 * a {@link ReactiveRedisCallback}. Callback is executed within a connection context. The connection is released
+	 * Internal variant of {@link #createFlux(ReactiveValkeyCallback)} bypassing proxy creation. Create a reusable Flux for
+	 * a {@link ReactiveValkeyCallback}. Callback is executed within a connection context. The connection is released
 	 * outside the callback.
 	 *
 	 * @param callback must not be {@literal null}
-	 * @return a {@link Flux} wrapping the {@link ReactiveRedisCallback}.
+	 * @return a {@link Flux} wrapping the {@link ReactiveValkeyCallback}.
 	 * @since 2.6
 	 */
-	<T> Flux<T> doCreateFlux(ReactiveRedisCallback<T> callback) {
+	<T> Flux<T> doCreateFlux(ReactiveValkeyCallback<T> callback) {
 
-		Assert.notNull(callback, "ReactiveRedisCallback must not be null");
+		Assert.notNull(callback, "ReactiveValkeyCallback must not be null");
 
 		return Flux.from(doInConnection(callback, true));
 	}
 
 	/**
-	 * Create a reusable Mono for a {@link ReactiveRedisCallback}. Callback is executed within a connection context. The
+	 * Create a reusable Mono for a {@link ReactiveValkeyCallback}. Callback is executed within a connection context. The
 	 * connection is released outside the callback.
 	 *
 	 * @param callback must not be {@literal null}
-	 * @return a {@link Mono} wrapping the {@link ReactiveRedisCallback}.
+	 * @return a {@link Mono} wrapping the {@link ReactiveValkeyCallback}.
 	 */
-	public <T> Mono<T> createMono(ReactiveRedisCallback<T> callback) {
+	public <T> Mono<T> createMono(ReactiveValkeyCallback<T> callback) {
 
-		Assert.notNull(callback, "ReactiveRedisCallback must not be null");
+		Assert.notNull(callback, "ReactiveValkeyCallback must not be null");
 
 		return Mono.from(doInConnection(callback, exposeConnection));
 	}
 
 	/**
-	 * Internal variant of {@link #createMono(ReactiveRedisCallback)} bypassing proxy creation. Create a reusable Mono for
-	 * a {@link ReactiveRedisCallback}. Callback is executed within a connection context. The connection is released
+	 * Internal variant of {@link #createMono(ReactiveValkeyCallback)} bypassing proxy creation. Create a reusable Mono for
+	 * a {@link ReactiveValkeyCallback}. Callback is executed within a connection context. The connection is released
 	 * outside the callback.
 	 *
 	 * @param callback must not be {@literal null}
-	 * @return a {@link Mono} wrapping the {@link ReactiveRedisCallback}.
+	 * @return a {@link Mono} wrapping the {@link ReactiveValkeyCallback}.
 	 * @since 2.6
 	 */
-	<T> Mono<T> doCreateMono(ReactiveRedisCallback<T> callback) {
+	<T> Mono<T> doCreateMono(ReactiveValkeyCallback<T> callback) {
 
-		Assert.notNull(callback, "ReactiveRedisCallback must not be null");
+		Assert.notNull(callback, "ReactiveValkeyCallback must not be null");
 
 		return Mono.from(doInConnection(callback, true));
 	}
@@ -232,37 +232,37 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	 *
 	 * @param <T> return type
 	 * @param action callback object to execute
-	 * @param exposeConnection whether to enforce exposure of the native Redis Connection to callback code
+	 * @param exposeConnection whether to enforce exposure of the native Valkey Connection to callback code
 	 * @return object returned by the action
 	 */
-	<T> Publisher<T> doInConnection(ReactiveRedisCallback<T> action, boolean exposeConnection) {
+	<T> Publisher<T> doInConnection(ReactiveValkeyCallback<T> action, boolean exposeConnection) {
 
 		Assert.notNull(action, "Callback object must not be null");
 
-		Mono<ReactiveRedisConnection> connection = getConnection();
+		Mono<ReactiveValkeyConnection> connection = getConnection();
 
 		if (!exposeConnection) {
-			connection = connection.map(this::createRedisConnectionProxy);
+			connection = connection.map(this::createValkeyConnectionProxy);
 		}
 
 		return Flux.usingWhen(connection, conn -> {
 
-			Publisher<T> result = action.doInRedis(conn);
+			Publisher<T> result = action.doInValkey(conn);
 
 			return postProcessResult(result, conn, false);
 
-		}, ReactiveRedisConnection::closeLater);
+		}, ReactiveValkeyConnection::closeLater);
 	}
 
 	/**
-	 * Creates a {@link Mono} which emits a new {@link ReactiveRedisConnection}. Can be overridden in subclasses to
+	 * Creates a {@link Mono} which emits a new {@link ReactiveValkeyConnection}. Can be overridden in subclasses to
 	 * provide a different mechanism for connection allocation for the given method.
 	 *
 	 * @since 2.5.5
 	 */
-	protected Mono<ReactiveRedisConnection> getConnection() {
+	protected Mono<ReactiveValkeyConnection> getConnection() {
 
-		ReactiveRedisConnectionFactory factory = getConnectionFactory();
+		ReactiveValkeyConnectionFactory factory = getConnectionFactory();
 
 		return Mono.fromSupplier(() -> preProcessConnection(factory.getReactiveConnection(), false));
 	}
@@ -281,7 +281,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	@Override
 	public Flux<? extends Message<String, V>> listenTo(Topic... topics) {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(getConnectionFactory());
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(getConnectionFactory());
 
 		return container
 				.receive(Arrays.asList(topics), getSerializationContext().getStringSerializationPair(),
@@ -293,7 +293,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Mono<Flux<? extends Message<String, V>>> listenToLater(Topic... topics) {
 
-		ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(getConnectionFactory());
+		ReactiveValkeyMessageListenerContainer container = new ReactiveValkeyMessageListenerContainer(getConnectionFactory());
 
 		return (Mono) container.receiveLater(Arrays.asList(topics), getSerializationContext().getStringSerializationPair(),
 						getSerializationContext().getValueSerializationPair()) //
@@ -302,7 +302,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis keys
+	// Methods dealing with Valkey keys
 	// -------------------------------------------------------------------------
 
 	@Override
@@ -490,17 +490,17 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Lua scripts
+	// Methods dealing with Valkey Lua scripts
 	// -------------------------------------------------------------------------
 
 	@Override
-	public <T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args) {
+	public <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args) {
 		return reactiveScriptExecutor.execute(script, keys, args);
 	}
 
 	@Override
-	public <T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args, RedisElementWriter<?> argsWriter,
-			RedisElementReader<T> resultReader) {
+	public <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args, ValkeyElementWriter<?> argsWriter,
+			ValkeyElementReader<T> resultReader) {
 		return reactiveScriptExecutor.execute(script, keys, args, argsWriter, resultReader);
 	}
 
@@ -515,7 +515,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	 * @param connection must not be {@literal null}.
 	 * @param existingConnection
 	 */
-	protected ReactiveRedisConnection preProcessConnection(ReactiveRedisConnection connection,
+	protected ReactiveValkeyConnection preProcessConnection(ReactiveValkeyConnection connection,
 			boolean existingConnection) {
 		return connection;
 	}
@@ -528,17 +528,17 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	 * @param existingConnection
 	 * @return
 	 */
-	protected <T> Publisher<T> postProcessResult(Publisher<T> result, ReactiveRedisConnection connection,
+	protected <T> Publisher<T> postProcessResult(Publisher<T> result, ReactiveValkeyConnection connection,
 			boolean existingConnection) {
 		return result;
 	}
 
-	protected ReactiveRedisConnection createRedisConnectionProxy(ReactiveRedisConnection reactiveRedisConnection) {
+	protected ReactiveValkeyConnection createValkeyConnectionProxy(ReactiveValkeyConnection reactiveValkeyConnection) {
 
-		Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(reactiveRedisConnection.getClass(),
+		Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(reactiveValkeyConnection.getClass(),
 				getClass().getClassLoader());
-		return (ReactiveRedisConnection) Proxy.newProxyInstance(reactiveRedisConnection.getClass().getClassLoader(), ifcs,
-				new CloseSuppressingInvocationHandler(reactiveRedisConnection));
+		return (ReactiveValkeyConnection) Proxy.newProxyInstance(reactiveValkeyConnection.getClass().getClassLoader(), ifcs,
+				new CloseSuppressingInvocationHandler(reactiveValkeyConnection));
 	}
 
 	@Override
@@ -547,7 +547,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	@Override
-	public <K1, V1> ReactiveGeoOperations<K1, V1> opsForGeo(RedisSerializationContext<K1, V1> serializationContext) {
+	public <K1, V1> ReactiveGeoOperations<K1, V1> opsForGeo(ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveGeoOperations<>(this, serializationContext);
 	}
 
@@ -559,7 +559,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 
 	@Override
 	public <K1, HK, HV> ReactiveHashOperations<K1, HK, HV> opsForHash(
-			RedisSerializationContext<K1, ?> serializationContext) {
+			ValkeySerializationContext<K1, ?> serializationContext) {
 		return new DefaultReactiveHashOperations<>(this, serializationContext);
 	}
 
@@ -570,7 +570,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 
 	@Override
 	public <K1, V1> ReactiveHyperLogLogOperations<K1, V1> opsForHyperLogLog(
-			RedisSerializationContext<K1, V1> serializationContext) {
+			ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveHyperLogLogOperations<>(this, serializationContext);
 	}
 
@@ -580,7 +580,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	@Override
-	public <K1, V1> ReactiveListOperations<K1, V1> opsForList(RedisSerializationContext<K1, V1> serializationContext) {
+	public <K1, V1> ReactiveListOperations<K1, V1> opsForList(ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveListOperations<>(this, serializationContext);
 	}
 
@@ -590,7 +590,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	@Override
-	public <K1, V1> ReactiveSetOperations<K1, V1> opsForSet(RedisSerializationContext<K1, V1> serializationContext) {
+	public <K1, V1> ReactiveSetOperations<K1, V1> opsForSet(ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveSetOperations<>(this, serializationContext);
 	}
 
@@ -608,12 +608,12 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 
 	@SuppressWarnings("unchecked")
 	public <HK, HV> ReactiveStreamOperations<K, HK, HV> opsForStream(
-			RedisSerializationContext<K, ?> serializationContext) {
+			ValkeySerializationContext<K, ?> serializationContext) {
 		return opsForStream(serializationContext, (HashMapper) ObjectHashMapper.getSharedInstance());
 	}
 
 	protected <HK, HV> ReactiveStreamOperations<K, HK, HV> opsForStream(
-			RedisSerializationContext<K, ?> serializationContext,
+			ValkeySerializationContext<K, ?> serializationContext,
 			@Nullable HashMapper<? super K, ? super HK, ? super HV> hashMapper) {
 		return new DefaultReactiveStreamOperations<>(this, serializationContext, hashMapper);
 	}
@@ -624,7 +624,7 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	@Override
-	public <K1, V1> ReactiveValueOperations<K1, V1> opsForValue(RedisSerializationContext<K1, V1> serializationContext) {
+	public <K1, V1> ReactiveValueOperations<K1, V1> opsForValue(ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveValueOperations<>(this, serializationContext);
 	}
 
@@ -634,37 +634,37 @@ public class ReactiveRedisTemplate<K, V> implements ReactiveRedisOperations<K, V
 	}
 
 	@Override
-	public <K1, V1> ReactiveZSetOperations<K1, V1> opsForZSet(RedisSerializationContext<K1, V1> serializationContext) {
+	public <K1, V1> ReactiveZSetOperations<K1, V1> opsForZSet(ValkeySerializationContext<K1, V1> serializationContext) {
 		return new DefaultReactiveZSetOperations<>(this, serializationContext);
 	}
 
 	@Override
-	public RedisSerializationContext<K, V> getSerializationContext() {
+	public ValkeySerializationContext<K, V> getSerializationContext() {
 		return serializationContext;
 	}
 
-	private ReactiveRedisOperations<K, V> withConnection(ReactiveRedisConnection connection) {
-		return new BoundConnectionRedisTemplate(connection, connectionFactory, serializationContext);
+	private ReactiveValkeyOperations<K, V> withConnection(ReactiveValkeyConnection connection) {
+		return new BoundConnectionValkeyTemplate(connection, connectionFactory, serializationContext);
 	}
 
-	class BoundConnectionRedisTemplate extends ReactiveRedisTemplate<K, V> {
+	class BoundConnectionValkeyTemplate extends ReactiveValkeyTemplate<K, V> {
 
-		private final ReactiveRedisConnection connection;
+		private final ReactiveValkeyConnection connection;
 
-		public BoundConnectionRedisTemplate(ReactiveRedisConnection connection,
-				ReactiveRedisConnectionFactory connectionFactory, RedisSerializationContext<K, V> serializationContext) {
+		public BoundConnectionValkeyTemplate(ReactiveValkeyConnection connection,
+				ReactiveValkeyConnectionFactory connectionFactory, ValkeySerializationContext<K, V> serializationContext) {
 			super(connectionFactory, serializationContext, true);
 			this.connection = connection;
 		}
 
 		@Override
-		<T> Publisher<T> doInConnection(ReactiveRedisCallback<T> action, boolean exposeConnection) {
+		<T> Publisher<T> doInConnection(ReactiveValkeyCallback<T> action, boolean exposeConnection) {
 
 			Assert.notNull(action, "Callback object must not be null");
 
-			ReactiveRedisConnection connToUse = ReactiveRedisTemplate.this.preProcessConnection(connection, true);
-			Publisher<T> result = action.doInRedis(connToUse);
-			return ReactiveRedisTemplate.this.postProcessResult(result, connToUse, true);
+			ReactiveValkeyConnection connToUse = ReactiveValkeyTemplate.this.preProcessConnection(connection, true);
+			Publisher<T> result = action.doInValkey(connToUse);
+			return ReactiveValkeyTemplate.this.postProcessResult(result, connToUse, true);
 		}
 	}
 

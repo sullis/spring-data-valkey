@@ -23,13 +23,13 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.lang.Nullable;
 
 /**
- * Set-specific commands supported by Redis.
+ * Set-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public interface RedisSetCommands {
+public interface ValkeySetCommands {
 
 	/**
 	 * Add given {@code values} to set at {@code key}.
@@ -37,7 +37,7 @@ public interface RedisSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be empty.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sadd">Redis Documentation: SADD</a>
+	 * @see <a href="https://redis.io/commands/sadd">Valkey Documentation: SADD</a>
 	 */
 	@Nullable
 	Long sAdd(byte[] key, byte[]... values);
@@ -48,7 +48,7 @@ public interface RedisSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be empty.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srem">Redis Documentation: SREM</a>
+	 * @see <a href="https://redis.io/commands/srem">Valkey Documentation: SREM</a>
 	 */
 	@Nullable
 	Long sRem(byte[] key, byte[]... values);
@@ -58,7 +58,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when key does not exist or used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/spop">Redis Documentation: SPOP</a>
+	 * @see <a href="https://redis.io/commands/spop">Valkey Documentation: SPOP</a>
 	 */
 	@Nullable
 	byte[] sPop(byte[] key);
@@ -69,7 +69,7 @@ public interface RedisSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param count number of random members to pop from the set.
 	 * @return empty {@link List} if set does not exist. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/spop">Redis Documentation: SPOP</a>
+	 * @see <a href="https://redis.io/commands/spop">Valkey Documentation: SPOP</a>
 	 * @since 2.0
 	 */
 	@Nullable
@@ -82,7 +82,7 @@ public interface RedisSetCommands {
 	 * @param destKey must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/smove">Redis Documentation: SMOVE</a>
+	 * @see <a href="https://redis.io/commands/smove">Valkey Documentation: SMOVE</a>
 	 */
 	@Nullable
 	Boolean sMove(byte[] srcKey, byte[] destKey, byte[] value);
@@ -92,7 +92,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/scard">Redis Documentation: SCARD</a>
+	 * @see <a href="https://redis.io/commands/scard">Valkey Documentation: SCARD</a>
 	 */
 	@Nullable
 	Long sCard(byte[] key);
@@ -103,7 +103,7 @@ public interface RedisSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sismember">Redis Documentation: SISMEMBER</a>
+	 * @see <a href="https://redis.io/commands/sismember">Valkey Documentation: SISMEMBER</a>
 	 */
 	@Nullable
 	Boolean sIsMember(byte[] key, byte[] value);
@@ -115,7 +115,7 @@ public interface RedisSetCommands {
 	 * @param values must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/smismember">Redis Documentation: SMISMEMBER</a>
+	 * @see <a href="https://redis.io/commands/smismember">Valkey Documentation: SMISMEMBER</a>
 	 */
 	@Nullable
 	List<Boolean> sMIsMember(byte[] key, byte[]... values);
@@ -125,7 +125,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
 	 */
 	@Nullable
 	Set<byte[]> sDiff(byte[]... keys);
@@ -136,7 +136,7 @@ public interface RedisSetCommands {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
 	 */
 	@Nullable
 	Long sDiffStore(byte[] destKey, byte[]... keys);
@@ -146,7 +146,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return empty {@link Set} if no intersection found. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sinter">Redis Documentation: SINTER</a>
+	 * @see <a href="https://redis.io/commands/sinter">Valkey Documentation: SINTER</a>
 	 */
 	@Nullable
 	Set<byte[]> sInter(byte[]... keys);
@@ -157,7 +157,7 @@ public interface RedisSetCommands {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sinterstore">Redis Documentation: SINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/sinterstore">Valkey Documentation: SINTERSTORE</a>
 	 */
 	@Nullable
 	Long sInterStore(byte[] destKey, byte[]... keys);
@@ -167,7 +167,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return empty {@link Set} if keys do not exist. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sunion">Redis Documentation: SUNION</a>
+	 * @see <a href="https://redis.io/commands/sunion">Valkey Documentation: SUNION</a>
 	 */
 	@Nullable
 	Set<byte[]> sUnion(byte[]... keys);
@@ -178,7 +178,7 @@ public interface RedisSetCommands {
 	 * @param destKey must not be {@literal null}.
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sunionstore">Redis Documentation: SUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/sunionstore">Valkey Documentation: SUNIONSTORE</a>
 	 */
 	@Nullable
 	Long sUnionStore(byte[] destKey, byte[]... keys);
@@ -189,7 +189,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return empty {@link Set} when key does not exist. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/smembers">Redis Documentation: SMEMBERS</a>
+	 * @see <a href="https://redis.io/commands/smembers">Valkey Documentation: SMEMBERS</a>
 	 */
 	@Nullable
 	Set<byte[]> sMembers(byte[] key);
@@ -199,7 +199,7 @@ public interface RedisSetCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
 	 */
 	@Nullable
 	byte[] sRandMember(byte[] key);
@@ -210,7 +210,7 @@ public interface RedisSetCommands {
 	 * @param key must not be {@literal null}.
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
 	 */
 	@Nullable
 	List<byte[]> sRandMember(byte[] key, long count);
@@ -222,7 +222,7 @@ public interface RedisSetCommands {
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 */
 	Cursor<byte[]> sScan(byte[] key, ScanOptions options);
 }

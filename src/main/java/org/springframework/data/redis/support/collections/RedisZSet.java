@@ -27,11 +27,11 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.BoundZSetOperations;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 /**
- * Redis ZSet (or sorted set (by weight)). Acts as a {@link SortedSet} based on the given priorities or weights
+ * Valkey ZSet (or sorted set (by weight)). Acts as a {@link SortedSet} based on the given priorities or weights
  * associated with each item.
  * <p>
  * Since using a {@link Comparator} does not apply, a ZSet implements the {@link SortedSet} methods where applicable.
@@ -42,200 +42,200 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
  * @author Christoph Strobl
  * @author Andrey Shlykov
  */
-public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
+public interface ValkeyZSet<E> extends ValkeyCollection<E>, Set<E> {
 
 	/**
-	 * Constructs a new {@link RedisZSet} instance with a default score of {@literal 1}.
+	 * Constructs a new {@link ValkeyZSet} instance with a default score of {@literal 1}.
 	 *
-	 * @param key Redis key of this set.
-	 * @param operations {@link RedisOperations} for the value type of this set.
+	 * @param key Valkey key of this set.
+	 * @param operations {@link ValkeyOperations} for the value type of this set.
 	 * @since 2.6
 	 */
-	static <E> RedisZSet<E> create(String key, RedisOperations<String, E> operations) {
-		return new DefaultRedisZSet<>(key, operations, 1);
+	static <E> ValkeyZSet<E> create(String key, ValkeyOperations<String, E> operations) {
+		return new DefaultValkeyZSet<>(key, operations, 1);
 	}
 
 	/**
-	 * Constructs a new {@link RedisZSet} instance.
+	 * Constructs a new {@link ValkeyZSet} instance.
 	 *
-	 * @param key Redis key of this set.
-	 * @param operations {@link RedisOperations} for the value type of this set.
+	 * @param key Valkey key of this set.
+	 * @param operations {@link ValkeyOperations} for the value type of this set.
 	 * @param defaultScore
 	 * @since 2.6
 	 */
-	static <E> RedisZSet<E> create(String key, RedisOperations<String, E> operations, double defaultScore) {
-		return new DefaultRedisZSet<>(key, operations, defaultScore);
+	static <E> ValkeyZSet<E> create(String key, ValkeyOperations<String, E> operations, double defaultScore) {
+		return new DefaultValkeyZSet<>(key, operations, defaultScore);
 	}
 
 	/**
-	 * Diff this set and another {@link RedisZSet}.
+	 * Diff this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the values that differ.
 	 * @since 2.6
 	 */
-	Set<E> diff(RedisZSet<?> set);
+	Set<E> diff(ValkeyZSet<?> set);
 
 	/**
-	 * Diff this set and other {@link RedisZSet}s.
+	 * Diff this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the values that differ.
 	 * @since 2.6
 	 */
-	Set<E> diff(Collection<? extends RedisZSet<?>> sets);
+	Set<E> diff(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Diff this set and another {@link RedisZSet}.
+	 * Diff this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the values that differ with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> diffWithScores(RedisZSet<?> set);
+	Set<TypedTuple<E>> diffWithScores(ValkeyZSet<?> set);
 
 	/**
-	 * Diff this set and other {@link RedisZSet}s.
+	 * Diff this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the values that differ with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> diffWithScores(Collection<? extends RedisZSet<?>> sets);
+	Set<TypedTuple<E>> diffWithScores(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Create a new {@link RedisZSet} by diffing this sorted set and {@link RedisZSet} and store result in destination
+	 * Create a new {@link ValkeyZSet} by diffing this sorted set and {@link ValkeyZSet} and store result in destination
 	 * {@code destKey}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}.
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}.
 	 * @since 2.6
 	 */
-	RedisZSet<E> diffAndStore(RedisZSet<?> set, String destKey);
+	ValkeyZSet<E> diffAndStore(ValkeyZSet<?> set, String destKey);
 
 	/**
-	 * Create a new {@link RedisZSet} by diffing this sorted set and the collection {@link RedisZSet} and store result in
+	 * Create a new {@link ValkeyZSet} by diffing this sorted set and the collection {@link ValkeyZSet} and store result in
 	 * destination {@code destKey}.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}.
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}.
 	 * @since 2.6
 	 */
-	RedisZSet<E> diffAndStore(Collection<? extends RedisZSet<?>> sets, String destKey);
+	ValkeyZSet<E> diffAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey);
 
 	/**
-	 * Intersect this set and another {@link RedisZSet}.
+	 * Intersect this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the intersecting values.
 	 * @since 2.6
 	 */
-	Set<E> intersect(RedisZSet<?> set);
+	Set<E> intersect(ValkeyZSet<?> set);
 
 	/**
-	 * Intersect this set and other {@link RedisZSet}s.
+	 * Intersect this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the intersecting values.
 	 * @since 2.6
 	 */
-	Set<E> intersect(Collection<? extends RedisZSet<?>> sets);
+	Set<E> intersect(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Intersect this set and another {@link RedisZSet}.
+	 * Intersect this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the intersecting values with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> intersectWithScores(RedisZSet<?> set);
+	Set<TypedTuple<E>> intersectWithScores(ValkeyZSet<?> set);
 
 	/**
-	 * Intersect this set and other {@link RedisZSet}s.
+	 * Intersect this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the intersecting values with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> intersectWithScores(Collection<? extends RedisZSet<?>> sets);
+	Set<TypedTuple<E>> intersectWithScores(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Create a new {@link RedisZSet} by intersecting this sorted set and {@link RedisZSet} and store result in
+	 * Create a new {@link ValkeyZSet} by intersecting this sorted set and {@link ValkeyZSet} and store result in
 	 * destination {@code destKey}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 */
-	RedisZSet<E> intersectAndStore(RedisZSet<?> set, String destKey);
+	ValkeyZSet<E> intersectAndStore(ValkeyZSet<?> set, String destKey);
 
 	/**
-	 * Create a new {@link RedisZSet} by intersecting this sorted set and the collection {@link RedisZSet} and store
+	 * Create a new {@link ValkeyZSet} by intersecting this sorted set and the collection {@link ValkeyZSet} and store
 	 * result in destination {@code destKey}.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 */
-	RedisZSet<E> intersectAndStore(Collection<? extends RedisZSet<?>> sets, String destKey);
+	ValkeyZSet<E> intersectAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey);
 
 	/**
-	 * Union this set and another {@link RedisZSet}.
+	 * Union this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the combined values.
 	 * @since 2.6
 	 */
-	Set<E> union(RedisZSet<?> set);
+	Set<E> union(ValkeyZSet<?> set);
 
 	/**
-	 * Union this set and other {@link RedisZSet}s.
+	 * Union this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the combined values.
 	 * @since 2.6
 	 */
-	Set<E> union(Collection<? extends RedisZSet<?>> sets);
+	Set<E> union(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Union this set and another {@link RedisZSet}.
+	 * Union this set and another {@link ValkeyZSet}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @return a {@link Set} containing the combined values with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> unionWithScores(RedisZSet<?> set);
+	Set<TypedTuple<E>> unionWithScores(ValkeyZSet<?> set);
 
 	/**
-	 * Union this set and other {@link RedisZSet}s.
+	 * Union this set and other {@link ValkeyZSet}s.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @return a {@link Set} containing the combined values with their scores.
 	 * @since 2.6
 	 */
-	Set<TypedTuple<E>> unionWithScores(Collection<? extends RedisZSet<?>> sets);
+	Set<TypedTuple<E>> unionWithScores(Collection<? extends ValkeyZSet<?>> sets);
 
 	/**
-	 * Create a new {@link RedisZSet} by union this sorted set and {@link RedisZSet} and store result in destination
+	 * Create a new {@link ValkeyZSet} by union this sorted set and {@link ValkeyZSet} and store result in destination
 	 * {@code destKey}.
 	 *
 	 * @param set must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 */
-	RedisZSet<E> unionAndStore(RedisZSet<?> set, String destKey);
+	ValkeyZSet<E> unionAndStore(ValkeyZSet<?> set, String destKey);
 
 	/**
-	 * Create a new {@link RedisZSet} by union this sorted set and the collection {@link RedisZSet} and store result in
+	 * Create a new {@link ValkeyZSet} by union this sorted set and the collection {@link ValkeyZSet} and store result in
 	 * destination {@code destKey}.
 	 *
 	 * @param sets must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 */
-	RedisZSet<E> unionAndStore(Collection<? extends RedisZSet<?>> sets, String destKey);
+	ValkeyZSet<E> unionAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey);
 
 	/**
 	 * Get random element from the set.
@@ -274,7 +274,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @deprecated since 3.0. Please use {@link #rangeByLex(Range)} instead.
 	 */
 	@Deprecated(since = "3.0", forRemoval = true)
-	default Set<E> rangeByLex(org.springframework.data.redis.connection.RedisZSetCommands.Range range) {
+	default Set<E> rangeByLex(org.springframework.data.redis.connection.ValkeyZSetCommands.Range range) {
 		return rangeByLex(range.toRange());
 	}
 
@@ -304,7 +304,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @deprecated since 3.0. Please use {@link #rangeByLex(Range, Limit)} instead.
 	 */
 	@Deprecated(since = "3.0", forRemoval = true)
-	default Set<E> rangeByLex(org.springframework.data.redis.connection.RedisZSetCommands.Range range, Limit limit) {
+	default Set<E> rangeByLex(org.springframework.data.redis.connection.ValkeyZSetCommands.Range range, Limit limit) {
 		return rangeByLex(range.toRange(), limit);
 	}
 
@@ -332,7 +332,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @deprecated since 3.0. Please use {@link #reverseRangeByLex(Range, Limit)} instead.
 	 */
 	@Deprecated(since = "3.0", forRemoval = true)
-	default Set<E> reverseRangeByLex(org.springframework.data.redis.connection.RedisZSetCommands.Range range) {
+	default Set<E> reverseRangeByLex(org.springframework.data.redis.connection.ValkeyZSetCommands.Range range) {
 		return reverseRangeByLex(range.toRange());
 	}
 
@@ -362,7 +362,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @deprecated since 3.0. Please use {@link #reverseRangeByLex(Range, Limit)} instead.
 	 */
 	@Deprecated(since = "3.0", forRemoval = true)
-	default Set<E> reverseRangeByLex(org.springframework.data.redis.connection.RedisZSetCommands.Range range,
+	default Set<E> reverseRangeByLex(org.springframework.data.redis.connection.ValkeyZSetCommands.Range range,
 			Limit limit) {
 		return reverseRangeByLex(range.toRange(), limit);
 	}
@@ -441,11 +441,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 *
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #rangeByLex(Range)
 	 */
-	default RedisZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range) {
+	default ValkeyZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range) {
 		return rangeAndStoreByLex(dstKey, range, Limit.unlimited());
 	}
 
@@ -457,11 +457,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #rangeByLex(Range, Limit)
 	 */
-	RedisZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range, Limit limit);
+	ValkeyZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range, Limit limit);
 
 	/**
 	 * Store all elements at {@code dstKey} with reverse lexicographical ordering from {@literal ZSET} at the bound key
@@ -469,11 +469,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 *
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #reverseRangeByLex(Range)
 	 */
-	default RedisZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range) {
+	default ValkeyZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range) {
 		return reverseRangeAndStoreByLex(dstKey, range, Limit.unlimited());
 	}
 
@@ -485,11 +485,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #reverseRangeByLex(Range, Limit)
 	 */
-	RedisZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range, Limit limit);
+	ValkeyZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range, Limit limit);
 
 	/**
 	 * Store all elements at {@code dstKey} with ordering by score from {@literal ZSET} at the bound key with a score
@@ -497,11 +497,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 *
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #rangeByScore(double, double)
 	 */
-	default RedisZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range) {
+	default ValkeyZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range) {
 		return rangeAndStoreByScore(dstKey, range, Limit.unlimited());
 	}
 
@@ -513,11 +513,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #rangeByScore(double, double)
 	 */
-	RedisZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit);
+	ValkeyZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit);
 
 	/**
 	 * Store all elements at {@code dstKey} with reverse ordering by score from {@literal ZSET} at the bound key with a
@@ -525,11 +525,11 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 *
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 * @see #reverseRangeByScore(double, double)
 	 */
-	default RedisZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range) {
+	default ValkeyZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range) {
 		return reverseRangeAndStoreByScore(dstKey, range, Limit.unlimited());
 	}
 
@@ -541,10 +541,10 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param dstKey must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 * @param limit must not be {@literal null}.
-	 * @return a new {@link RedisZSet} pointing at {@code destKey}
+	 * @return a new {@link ValkeyZSet} pointing at {@code destKey}
 	 * @since 3.0
 	 */
-	RedisZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit);
+	ValkeyZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit);
 
 	/**
 	 * Remove elements in range between {@code start} and {@code end} from sorted set.
@@ -553,7 +553,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param end
 	 * @return {@code this} set.
 	 */
-	RedisZSet<E> remove(long start, long end);
+	ValkeyZSet<E> remove(long start, long end);
 
 	/**
 	 * Remove all elements in range.
@@ -562,7 +562,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @return {@code this} set.
 	 * @since 2.5
 	 */
-	RedisZSet<E> removeByLex(Range<String> range);
+	ValkeyZSet<E> removeByLex(Range<String> range);
 
 	/**
 	 * Remove elements with scores between {@code min} and {@code max} from sorted set with the bound key.
@@ -571,7 +571,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param max
 	 * @return {@code this} set.
 	 */
-	RedisZSet<E> removeByScore(double min, double max);
+	ValkeyZSet<E> removeByScore(double min, double max);
 
 	/**
 	 * Adds an element to the set with the given score, or updates the score if the element exists.
@@ -617,7 +617,7 @@ public interface RedisZSet<E> extends RedisCollection<E>, Set<E> {
 	 * @param range must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/zlexcount">Redis Documentation: ZLEXCOUNT</a>
+	 * @see <a href="https://redis.io/commands/zlexcount">Valkey Documentation: ZLEXCOUNT</a>
 	 */
 	Long lexCount(Range<String> range);
 

@@ -29,7 +29,7 @@ class LettuceReactiveClusterGeoCommands extends LettuceReactiveGeoCommands imple
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterGeoCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterGeoCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 }

@@ -18,17 +18,17 @@ package org.springframework.data.redis.core;
 import java.util.Collection;
 import java.util.Set;
 
-import org.springframework.data.redis.connection.RedisClusterCommands;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
+import org.springframework.data.redis.connection.ValkeyClusterCommands;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
 
 /**
- * Redis operations for cluster specific operations. A {@link RedisClusterNode} can be obtained from
- * {@link RedisClusterCommands#clusterGetNodes() a connection} or it can be
- * constructed using either {@link RedisClusterNode#getHost() host} and {@link RedisClusterNode#getPort()} or the
- * {@link RedisClusterNode#getId() node Id}.
+ * Valkey operations for cluster specific operations. A {@link ValkeyClusterNode} can be obtained from
+ * {@link ValkeyClusterCommands#clusterGetNodes() a connection} or it can be
+ * constructed using either {@link ValkeyClusterNode#getHost() host} and {@link ValkeyClusterNode#getPort()} or the
+ * {@link ValkeyClusterNode#getId() node Id}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -43,27 +43,27 @@ public interface ClusterOperations<K, V> {
 	 * @param node must not be {@literal null}.
 	 * @param pattern
 	 * @return never {@literal null}.
-	 * @see RedisConnection#keys(byte[])
+	 * @see ValkeyConnection#keys(byte[])
 	 */
-	Set<K> keys(RedisClusterNode node, K pattern);
+	Set<K> keys(ValkeyClusterNode node, K pattern);
 
 	/**
 	 * Ping the given node;
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisConnection#ping()
+	 * @see ValkeyConnection#ping()
 	 */
-	String ping(RedisClusterNode node);
+	String ping(ValkeyClusterNode node);
 
 	/**
 	 * Get a random key from the range served by the given node.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisConnection#randomKey()
+	 * @see ValkeyConnection#randomKey()
 	 */
-	K randomKey(RedisClusterNode node);
+	K randomKey(ValkeyClusterNode node);
 
 	/**
 	 * Add slots to given node;
@@ -71,7 +71,7 @@ public interface ClusterOperations<K, V> {
 	 * @param node must not be {@literal null}.
 	 * @param slots must not be {@literal null}.
 	 */
-	void addSlots(RedisClusterNode node, int... slots);
+	void addSlots(ValkeyClusterNode node, int... slots);
 
 	/**
 	 * Add slots in {@link SlotRange} to given node.
@@ -79,77 +79,77 @@ public interface ClusterOperations<K, V> {
 	 * @param node must not be {@literal null}.
 	 * @param range must not be {@literal null}.
 	 */
-	void addSlots(RedisClusterNode node, SlotRange range);
+	void addSlots(ValkeyClusterNode node, SlotRange range);
 
 	/**
 	 * Start an {@literal Append Only File} rewrite process on given node.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see RedisConnection#bgReWriteAof()
+	 * @see ValkeyConnection#bgReWriteAof()
 	 */
-	void bgReWriteAof(RedisClusterNode node);
+	void bgReWriteAof(ValkeyClusterNode node);
 
 	/**
 	 * Start background saving of db on given node.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see RedisConnection#bgSave()
+	 * @see ValkeyConnection#bgSave()
 	 */
-	void bgSave(RedisClusterNode node);
+	void bgSave(ValkeyClusterNode node);
 
 	/**
 	 * Add the node to cluster.
 	 *
 	 * @param node must not be {@literal null}.
 	 */
-	void meet(RedisClusterNode node);
+	void meet(ValkeyClusterNode node);
 
 	/**
 	 * Remove the node from the cluster.
 	 *
 	 * @param node must not be {@literal null}.
 	 */
-	void forget(RedisClusterNode node);
+	void forget(ValkeyClusterNode node);
 
 	/**
 	 * Flush db on node.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see RedisConnection#flushDb()
+	 * @see ValkeyConnection#flushDb()
 	 */
-	void flushDb(RedisClusterNode node);
+	void flushDb(ValkeyClusterNode node);
 
 	/**
 	 * Flush db on node using the specified {@link FlushOption}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param option must not be {@literal null}.
-	 * @see RedisConnection#flushDb(FlushOption)
+	 * @see ValkeyConnection#flushDb(FlushOption)
 	 * @since 2.7
 	 */
-	void flushDb(RedisClusterNode node, FlushOption option);
+	void flushDb(ValkeyClusterNode node, FlushOption option);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return
 	 */
-	Collection<RedisClusterNode> getReplicas(RedisClusterNode node);
+	Collection<ValkeyClusterNode> getReplicas(ValkeyClusterNode node);
 
 	/**
 	 * Synchronous save current db snapshot on server.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see RedisConnection#save()
+	 * @see ValkeyConnection#save()
 	 */
-	void save(RedisClusterNode node);
+	void save(ValkeyClusterNode node);
 
 	/**
 	 * Shutdown given node.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see RedisConnection#shutdown()
+	 * @see ValkeyConnection#shutdown()
 	 */
-	void shutdown(RedisClusterNode node);
+	void shutdown(ValkeyClusterNode node);
 
 	/**
 	 * Move slot assignment from one source to target node and copy keys associated with the slot.
@@ -158,5 +158,5 @@ public interface ClusterOperations<K, V> {
 	 * @param slot
 	 * @param target must not be {@literal null}.
 	 */
-	void reshard(RedisClusterNode source, int slot, RedisClusterNode target);
+	void reshard(ValkeyClusterNode source, int slot, ValkeyClusterNode target);
 }

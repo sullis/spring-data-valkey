@@ -26,11 +26,11 @@ import java.util.Map;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 
 /**
- * Reactive Redis operations for simple (or in Redis terminology 'string') values.
+ * Reactive Valkey operations for simple (or in Valkey terminology 'string') values.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
@@ -44,7 +44,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	Mono<Boolean> set(K key, V value);
 
@@ -54,7 +54,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @param timeout must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+	 * @see <a href="https://redis.io/commands/setex">Valkey Documentation: SETEX</a>
 	 */
 	Mono<Boolean> set(K key, V value, Duration timeout);
 
@@ -63,7 +63,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value
-	 * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
+	 * @see <a href="https://redis.io/commands/setnx">Valkey Documentation: SETNX</a>
 	 */
 	Mono<Boolean> setIfAbsent(K key, V value);
 
@@ -74,7 +74,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param value
 	 * @param timeout must not be {@literal null}.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	Mono<Boolean> setIfAbsent(K key, V value, Duration timeout);
 
@@ -83,7 +83,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	Mono<Boolean> setIfPresent(K key, V value);
 
@@ -94,7 +94,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param value
 	 * @param timeout must not be {@literal null}.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+	 * @see <a href="https://redis.io/commands/set">Valkey Documentation: SET</a>
 	 */
 	Mono<Boolean> setIfPresent(K key, V value, Duration timeout);
 
@@ -102,7 +102,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * Set multiple keys to multiple values using key-value pairs provided in {@code tuple}.
 	 *
 	 * @param map must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/mset">Redis Documentation: MSET</a>
+	 * @see <a href="https://redis.io/commands/mset">Valkey Documentation: MSET</a>
 	 */
 	Mono<Boolean> multiSet(Map<? extends K, ? extends V> map);
 
@@ -111,7 +111,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * not exist.
 	 *
 	 * @param map must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/msetnx">Redis Documentation: MSETNX</a>
+	 * @see <a href="https://redis.io/commands/msetnx">Valkey Documentation: MSETNX</a>
 	 */
 	Mono<Boolean> multiSetIfAbsent(Map<? extends K, ? extends V> map);
 
@@ -119,7 +119,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * Get the value of {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/get">Redis Documentation: GET</a>
+	 * @see <a href="https://redis.io/commands/get">Valkey Documentation: GET</a>
 	 */
 	Mono<V> get(Object key);
 
@@ -127,7 +127,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * Return the value at {@code key} and delete the key.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/getdel">Redis Documentation: GETDEL</a>
+	 * @see <a href="https://redis.io/commands/getdel">Valkey Documentation: GETDEL</a>
 	 * @since 2.6
 	 */
 	Mono<V> getAndDelete(K key);
@@ -137,7 +137,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param timeout must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	Mono<V> getAndExpire(K key, Duration timeout);
@@ -147,7 +147,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/getex">Redis Documentation: GETEX</a>
+	 * @see <a href="https://redis.io/commands/getex">Valkey Documentation: GETEX</a>
 	 * @since 2.6
 	 */
 	Mono<V> getAndPersist(K key);
@@ -156,7 +156,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * Set {@code value} of {@code key} and return its old value.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/getset">Redis Documentation: GETSET</a>
+	 * @see <a href="https://redis.io/commands/getset">Valkey Documentation: GETSET</a>
 	 */
 	Mono<V> getAndSet(K key, V value);
 
@@ -165,7 +165,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * {@literal null} in the resulting {@link List}.
 	 *
 	 * @param keys must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/mget">Redis Documentation: MGET</a>
+	 * @see <a href="https://redis.io/commands/mget">Valkey Documentation: MGET</a>
 	 */
 	Mono<List<V>> multiGet(Collection<K> keys);
 
@@ -174,7 +174,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/incr">Redis Documentation: INCR</a>
+	 * @see <a href="https://redis.io/commands/incr">Valkey Documentation: INCR</a>
 	 */
 	Mono<Long> increment(K key);
 
@@ -184,7 +184,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param delta
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/incrby">Redis Documentation: INCRBY</a>
+	 * @see <a href="https://redis.io/commands/incrby">Valkey Documentation: INCRBY</a>
 	 */
 	Mono<Long> increment(K key, long delta);
 
@@ -194,7 +194,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param delta
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/incrbyfloat">Redis Documentation: INCRBYFLOAT</a>
+	 * @see <a href="https://redis.io/commands/incrbyfloat">Valkey Documentation: INCRBYFLOAT</a>
 	 */
 	Mono<Double> increment(K key, double delta);
 
@@ -203,7 +203,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/decr">Redis Documentation: DECR</a>
+	 * @see <a href="https://redis.io/commands/decr">Valkey Documentation: DECR</a>
 	 */
 	Mono<Long> decrement(K key);
 
@@ -213,7 +213,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param delta
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/decrby">Redis Documentation: DECRBY</a>
+	 * @see <a href="https://redis.io/commands/decrby">Valkey Documentation: DECRBY</a>
 	 */
 	Mono<Long> decrement(K key, long delta);
 
@@ -222,7 +222,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value
-	 * @see <a href="https://redis.io/commands/append">Redis Documentation: APPEND</a>
+	 * @see <a href="https://redis.io/commands/append">Valkey Documentation: APPEND</a>
 	 */
 	Mono<Long> append(K key, String value);
 
@@ -232,7 +232,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param start
 	 * @param end
-	 * @see <a href="https://redis.io/commands/getrange">Redis Documentation: GETRANGE</a>
+	 * @see <a href="https://redis.io/commands/getrange">Valkey Documentation: GETRANGE</a>
 	 */
 	Mono<String> get(K key, long start, long end);
 
@@ -242,7 +242,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @param offset
-	 * @see <a href="https://redis.io/commands/setrange">Redis Documentation: SETRANGE</a>
+	 * @see <a href="https://redis.io/commands/setrange">Valkey Documentation: SETRANGE</a>
 	 */
 	Mono<Long> set(K key, V value, long offset);
 
@@ -250,7 +250,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * Get the length of the value stored at {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/strlen">Redis Documentation: STRLEN</a>
+	 * @see <a href="https://redis.io/commands/strlen">Valkey Documentation: STRLEN</a>
 	 */
 	Mono<Long> size(K key);
 
@@ -260,7 +260,7 @@ public interface ReactiveValueOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param offset
 	 * @param value
-	 * @see <a href="https://redis.io/commands/setbit">Redis Documentation: SETBIT</a>
+	 * @see <a href="https://redis.io/commands/setbit">Valkey Documentation: SETBIT</a>
 	 */
 	Mono<Boolean> setBit(K key, long offset, boolean value);
 
@@ -269,7 +269,7 @@ public interface ReactiveValueOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param offset
-	 * @see <a href="https://redis.io/commands/getbit">Redis Documentation: GETBIT</a>
+	 * @see <a href="https://redis.io/commands/getbit">Valkey Documentation: GETBIT</a>
 	 */
 	Mono<Boolean> getBit(K key, long offset);
 

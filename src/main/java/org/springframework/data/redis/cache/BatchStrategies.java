@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.util.Assert;
 
 /**
- * Collection of predefined {@link BatchStrategy} implementations using the Redis {@code KEYS} or {@code SCAN} command.
+ * Collection of predefined {@link BatchStrategy} implementations using the Valkey {@code KEYS} or {@code SCAN} command.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -39,10 +39,10 @@ public abstract class BatchStrategies {
 
 	/**
 	 * A {@link BatchStrategy} using a single {@code KEYS} and {@code DEL} command to remove all matching keys.
-	 * {@code KEYS} scans the entire keyspace of the Redis database and can block the Redis worker thread for a long time
+	 * {@code KEYS} scans the entire keyspace of the Valkey database and can block the Valkey worker thread for a long time
 	 * on large keyspaces.
 	 * <p>
-	 * {@code KEYS} is supported for standalone and clustered (sharded) Redis operation modes.
+	 * {@code KEYS} is supported for standalone and clustered (sharded) Valkey operation modes.
 	 *
 	 * @return batching strategy using {@code KEYS}.
 	 */
@@ -54,7 +54,7 @@ public abstract class BatchStrategies {
 	 * A {@link BatchStrategy} using a {@code SCAN} cursors and potentially multiple {@code DEL} commands to remove all
 	 * matching keys. This strategy allows a configurable batch size to optimize for scan batching.
 	 * <p>
-	 * Note that using the {@code SCAN} strategy might be not supported on all drivers and Redis operation modes.
+	 * Note that using the {@code SCAN} strategy might be not supported on all drivers and Valkey operation modes.
 	 *
 	 * @return batching strategy using {@code SCAN}.
 	 */
@@ -77,7 +77,7 @@ public abstract class BatchStrategies {
 		static Keys INSTANCE = new Keys();
 
 		@Override
-		public long cleanCache(RedisConnection connection, String name, byte[] pattern) {
+		public long cleanCache(ValkeyConnection connection, String name, byte[] pattern) {
 
 			byte[][] keys = Optional.ofNullable(connection.keys(pattern)).orElse(Collections.emptySet())
 					.toArray(new byte[0][]);
@@ -102,7 +102,7 @@ public abstract class BatchStrategies {
 		}
 
 		@Override
-		public long cleanCache(RedisConnection connection, String name, byte[] pattern) {
+		public long cleanCache(ValkeyConnection connection, String name, byte[] pattern) {
 
 			Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().count(batchSize).match(pattern).build());
 

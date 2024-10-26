@@ -27,12 +27,12 @@ import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.ConvertingCursor;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 /**
- * Default implementation for {@link RedisZSet}. Note that the collection support works only with normal,
+ * Default implementation for {@link ValkeyZSet}. Note that the collection support works only with normal,
  * non-pipeline/multi-exec connections as it requires a reply to be sent right away.
  *
  * @author Costin Leau
@@ -40,41 +40,41 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
  * @author Mark Paluch
  * @author Andrey Shlykov
  */
-public class DefaultRedisZSet<E> extends AbstractRedisCollection<E> implements RedisZSet<E> {
+public class DefaultValkeyZSet<E> extends AbstractValkeyCollection<E> implements ValkeyZSet<E> {
 
 	private final BoundZSetOperations<String, E> boundZSetOps;
 	private final double defaultScore;
 
-	private class DefaultRedisSortedSetIterator extends RedisIterator<E> {
+	private class DefaultValkeySortedSetIterator extends ValkeyIterator<E> {
 
-		public DefaultRedisSortedSetIterator(Iterator<E> delegate) {
+		public DefaultValkeySortedSetIterator(Iterator<E> delegate) {
 			super(delegate);
 		}
 
 		@Override
-		protected void removeFromRedisStorage(E item) {
-			DefaultRedisZSet.this.remove(item);
+		protected void removeFromValkeyStorage(E item) {
+			DefaultValkeyZSet.this.remove(item);
 		}
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisZSet} instance with a default score of {@literal 1}.
+	 * Constructs a new {@link DefaultValkeyZSet} instance with a default score of {@literal 1}.
 	 *
-	 * @param key Redis key of this set.
-	 * @param operations {@link RedisOperations} for the value type of this set.
+	 * @param key Valkey key of this set.
+	 * @param operations {@link ValkeyOperations} for the value type of this set.
 	 */
-	public DefaultRedisZSet(String key, RedisOperations<String, E> operations) {
+	public DefaultValkeyZSet(String key, ValkeyOperations<String, E> operations) {
 		this(key, operations, 1);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisZSet} instance.
+	 * Constructs a new {@link DefaultValkeyZSet} instance.
 	 *
-	 * @param key Redis key of this set.
-	 * @param operations {@link RedisOperations} for the value type of this set.
+	 * @param key Valkey key of this set.
+	 * @param operations {@link ValkeyOperations} for the value type of this set.
 	 * @param defaultScore
 	 */
-	public DefaultRedisZSet(String key, RedisOperations<String, E> operations, double defaultScore) {
+	public DefaultValkeyZSet(String key, ValkeyOperations<String, E> operations, double defaultScore) {
 
 		super(key, operations);
 
@@ -83,21 +83,21 @@ public class DefaultRedisZSet<E> extends AbstractRedisCollection<E> implements R
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisZSet} instance with a default score of '1'.
+	 * Constructs a new {@link DefaultValkeyZSet} instance with a default score of '1'.
 	 *
 	 * @param boundOps {@link BoundZSetOperations} for the value type of this set.
 	 */
-	public DefaultRedisZSet(BoundZSetOperations<String, E> boundOps) {
+	public DefaultValkeyZSet(BoundZSetOperations<String, E> boundOps) {
 		this(boundOps, 1);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisZSet} instance.
+	 * Constructs a new {@link DefaultValkeyZSet} instance.
 	 *
 	 * @param boundOps {@link BoundZSetOperations} for the value type of this set.
 	 * @param defaultScore
 	 */
-	public DefaultRedisZSet(BoundZSetOperations<String, E> boundOps, double defaultScore) {
+	public DefaultValkeyZSet(BoundZSetOperations<String, E> boundOps, double defaultScore) {
 
 		super(boundOps.getKey(), boundOps.getOperations());
 
@@ -106,103 +106,103 @@ public class DefaultRedisZSet<E> extends AbstractRedisCollection<E> implements R
 	}
 
 	@Override
-	public Set<E> diff(RedisZSet<?> set) {
+	public Set<E> diff(ValkeyZSet<?> set) {
 		return boundZSetOps.difference(set.getKey());
 	}
 
 	@Override
-	public Set<E> diff(Collection<? extends RedisZSet<?>> sets) {
+	public Set<E> diff(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.difference(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public Set<TypedTuple<E>> diffWithScores(RedisZSet<?> set) {
+	public Set<TypedTuple<E>> diffWithScores(ValkeyZSet<?> set) {
 		return boundZSetOps.differenceWithScores(set.getKey());
 	}
 
 	@Override
-	public Set<TypedTuple<E>> diffWithScores(Collection<? extends RedisZSet<?>> sets) {
+	public Set<TypedTuple<E>> diffWithScores(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.differenceWithScores(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisZSet<E> diffAndStore(RedisZSet<?> set, String destKey) {
+	public ValkeyZSet<E> diffAndStore(ValkeyZSet<?> set, String destKey) {
 
 		boundZSetOps.differenceAndStore(set.getKey(), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
-	public RedisZSet<E> diffAndStore(Collection<? extends RedisZSet<?>> sets, String destKey) {
+	public ValkeyZSet<E> diffAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey) {
 
 		boundZSetOps.differenceAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
-	public Set<E> intersect(RedisZSet<?> set) {
+	public Set<E> intersect(ValkeyZSet<?> set) {
 		return boundZSetOps.intersect(set.getKey());
 	}
 
 	@Override
-	public Set<E> intersect(Collection<? extends RedisZSet<?>> sets) {
+	public Set<E> intersect(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.intersect(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public Set<TypedTuple<E>> intersectWithScores(RedisZSet<?> set) {
+	public Set<TypedTuple<E>> intersectWithScores(ValkeyZSet<?> set) {
 		return boundZSetOps.intersectWithScores(set.getKey());
 	}
 
 	@Override
-	public Set<TypedTuple<E>> intersectWithScores(Collection<? extends RedisZSet<?>> sets) {
+	public Set<TypedTuple<E>> intersectWithScores(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.intersectWithScores(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisZSet<E> intersectAndStore(RedisZSet<?> set, String destKey) {
+	public ValkeyZSet<E> intersectAndStore(ValkeyZSet<?> set, String destKey) {
 
 		boundZSetOps.intersectAndStore(set.getKey(), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
-	public RedisZSet<E> intersectAndStore(Collection<? extends RedisZSet<?>> sets, String destKey) {
+	public ValkeyZSet<E> intersectAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey) {
 
 		boundZSetOps.intersectAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
-	public Set<E> union(RedisZSet<?> set) {
+	public Set<E> union(ValkeyZSet<?> set) {
 		return boundZSetOps.union(set.getKey());
 	}
 
 	@Override
-	public Set<E> union(Collection<? extends RedisZSet<?>> sets) {
+	public Set<E> union(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.union(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public Set<TypedTuple<E>> unionWithScores(RedisZSet<?> set) {
+	public Set<TypedTuple<E>> unionWithScores(ValkeyZSet<?> set) {
 		return boundZSetOps.unionWithScores(set.getKey());
 	}
 
 	@Override
-	public Set<TypedTuple<E>> unionWithScores(Collection<? extends RedisZSet<?>> sets) {
+	public Set<TypedTuple<E>> unionWithScores(Collection<? extends ValkeyZSet<?>> sets) {
 		return boundZSetOps.unionWithScores(CollectionUtils.extractKeys(sets));
 	}
 
 	@Override
-	public RedisZSet<E> unionAndStore(RedisZSet<?> set, String destKey) {
+	public ValkeyZSet<E> unionAndStore(ValkeyZSet<?> set, String destKey) {
 		boundZSetOps.unionAndStore(set.getKey(), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
-	public RedisZSet<E> unionAndStore(Collection<? extends RedisZSet<?>> sets, String destKey) {
+	public ValkeyZSet<E> unionAndStore(Collection<? extends ValkeyZSet<?>> sets, String destKey) {
 		boundZSetOps.unionAndStore(CollectionUtils.extractKeys(sets), destKey);
-		return new DefaultRedisZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
+		return new DefaultValkeyZSet<>(boundZSetOps.getOperations().boundZSetOps(destKey), getDefaultScore());
 	}
 
 	@Override
@@ -261,43 +261,43 @@ public class DefaultRedisZSet<E> extends AbstractRedisCollection<E> implements R
 	}
 
 	@Override
-	public RedisZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range, Limit limit) {
+	public ValkeyZSet<E> rangeAndStoreByLex(String dstKey, Range<String> range, Limit limit) {
 		boundZSetOps.rangeAndStoreByLex(dstKey, range, limit);
-		return new DefaultRedisZSet<>(getOperations().boundZSetOps(dstKey));
+		return new DefaultValkeyZSet<>(getOperations().boundZSetOps(dstKey));
 	}
 
 	@Override
-	public RedisZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range, Limit limit) {
+	public ValkeyZSet<E> reverseRangeAndStoreByLex(String dstKey, Range<String> range, Limit limit) {
 		boundZSetOps.reverseRangeAndStoreByLex(dstKey, range, limit);
-		return new DefaultRedisZSet<>(getOperations().boundZSetOps(dstKey));
+		return new DefaultValkeyZSet<>(getOperations().boundZSetOps(dstKey));
 	}
 
 	@Override
-	public RedisZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit) {
+	public ValkeyZSet<E> rangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit) {
 		boundZSetOps.rangeAndStoreByScore(dstKey, range, limit);
-		return new DefaultRedisZSet<>(getOperations().boundZSetOps(dstKey));
+		return new DefaultValkeyZSet<>(getOperations().boundZSetOps(dstKey));
 	}
 
 	@Override
-	public RedisZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit) {
+	public ValkeyZSet<E> reverseRangeAndStoreByScore(String dstKey, Range<? extends Number> range, Limit limit) {
 		boundZSetOps.reverseRangeAndStoreByScore(dstKey, range, limit);
-		return new DefaultRedisZSet<>(getOperations().boundZSetOps(dstKey));
+		return new DefaultValkeyZSet<>(getOperations().boundZSetOps(dstKey));
 	}
 
 	@Override
-	public RedisZSet<E> remove(long start, long end) {
+	public ValkeyZSet<E> remove(long start, long end) {
 		boundZSetOps.removeRange(start, end);
 		return this;
 	}
 
 	@Override
-	public RedisZSet<E> removeByLex(Range<String> range) {
+	public ValkeyZSet<E> removeByLex(Range<String> range) {
 		boundZSetOps.removeRangeByLex(range);
 		return this;
 	}
 
 	@Override
-	public RedisZSet<E> removeByScore(double min, double max) {
+	public ValkeyZSet<E> removeByScore(double min, double max) {
 		boundZSetOps.removeRangeByScore(min, max);
 		return this;
 	}
@@ -338,7 +338,7 @@ public class DefaultRedisZSet<E> extends AbstractRedisCollection<E> implements R
 	public Iterator<E> iterator() {
 		Set<E> members = boundZSetOps.range(0, -1);
 		checkResult(members);
-		return new DefaultRedisSortedSetIterator(members.iterator());
+		return new DefaultValkeySortedSetIterator(members.iterator());
 	}
 
 	@Override

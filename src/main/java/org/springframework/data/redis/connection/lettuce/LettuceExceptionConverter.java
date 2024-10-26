@@ -15,11 +15,11 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisCommandExecutionException;
-import io.lettuce.core.RedisCommandInterruptedException;
-import io.lettuce.core.RedisCommandTimeoutException;
-import io.lettuce.core.RedisConnectionException;
-import io.lettuce.core.RedisException;
+import io.lettuce.core.ValkeyCommandExecutionException;
+import io.lettuce.core.ValkeyCommandInterruptedException;
+import io.lettuce.core.ValkeyCommandTimeoutException;
+import io.lettuce.core.ValkeyConnectionException;
+import io.lettuce.core.ValkeyException;
 import io.netty.channel.ChannelException;
 
 import java.util.concurrent.ExecutionException;
@@ -28,8 +28,8 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.QueryTimeoutException;
-import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
+import org.springframework.data.redis.ValkeySystemException;
 
 /**
  * Converts Lettuce Exceptions to {@link DataAccessException}s
@@ -44,32 +44,32 @@ public class LettuceExceptionConverter implements Converter<Exception, DataAcces
 
 	public DataAccessException convert(Exception ex) {
 
-		if (ex instanceof ExecutionException || ex instanceof RedisCommandExecutionException) {
+		if (ex instanceof ExecutionException || ex instanceof ValkeyCommandExecutionException) {
 
 			if (ex.getCause() != ex && ex.getCause() instanceof Exception cause) {
 				return convert(cause);
 			}
-			return new RedisSystemException("Error in execution", ex);
+			return new ValkeySystemException("Error in execution", ex);
 		}
 
 		if (ex instanceof DataAccessException dae) {
 			return dae;
 		}
 
-		if (ex instanceof RedisCommandInterruptedException) {
-			return new RedisSystemException("Redis command interrupted", ex);
+		if (ex instanceof ValkeyCommandInterruptedException) {
+			return new ValkeySystemException("Valkey command interrupted", ex);
 		}
 
-		if (ex instanceof ChannelException || ex instanceof RedisConnectionException) {
-			return new RedisConnectionFailureException("Redis connection failed", ex);
+		if (ex instanceof ChannelException || ex instanceof ValkeyConnectionException) {
+			return new ValkeyConnectionFailureException("Valkey connection failed", ex);
 		}
 
-		if (ex instanceof TimeoutException || ex instanceof RedisCommandTimeoutException) {
-			return new QueryTimeoutException("Redis command timed out", ex);
+		if (ex instanceof TimeoutException || ex instanceof ValkeyCommandTimeoutException) {
+			return new QueryTimeoutException("Valkey command timed out", ex);
 		}
 
-		if (ex instanceof RedisException) {
-			return new RedisSystemException("Redis exception", ex);
+		if (ex instanceof ValkeyException) {
+			return new ValkeySystemException("Valkey exception", ex);
 		}
 
 		return null;

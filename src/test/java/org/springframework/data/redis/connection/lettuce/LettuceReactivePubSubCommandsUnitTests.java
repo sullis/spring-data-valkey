@@ -18,8 +18,8 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.pubsub.api.reactive.ValkeyPubSubReactiveCommands;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,10 +41,10 @@ class LettuceReactivePubSubCommandsUnitTests {
 
 	LettuceReactivePubSubCommands sut;
 
-	@Mock LettuceReactiveRedisConnection connection;
+	@Mock LettuceReactiveValkeyConnection connection;
 
-	@Mock StatefulRedisPubSubConnection<ByteBuffer, ByteBuffer> lettuceConnection;
-	@Mock RedisPubSubReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
+	@Mock StatefulValkeyPubSubConnection<ByteBuffer, ByteBuffer> lettuceConnection;
+	@Mock ValkeyPubSubReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach

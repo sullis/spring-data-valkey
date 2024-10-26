@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.StringValkeyConnection;
 
 /**
  * @author Costin Leau
@@ -32,16 +32,16 @@ class SessionUnitTests {
 
 	@Test
 	void testSession() throws Exception {
-		RedisConnection conn = mock(RedisConnection.class);
-		StringRedisConnection stringConn = mock(StringRedisConnection.class);
-		RedisConnectionFactory factory = mock(RedisConnectionFactory.class);
-		StringRedisTemplate template = spy(new StringRedisTemplate(factory));
+		ValkeyConnection conn = mock(ValkeyConnection.class);
+		StringValkeyConnection stringConn = mock(StringValkeyConnection.class);
+		ValkeyConnectionFactory factory = mock(ValkeyConnectionFactory.class);
+		StringValkeyTemplate template = spy(new StringValkeyTemplate(factory));
 		when(factory.getConnection()).thenReturn(conn);
 		doReturn(stringConn).when(template).preProcessConnection(eq(conn), anyBoolean());
 
 		template.execute(new SessionCallback<Object>() {
 			@SuppressWarnings("rawtypes")
-			public Object execute(RedisOperations operations) {
+			public Object execute(ValkeyOperations operations) {
 				checkConnection(template, stringConn);
 				template.discard();
 				assertThat(operations).isSameAs(template);
@@ -51,7 +51,7 @@ class SessionUnitTests {
 		});
 	}
 
-	private void checkConnection(RedisTemplate<?, ?> template, RedisConnection expectedConnection) {
+	private void checkConnection(ValkeyTemplate<?, ?> template, ValkeyConnection expectedConnection) {
 		template.execute(connection -> {
 			assertThat(connection).isSameAs(expectedConnection);
 			return null;

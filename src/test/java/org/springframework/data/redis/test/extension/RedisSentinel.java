@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@code @RedisSentinel} is used to qualify a connection resource to point to Redis Sentinel.
+ * {@code @ValkeySentinel} is used to qualify a connection resource to point to Valkey Sentinel.
  *
  * @author Mark Paluch
  * @see SettingsUtils#getSentinelPort()
@@ -34,5 +34,5 @@ import org.springframework.data.redis.SettingsUtils;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface RedisSentinel {
+public @interface ValkeySentinel {
 }

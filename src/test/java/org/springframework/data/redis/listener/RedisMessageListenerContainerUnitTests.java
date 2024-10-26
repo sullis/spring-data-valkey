@@ -30,25 +30,25 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.Subscription;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.listener.adapter.RedisListenerExecutionFailedException;
+import org.springframework.data.redis.listener.adapter.ValkeyListenerExecutionFailedException;
 import org.springframework.util.backoff.FixedBackOff;
 
 /**
- * Unit tests for {@link RedisMessageListenerContainer}.
+ * Unit tests for {@link ValkeyMessageListenerContainer}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Seongjun Lee
  */
-class RedisMessageListenerContainerUnitTests {
+class ValkeyMessageListenerContainerUnitTests {
 
 	private final Object handler = new Object() {
 
@@ -58,10 +58,10 @@ class RedisMessageListenerContainerUnitTests {
 
 	private final MessageListenerAdapter adapter = new MessageListenerAdapter(handler);
 
-	private RedisMessageListenerContainer container;
+	private ValkeyMessageListenerContainer container;
 
-	private RedisConnectionFactory connectionFactoryMock;
-	private RedisConnection connectionMock;
+	private ValkeyConnectionFactory connectionFactoryMock;
+	private ValkeyConnection connectionMock;
 	private Subscription subscriptionMock;
 	private Executor executorMock;
 
@@ -70,10 +70,10 @@ class RedisMessageListenerContainerUnitTests {
 
 		executorMock = mock(Executor.class);
 		connectionFactoryMock = mock(JedisConnectionFactory.class);
-		connectionMock = mock(RedisConnection.class);
+		connectionMock = mock(ValkeyConnection.class);
 		subscriptionMock = mock(Subscription.class);
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(connectionFactoryMock);
 		container.setBeanName("container");
 		container.setTaskExecutor(new SyncTaskExecutor());
@@ -117,9 +117,9 @@ class RedisMessageListenerContainerUnitTests {
 	}
 
 	@Test // GH-2335
-	void containerStartShouldReportFailureOnRedisUnavailability() {
+	void containerStartShouldReportFailureOnValkeyUnavailability() {
 
-		when(connectionFactoryMock.getConnection()).thenThrow(new RedisConnectionFailureException("Booh"));
+		when(connectionFactoryMock.getConnection()).thenThrow(new ValkeyConnectionFailureException("Booh"));
 
 		doAnswer(it -> {
 
@@ -129,16 +129,16 @@ class RedisMessageListenerContainerUnitTests {
 		}).when(executorMock).execute(any());
 
 		container.addMessageListener(adapter, new ChannelTopic("a"));
-		assertThatExceptionOfType(RedisListenerExecutionFailedException.class).isThrownBy(() -> container.start());
+		assertThatExceptionOfType(ValkeyListenerExecutionFailedException.class).isThrownBy(() -> container.start());
 
 		assertThat(container.isRunning()).isTrue();
 		assertThat(container.isListening()).isFalse();
 	}
 
 	@Test // GH-2335
-	void containerListenShouldReportFailureOnRedisUnavailability() {
+	void containerListenShouldReportFailureOnValkeyUnavailability() {
 
-		when(connectionFactoryMock.getConnection()).thenThrow(new RedisConnectionFailureException("Booh"));
+		when(connectionFactoryMock.getConnection()).thenThrow(new ValkeyConnectionFailureException("Booh"));
 
 		doAnswer(it -> {
 
@@ -149,7 +149,7 @@ class RedisMessageListenerContainerUnitTests {
 
 		container.start();
 
-		assertThatExceptionOfType(RedisListenerExecutionFailedException.class)
+		assertThatExceptionOfType(ValkeyListenerExecutionFailedException.class)
 				.isThrownBy(() -> container.addMessageListener(adapter, new ChannelTopic("a")));
 
 		assertThat(container.isRunning()).isTrue();
@@ -162,7 +162,7 @@ class RedisMessageListenerContainerUnitTests {
 		AtomicInteger requestCount = new AtomicInteger();
 		AtomicBoolean shouldThrowSubscriptionException = new AtomicBoolean();
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(connectionFactoryMock);
 		container.setBeanName("container");
 		container.setTaskExecutor(new SyncTaskExecutor());
@@ -178,7 +178,7 @@ class RedisMessageListenerContainerUnitTests {
 				return connectionMock;
 			}
 
-			throw new RedisConnectionFailureException("Booh");
+			throw new ValkeyConnectionFailureException("Booh");
 		}).when(connectionFactoryMock).getConnection();
 
 		CountDownLatch exceptionWait = new CountDownLatch(1);
@@ -197,7 +197,7 @@ class RedisMessageListenerContainerUnitTests {
 
 			if (shouldThrowSubscriptionException.compareAndSet(true, false)) {
 				when(connectionMock.isSubscribed()).thenReturn(false);
-				throw new RedisConnectionFailureException("Disconnected");
+				throw new ValkeyConnectionFailureException("Disconnected");
 			}
 
 			recoveryArmed.countDown();

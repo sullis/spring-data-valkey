@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Christoph Strobl
  * @since 2.2
- * @see <a href="https://redis.io/topics/streams-intro#entry-ids">Redis Documentation - Entriy ID</a>
+ * @see <a href="https://redis.io/topics/streams-intro#entry-ids">Valkey Documentation - Entriy ID</a>
  */
 public class RecordId {
 

@@ -32,8 +32,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.connection.ReactiveStreamCommands;
-import org.springframework.data.redis.connection.RedisStreamCommands.XClaimOptions;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XClaimOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.stream.ByteBufferRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -49,7 +49,7 @@ import org.springframework.data.redis.connection.stream.StreamInfo.XInfoStream;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -66,12 +66,12 @@ import org.springframework.util.ClassUtils;
  */
 class DefaultReactiveStreamOperations<K, HK, HV> implements ReactiveStreamOperations<K, HK, HV> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, ?> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, ?> serializationContext;
 	private final StreamObjectMapper objectMapper;
 
-	DefaultReactiveStreamOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, ?> serializationContext,
+	DefaultReactiveStreamOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, ?> serializationContext,
 			@Nullable HashMapper<? super K, ? super HK, ? super HV> hashMapper) {
 
 		this.template = template;

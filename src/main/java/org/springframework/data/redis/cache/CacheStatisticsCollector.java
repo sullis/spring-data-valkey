@@ -16,7 +16,7 @@
 package org.springframework.data.redis.cache;
 
 /**
- * The statistics collector supports capturing of relevant {@link RedisCache} operations such as
+ * The statistics collector supports capturing of relevant {@link ValkeyCache} operations such as
  * {@literal hits & misses}.
  *
  * @author Christoph Strobl

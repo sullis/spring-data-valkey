@@ -18,10 +18,10 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
-import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
+import io.lettuce.core.ValkeyFuture;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.pubsub.api.async.ValkeyPubSubAsyncCommands;
+import io.lettuce.core.pubsub.api.sync.ValkeyPubSubCommands;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisInvalidSubscriptionException;
+import org.springframework.data.redis.connection.ValkeyInvalidSubscriptionException;
 
 /**
  * Unit test of {@link LettuceSubscription}
@@ -43,11 +43,11 @@ class LettuceSubscriptionUnitTests {
 
 	private LettuceSubscription subscription;
 
-	private StatefulRedisPubSubConnection<byte[], byte[]> pubsub;
+	private StatefulValkeyPubSubConnection<byte[], byte[]> pubsub;
 
-	private RedisPubSubCommands<byte[], byte[]> syncCommands;
+	private ValkeyPubSubCommands<byte[], byte[]> syncCommands;
 
-	private RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands;
+	private ValkeyPubSubAsyncCommands<byte[], byte[]> asyncCommands;
 
 	private LettuceConnectionProvider connectionProvider;
 
@@ -55,9 +55,9 @@ class LettuceSubscriptionUnitTests {
 	@BeforeEach
 	void setUp() {
 
-		pubsub = mock(StatefulRedisPubSubConnection.class);
-		syncCommands = mock(RedisPubSubCommands.class);
-		asyncCommands = mock(RedisPubSubAsyncCommands.class);
+		pubsub = mock(StatefulValkeyPubSubConnection.class);
+		syncCommands = mock(ValkeyPubSubCommands.class);
+		asyncCommands = mock(ValkeyPubSubAsyncCommands.class);
 		connectionProvider = mock(LettuceConnectionProvider.class);
 
 		when(pubsub.sync()).thenReturn(syncCommands);
@@ -223,7 +223,7 @@ class LettuceSubscriptionUnitTests {
 
 		assertThat(subscription.isAlive()).isFalse();
 
-		assertThatExceptionOfType(RedisInvalidSubscriptionException.class)
+		assertThatExceptionOfType(ValkeyInvalidSubscriptionException.class)
 				.isThrownBy(() -> subscription.subscribe(new byte[][] { "s".getBytes() }));
 	}
 
@@ -384,7 +384,7 @@ class LettuceSubscriptionUnitTests {
 
 		assertThat(subscription.isAlive()).isFalse();
 
-		assertThatExceptionOfType(RedisInvalidSubscriptionException.class)
+		assertThatExceptionOfType(ValkeyInvalidSubscriptionException.class)
 				.isThrownBy(() -> subscription.pSubscribe(new byte[][] { "s*".getBytes() }));
 	}
 
@@ -400,11 +400,11 @@ class LettuceSubscriptionUnitTests {
 	@Test
 	void testDoCloseSubscribedChannels() {
 
-		RedisFuture<Void> future = mock(RedisFuture.class);
+		ValkeyFuture<Void> future = mock(ValkeyFuture.class);
 		when(future.toCompletableFuture()).thenReturn(CompletableFuture.completedFuture(null));
 
 		when(asyncCommands.unsubscribe()).thenReturn(future);
-		when(asyncCommands.ping()).thenReturn((RedisFuture) future);
+		when(asyncCommands.ping()).thenReturn((ValkeyFuture) future);
 
 		subscription.subscribe(new byte[][] { "a".getBytes() });
 		subscription.doClose();
@@ -417,11 +417,11 @@ class LettuceSubscriptionUnitTests {
 	@Test
 	void testDoCloseSubscribedPatterns() {
 
-		RedisFuture<Void> future = mock(RedisFuture.class);
+		ValkeyFuture<Void> future = mock(ValkeyFuture.class);
 		when(future.toCompletableFuture()).thenReturn(CompletableFuture.completedFuture(null));
 
 		when(asyncCommands.punsubscribe()).thenReturn(future);
-		when(asyncCommands.ping()).thenReturn((RedisFuture) future);
+		when(asyncCommands.ping()).thenReturn((ValkeyFuture) future);
 
 		subscription.pSubscribe(new byte[][] { "a*".getBytes() });
 		subscription.doClose();

@@ -19,7 +19,7 @@ import io.micrometer.common.docs.KeyName;
 import io.micrometer.observation.docs.ObservationDocumentation;
 
 /**
- * A Redis-based {@link io.micrometer.observation.Observation}.
+ * A Valkey-based {@link io.micrometer.observation.Observation}.
  *
  * @author Mark Paluch
  * @since 3.0
@@ -27,10 +27,10 @@ import io.micrometer.observation.docs.ObservationDocumentation;
  *             {@link io.lettuce.core.tracing.MicrometerTracing}.
  */
 @Deprecated(since = "3.4", forRemoval = true)
-public enum RedisObservation implements ObservationDocumentation {
+public enum ValkeyObservation implements ObservationDocumentation {
 
 	/**
-	 * Timer created around a Redis command execution.
+	 * Timer created around a Valkey command execution.
 	 */
 	REDIS_COMMAND_OBSERVATION {
 
@@ -51,7 +51,7 @@ public enum RedisObservation implements ObservationDocumentation {
 	};
 
 	/**
-	 * Enums related to low cardinality key names for Redis commands.
+	 * Enums related to low cardinality key names for Valkey commands.
 	 */
 	enum LowCardinalityCommandKeyNames implements KeyName {
 
@@ -116,7 +116,7 @@ public enum RedisObservation implements ObservationDocumentation {
 		},
 
 		/**
-		 * Redis user.
+		 * Valkey user.
 		 */
 		DB_USER {
 			@Override
@@ -126,7 +126,7 @@ public enum RedisObservation implements ObservationDocumentation {
 		},
 
 		/**
-		 * Redis database index.
+		 * Valkey database index.
 		 */
 		DB_INDEX {
 			@Override
@@ -136,7 +136,7 @@ public enum RedisObservation implements ObservationDocumentation {
 		},
 
 		/**
-		 * Redis command value.
+		 * Valkey command value.
 		 */
 		REDIS_COMMAND {
 			@Override
@@ -148,12 +148,12 @@ public enum RedisObservation implements ObservationDocumentation {
 	}
 
 	/**
-	 * Enums related to high cardinality key names for Redis commands.
+	 * Enums related to high cardinality key names for Valkey commands.
 	 */
 	enum HighCardinalityCommandKeyNames implements KeyName {
 
 		/**
-		 * Redis statement.
+		 * Valkey statement.
 		 */
 		STATEMENT {
 			@Override
@@ -163,7 +163,7 @@ public enum RedisObservation implements ObservationDocumentation {
 		},
 
 		/**
-		 * Redis error response.
+		 * Valkey error response.
 		 */
 		ERROR {
 			@Override

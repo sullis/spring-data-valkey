@@ -22,20 +22,20 @@ import org.springframework.data.repository.config.RepositoryBeanDefinitionRegist
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
 
 /**
- * Redis specific {@link ImportBeanDefinitionRegistrar}.
+ * Valkey specific {@link ImportBeanDefinitionRegistrar}.
  *
  * @author Christoph Strobl
  * @since 1.7
  */
-public class RedisRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
+public class ValkeyRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
 
 	@Override
 	protected Class<? extends Annotation> getAnnotation() {
-		return EnableRedisRepositories.class;
+		return EnableValkeyRepositories.class;
 	}
 
 	@Override
 	protected RepositoryConfigurationExtension getExtension() {
-		return new RedisRepositoryConfigurationExtension();
+		return new ValkeyRepositoryConfigurationExtension();
 	}
 }

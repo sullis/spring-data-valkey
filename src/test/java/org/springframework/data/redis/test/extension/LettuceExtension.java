@@ -15,17 +15,17 @@
  */
 package org.springframework.data.redis.test.extension;
 
-import io.lettuce.core.AbstractRedisClient;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.AbstractValkeyClient;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.sync.ValkeyCommands;
 import io.lettuce.core.cluster.ClusterClientOptions;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
 import io.lettuce.core.protocol.ProtocolVersion;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
 import io.lettuce.core.resource.ClientResources;
 
 import java.io.Closeable;
@@ -60,20 +60,20 @@ import org.springframework.data.util.Lazy;
  * callbacks. The following resource types are supported by this extension:
  * <ul>
  * <li>{@link ClientResources} (singleton)</li>
- * <li>{@link RedisClient} (singleton)</li>
- * <li>{@link RedisClusterClient} (singleton)</li>
- * <li>{@link StatefulRedisConnection}</li>
- * <li>{@link StatefulRedisPubSubConnection}</li>
- * <li>{@link StatefulRedisClusterConnection}</li>
+ * <li>{@link ValkeyClient} (singleton)</li>
+ * <li>{@link ValkeyClusterClient} (singleton)</li>
+ * <li>{@link StatefulValkeyConnection}</li>
+ * <li>{@link StatefulValkeyPubSubConnection}</li>
+ * <li>{@link StatefulValkeyClusterConnection}</li>
  * </ul>
  *
  * <pre class="code">
  * &#064;ExtendWith(LettuceExtension.class)
  * public class CustomCommandTest {
  *
- * 	private final RedisCommands&lt;String, String&gt; redis;
+ * 	private final ValkeyCommands&lt;String, String&gt; redis;
  *
- * 	public CustomCommandTest(StatefulRedisConnection&lt;String, String&gt; connection) {
+ * 	public CustomCommandTest(StatefulValkeyConnection&lt;String, String&gt; connection) {
  * 		this.redis = connection.sync();
  * 	}
  *
@@ -82,7 +82,7 @@ import org.springframework.data.util.Lazy;
  *
  * <h3>Resource lifecycle</h3> This extension allocates resources lazily and stores them in its {@link ExtensionContext}
  * {@link ExtensionContext.Store} for reuse across multiple tests. Client and {@link ClientResources} are allocated
- * through default {@link RedisClient} respective {@link RedisClientSupplier} so shutdown is managed by the actual
+ * through default {@link ValkeyClient} respective {@link ValkeyClientSupplier} so shutdown is managed by the actual
  * suppliers. Singleton connection resources are closed after the test class (test container) is finished.
  *
  * @author Mark Paluch
@@ -99,18 +99,18 @@ public class LettuceExtension implements ParameterResolver, AfterAllCallback, Af
 			.protocolVersion(ProtocolVersion.RESP2).pingBeforeActivateConnection(false).build();
 
 	private static final Set<Class<?>> SUPPORTED_INJECTABLE_TYPES = new HashSet<>(
-			Arrays.asList(StatefulRedisConnection.class, StatefulRedisPubSubConnection.class, RedisCommands.class,
-					RedisClient.class, ClientResources.class, StatefulRedisClusterConnection.class, RedisClusterClient.class));
+			Arrays.asList(StatefulValkeyConnection.class, StatefulValkeyPubSubConnection.class, ValkeyCommands.class,
+					ValkeyClient.class, ClientResources.class, StatefulValkeyClusterConnection.class, ValkeyClusterClient.class));
 
-	private static final Set<Class<?>> CLOSE_AFTER_EACH = new HashSet<>(Arrays.asList(StatefulRedisConnection.class,
-			StatefulRedisPubSubConnection.class, StatefulRedisClusterConnection.class));
+	private static final Set<Class<?>> CLOSE_AFTER_EACH = new HashSet<>(Arrays.asList(StatefulValkeyConnection.class,
+			StatefulValkeyPubSubConnection.class, StatefulValkeyClusterConnection.class));
 
 	private static final List<Supplier<?>> SUPPLIERS = Arrays.asList(ClientResourcesSupplier.INSTANCE,
-			RedisClusterClientSupplier.INSTANCE, RedisClientSupplier.INSTANCE, StatefulRedisConnectionSupplier.INSTANCE,
-			StatefulRedisPubSubConnectionSupplier.INSTANCE, StatefulRedisClusterConnectionSupplier.INSTANCE);
+			ValkeyClusterClientSupplier.INSTANCE, ValkeyClientSupplier.INSTANCE, StatefulValkeyConnectionSupplier.INSTANCE,
+			StatefulValkeyPubSubConnectionSupplier.INSTANCE, StatefulValkeyClusterConnectionSupplier.INSTANCE);
 
 	private static final List<Function<?, ?>> RESOURCE_FUNCTIONS = Collections
-			.singletonList(RedisCommandsFunction.INSTANCE);
+			.singletonList(ValkeyCommandsFunction.INSTANCE);
 
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
@@ -149,7 +149,7 @@ public class LettuceExtension implements ParameterResolver, AfterAllCallback, Af
 
 		ExtensionContext.Store store = getStore(context);
 
-		RedisClient redisClient = store.get(RedisClient.class, RedisClient.class);
+		ValkeyClient redisClient = store.get(ValkeyClient.class, ValkeyClient.class);
 		if (redisClient != null) {
 			redisClient.setOptions(DEFAULT_OPTIONS);
 		}
@@ -166,7 +166,7 @@ public class LettuceExtension implements ParameterResolver, AfterAllCallback, Af
 
 			if (connection != null) {
 				connection.close();
-				store.remove(StatefulRedisConnection.class);
+				store.remove(StatefulValkeyConnection.class);
 			}
 		});
 	}
@@ -240,7 +240,7 @@ public class LettuceExtension implements ParameterResolver, AfterAllCallback, Af
 		}
 	}
 
-	record RedisClientCloseable(AbstractRedisClient client) implements Closeable {
+	record ValkeyClientCloseable(AbstractValkeyClient client) implements Closeable {
 
 		@Override
 		public void close() throws IOException {
@@ -248,81 +248,81 @@ public class LettuceExtension implements ParameterResolver, AfterAllCallback, Af
 		}
 	}
 
-	enum RedisClientSupplier implements Supplier<RedisClient> {
+	enum ValkeyClientSupplier implements Supplier<ValkeyClient> {
 
 		INSTANCE;
 
-		final Lazy<RedisClient> lazy = Lazy.of(() -> {
+		final Lazy<ValkeyClient> lazy = Lazy.of(() -> {
 
-			RedisClient client = RedisClient.create(LettuceTestClientResources.getSharedClientResources(),
-					RedisURI.create(SettingsUtils.getHost(), SettingsUtils.getPort()));
+			ValkeyClient client = ValkeyClient.create(LettuceTestClientResources.getSharedClientResources(),
+					ValkeyURI.create(SettingsUtils.getHost(), SettingsUtils.getPort()));
 			client.setOptions(DEFAULT_OPTIONS);
 
-			ShutdownQueue.register(new RedisClientCloseable(client));
+			ShutdownQueue.register(new ValkeyClientCloseable(client));
 			return client;
 		});
 
 		@Override
-		public RedisClient get() {
+		public ValkeyClient get() {
 			return lazy.get();
 		}
 	}
 
-	enum RedisClusterClientSupplier implements Supplier<RedisClusterClient> {
+	enum ValkeyClusterClientSupplier implements Supplier<ValkeyClusterClient> {
 
 		INSTANCE;
 
-		final Lazy<RedisClusterClient> lazy = Lazy.of(() -> {
-			RedisClusterClient client = RedisClusterClient.create(LettuceTestClientResources.getSharedClientResources(),
-					RedisURI.create(SettingsUtils.getHost(), SettingsUtils.getClusterPort()));
+		final Lazy<ValkeyClusterClient> lazy = Lazy.of(() -> {
+			ValkeyClusterClient client = ValkeyClusterClient.create(LettuceTestClientResources.getSharedClientResources(),
+					ValkeyURI.create(SettingsUtils.getHost(), SettingsUtils.getClusterPort()));
 			client.setOptions(DEFAULT_OPTIONS);
 
-			ShutdownQueue.register(new RedisClientCloseable(client));
+			ShutdownQueue.register(new ValkeyClientCloseable(client));
 			return client;
 		});
 
 		@Override
-		public RedisClusterClient get() {
+		public ValkeyClusterClient get() {
 			return lazy.get();
 		}
 	}
 
-	enum StatefulRedisConnectionSupplier implements Supplier<StatefulRedisConnection<String, String>> {
+	enum StatefulValkeyConnectionSupplier implements Supplier<StatefulValkeyConnection<String, String>> {
 
 		INSTANCE;
 
 		@Override
-		public StatefulRedisConnection<String, String> get() {
-			return RedisClientSupplier.INSTANCE.get().connect();
+		public StatefulValkeyConnection<String, String> get() {
+			return ValkeyClientSupplier.INSTANCE.get().connect();
 		}
 	}
 
-	enum StatefulRedisPubSubConnectionSupplier implements Supplier<StatefulRedisPubSubConnection<String, String>> {
+	enum StatefulValkeyPubSubConnectionSupplier implements Supplier<StatefulValkeyPubSubConnection<String, String>> {
 
 		INSTANCE;
 
 		@Override
-		public StatefulRedisPubSubConnection<String, String> get() {
-			return RedisClientSupplier.INSTANCE.get().connectPubSub();
+		public StatefulValkeyPubSubConnection<String, String> get() {
+			return ValkeyClientSupplier.INSTANCE.get().connectPubSub();
 		}
 	}
 
-	enum StatefulRedisClusterConnectionSupplier implements Supplier<StatefulRedisClusterConnection<String, String>> {
+	enum StatefulValkeyClusterConnectionSupplier implements Supplier<StatefulValkeyClusterConnection<String, String>> {
 
 		INSTANCE;
 
 		@Override
-		public StatefulRedisClusterConnection<String, String> get() {
-			return RedisClusterClientSupplier.INSTANCE.get().connect();
+		public StatefulValkeyClusterConnection<String, String> get() {
+			return ValkeyClusterClientSupplier.INSTANCE.get().connect();
 		}
 	}
 
-	enum RedisCommandsFunction
-			implements Function<StatefulRedisConnection<String, String>, RedisCommands<String, String>> {
+	enum ValkeyCommandsFunction
+			implements Function<StatefulValkeyConnection<String, String>, ValkeyCommands<String, String>> {
 		INSTANCE;
 
 		@Override
-		public RedisCommands<String, String> apply(StatefulRedisConnection<String, String> connection) {
+		public ValkeyCommands<String, String> apply(StatefulValkeyConnection<String, String> connection) {
 			return connection.sync();
 		}
 	}

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -65,7 +65,7 @@ public class ReactiveIntegrationTests extends SampleTestRunner {
 
 			Observation intermediate = Observation.start("intermediate", createObservationRegistry());
 
-			ReactiveRedisConnection connection = connectionFactory.getReactiveConnection();
+			ReactiveValkeyConnection connection = connectionFactory.getReactiveConnection();
 
 			connection.ping().contextWrite(Context.of(ObservationThreadLocalAccessor.KEY, intermediate))
 					.as(StepVerifier::create).expectNext("PONG").verifyComplete();

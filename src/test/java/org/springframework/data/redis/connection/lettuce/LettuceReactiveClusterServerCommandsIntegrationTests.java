@@ -22,8 +22,8 @@ import static org.springframework.data.redis.connection.lettuce.LettuceReactiveC
 import reactor.test.StepVerifier;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
 
 /**
  * @author Mark Paluch
@@ -32,9 +32,9 @@ import org.springframework.data.redis.connection.RedisServerCommands.FlushOption
  */
 class LettuceReactiveClusterServerCommandsIntegrationTests extends LettuceReactiveClusterTestSupport {
 
-	private static final RedisClusterNode NODE1 = new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT);
-	private static final RedisClusterNode NODE2 = new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT);
-	private static final RedisClusterNode NODE3 = new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_3_PORT);
+	private static final ValkeyClusterNode NODE1 = new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT);
+	private static final ValkeyClusterNode NODE2 = new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT);
+	private static final ValkeyClusterNode NODE3 = new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_3_PORT);
 
 	@Test // DATAREDIS-659
 	void pingShouldRespondCorrectly() {

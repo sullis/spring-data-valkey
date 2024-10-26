@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisZSetCommands;
+import org.springframework.data.redis.connection.ValkeyZSetCommands;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
@@ -43,7 +43,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisZSetCommands} implementation for Jedis.
+ * {@link ValkeyZSetCommands} implementation for Jedis.
  *
  * @author Christoph Strobl
  * @author Clement Ong
@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class JedisZSetCommands implements RedisZSetCommands {
+class JedisZSetCommands implements ValkeyZSetCommands {
 
 	private final JedisConnection connection;
 

@@ -21,33 +21,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
 /**
- * Integration tests for {@link ReactiveStringRedisTemplate}.
+ * Integration tests for {@link ReactiveStringValkeyTemplate}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(LettuceConnectionFactoryExtension.class)
-public class ReactiveStringRedisTemplateIntegrationTests {
+public class ReactiveStringValkeyTemplateIntegrationTests {
 
-	private final ReactiveRedisConnectionFactory connectionFactory;
+	private final ReactiveValkeyConnectionFactory connectionFactory;
 
-	private ReactiveStringRedisTemplate template;
+	private ReactiveStringValkeyTemplate template;
 
-	public ReactiveStringRedisTemplateIntegrationTests(ReactiveRedisConnectionFactory connectionFactory) {
+	public ReactiveStringValkeyTemplateIntegrationTests(ReactiveValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
 	@BeforeEach
 	void before() {
 
-		template = new ReactiveStringRedisTemplate(connectionFactory);
+		template = new ReactiveStringValkeyTemplate(connectionFactory);
 
 		template.execute(connection -> connection.serverCommands().flushDb()).as(StepVerifier::create).expectNext("OK")
 				.verifyComplete();
@@ -66,11 +66,11 @@ public class ReactiveStringRedisTemplateIntegrationTests {
 		template.opsForValue().set("a", "1").as(StepVerifier::create).expectNext(true).verifyComplete();
 		template.opsForValue().set("b", "1").as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		RedisElementReader<String> reader = RedisElementReader.from(StringRedisSerializer.UTF_8);
-		RedisElementWriter<String> writer = RedisElementWriter.from(StringRedisSerializer.UTF_8);
+		ValkeyElementReader<String> reader = ValkeyElementReader.from(StringValkeySerializer.UTF_8);
+		ValkeyElementWriter<String> writer = ValkeyElementWriter.from(StringValkeySerializer.UTF_8);
 
-		RedisSerializationContext<String, String> nullReadingContext = RedisSerializationContext
-				.<String, String>newSerializationContext(StringRedisSerializer.UTF_8).key(buffer -> {
+		ValkeySerializationContext<String, String> nullReadingContext = ValkeySerializationContext
+				.<String, String>newSerializationContext(StringValkeySerializer.UTF_8).key(buffer -> {
 
 					String read = reader.read(buffer);
 
@@ -78,7 +78,7 @@ public class ReactiveStringRedisTemplateIntegrationTests {
 
 				}, writer).build();
 
-		ReactiveRedisTemplate<String, String> customTemplate = new ReactiveRedisTemplate<>(template.getConnectionFactory(),
+		ReactiveValkeyTemplate<String, String> customTemplate = new ReactiveValkeyTemplate<>(template.getConnectionFactory(),
 				nullReadingContext);
 
 		customTemplate.keys("b").as(StepVerifier::create).expectNext("b").verifyComplete();

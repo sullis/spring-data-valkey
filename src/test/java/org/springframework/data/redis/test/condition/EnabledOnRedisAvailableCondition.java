@@ -29,38 +29,38 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@link ExecutionCondition} for {@link EnabledOnRedisAvailableCondition @EnabledOnRedisAvailable}.
+ * {@link ExecutionCondition} for {@link EnabledOnValkeyAvailableCondition @EnabledOnValkeyAvailable}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
- * @see EnabledOnRedisAvailableCondition
+ * @see EnabledOnValkeyAvailableCondition
  */
-class EnabledOnRedisAvailableCondition implements ExecutionCondition {
+class EnabledOnValkeyAvailableCondition implements ExecutionCondition {
 
 	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled(
-			"@EnabledOnRedisAvailable is not present");
+			"@EnabledOnValkeyAvailable is not present");
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
 
-		Optional<EnabledOnRedisAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
-				EnabledOnRedisAvailable.class);
+		Optional<EnabledOnValkeyAvailable> optional = AnnotationUtils.findAnnotation(context.getElement(),
+				EnabledOnValkeyAvailable.class);
 
 		if (!optional.isPresent()) {
 			return ENABLED_BY_DEFAULT;
 		}
 
-		EnabledOnRedisAvailable annotation = optional.get();
+		EnabledOnValkeyAvailable annotation = optional.get();
 
 		try (Socket socket = new Socket()) {
 
 			socket.connect(new InetSocketAddress(SettingsUtils.getHost(), annotation.value()), 100);
 
-			return enabled("Connection successful to Redis at %s:%d".formatted(SettingsUtils.getHost(),
+			return enabled("Connection successful to Valkey at %s:%d".formatted(SettingsUtils.getHost(),
 					annotation.value()));
 		} catch (IOException ex) {
-			return disabled("Cannot connect to Redis at %s:%d (%s)".formatted(SettingsUtils.getHost(),
+			return disabled("Cannot connect to Valkey at %s:%d (%s)".formatted(SettingsUtils.getHost(),
 					annotation.value(), ex));
 		}
 	}

@@ -17,18 +17,18 @@
 package org.springframework.data.redis.connection;
 
 /**
- * Specifies that the connection decorates another {@link RedisConnection}.
+ * Specifies that the connection decorates another {@link ValkeyConnection}.
  *
  * @author Mark Paluch
  * @since 1.7
  */
-public interface DecoratedRedisConnection {
+public interface DecoratedValkeyConnection {
 
 	/**
-	 * Gets the underlying {@link RedisConnection}.
+	 * Gets the underlying {@link ValkeyConnection}.
 	 *
 	 * @return never {@literal null}.
 	 */
-	RedisConnection getDelegate();
+	ValkeyConnection getDelegate();
 
 }

@@ -40,7 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public @interface EnabledOnCommand {
 
 	/**
-	 * Name of the Redis command to be available.
+	 * Name of the Valkey command to be available.
 	 */
 	String value();
 }

@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 import org.springframework.data.redis.connection.stream.StreamRecords.MapBackedRecord;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -93,14 +93,14 @@ public interface MapRecord<S, K, V> extends Record<S, Map<K, V>>, Iterable<Map.E
 
 	/**
 	 * Serialize {@link #getStream() key} and {@link #getValue() field/value pairs} with the given
-	 * {@link RedisSerializer}. An already assigned {@link RecordId id} is carried over to the new instance.
+	 * {@link ValkeySerializer}. An already assigned {@link RecordId id} is carried over to the new instance.
 	 *
 	 * @param serializer can be {@literal null} if the {@link Record} only holds binary data.
 	 * @return new {@link ByteRecord} holding the serialized values.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	default ByteRecord serialize(@Nullable RedisSerializer<?> serializer) {
-		return serialize((RedisSerializer) serializer, (RedisSerializer) serializer, (RedisSerializer) serializer);
+	default ByteRecord serialize(@Nullable ValkeySerializer<?> serializer) {
+		return serialize((ValkeySerializer) serializer, (ValkeySerializer) serializer, (ValkeySerializer) serializer);
 	}
 
 	/**
@@ -113,8 +113,8 @@ public interface MapRecord<S, K, V> extends Record<S, Map<K, V>>, Iterable<Map.E
 	 * @param valueSerializer can be {@literal null} if the values are binary.
 	 * @return new {@link ByteRecord} holding the serialized values.
 	 */
-	default ByteRecord serialize(@Nullable RedisSerializer<? super S> streamSerializer,
-			@Nullable RedisSerializer<? super K> fieldSerializer, @Nullable RedisSerializer<? super V> valueSerializer) {
+	default ByteRecord serialize(@Nullable ValkeySerializer<? super S> streamSerializer,
+			@Nullable ValkeySerializer<? super K> fieldSerializer, @Nullable ValkeySerializer<? super V> valueSerializer) {
 
 		MapRecord<S, byte[], byte[]> binaryMap = mapEntries(
 				it -> Collections.singletonMap(StreamSerialization.serialize(fieldSerializer, it.getKey()),

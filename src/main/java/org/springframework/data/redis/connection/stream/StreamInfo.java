@@ -97,7 +97,7 @@ public class StreamInfo {
 	}
 
 	/**
-	 * Value object holding general information about a {@literal Redis Stream}.
+	 * Value object holding general information about a {@literal Valkey Stream}.
 	 *
 	 * @author Christoph Strobl
 	 */
@@ -216,7 +216,7 @@ public class StreamInfo {
 
 	/**
 	 * Value object holding general information about {@literal consumer groups} associated with a
-	 * {@literal Redis Stream}.
+	 * {@literal Valkey Stream}.
 	 *
 	 * @author Christoph Strobl
 	 */

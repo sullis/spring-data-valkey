@@ -30,19 +30,19 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Metrics;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.Flag;
-import org.springframework.data.redis.connection.RedisClusterNode.LinkState;
-import org.springframework.data.redis.connection.RedisClusterNode.RedisClusterNodeBuilder;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisNode.NodeType;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.Flag;
+import org.springframework.data.redis.connection.ValkeyClusterNode.LinkState;
+import org.springframework.data.redis.connection.ValkeyClusterNode.ValkeyClusterNodeBuilder;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyNode.NodeType;
 import org.springframework.data.redis.connection.zset.Tuple;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -110,7 +110,7 @@ public abstract class Converters {
 		try (StringReader stringReader = new StringReader(source)) {
 			info.load(stringReader);
 		} catch (Exception ex) {
-			throw new RedisSystemException("Cannot read Redis info", ex);
+			throw new ValkeySystemException("Cannot read Valkey info", ex);
 		}
 
 		return info;
@@ -138,30 +138,30 @@ public abstract class Converters {
 	}
 
 	/**
-	 * Converts the result of a single line of {@code CLUSTER NODES} into a {@link RedisClusterNode}.
+	 * Converts the result of a single line of {@code CLUSTER NODES} into a {@link ValkeyClusterNode}.
 	 *
 	 * @param clusterNodesLine
 	 * @return
 	 * @since 1.7
 	 */
-	protected static RedisClusterNode toClusterNode(String clusterNodesLine) {
+	protected static ValkeyClusterNode toClusterNode(String clusterNodesLine) {
 		return ClusterNodesConverter.INSTANCE.convert(clusterNodesLine);
 	}
 
 	/**
-	 * Converts lines from the result of {@code CLUSTER NODES} into {@link RedisClusterNode}s.
+	 * Converts lines from the result of {@code CLUSTER NODES} into {@link ValkeyClusterNode}s.
 	 *
 	 * @param lines
 	 * @return
 	 * @since 1.7
 	 */
-	public static Set<RedisClusterNode> toSetOfRedisClusterNodes(Collection<String> lines) {
+	public static Set<ValkeyClusterNode> toSetOfValkeyClusterNodes(Collection<String> lines) {
 
 		if (CollectionUtils.isEmpty(lines)) {
 			return Collections.emptySet();
 		}
 
-		Set<RedisClusterNode> nodes = new LinkedHashSet<>(lines.size());
+		Set<ValkeyClusterNode> nodes = new LinkedHashSet<>(lines.size());
 
 		for (String line : lines) {
 			nodes.add(toClusterNode(line));
@@ -171,16 +171,16 @@ public abstract class Converters {
 	}
 
 	/**
-	 * Converts the result of {@code CLUSTER NODES} into {@link RedisClusterNode}s.
+	 * Converts the result of {@code CLUSTER NODES} into {@link ValkeyClusterNode}s.
 	 *
 	 * @param clusterNodes
 	 * @return
 	 * @since 1.7
 	 */
-	public static Set<RedisClusterNode> toSetOfRedisClusterNodes(String clusterNodes) {
+	public static Set<ValkeyClusterNode> toSetOfValkeyClusterNodes(String clusterNodes) {
 
 		return StringUtils.hasText(clusterNodes)
-				? toSetOfRedisClusterNodes(Arrays.asList(clusterNodes.split(CLUSTER_NODES_LINE_SEPARATOR)))
+				? toSetOfValkeyClusterNodes(Arrays.asList(clusterNodes.split(CLUSTER_NODES_LINE_SEPARATOR)))
 				: Collections.emptySet();
 	}
 
@@ -285,7 +285,7 @@ public abstract class Converters {
 	 * @since 1.8
 	 */
 	public static <V> Converter<GeoResults<GeoLocation<byte[]>>, GeoResults<GeoLocation<V>>> deserializingGeoResultsConverter(
-			RedisSerializer<V> serializer) {
+			ValkeySerializer<V> serializer) {
 
 		return new DeserializingGeoResultsConverter<>(serializer);
 	}
@@ -358,7 +358,7 @@ public abstract class Converters {
 	}
 
 	/**
-	 * Parse a rather generic Redis response, such as a list of something into a meaningful structure applying best effort
+	 * Parse a rather generic Valkey response, such as a list of something into a meaningful structure applying best effort
 	 * conversion of {@code byte[]} and {@link ByteBuffer}.
 	 *
 	 * @param source the source to parse
@@ -372,7 +372,7 @@ public abstract class Converters {
 	}
 
 	/**
-	 * Parse a rather generic Redis response, such as a list of something into a meaningful structure applying best effort
+	 * Parse a rather generic Valkey response, such as a list of something into a meaningful structure applying best effort
 	 * conversion of {@code byte[]} and {@link ByteBuffer} based on the {@literal sourcePath} and a {@literal typeHintMap}
 	 *
 	 * @param source the source to parse
@@ -514,9 +514,9 @@ public abstract class Converters {
 	static class DeserializingGeoResultsConverter<V>
 			implements Converter<GeoResults<GeoLocation<byte[]>>, GeoResults<GeoLocation<V>>> {
 
-		final RedisSerializer<V> serializer;
+		final ValkeySerializer<V> serializer;
 
-		public DeserializingGeoResultsConverter(RedisSerializer<V> serializer) {
+		public DeserializingGeoResultsConverter(ValkeySerializer<V> serializer) {
 			this.serializer = serializer;
 		}
 
@@ -535,19 +535,19 @@ public abstract class Converters {
 		}
 	}
 
-	enum ClusterNodesConverter implements Converter<String, RedisClusterNode> {
+	enum ClusterNodesConverter implements Converter<String, ValkeyClusterNode> {
 
 		INSTANCE;
 
 		/**
 		 * Support following printf patterns:
 		 * <ul>
-		 * <li>{@code %s:%i} (Redis 3)</li>
-		 * <li>{@code %s:%i@%i} (Redis 4, with bus port)</li>
-		 * <li>{@code %s:%i@%i,%s} (Redis 7, with announced hostname)</li>
+		 * <li>{@code %s:%i} (Valkey 3)</li>
+		 * <li>{@code %s:%i@%i} (Valkey 4, with bus port)</li>
+		 * <li>{@code %s:%i@%i,%s} (Valkey 7, with announced hostname)</li>
 		 *
 		 * The output of the {@code CLUSTER NODES } command is just a space-separated CSV string, where each
-		 * line represents a node in the cluster. The following is an example of output on Redis 7.2.0.
+		 * line represents a node in the cluster. The following is an example of output on Valkey 7.2.0.
 		 * You can check the latest <a href="https://redis.io/docs/latest/commands/cluster-nodes/">here</a>.
 		 *
 		 * {@code <id> <ip:port@cport[,hostname]> <flags> <master> <ping-sent> <pong-recv> <config-epoch> <link-state> <slot> <slot> ... <slot>}
@@ -573,7 +573,7 @@ public abstract class Converters {
 		static final int SLOTS_INDEX = 8;
 
 		/**
-		 * Value object capturing Redis' representation of a cluster node network coordinate.
+		 * Value object capturing Valkey' representation of a cluster node network coordinate.
 		 *
 		 * @author Marcin Grzejszczak
 		 * @author Mark Paluch
@@ -581,7 +581,7 @@ public abstract class Converters {
 		record AddressPortHostname(String address, String port, @Nullable String hostname) {
 
 			/**
-			 * Parses Redis {@code CLUSTER NODES} host and port segment into {@link AddressPortHostname}.
+			 * Parses Valkey {@code CLUSTER NODES} host and port segment into {@link AddressPortHostname}.
 			 */
 			static AddressPortHostname parse(String hostAndPortPart) {
 
@@ -632,7 +632,7 @@ public abstract class Converters {
 		}
 
 		@Override
-		public RedisClusterNode convert(String source) {
+		public ValkeyClusterNode convert(String source) {
 
 			String[] args = source.split(" ");
 
@@ -644,7 +644,7 @@ public abstract class Converters {
 			SlotRange range = parseSlotRange(args);
 			Set<Flag> flags = parseFlags(args[FLAGS_INDEX]);
 
-			RedisClusterNodeBuilder nodeBuilder = RedisClusterNode.newRedisClusterNode()
+			ValkeyClusterNodeBuilder nodeBuilder = ValkeyClusterNode.newValkeyClusterNode()
 					.listeningAt(endpoint.address(), endpoint.portAsInt()) //
 					.withId(args[ID_INDEX]) //
 					.promotedAs(flags.contains(Flag.MASTER) ? NodeType.MASTER : NodeType.REPLICA) //

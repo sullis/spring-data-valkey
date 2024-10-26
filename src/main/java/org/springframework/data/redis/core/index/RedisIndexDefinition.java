@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
  * @author Christoph Strobl
  * @since 1.7
  */
-public abstract class RedisIndexDefinition implements IndexDefinition {
+public abstract class ValkeyIndexDefinition implements IndexDefinition {
 
 	private final String keyspace;
 	private final String indexName;
@@ -41,13 +41,13 @@ public abstract class RedisIndexDefinition implements IndexDefinition {
 	private @Nullable IndexValueTransformer valueTransformer;
 
 	/**
-	 * Creates new {@link RedisIndexDefinition}.
+	 * Creates new {@link ValkeyIndexDefinition}.
 	 *
 	 * @param keyspace
 	 * @param path
 	 * @param indexName
 	 */
-	protected RedisIndexDefinition(String keyspace, @Nullable String path, String indexName) {
+	protected ValkeyIndexDefinition(String keyspace, @Nullable String path, String indexName) {
 
 		this.keyspace = keyspace;
 		this.indexName = indexName;
@@ -105,7 +105,7 @@ public abstract class RedisIndexDefinition implements IndexDefinition {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof RedisIndexDefinition that)) {
+		if (!(obj instanceof ValkeyIndexDefinition that)) {
 			return false;
 		}
 

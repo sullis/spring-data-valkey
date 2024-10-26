@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
 import org.reactivestreams.Publisher;
 
 import org.springframework.data.redis.connection.ReactiveHashCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyScanCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyScanCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.util.Assert;
 
@@ -46,14 +46,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveHashCommands implements ReactiveHashCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveHashCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveHashCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveHashCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 		this.connection = connection;

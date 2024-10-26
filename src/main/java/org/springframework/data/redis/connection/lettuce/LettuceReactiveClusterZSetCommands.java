@@ -22,7 +22,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.ReactiveClusterZSetCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.util.Assert;
 
 /**
@@ -37,7 +37,7 @@ class LettuceReactiveClusterZSetCommands extends LettuceReactiveZSetCommands imp
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterZSetCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterZSetCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 

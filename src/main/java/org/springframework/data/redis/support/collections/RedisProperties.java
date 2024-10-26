@@ -31,11 +31,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link Properties} extension for a Redis back-store. Useful for reading (and storing) properties inside a Redis hash.
+ * {@link Properties} extension for a Valkey back-store. Useful for reading (and storing) properties inside a Valkey hash.
  * Particularly useful inside a Spring container for hooking into Spring's property placeholder or
  * {@link org.springframework.beans.factory.config.PropertiesFactoryBean}.
  * <p>
@@ -45,54 +45,54 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.core.io.support.PropertiesLoaderSupport
  * @author Costin Leau
  */
-public class RedisProperties extends Properties implements RedisMap<Object, Object> {
+public class ValkeyProperties extends Properties implements ValkeyMap<Object, Object> {
 
 	private final BoundHashOperations<String, String, String> hashOps;
-	private final RedisMap<String, String> delegate;
+	private final ValkeyMap<String, String> delegate;
 
 	/**
-	 * Constructs a new {@link RedisProperties} instance.
+	 * Constructs a new {@link ValkeyProperties} instance.
 	 */
-	public RedisProperties(BoundHashOperations<String, String, String> boundOps) {
+	public ValkeyProperties(BoundHashOperations<String, String, String> boundOps) {
 		this(null, boundOps);
 	}
 
 	/**
-	 * Constructs a new {@link RedisProperties} instance.
+	 * Constructs a new {@link ValkeyProperties} instance.
 	 *
-	 * @param key Redis key of this property map.
-	 * @param operations {@link RedisOperations} for this properties.
-	 * @see RedisOperations#getHashKeySerializer()
-	 * @see RedisOperations#getHashValueSerializer()
+	 * @param key Valkey key of this property map.
+	 * @param operations {@link ValkeyOperations} for this properties.
+	 * @see ValkeyOperations#getHashKeySerializer()
+	 * @see ValkeyOperations#getHashValueSerializer()
 	 */
-	public RedisProperties(String key, RedisOperations<String, ?> operations) {
+	public ValkeyProperties(String key, ValkeyOperations<String, ?> operations) {
 		this(null, operations.<String, String> boundHashOps(key));
 	}
 
 	/**
-	 * Constructs a new {@link RedisProperties} instance.
+	 * Constructs a new {@link ValkeyProperties} instance.
 	 *
 	 * @param defaults default properties to apply, can be {@literal null}.
 	 * @param boundOps {@link BoundHashOperations} for this properties.
 	 */
-	public RedisProperties(@Nullable Properties defaults, BoundHashOperations<String, String, String> boundOps) {
+	public ValkeyProperties(@Nullable Properties defaults, BoundHashOperations<String, String, String> boundOps) {
 
 		super(defaults);
 
 		this.hashOps = boundOps;
-		this.delegate = new DefaultRedisMap<>(boundOps);
+		this.delegate = new DefaultValkeyMap<>(boundOps);
 	}
 
 	/**
-	 * Constructs a new {@link RedisProperties} instance.
+	 * Constructs a new {@link ValkeyProperties} instance.
 	 *
 	 * @param defaults default properties to apply, can be {@literal null}.
-	 * @param key Redis key of this property map.
-	 * @param operations {@link RedisOperations} for this properties.
-	 * @see RedisOperations#getHashKeySerializer()
-	 * @see RedisOperations#getHashValueSerializer()
+	 * @param key Valkey key of this property map.
+	 * @param operations {@link ValkeyOperations} for this properties.
+	 * @see ValkeyOperations#getHashKeySerializer()
+	 * @see ValkeyOperations#getHashValueSerializer()
 	 */
-	public RedisProperties(Properties defaults, String key, RedisOperations<String, ?> operations) {
+	public ValkeyProperties(Properties defaults, String key, ValkeyOperations<String, ?> operations) {
 		this(defaults, operations.boundHashOps(key));
 	}
 
@@ -128,7 +128,7 @@ public class RedisProperties extends Properties implements RedisMap<Object, Obje
 
 	@Override
 	public synchronized Object clone() {
-		return new RedisProperties(defaults, hashOps);
+		return new ValkeyProperties(defaults, hashOps);
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class RedisProperties extends Properties implements RedisMap<Object, Obje
 		if (o == this)
 			return true;
 
-		if (o instanceof RedisProperties) {
+		if (o instanceof ValkeyProperties) {
 			return o.hashCode() == hashCode();
 		}
 		return false;
@@ -173,7 +173,7 @@ public class RedisProperties extends Properties implements RedisMap<Object, Obje
 	@Override
 	public synchronized int hashCode() {
 
-		int hash = RedisProperties.class.hashCode();
+		int hash = ValkeyProperties.class.hashCode();
 		return hash * 17 + delegate.hashCode();
 	}
 
@@ -231,7 +231,7 @@ public class RedisProperties extends Properties implements RedisMap<Object, Obje
 	}
 
 	@Override
-	public RedisOperations<String, ?> getOperations() {
+	public ValkeyOperations<String, ?> getOperations() {
 		return hashOps.getOperations();
 	}
 

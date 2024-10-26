@@ -17,13 +17,13 @@ package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.LPosArgs;
-import io.lettuce.core.api.async.RedisListAsyncCommands;
+import io.lettuce.core.api.async.ValkeyListAsyncCommands;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.redis.connection.RedisListCommands;
+import org.springframework.data.redis.connection.ValkeyListCommands;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * @author dengliming
  * @since 2.0
  */
-class LettuceListCommands implements RedisListCommands {
+class LettuceListCommands implements ValkeyListCommands {
 
 	private final LettuceConnection connection;
 
@@ -46,7 +46,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::rpush, key, values);
+		return connection.invoke().just(ValkeyListAsyncCommands::rpush, key, values);
 	}
 
 	@Override
@@ -61,10 +61,10 @@ class LettuceListCommands implements RedisListCommands {
 		}
 
 		if (count != null) {
-			return connection.invoke().just(RedisListAsyncCommands::lpos, key, element, count, args);
+			return connection.invoke().just(ValkeyListAsyncCommands::lpos, key, element, count, args);
 		}
 
-		return connection.invoke().from(RedisListAsyncCommands::lpos, key, element, args)
+		return connection.invoke().from(ValkeyListAsyncCommands::lpos, key, element, args)
 				.getOrElse(Collections::singletonList, Collections::emptyList);
 	}
 
@@ -75,7 +75,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(values, "Values must not be null");
 		Assert.noNullElements(values, "Values must not contain null elements");
 
-		return connection.invoke().just(RedisListAsyncCommands::lpush, key, values);
+		return connection.invoke().just(ValkeyListAsyncCommands::lpush, key, values);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::rpushx, key, value);
+		return connection.invoke().just(ValkeyListAsyncCommands::rpushx, key, value);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lpushx, key, value);
+		return connection.invoke().just(ValkeyListAsyncCommands::lpushx, key, value);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::llen, key);
+		return connection.invoke().just(ValkeyListAsyncCommands::llen, key);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lrange, key, start, end);
+		return connection.invoke().just(ValkeyListAsyncCommands::lrange, key, start, end);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		connection.invokeStatus().just(RedisListAsyncCommands::ltrim, key, start, end);
+		connection.invokeStatus().just(ValkeyListAsyncCommands::ltrim, key, start, end);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lindex, key, index);
+		return connection.invoke().just(ValkeyListAsyncCommands::lindex, key, index);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::linsert, key, LettuceConverters.toBoolean(where), pivot,
+		return connection.invoke().just(ValkeyListAsyncCommands::linsert, key, LettuceConverters.toBoolean(where), pivot,
 				value);
 	}
 
@@ -145,7 +145,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(from, "From direction must not be null");
 		Assert.notNull(to, "To direction must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lmove, sourceKey, destinationKey,
+		return connection.invoke().just(ValkeyListAsyncCommands::lmove, sourceKey, destinationKey,
 				LettuceConverters.toLmoveArgs(from, to));
 
 	}
@@ -158,7 +158,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(from, "From direction must not be null");
 		Assert.notNull(to, "To direction must not be null");
 
-		return connection.invoke(connection.getAsyncDedicatedConnection()).just(RedisListAsyncCommands::blmove, sourceKey,
+		return connection.invoke(connection.getAsyncDedicatedConnection()).just(ValkeyListAsyncCommands::blmove, sourceKey,
 				destinationKey, LettuceConverters.toLmoveArgs(from, to), timeout);
 	}
 
@@ -168,7 +168,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		connection.invokeStatus().just(RedisListAsyncCommands::lset, key, index, value);
+		connection.invokeStatus().just(ValkeyListAsyncCommands::lset, key, index, value);
 	}
 
 	@Override
@@ -177,7 +177,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lrem, key, count, value);
+		return connection.invoke().just(ValkeyListAsyncCommands::lrem, key, count, value);
 	}
 
 	@Override
@@ -185,7 +185,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lpop, key);
+		return connection.invoke().just(ValkeyListAsyncCommands::lpop, key);
 	}
 
 	@Override
@@ -193,7 +193,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::lpop, key, count);
+		return connection.invoke().just(ValkeyListAsyncCommands::lpop, key, count);
 	}
 
 	@Override
@@ -201,7 +201,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::rpop, key);
+		return connection.invoke().just(ValkeyListAsyncCommands::rpop, key);
 	}
 
 	@Override
@@ -209,7 +209,7 @@ class LettuceListCommands implements RedisListCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::rpop, key, count);
+		return connection.invoke().just(ValkeyListAsyncCommands::rpop, key, count);
 	}
 
 	@Override
@@ -219,7 +219,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.noNullElements(keys, "Keys must not contain null elements");
 
 		return connection.invoke(connection.getAsyncDedicatedConnection())
-				.from(RedisListAsyncCommands::blpop, timeout, keys).get(LettuceListCommands::toBytesList);
+				.from(ValkeyListAsyncCommands::blpop, timeout, keys).get(LettuceListCommands::toBytesList);
 	}
 
 	@Override
@@ -229,7 +229,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.noNullElements(keys, "Keys must not contain null elements");
 
 		return connection.invoke(connection.getAsyncDedicatedConnection())
-				.from(RedisListAsyncCommands::brpop, timeout, keys).get(LettuceListCommands::toBytesList);
+				.from(ValkeyListAsyncCommands::brpop, timeout, keys).get(LettuceListCommands::toBytesList);
 	}
 
 	@Override
@@ -238,7 +238,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(srcKey, "Source key must not be null");
 		Assert.notNull(dstKey, "Destination key must not be null");
 
-		return connection.invoke().just(RedisListAsyncCommands::rpoplpush, srcKey, dstKey);
+		return connection.invoke().just(ValkeyListAsyncCommands::rpoplpush, srcKey, dstKey);
 	}
 
 	@Override
@@ -247,7 +247,7 @@ class LettuceListCommands implements RedisListCommands {
 		Assert.notNull(srcKey, "Source key must not be null");
 		Assert.notNull(dstKey, "Destination key must not be null");
 
-		return connection.invoke(connection.getAsyncDedicatedConnection()).just(RedisListAsyncCommands::brpoplpush, timeout,
+		return connection.invoke(connection.getAsyncDedicatedConnection()).just(ValkeyListAsyncCommands::brpoplpush, timeout,
 				srcKey, dstKey);
 	}
 

@@ -1,11 +1,11 @@
 [[preface]]
 = Preface
 
-The Spring Data Redis project applies core Spring concepts to the development of solutions by using a key-value style data store.
+The Spring Data Valkey project applies core Spring concepts to the development of solutions by using a key-value style data store.
 We provide a "`template`" as a high-level abstraction for sending and receiving messages.
 You may notice similarities to the JDBC support in the Spring Framework.
 
-This section provides an easy-to-follow guide for getting started with the Spring Data Redis module.
+This section provides an easy-to-follow guide for getting started with the Spring Data Valkey module.
 
 [[get-started:first-steps:spring]]
 == Learning Spring
@@ -23,15 +23,15 @@ Spring Data uses Spring framework's
 While you need not know the Spring APIs, understanding the concepts behind them is important.
 At a minimum, the idea behind Inversion of Control (IoC) should be familiar, and you should be familiar with whatever IoC container you choose to use.
 
-The core functionality of the Redis support can be used directly, with no need to invoke the IoC services of the Spring Container.
+The core functionality of the Valkey support can be used directly, with no need to invoke the IoC services of the Spring Container.
 This is much like `JdbcTemplate`, which can be used "'standalone'" without any other services of the Spring container.
-To leverage all the features of Spring Data Redis, such as the repository support, you need to configure some parts of the library to use Spring.
+To leverage all the features of Spring Data Valkey, such as the repository support, you need to configure some parts of the library to use Spring.
 
 To learn more about Spring, you can refer to the comprehensive documentation that explains the Spring Framework in detail.
 There are a lot of articles, blog entries, and books on the subject.
 See the Spring framework https://spring.io/projects/spring-framework/[home page] for more information.
 
-In general, this should be the starting point for developers wanting to try Spring Data Redis.
+In general, this should be the starting point for developers wanting to try Spring Data Valkey.
 
 [[get-started:first-steps:nosql]]
 == Learning NoSQL and Key Value Stores
@@ -49,16 +49,16 @@ One can find various samples for key-value stores in the dedicated Spring Data e
 [[requirements]]
 == Requirements
 
-Spring Data Redis binaries require JDK level 17 and above and https://spring.io/projects/spring-framework/[Spring Framework] {springVersion} and above.
+Spring Data Valkey binaries require JDK level 17 and above and https://spring.io/projects/spring-framework/[Spring Framework] {springVersion} and above.
 
-In terms of key-value stores, https://redis.io[Redis] 2.6.x or higher is required.
-Spring Data Redis is currently tested against the latest 6.0 release.
+In terms of key-value stores, https://redis.io[Valkey] 2.6.x or higher is required.
+Spring Data Valkey is currently tested against the latest 6.0 release.
 
 [[get-started:help]]
 == Additional Help Resources
 
 Learning a new framework is not always straightforward.
-In this section, we try to provide what we think is an easy-to-follow guide for starting with the Spring Data Redis module.
+In this section, we try to provide what we think is an easy-to-follow guide for starting with the Spring Data Valkey module.
 However, if you encounter issues or you need advice, feel free to use one of the following links:
 
 [get-started:help:community]]

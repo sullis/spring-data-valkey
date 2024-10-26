@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
  * @author LeeHyungGeol
  * @since 1.4
  */
-public class RedisNode implements NamedNode {
+public class ValkeyNode implements NamedNode {
 
 	public static final int DEFAULT_PORT = 6379;
 	public static final int DEFAULT_SENTINEL_PORT = 26379;
@@ -40,12 +40,12 @@ public class RedisNode implements NamedNode {
 	@Nullable String masterId;
 
 	/**
-	 * Creates a new {@link RedisNode} with the given {@code host}, {@code port}.
+	 * Creates a new {@link ValkeyNode} with the given {@code host}, {@code port}.
 	 *
 	 * @param host must not be {@literal null}
 	 * @param port
 	 */
-	public RedisNode(String host, int port) {
+	public ValkeyNode(String host, int port) {
 
 		Assert.notNull(host, "host must not be null");
 
@@ -53,9 +53,9 @@ public class RedisNode implements NamedNode {
 		this.port = port;
 	}
 
-	protected RedisNode() {}
+	protected ValkeyNode() {}
 
-	private RedisNode(RedisNode redisNode) {
+	private ValkeyNode(ValkeyNode redisNode) {
 
 		this.id = redisNode.id;
 		this.name = redisNode.name;
@@ -66,44 +66,44 @@ public class RedisNode implements NamedNode {
 	}
 
 	/**
-	 * Parse a {@code hostAndPort} string into {@link RedisNode}. Supports IPv4, IPv6, and hostname notations including
+	 * Parse a {@code hostAndPort} string into {@link ValkeyNode}. Supports IPv4, IPv6, and hostname notations including
 	 * the port. For example:
 	 *
 	 * <pre class="code">
-	 * RedisNode.fromString("127.0.0.1");
-	 * RedisNode.fromString("127.0.0.1:6379");
-	 * RedisNode.fromString("[aaaa:bbbb::dddd:eeee]");
-	 * RedisNode.fromString("[aaaa:bbbb::dddd:eeee]:6379");
-	 * RedisNode.fromString("my.redis.server");
-	 * RedisNode.fromString("my.redis.server:6379");
+	 * ValkeyNode.fromString("127.0.0.1");
+	 * ValkeyNode.fromString("127.0.0.1:6379");
+	 * ValkeyNode.fromString("[aaaa:bbbb::dddd:eeee]");
+	 * ValkeyNode.fromString("[aaaa:bbbb::dddd:eeee]:6379");
+	 * ValkeyNode.fromString("my.valkey.server");
+	 * ValkeyNode.fromString("my.valkey.server:6379");
 	 * </pre>
 	 *
 	 * @param hostPortString must not be {@literal null} or empty.
-	 * @return the parsed {@link RedisNode}.
+	 * @return the parsed {@link ValkeyNode}.
 	 * @since 2.7.4
 	 */
-	public static RedisNode fromString(String hostPortString) {
+	public static ValkeyNode fromString(String hostPortString) {
 		return fromString(hostPortString, DEFAULT_PORT);
 	}
 
 	/**
-	 * Parse a {@code hostAndPort} string into {@link RedisNode}. Supports IPv4, IPv6, and hostname notations including
+	 * Parse a {@code hostAndPort} string into {@link ValkeyNode}. Supports IPv4, IPv6, and hostname notations including
 	 * the port. For example:
 	 *
 	 * <pre class="code">
-	 * RedisNode.fromString("127.0.0.1");
-	 * RedisNode.fromString("127.0.0.1:6379");
-	 * RedisNode.fromString("[aaaa:bbbb::dddd:eeee]");
-	 * RedisNode.fromString("[aaaa:bbbb::dddd:eeee]:6379");
-	 * RedisNode.fromString("my.redis.server");
-	 * RedisNode.fromString("my.redis.server:6379");
+	 * ValkeyNode.fromString("127.0.0.1");
+	 * ValkeyNode.fromString("127.0.0.1:6379");
+	 * ValkeyNode.fromString("[aaaa:bbbb::dddd:eeee]");
+	 * ValkeyNode.fromString("[aaaa:bbbb::dddd:eeee]:6379");
+	 * ValkeyNode.fromString("my.valkey.server");
+	 * ValkeyNode.fromString("my.valkey.server:6379");
 	 * </pre>
 	 *
 	 * @param hostPortString must not be {@literal null} or empty.
-	 * @return the parsed {@link RedisNode}.
+	 * @return the parsed {@link ValkeyNode}.
 	 * @since 3.4
 	 */
-	public static RedisNode fromString(String hostPortString, int defaultPort) {
+	public static ValkeyNode fromString(String hostPortString, int defaultPort) {
 
 		Assert.notNull(hostPortString, "HostAndPort must not be null");
 
@@ -149,7 +149,7 @@ public class RedisNode implements NamedNode {
 			throw new IllegalArgumentException("Port number out of range: %s".formatted(hostPortString));
 		}
 
-		return new RedisNode(host, port);
+		return new ValkeyNode(host, port);
 	}
 
 	/**
@@ -284,13 +284,13 @@ public class RedisNode implements NamedNode {
 	}
 
 	/**
-	 * Get {@link RedisNodeBuilder} for creating new {@link RedisNode}.
+	 * Get {@link ValkeyNodeBuilder} for creating new {@link ValkeyNode}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 1.7
 	 */
-	public static RedisNodeBuilder newRedisNode() {
-		return new RedisNodeBuilder();
+	public static ValkeyNodeBuilder newValkeyNode() {
+		return new ValkeyNodeBuilder();
 	}
 
 	@Override
@@ -313,7 +313,7 @@ public class RedisNode implements NamedNode {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof RedisNode other)) {
+		if (obj == null || !(obj instanceof ValkeyNode other)) {
 			return false;
 		}
 
@@ -341,23 +341,23 @@ public class RedisNode implements NamedNode {
 	}
 
 	/**
-	 * Builder for creating new {@link RedisNode}.
+	 * Builder for creating new {@link ValkeyNode}.
 	 *
 	 * @author Christoph Strobl
 	 * @since 1.4
 	 */
-	public static class RedisNodeBuilder {
+	public static class ValkeyNodeBuilder {
 
-		private RedisNode node;
+		private ValkeyNode node;
 
-		public RedisNodeBuilder() {
-			node = new RedisNode();
+		public ValkeyNodeBuilder() {
+			node = new ValkeyNode();
 		}
 
 		/**
 		 * Define node name.
 		 */
-		public RedisNodeBuilder withName(String name) {
+		public ValkeyNodeBuilder withName(String name) {
 			node.name = name;
 			return this;
 		}
@@ -369,7 +369,7 @@ public class RedisNode implements NamedNode {
 		 * @param port
 		 * @return
 		 */
-		public RedisNodeBuilder listeningAt(String host, int port) {
+		public ValkeyNodeBuilder listeningAt(String host, int port) {
 
 			Assert.notNull(host, "Hostname must not be null");
 			node.host = host;
@@ -383,7 +383,7 @@ public class RedisNode implements NamedNode {
 		 * @param id
 		 * @return
 		 */
-		public RedisNodeBuilder withId(String id) {
+		public ValkeyNodeBuilder withId(String id) {
 
 			node.id = id;
 			return this;
@@ -396,7 +396,7 @@ public class RedisNode implements NamedNode {
 		 * @return
 		 * @since 1.7
 		 */
-		public RedisNodeBuilder promotedAs(NodeType type) {
+		public ValkeyNodeBuilder promotedAs(NodeType type) {
 
 			node.type = type;
 			return this;
@@ -409,19 +409,19 @@ public class RedisNode implements NamedNode {
 		 * @return this.
 		 * @since 2.1
 		 */
-		public RedisNodeBuilder replicaOf(String masterId) {
+		public ValkeyNodeBuilder replicaOf(String masterId) {
 
 			node.masterId = masterId;
 			return this;
 		}
 
 		/**
-		 * Get the {@link RedisNode}.
+		 * Get the {@link ValkeyNode}.
 		 *
 		 * @return
 		 */
-		public RedisNode build() {
-			return new RedisNode(this.node);
+		public ValkeyNode build() {
+			return new ValkeyNode(this.node);
 		}
 	}
 

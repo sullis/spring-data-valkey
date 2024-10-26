@@ -53,15 +53,15 @@ class BoundOperationsProxyFactory {
 	 * @param boundOperationsInterface the {@code Bound…Operations} interface.
 	 * @param key the bound key.
 	 * @param type the {@link DataType} for which to create a proxy object.
-	 * @param operations the {@link RedisOperations} instance.
+	 * @param operations the {@link ValkeyOperations} instance.
 	 * @param operationsTargetFunction function to extract the actual delegate for method calls.
 	 * @return the proxy object.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T createProxy(Class<T> boundOperationsInterface, Object key, DataType type,
-			RedisOperations<?, ?> operations, Function<RedisOperations<?, ?>, Object> operationsTargetFunction) {
+			ValkeyOperations<?, ?> operations, Function<ValkeyOperations<?, ?>, Object> operationsTargetFunction) {
 
-		DefaultBoundKeyOperations delegate = new DefaultBoundKeyOperations(type, key, (RedisOperations) operations);
+		DefaultBoundKeyOperations delegate = new DefaultBoundKeyOperations(type, key, (ValkeyOperations) operations);
 		Object operationsTarget = operationsTargetFunction.apply(operations);
 
 		ProxyFactory proxyFactory = new ProxyFactory();
@@ -115,7 +115,7 @@ class BoundOperationsProxyFactory {
 	}
 
 	/**
-	 * {@link MethodInterceptor} to delegate proxy calls to either {@link RedisOperations}, {@code key},
+	 * {@link MethodInterceptor} to delegate proxy calls to either {@link ValkeyOperations}, {@code key},
 	 * {@link DefaultBoundKeyOperations} or the {@code operationsTarget} such as {@link ValueOperations}.
 	 */
 	class BoundOperationsMethodInterceptor implements MethodInterceptor {
@@ -124,7 +124,7 @@ class BoundOperationsProxyFactory {
 		private final Object operationsTarget;
 		private final DefaultBoundKeyOperations delegate;
 
-		public BoundOperationsMethodInterceptor(Object key, RedisOperations<?, ?> operations,
+		public BoundOperationsMethodInterceptor(Object key, ValkeyOperations<?, ?> operations,
 				Class<?> boundOperationsInterface, Object operationsTarget, DefaultBoundKeyOperations delegate) {
 
 			this.boundOperationsInterface = boundOperationsInterface;
@@ -192,9 +192,9 @@ class BoundOperationsProxyFactory {
 
 		private final DataType type;
 		private Object key;
-		private final RedisOperations<Object, ?> ops;
+		private final ValkeyOperations<Object, ?> ops;
 
-		DefaultBoundKeyOperations(DataType type, Object key, RedisOperations<Object, ?> operations) {
+		DefaultBoundKeyOperations(DataType type, Object key, ValkeyOperations<Object, ?> operations) {
 			this.type = type;
 
 			this.key = key;
@@ -238,7 +238,7 @@ class BoundOperationsProxyFactory {
 			return type;
 		}
 
-		public RedisOperations<Object, ?> getOps() {
+		public ValkeyOperations<Object, ?> getOps() {
 			return ops;
 		}
 	}

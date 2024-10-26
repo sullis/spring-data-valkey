@@ -25,7 +25,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Operations over a Redis key. Useful for executing common key-'bound' operations to all implementations.
+ * Operations over a Valkey key. Useful for executing common key-'bound' operations to all implementations.
  * <p>
  * As the rest of the APIs, if the underlying connection is pipelined or queued/in multi mode, all methods will return
  * {@literal null}.
@@ -44,7 +44,7 @@ public interface BoundKeyOperations<K> {
 	K getKey();
 
 	/**
-	 * Returns the associated Redis type.
+	 * Returns the associated Valkey type.
 	 *
 	 * @return key type. {@literal null} when used in pipeline / transaction.
 	 */

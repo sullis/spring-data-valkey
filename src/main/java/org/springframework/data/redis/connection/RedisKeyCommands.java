@@ -27,14 +27,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Key-specific commands supported by Redis.
+ * Key-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author ihaohong
  */
-public interface RedisKeyCommands {
+public interface ValkeyKeyCommands {
 
 	/**
 	 * Copy given {@code sourceKey} to {@code targetKey}.
@@ -43,7 +43,7 @@ public interface RedisKeyCommands {
 	 * @param targetKey must not be {@literal null}.
 	 * @param replace whether to replace existing keys.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/copy">Redis Documentation: COPY</a>
+	 * @see <a href="https://redis.io/commands/copy">Valkey Documentation: COPY</a>
 	 * @since 2.6
 	 */
 	@Nullable
@@ -54,7 +54,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal true} if key exists. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/exists">Redis Documentation: EXISTS</a>
+	 * @see <a href="https://redis.io/commands/exists">Valkey Documentation: EXISTS</a>
 	 */
 	@Nullable
 	default Boolean exists(byte[] key) {
@@ -81,7 +81,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/del">Redis Documentation: DEL</a>
+	 * @see <a href="https://redis.io/commands/del">Valkey Documentation: DEL</a>
 	 */
 	@Nullable
 	Long del(byte[]... keys);
@@ -92,7 +92,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+	 * @see <a href="https://redis.io/commands/unlink">Valkey Documentation: UNLINK</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -103,7 +103,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/type">Redis Documentation: TYPE</a>
+	 * @see <a href="https://redis.io/commands/type">Valkey Documentation: TYPE</a>
 	 */
 	@Nullable
 	DataType type(byte[] key);
@@ -113,7 +113,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/touch">Redis Documentation: TOUCH</a>
+	 * @see <a href="https://redis.io/commands/touch">Valkey Documentation: TOUCH</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -124,7 +124,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param pattern must not be {@literal null}.
 	 * @return empty {@link Set} if no match found. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/keys">Redis Documentation: KEYS</a>
+	 * @see <a href="https://redis.io/commands/keys">Valkey Documentation: KEYS</a>
 	 */
 	@Nullable
 	Set<byte[]> keys(byte[] pattern);
@@ -135,7 +135,7 @@ public interface RedisKeyCommands {
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 */
 	default Cursor<byte[]> scan(KeyScanOptions options) {
 		return scan((ScanOptions) options);
@@ -147,7 +147,7 @@ public interface RedisKeyCommands {
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 1.4
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 */
 	Cursor<byte[]> scan(ScanOptions options);
 
@@ -155,7 +155,7 @@ public interface RedisKeyCommands {
 	 * Return a random key from the keyspace.
 	 *
 	 * @return {@literal null} if no keys available or when used in pipeline or transaction.
-	 * @see <a href="https://redis.io/commands/randomkey">Redis Documentation: RANDOMKEY</a>
+	 * @see <a href="https://redis.io/commands/randomkey">Valkey Documentation: RANDOMKEY</a>
 	 */
 	@Nullable
 	byte[] randomKey();
@@ -165,7 +165,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/rename">Redis Documentation: RENAME</a>
+	 * @see <a href="https://redis.io/commands/rename">Valkey Documentation: RENAME</a>
 	 */
 	void rename(byte[] oldKey, byte[] newKey);
 
@@ -175,7 +175,7 @@ public interface RedisKeyCommands {
 	 * @param oldKey must not be {@literal null}.
 	 * @param newKey must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/renamenx">Redis Documentation: RENAMENX</a>
+	 * @see <a href="https://redis.io/commands/renamenx">Valkey Documentation: RENAMENX</a>
 	 */
 	@Nullable
 	Boolean renameNX(byte[] oldKey, byte[] newKey);
@@ -186,7 +186,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param seconds
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/expire">Redis Documentation: EXPIRE</a>
+	 * @see <a href="https://redis.io/commands/expire">Valkey Documentation: EXPIRE</a>
 	 */
 	@Nullable
 	Boolean expire(byte[] key, long seconds);
@@ -197,7 +197,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param millis
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/pexpire">Redis Documentation: PEXPIRE</a>
+	 * @see <a href="https://redis.io/commands/pexpire">Valkey Documentation: PEXPIRE</a>
 	 */
 	@Nullable
 	Boolean pExpire(byte[] key, long millis);
@@ -208,7 +208,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param unixTime
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/expireat">Redis Documentation: EXPIREAT</a>
+	 * @see <a href="https://redis.io/commands/expireat">Valkey Documentation: EXPIREAT</a>
 	 */
 	@Nullable
 	Boolean expireAt(byte[] key, long unixTime);
@@ -219,7 +219,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param unixTimeInMillis
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/pexpireat">Redis Documentation: PEXPIREAT</a>
+	 * @see <a href="https://redis.io/commands/pexpireat">Valkey Documentation: PEXPIREAT</a>
 	 */
 	@Nullable
 	Boolean pExpireAt(byte[] key, long unixTimeInMillis);
@@ -229,7 +229,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/persist">Redis Documentation: PERSIST</a>
+	 * @see <a href="https://redis.io/commands/persist">Valkey Documentation: PERSIST</a>
 	 */
 	@Nullable
 	Boolean persist(byte[] key);
@@ -240,7 +240,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param dbIndex
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/move">Redis Documentation: MOVE</a>
+	 * @see <a href="https://redis.io/commands/move">Valkey Documentation: MOVE</a>
 	 */
 	@Nullable
 	Boolean move(byte[] key, int dbIndex);
@@ -250,7 +250,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/ttl">Redis Documentation: TTL</a>
+	 * @see <a href="https://redis.io/commands/ttl">Valkey Documentation: TTL</a>
 	 */
 	@Nullable
 	Long ttl(byte[] key);
@@ -262,7 +262,7 @@ public interface RedisKeyCommands {
 	 * @param timeUnit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/ttl">Redis Documentation: TTL</a>
+	 * @see <a href="https://redis.io/commands/ttl">Valkey Documentation: TTL</a>
 	 */
 	@Nullable
 	Long ttl(byte[] key, TimeUnit timeUnit);
@@ -272,7 +272,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/pttl">Redis Documentation: PTTL</a>
+	 * @see <a href="https://redis.io/commands/pttl">Valkey Documentation: PTTL</a>
 	 */
 	@Nullable
 	Long pTtl(byte[] key);
@@ -284,7 +284,7 @@ public interface RedisKeyCommands {
 	 * @param timeUnit must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 1.8
-	 * @see <a href="https://redis.io/commands/pttl">Redis Documentation: PTTL</a>
+	 * @see <a href="https://redis.io/commands/pttl">Valkey Documentation: PTTL</a>
 	 */
 	@Nullable
 	Long pTtl(byte[] key, TimeUnit timeUnit);
@@ -295,7 +295,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param params must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
 	List<byte[]> sort(byte[] key, SortParameters params);
@@ -307,7 +307,7 @@ public interface RedisKeyCommands {
 	 * @param params must not be {@literal null}.
 	 * @param storeKey must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+	 * @see <a href="https://redis.io/commands/sort">Valkey Documentation: SORT</a>
 	 */
 	@Nullable
 	Long sort(byte[] key, SortParameters params, byte[] storeKey);
@@ -317,7 +317,7 @@ public interface RedisKeyCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/dump">Redis Documentation: DUMP</a>
+	 * @see <a href="https://redis.io/commands/dump">Valkey Documentation: DUMP</a>
 	 */
 	@Nullable
 	byte[] dump(byte[] key);
@@ -328,7 +328,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @param ttlInMillis
 	 * @param serializedValue must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/restore">Redis Documentation: RESTORE</a>
+	 * @see <a href="https://redis.io/commands/restore">Valkey Documentation: RESTORE</a>
 	 */
 	default void restore(byte[] key, long ttlInMillis, byte[] serializedValue) {
 		restore(key, ttlInMillis, serializedValue, false);
@@ -342,7 +342,7 @@ public interface RedisKeyCommands {
 	 * @param serializedValue must not be {@literal null}.
 	 * @param replace use {@literal true} to replace a potentially existing value instead of erroring.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/restore">Redis Documentation: RESTORE</a>
+	 * @see <a href="https://redis.io/commands/restore">Valkey Documentation: RESTORE</a>
 	 */
 	void restore(byte[] key, long ttlInMillis, byte[] serializedValue, boolean replace);
 
@@ -350,10 +350,10 @@ public interface RedisKeyCommands {
 	 * Get the type of internal representation used for storing the value at the given {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @return {@link org.springframework.data.redis.connection.ValueEncoding.RedisValueEncoding#VACANT} if key does not
+	 * @return {@link org.springframework.data.redis.connection.ValueEncoding.ValkeyValueEncoding#VACANT} if key does not
 	 *         exist or {@literal null} when used in pipeline / transaction.
 	 * @throws IllegalArgumentException if {@code key} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/object">Redis Documentation: OBJECT ENCODING</a>
+	 * @see <a href="https://redis.io/commands/object">Valkey Documentation: OBJECT ENCODING</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -365,7 +365,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @throws IllegalArgumentException if {@code key} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/object">Redis Documentation: OBJECT IDLETIME</a>
+	 * @see <a href="https://redis.io/commands/object">Valkey Documentation: OBJECT IDLETIME</a>
 	 * @since 2.1
 	 */
 	@Nullable
@@ -377,7 +377,7 @@ public interface RedisKeyCommands {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @throws IllegalArgumentException if {@code key} is {@literal null}.
-	 * @see <a href="https://redis.io/commands/object">Redis Documentation: OBJECT REFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/object">Valkey Documentation: OBJECT REFCOUNT</a>
 	 * @since 2.1
 	 */
 	@Nullable

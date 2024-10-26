@@ -32,7 +32,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.test.condition.EnabledIfLongRunningTest;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration test of {@link DefaultListOperations}
@@ -47,7 +47,7 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @MethodSource("testParams")
 public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 
-	private final RedisTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> redisTemplate;
 
 	private final ObjectFactory<K> keyFactory;
 
@@ -55,7 +55,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 
 	private final ListOperations<K, V> listOps;
 
-	public DefaultListOperationsIntegrationIntegrationTests(RedisTemplate<K, V> redisTemplate,
+	public DefaultListOperationsIntegrationIntegrationTests(ValkeyTemplate<K, V> redisTemplate,
 			ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -71,13 +71,13 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 	@BeforeEach
 	void setUp() {
 
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLeftPushWithPivot() {
 
 		K key = keyFactory.instance();
@@ -91,7 +91,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).containsSequence(v2, v3, v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLeftPushIfPresent() {
 
 		K key = keyFactory.instance();
@@ -105,7 +105,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLeftPushAll() {
 
 		K key = keyFactory.instance();
@@ -118,7 +118,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).contains(v3, v2, v1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-611
+	@ParameterizedValkeyTest // DATAREDIS-611
 	@EnabledIfLongRunningTest
 	void testLeftPopDuration() {
 
@@ -134,7 +134,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.leftPop(key, Duration.ofSeconds(1))).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-611
+	@ParameterizedValkeyTest // DATAREDIS-611
 	@EnabledIfLongRunningTest
 	void testRightPopDuration() {
 
@@ -150,7 +150,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.rightPop(key, Duration.ofSeconds(1))).isEqualTo(v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	@EnabledIfLongRunningTest
 	void testRightPopAndLeftPushTimeout() {
 		// 1 ms timeout gets upgraded to 1 sec timeout at the moment
@@ -165,7 +165,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.rightPopAndLeftPush(key, key2, 1, TimeUnit.MILLISECONDS)).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-611
+	@ParameterizedValkeyTest // DATAREDIS-611
 	@EnabledIfLongRunningTest
 	void testRightPopAndLeftPushDuration() {
 		// 1 ms timeout gets upgraded to 1 sec timeout at the moment
@@ -180,7 +180,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.rightPopAndLeftPush(key, key2, Duration.ofMillis(1))).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRightPopAndLeftPush() {
 
 		K key = keyFactory.instance();
@@ -192,7 +192,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.rightPopAndLeftPush(key, key2)).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRightPushWithPivot() {
 
 		K key = keyFactory.instance();
@@ -206,7 +206,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).containsSequence(v1, v3, v2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRightPushIfPresent() {
 
 		K key = keyFactory.instance();
@@ -220,7 +220,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRightPushAll() {
 
 		K key = keyFactory.instance();
@@ -233,7 +233,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).containsSequence(v1, v2, v3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 
 	void testRightPushAllCollection() {
 
@@ -247,26 +247,26 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).containsSequence(v1, v2, v3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void rightPushAllShouldThrowExceptionWhenCalledWithEmptyCollection() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.rightPushAll(keyFactory.instance(), Collections.<V> emptyList()));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	// DATAREDIS-288
 	void rightPushAllShouldThrowExceptionWhenCollectionContainsNullValue() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.rightPushAll(keyFactory.instance(), Arrays.asList(valueFactory.instance(), null)));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void rightPushAllShouldThrowExceptionWhenCalledWithNull() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.rightPushAll(keyFactory.instance(), (Collection<V>) null));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void testLeftPushAllCollection() {
 
 		assumeThat(redisTemplate.getConnectionFactory() instanceof LettuceConnectionFactory).isTrue();
@@ -281,25 +281,25 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(key, 0, -1)).containsSequence(v3, v2, v1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void leftPushAllShouldThrowExceptionWhenCalledWithEmptyCollection() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.leftPushAll(keyFactory.instance(), Collections.<V> emptyList()));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void leftPushAllShouldThrowExceptionWhenCollectionContainsNullValue() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.leftPushAll(keyFactory.instance(), Arrays.asList(valueFactory.instance(), null)));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-288
+	@ParameterizedValkeyTest // DATAREDIS-288
 	void leftPushAllShouldThrowExceptionWhenCalledWithNull() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> listOps.leftPushAll(keyFactory.instance(), (Collection<V>) null));
 	}
 
-	@ParameterizedRedisTest // GH-2039
+	@ParameterizedValkeyTest // GH-2039
 	@EnabledOnCommand("LMOVE")
 	void move() {
 
@@ -322,7 +322,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(target, 0, -1)).containsExactly(v4, v1);
 	}
 
-	@ParameterizedRedisTest // GH-2039
+	@ParameterizedValkeyTest // GH-2039
 	@EnabledOnCommand("BLMOVE")
 	void moveWithTimeout() {
 
@@ -346,7 +346,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.range(target, 0, -1)).containsExactly(v4, v1);
 	}
 
-	@ParameterizedRedisTest // GH-2937
+	@ParameterizedValkeyTest // GH-2937
 	void getFirst() {
 
 		K key = keyFactory.instance();
@@ -360,7 +360,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.getFirst(key)).isEqualTo(v1);
 	}
 
-	@ParameterizedRedisTest // GH-2937
+	@ParameterizedValkeyTest // GH-2937
 	void getLast() {
 
 		K key = keyFactory.instance();
@@ -374,7 +374,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.getLast(key)).isEqualTo(v3);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1196
+	@ParameterizedValkeyTest // DATAREDIS-1196
 	@EnabledOnCommand("LPOS")
 	void indexOf() {
 
@@ -389,7 +389,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 		assertThat(listOps.indexOf(key, v1)).isEqualTo(0);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1196
+	@ParameterizedValkeyTest // DATAREDIS-1196
 	@EnabledOnCommand("LPOS")
 	void lastIndexOf() {
 

@@ -27,12 +27,12 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ByteBufferObjectFactory;
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.core.ReactiveOperationsTestParams.Fixture;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration tests for {@link DefaultReactiveSetOperations}.
@@ -44,7 +44,7 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @SuppressWarnings("unchecked")
 public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 
-	private final ReactiveRedisTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> redisTemplate;
 	private final ReactiveSetOperations<K, V> setOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -65,13 +65,13 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		RedisConnectionFactory connectionFactory = (RedisConnectionFactory) redisTemplate.getConnectionFactory();
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void add() {
 
 		K key = keyFactory.instance();
@@ -82,7 +82,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.add(key, value1, value2).as(StepVerifier::create).expectNext(1L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void remove() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -98,7 +98,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.remove(key, value1, value2).as(StepVerifier::create).expectNext(1L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void pop() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -113,7 +113,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-668
+	@ParameterizedValkeyTest // DATAREDIS-668
 	void popWithCount() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -128,7 +128,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.size(key).as(StepVerifier::create).expectNext(1L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void move() {
 
 		K key = keyFactory.instance();
@@ -142,7 +142,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.size(otherKey).as(StepVerifier::create).expectNext(1L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void isMember() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -155,7 +155,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.isMember(key, value1).as(StepVerifier::create).expectNext(true).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // GH-2037
+	@ParameterizedValkeyTest // GH-2037
 	@EnabledOnCommand("SMISMEMBER")
 	void isMembers() {
 
@@ -172,7 +172,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void intersect() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -200,7 +200,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void intersectAndStore() {
 
 		K key = keyFactory.instance();
@@ -227,7 +227,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.isMember(destKey, shared).as(StepVerifier::create).expectNext(true).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void difference() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -255,7 +255,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void differenceAndStore() {
 
 		K key = keyFactory.instance();
@@ -278,7 +278,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.isMember(destKey, onlyInKey).as(StepVerifier::create).expectNext(true).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void union() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -304,7 +304,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602, DATAREDIS-873
+	@ParameterizedValkeyTest // DATAREDIS-602, DATAREDIS-873
 	void unionAndStore() {
 
 		K key = keyFactory.instance();
@@ -330,7 +330,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.isMember(destKey, onlyInOtherKey).as(StepVerifier::create).expectNext(true).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void members() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -344,7 +344,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.consumeNextWith(actual -> assertThat(actual).isIn(value1, value2)).expectNextCount(1).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-743
+	@ParameterizedValkeyTest // DATAREDIS-743
 	void scan() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -363,7 +363,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void randomMember() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -379,7 +379,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void randomMembers() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -393,7 +393,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 		setOperations.randomMembers(key, 3).as(StepVerifier::create).expectNextCount(3).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void distinctRandomMembers() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -409,7 +409,7 @@ public class DefaultReactiveSetOperationsIntegrationTests<K, V> {
 				.verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void delete() {
 
 		K key = keyFactory.instance();

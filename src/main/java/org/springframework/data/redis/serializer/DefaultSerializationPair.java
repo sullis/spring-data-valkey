@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.serializer;
 
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
 
 /**
  * Default implementation of {@link SerializationPair}.
@@ -26,23 +26,23 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
  */
 class DefaultSerializationPair<T> implements SerializationPair<T> {
 
-	private final RedisElementReader<T> reader;
-	private final RedisElementWriter<T> writer;
+	private final ValkeyElementReader<T> reader;
+	private final ValkeyElementWriter<T> writer;
 
 	@SuppressWarnings("unchecked")
-	DefaultSerializationPair(RedisElementReader<? extends T> reader, RedisElementWriter<? extends T> writer) {
+	DefaultSerializationPair(ValkeyElementReader<? extends T> reader, ValkeyElementWriter<? extends T> writer) {
 
-		this.reader = (RedisElementReader) reader;
-		this.writer = (RedisElementWriter) writer;
+		this.reader = (ValkeyElementReader) reader;
+		this.writer = (ValkeyElementWriter) writer;
 	}
 
 	@Override
-	public RedisElementReader<T> getReader() {
+	public ValkeyElementReader<T> getReader() {
 		return this.reader;
 	}
 
 	@Override
-	public RedisElementWriter<T> getWriter() {
+	public ValkeyElementWriter<T> getWriter() {
 		return this.writer;
 	}
 }

@@ -18,7 +18,7 @@ package org.springframework.data.redis.core.script;
 import org.springframework.core.NestedRuntimeException;
 
 /**
- * {@link RuntimeException} thrown when issues occur with {@link RedisScript}s
+ * {@link RuntimeException} thrown when issues occur with {@link ValkeyScript}s
  *
  * @author Jennifer Hickey
  * @author Mark Paluch

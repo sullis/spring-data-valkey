@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 
 import io.lettuce.core.ClientOptions;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SslVerifyMode;
 import io.lettuce.core.TimeoutOptions;
 import io.lettuce.core.resource.ClientResources;
@@ -111,10 +111,10 @@ class LettuceClientConfigurationUnitTests {
 	}
 
 	@Test // GH-2116
-	void shouldApplySettingsFromRedisURI() {
+	void shouldApplySettingsFromValkeyURI() {
 
 		LettuceClientConfiguration configuration = LettuceClientConfiguration.builder() //
-				.apply(RedisURI.create("rediss://foo?verifyPeer=FULL&clientName=bar&timeout=10s")).build();
+				.apply(ValkeyURI.create("rediss://foo?verifyPeer=FULL&clientName=bar&timeout=10s")).build();
 
 		assertThat(configuration.isUseSsl()).isTrue();
 		assertThat(configuration.isVerifyPeer()).isTrue();
@@ -130,7 +130,7 @@ class LettuceClientConfigurationUnitTests {
 		LettuceClientConfiguration configuration = LettuceClientConfiguration.builder() //
 				.clientName("hello") //
 				.commandTimeout(Duration.ofMillis(1)) //
-				.apply(RedisURI.create("rediss://foo")).build();
+				.apply(ValkeyURI.create("rediss://foo")).build();
 
 		assertThat(configuration.getClientName()).contains("hello");
 		assertThat(configuration.getCommandTimeout()).isEqualTo(Duration.ofMillis(1));

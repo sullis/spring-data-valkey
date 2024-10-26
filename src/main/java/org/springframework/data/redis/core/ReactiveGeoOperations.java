@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.core;
 
-import static org.springframework.data.redis.connection.RedisGeoCommands.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.*;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,11 +35,11 @@ import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
 
 /**
- * Reactive Redis operations for Geo Commands.
+ * Reactive Valkey operations for Geo Commands.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
- * @see <a href="https://redis.io/commands#geo">Redis Documentation: Geo Commands</a>
+ * @see <a href="https://redis.io/commands#geo">Valkey Documentation: Geo Commands</a>
  * @since 2.0
  */
 public interface ReactiveGeoOperations<K, M> {
@@ -51,7 +51,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param point must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return Number of elements added.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Mono<Long> add(K key, Point point, M member);
 
@@ -61,7 +61,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param location must not be {@literal null}.
 	 * @return Number of elements added.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Mono<Long> add(K key, GeoLocation<M> location);
 
@@ -71,7 +71,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param memberCoordinateMap must not be {@literal null}.
 	 * @return Number of elements added.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Mono<Long> add(K key, Map<M, Point> memberCoordinateMap);
 
@@ -81,7 +81,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param locations must not be {@literal null}.
 	 * @return Number of elements added.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Mono<Long> add(K key, Iterable<GeoLocation<M>> locations);
 
@@ -91,7 +91,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param locations must not be {@literal null}.
 	 * @return Number of elements added.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Flux<Long> add(K key, Publisher<? extends Collection<GeoLocation<M>>> locations);
 
@@ -102,7 +102,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param member1 must not be {@literal null}.
 	 * @param member2 must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	Mono<Distance> distance(K key, M member1, M member2);
 
@@ -114,7 +114,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param member2 must not be {@literal null}.
 	 * @param metric must not be {@literal null}.
 	 * @return can be {@literal null}.
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	Mono<Distance> distance(K key, M member1, M member2, Metric metric);
 
@@ -124,7 +124,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	Mono<String> hash(K key, M member);
 
@@ -134,7 +134,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	Mono<List<String>> hash(K key, M... members);
 
@@ -144,7 +144,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	Mono<Point> position(K key, M member);
 
@@ -154,7 +154,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	Mono<List<Point>> position(K key, M... members);
 
@@ -164,7 +164,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param key must not be {@literal null}.
 	 * @param within must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> radius(K key, Circle within);
 
@@ -175,7 +175,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> radius(K key, Circle within, GeoRadiusCommandArgs args);
 
@@ -187,7 +187,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param member must not be {@literal null}.
 	 * @param radius
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> radius(K key, M member, double radius);
 
@@ -199,7 +199,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param member must not be {@literal null}.
 	 * @param distance must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> radius(K key, M member, Distance distance);
 
@@ -212,7 +212,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param distance must not be {@literal null}.
 	 * @param args must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> radius(K key, M member, Distance distance, GeoRadiusCommandArgs args);
 
@@ -239,7 +239,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<M>>> search(K key, Circle within) {
 		return search(key, GeoReference.fromCircle(within), GeoShape.byRadius(within.getRadius()),
@@ -255,7 +255,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param radius must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<M>>> search(K key, GeoReference<M> reference, Distance radius) {
 		return search(key, reference, radius, GeoSearchCommandArgs.newGeoSearchArgs());
@@ -271,7 +271,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<M>>> search(K key, GeoReference<M> reference, Distance radius,
 			GeoSearchCommandArgs args) {
@@ -287,7 +287,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param boundingBox must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<M>>> search(K key, GeoReference<M> reference, BoundingBox boundingBox) {
 		return search(key, reference, boundingBox, GeoSearchCommandArgs.newGeoSearchArgs());
@@ -303,7 +303,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<M>>> search(K key, GeoReference<M> reference, BoundingBox boundingBox,
 			GeoSearchCommandArgs args) {
@@ -320,7 +320,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	Flux<GeoResult<GeoLocation<M>>> search(K key, GeoReference<M> reference, GeoShape geoPredicate,
 			GeoSearchCommandArgs args);
@@ -332,7 +332,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param within must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	default Mono<Long> searchAndStore(K key, K destKey, Circle within) {
 		return searchAndStore(key, destKey, GeoReference.fromCircle(within), GeoShape.byRadius(within.getRadius()),
@@ -348,7 +348,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param radius must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	default Mono<Long> searchAndStore(K key, K destKey, GeoReference<M> reference, Distance radius) {
 		return searchAndStore(key, destKey, reference, radius, GeoSearchStoreCommandArgs.newGeoSearchStoreArgs());
@@ -364,7 +364,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	default Mono<Long> searchAndStore(K key, K destKey, GeoReference<M> reference, Distance radius,
 			GeoSearchStoreCommandArgs args) {
@@ -380,7 +380,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param boundingBox must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	default Mono<Long> searchAndStore(K key, K destKey, GeoReference<M> reference, BoundingBox boundingBox) {
 		return searchAndStore(key, destKey, reference, boundingBox, GeoSearchStoreCommandArgs.newGeoSearchStoreArgs());
@@ -396,7 +396,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	default Mono<Long> searchAndStore(K key, K destKey, GeoReference<M> reference, BoundingBox boundingBox,
 			GeoSearchStoreCommandArgs args) {
@@ -413,7 +413,7 @@ public interface ReactiveGeoOperations<K, M> {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	Mono<Long> searchAndStore(K key, K destKey, GeoReference<M> reference, GeoShape geoPredicate,
 			GeoSearchStoreCommandArgs args);

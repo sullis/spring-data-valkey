@@ -15,9 +15,9 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
-import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.pubsub.api.async.ValkeyPubSubAsyncCommands;
+import io.lettuce.core.pubsub.api.sync.ValkeyPubSubCommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +39,14 @@ import org.springframework.data.redis.connection.util.AbstractSubscription;
  */
 public class LettuceSubscription extends AbstractSubscription {
 
-	private final StatefulRedisPubSubConnection<byte[], byte[]> connection;
+	private final StatefulValkeyPubSubConnection<byte[], byte[]> connection;
 	private final LettuceMessageListener listener;
 	private final LettuceConnectionProvider connectionProvider;
-	private final RedisPubSubCommands<byte[], byte[]> pubsub;
-	private final RedisPubSubAsyncCommands<byte[], byte[]> pubSubAsync;
+	private final ValkeyPubSubCommands<byte[], byte[]> pubsub;
+	private final ValkeyPubSubAsyncCommands<byte[], byte[]> pubSubAsync;
 
 	/**
-	 * Creates a new {@link LettuceSubscription} given {@link MessageListener}, {@link StatefulRedisPubSubConnection}, and
+	 * Creates a new {@link LettuceSubscription} given {@link MessageListener}, {@link StatefulValkeyPubSubConnection}, and
 	 * {@link LettuceConnectionProvider}.
 	 *
 	 * @param listener the listener to notify, must not be {@literal null}.
@@ -54,7 +54,7 @@ public class LettuceSubscription extends AbstractSubscription {
 	 * @param connectionProvider must not be {@literal null}.
 	 */
 	protected LettuceSubscription(MessageListener listener,
-			StatefulRedisPubSubConnection<byte[], byte[]> pubsubConnection, LettuceConnectionProvider connectionProvider) {
+			StatefulValkeyPubSubConnection<byte[], byte[]> pubsubConnection, LettuceConnectionProvider connectionProvider) {
 
 		super(listener);
 
@@ -69,7 +69,7 @@ public class LettuceSubscription extends AbstractSubscription {
 		this.connection.addListener(this.listener);
 	}
 
-	protected StatefulRedisPubSubConnection<byte[], byte[]> getNativeConnection() {
+	protected StatefulValkeyPubSubConnection<byte[], byte[]> getNativeConnection() {
 		return connection;
 	}
 

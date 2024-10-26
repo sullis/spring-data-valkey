@@ -22,9 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisKeyCommands;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
@@ -33,15 +33,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Unit tests for {@link RedisConnectionUtils}.
+ * Unit tests for {@link ValkeyConnectionUtils}.
  *
  * @author Mark Paluch
  */
-class RedisConnectionUtilsUnitTests {
+class ValkeyConnectionUtilsUnitTests {
 
-	RedisConnection connectionMock1 = mock(RedisConnection.class);
-	RedisConnection connectionMock2 = mock(RedisConnection.class);
-	RedisConnectionFactory factoryMock = mock(RedisConnectionFactory.class);
+	ValkeyConnection connectionMock1 = mock(ValkeyConnection.class);
+	ValkeyConnection connectionMock2 = mock(ValkeyConnection.class);
+	ValkeyConnectionFactory factoryMock = mock(ValkeyConnectionFactory.class);
 
 	@BeforeEach
 	void setUp() {
@@ -57,11 +57,11 @@ class RedisConnectionUtilsUnitTests {
 	}
 
 	@Test // DATAREDIS-1104
-	void shouldSilentlyCloseRedisConnection() {
+	void shouldSilentlyCloseValkeyConnection() {
 
 		Mockito.reset(connectionMock1);
 		doThrow(new IllegalStateException()).when(connectionMock1).close();
-		RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+		ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 		verify(connectionMock1).close();
 	}
@@ -69,15 +69,15 @@ class RedisConnectionUtilsUnitTests {
 	@Test // DATAREDIS-891
 	void bindConnectionShouldBindConnectionToClosureScope() {
 
-		assertThat(RedisConnectionUtils.bindConnection(factoryMock)).isSameAs(connectionMock1);
+		assertThat(ValkeyConnectionUtils.bindConnection(factoryMock)).isSameAs(connectionMock1);
 		assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
 
-		assertThat(RedisConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
+		assertThat(ValkeyConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
 
-		RedisConnectionUtils.unbindConnection(factoryMock);
+		ValkeyConnectionUtils.unbindConnection(factoryMock);
 		verifyNoInteractions(connectionMock1);
 
-		RedisConnectionUtils.unbindConnection(factoryMock);
+		ValkeyConnectionUtils.unbindConnection(factoryMock);
 		verify(connectionMock1).close();
 
 		assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isFalse();
@@ -91,12 +91,12 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			assertThat(RedisConnectionUtils.getConnection(factoryMock, true)).isSameAs(connectionMock1);
+			assertThat(ValkeyConnectionUtils.getConnection(factoryMock, true)).isSameAs(connectionMock1);
 			assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
-			assertThat(RedisConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
+			assertThat(ValkeyConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
 
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 			verifyNoInteractions(connectionMock1);
 		});
@@ -112,13 +112,13 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			assertThat(RedisConnectionUtils.bindConnection(factoryMock, true))
-					.isInstanceOf(RedisConnectionUtils.RedisConnectionProxy.class);
+			assertThat(ValkeyConnectionUtils.bindConnection(factoryMock, true))
+					.isInstanceOf(ValkeyConnectionUtils.ValkeyConnectionProxy.class);
 			assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
-			assertThat(RedisConnectionUtils.getConnection(factoryMock)).isNotNull();
+			assertThat(ValkeyConnectionUtils.getConnection(factoryMock)).isNotNull();
 
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 			verify(connectionMock1).multi();
 			verifyNoMoreInteractions(connectionMock1);
@@ -131,12 +131,12 @@ class RedisConnectionUtilsUnitTests {
 	@Test // DATAREDIS-891
 	void bindConnectionShouldNotBindConnectionToTransactionWithoutTransaction() {
 
-		assertThat(RedisConnectionUtils.bindConnection(factoryMock, true)).isNotNull();
+		assertThat(ValkeyConnectionUtils.bindConnection(factoryMock, true)).isNotNull();
 		assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
-		assertThat(RedisConnectionUtils.getConnection(factoryMock)).isNotNull();
+		assertThat(ValkeyConnectionUtils.getConnection(factoryMock)).isNotNull();
 
-		RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
-		RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+		ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+		ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 		verify(connectionMock1).close();
 		assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isFalse();
@@ -149,10 +149,10 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			assertThat(RedisConnectionUtils.getConnection(factoryMock, true)).isNotNull();
+			assertThat(ValkeyConnectionUtils.getConnection(factoryMock, true)).isNotNull();
 			assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
 
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 			verify(connectionMock1).multi();
 			verify(factoryMock, times(1)).getConnection();
@@ -169,10 +169,10 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			assertThat(RedisConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
+			assertThat(ValkeyConnectionUtils.getConnection(factoryMock)).isSameAs(connectionMock1);
 			assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isFalse();
 
-			RedisConnectionUtils.releaseConnection(connectionMock1, factoryMock);
+			ValkeyConnectionUtils.releaseConnection(connectionMock1, factoryMock);
 
 			verify(factoryMock).getConnection();
 			verify(connectionMock1).close();
@@ -189,10 +189,10 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			assertThat(RedisConnectionUtils.bindConnection(factoryMock)).isSameAs(connectionMock1);
+			assertThat(ValkeyConnectionUtils.bindConnection(factoryMock)).isSameAs(connectionMock1);
 			assertThat(TransactionSynchronizationManager.hasResource(factoryMock)).isTrue();
 
-			RedisConnectionUtils.unbindConnection(factoryMock);
+			ValkeyConnectionUtils.unbindConnection(factoryMock);
 
 			verify(connectionMock1).close();
 			verify(factoryMock, times(1)).getConnection();
@@ -212,7 +212,7 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			RedisConnection connection = RedisConnectionUtils.getConnection(factoryMock, true);
+			ValkeyConnection connection = ValkeyConnectionUtils.getConnection(factoryMock, true);
 
 			assertThat(connection.exists(anyBytes)).isEqualTo(true);
 		});
@@ -225,7 +225,7 @@ class RedisConnectionUtilsUnitTests {
 
 		byte[] anyBytes = new byte[] { 1, 2, 3 };
 
-		RedisKeyCommands commandsMock = mock(RedisKeyCommands.class);
+		ValkeyKeyCommands commandsMock = mock(ValkeyKeyCommands.class);
 
 		when(connectionMock1.keyCommands()).thenReturn(commandsMock);
 		when(connectionMock2.keyCommands()).thenReturn(commandsMock);
@@ -234,7 +234,7 @@ class RedisConnectionUtilsUnitTests {
 
 		template.executeWithoutResult(status -> {
 
-			RedisConnection connection = RedisConnectionUtils.getConnection(factoryMock, true);
+			ValkeyConnection connection = ValkeyConnectionUtils.getConnection(factoryMock, true);
 
 			assertThat(connection.keyCommands().exists(anyBytes)).isEqualTo(true);
 			assertThat(connection.keyCommands().del(anyBytes)).isEqualTo(42L);

@@ -25,8 +25,8 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.redis.core.convert.MappingRedisConverter;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.data.redis.hash.ObjectHashMapper;
 
 /**
@@ -69,20 +69,20 @@ class ObjectHashMapperTests extends AbstractHashMapperTests {
 	}
 
 	@Test // DATAREDIS-1179
-	void hashMapperAllowsReuseOfRedisConverter/*and thus the MappingContext holding eg. TypeAlias information*/() {
+	void hashMapperAllowsReuseOfValkeyConverter/*and thus the MappingContext holding eg. TypeAlias information*/() {
 
 		WithTypeAlias source = new WithTypeAlias();
 		source.value = "val";
 		Map<byte[], byte[]> hash = new ObjectHashMapper().toHash(source);
 
-		RedisMappingContext ctx = new RedisMappingContext();
+		ValkeyMappingContext ctx = new ValkeyMappingContext();
 		ctx.setInitialEntitySet(Collections.singleton(WithTypeAlias.class));
 		ctx.afterPropertiesSet();
 
-		MappingRedisConverter mappingRedisConverter = new MappingRedisConverter(ctx, null, null);
-		mappingRedisConverter.afterPropertiesSet();
+		MappingValkeyConverter mappingValkeyConverter = new MappingValkeyConverter(ctx, null, null);
+		mappingValkeyConverter.afterPropertiesSet();
 
-		ObjectHashMapper objectHashMapper = new ObjectHashMapper(mappingRedisConverter);
+		ObjectHashMapper objectHashMapper = new ObjectHashMapper(mappingValkeyConverter);
 		assertThat(objectHashMapper.fromHash(hash)).isEqualTo(source);
 	}
 

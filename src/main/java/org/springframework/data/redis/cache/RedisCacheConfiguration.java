@@ -24,18 +24,18 @@ import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.data.redis.cache.RedisCacheWriter.TtlFunction;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.cache.ValkeyCacheWriter.TtlFunction;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Immutable {@link RedisCacheConfiguration} used to customize {@link RedisCache} behavior, such as caching
+ * Immutable {@link ValkeyCacheConfiguration} used to customize {@link ValkeyCache} behavior, such as caching
  * {@literal null} values, computing cache key prefixes and handling binary serialization.
  * <p>
- * Start with {@link RedisCacheConfiguration#defaultCacheConfig()} and customize {@link RedisCache} behavior
+ * Start with {@link ValkeyCacheConfiguration#defaultCacheConfig()} and customize {@link ValkeyCache} behavior
  * using the builder methods, such as {@link #entryTtl(Duration)}, {@link #serializeKeysWith(SerializationPair)}
  * and {@link #serializeValuesWith(SerializationPair)}.
  *
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-public class RedisCacheConfiguration {
+public class ValkeyCacheConfiguration {
 
 	protected static final boolean DEFAULT_CACHE_NULL_VALUES = true;
 	protected static final boolean DEFAULT_ENABLE_TIME_TO_IDLE_EXPIRATION = false;
@@ -54,7 +54,7 @@ public class RedisCacheConfiguration {
 	protected static final boolean USE_TIME_TO_IDLE_EXPIRATION = true;
 
 	/**
-	 * Default {@link RedisCacheConfiguration} using the following:
+	 * Default {@link ValkeyCacheConfiguration} using the following:
 	 * <dl>
 	 * <dt>key expiration</dt>
 	 * <dd>eternal</dd>
@@ -65,22 +65,22 @@ public class RedisCacheConfiguration {
 	 * <dt>default prefix</dt>
 	 * <dd>[the actual cache name]</dd>
 	 * <dt>key serializer</dt>
-	 * <dd>{@link org.springframework.data.redis.serializer.StringRedisSerializer}</dd>
+	 * <dd>{@link org.springframework.data.redis.serializer.StringValkeySerializer}</dd>
 	 * <dt>value serializer</dt>
-	 * <dd>{@link org.springframework.data.redis.serializer.JdkSerializationRedisSerializer}</dd>
+	 * <dd>{@link org.springframework.data.redis.serializer.JdkSerializationValkeySerializer}</dd>
 	 * <dt>conversion service</dt>
 	 * <dd>{@link DefaultFormattingConversionService} with {@link #registerDefaultConverters(ConverterRegistry) default}
 	 * cache key converters</dd>
 	 * </dl>
 	 *
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public static RedisCacheConfiguration defaultCacheConfig() {
+	public static ValkeyCacheConfiguration defaultCacheConfig() {
 		return defaultCacheConfig(null);
 	}
 
 	/**
-	 * Create default {@link RedisCacheConfiguration} given {@link ClassLoader} using the following:
+	 * Create default {@link ValkeyCacheConfiguration} given {@link ClassLoader} using the following:
 	 * <dl>
 	 * <dt>key expiration</dt>
 	 * <dd>eternal</dd>
@@ -91,32 +91,32 @@ public class RedisCacheConfiguration {
 	 * <dt>default prefix</dt>
 	 * <dd>[the actual cache name]</dd>
 	 * <dt>key serializer</dt>
-	 * <dd>{@link org.springframework.data.redis.serializer.StringRedisSerializer}</dd>
+	 * <dd>{@link org.springframework.data.redis.serializer.StringValkeySerializer}</dd>
 	 * <dt>value serializer</dt>
-	 * <dd>{@link org.springframework.data.redis.serializer.JdkSerializationRedisSerializer}</dd>
+	 * <dd>{@link org.springframework.data.redis.serializer.JdkSerializationValkeySerializer}</dd>
 	 * <dt>conversion service</dt>
 	 * <dd>{@link DefaultFormattingConversionService} with {@link #registerDefaultConverters(ConverterRegistry) default}
 	 * cache key converters</dd>
 	 * </dl>
 	 *
 	 * @param classLoader the {@link ClassLoader} used for deserialization by the
-	 *          {@link org.springframework.data.redis.serializer.JdkSerializationRedisSerializer}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 *          {@link org.springframework.data.redis.serializer.JdkSerializationValkeySerializer}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 * @since 2.1
 	 */
-	public static RedisCacheConfiguration defaultCacheConfig(@Nullable ClassLoader classLoader) {
+	public static ValkeyCacheConfiguration defaultCacheConfig(@Nullable ClassLoader classLoader) {
 
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 
 		registerDefaultConverters(conversionService);
 
-		return new RedisCacheConfiguration(TtlFunction.persistent(),
+		return new ValkeyCacheConfiguration(TtlFunction.persistent(),
 				DEFAULT_CACHE_NULL_VALUES,
 				DEFAULT_ENABLE_TIME_TO_IDLE_EXPIRATION,
 				DEFAULT_USE_PREFIX,
 				CacheKeyPrefix.simple(),
-				SerializationPair.fromSerializer(RedisSerializer.string()),
-				SerializationPair.fromSerializer(RedisSerializer.java(classLoader)),
+				SerializationPair.fromSerializer(ValkeySerializer.string()),
+				SerializationPair.fromSerializer(ValkeySerializer.java(classLoader)),
 				conversionService);
 	}
 
@@ -134,7 +134,7 @@ public class RedisCacheConfiguration {
 	private final TtlFunction ttlFunction;
 
 	@SuppressWarnings("unchecked")
-	private RedisCacheConfiguration(TtlFunction ttlFunction, Boolean cacheNullValues, Boolean enableTimeToIdle,
+	private ValkeyCacheConfiguration(TtlFunction ttlFunction, Boolean cacheNullValues, Boolean enableTimeToIdle,
 			Boolean usePrefix, CacheKeyPrefix keyPrefix, SerializationPair<String> keySerializationPair,
 			SerializationPair<?> valueSerializationPair, ConversionService conversionService) {
 
@@ -149,33 +149,33 @@ public class RedisCacheConfiguration {
 	}
 
 	/**
-	 * Prefix the {@link RedisCache#getName() cache name} with the given value. <br />
+	 * Prefix the {@link ValkeyCache#getName() cache name} with the given value. <br />
 	 * The generated cache key will be: {@code prefix + cache name + "::" + cache entry key}.
 	 *
 	 * @param prefix the prefix to prepend to the cache name.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 * @see #computePrefixWith(CacheKeyPrefix)
 	 * @see CacheKeyPrefix#prefixed(String)
 	 * @since 2.3
 	 */
-	public RedisCacheConfiguration prefixCacheNameWith(String prefix) {
+	public ValkeyCacheConfiguration prefixCacheNameWith(String prefix) {
 		return computePrefixWith(CacheKeyPrefix.prefixed(prefix));
 	}
 
 	/**
-	 * Use the given {@link CacheKeyPrefix} to compute the prefix for the actual Redis {@literal key} given the
+	 * Use the given {@link CacheKeyPrefix} to compute the prefix for the actual Valkey {@literal key} given the
 	 * {@literal cache name} as function input.
 	 *
 	 * @param cacheKeyPrefix must not be {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 * @since 2.0.4
 	 * @see CacheKeyPrefix
 	 */
-	public RedisCacheConfiguration computePrefixWith(CacheKeyPrefix cacheKeyPrefix) {
+	public ValkeyCacheConfiguration computePrefixWith(CacheKeyPrefix cacheKeyPrefix) {
 
 		Assert.notNull(cacheKeyPrefix, "Function used to compute prefix must not be null");
 
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				DEFAULT_USE_PREFIX, cacheKeyPrefix, getKeySerializationPair(), getValueSerializationPair(),
 				getConversionService());
 	}
@@ -183,26 +183,26 @@ public class RedisCacheConfiguration {
 	/**
 	 * Disable caching {@literal null} values. <br />
 	 * <strong>NOTE</strong> any {@link org.springframework.cache.Cache#put(Object, Object)} operation involving
-	 * {@literal null} value will error. Nothing will be written to Redis, nothing will be removed. An already existing
+	 * {@literal null} value will error. Nothing will be written to Valkey, nothing will be removed. An already existing
 	 * key will still be there afterwards with the very same value as before.
 	 *
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration disableCachingNullValues() {
-		return new RedisCacheConfiguration(getTtlFunction(), DO_NOT_CACHE_NULL_VALUES, isTimeToIdleEnabled(),
+	public ValkeyCacheConfiguration disableCachingNullValues() {
+		return new ValkeyCacheConfiguration(getTtlFunction(), DO_NOT_CACHE_NULL_VALUES, isTimeToIdleEnabled(),
 				usePrefix(), getKeyPrefix(), getKeySerializationPair(), getValueSerializationPair(),
 				getConversionService());
 	}
 
 	/**
 	 * Disable using cache key prefixes. <br />
-	 * <strong>NOTE</strong>: {@link Cache#clear()} might result in unintended removal of {@literal key}s in Redis. Make
-	 * sure to use a dedicated Redis instance when disabling prefixes.
+	 * <strong>NOTE</strong>: {@link Cache#clear()} might result in unintended removal of {@literal key}s in Valkey. Make
+	 * sure to use a dedicated Valkey instance when disabling prefixes.
 	 *
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration disableKeyPrefix() {
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
+	public ValkeyCacheConfiguration disableKeyPrefix() {
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				DO_NOT_USE_PREFIX, getKeyPrefix(), getKeySerializationPair(), getValueSerializationPair(), getConversionService());
 	}
 
@@ -211,22 +211,22 @@ public class RedisCacheConfiguration {
 	 * such as {@link Cache#get(Object)}.
 	 * <p>
 	 * Enabling this option applies the same {@link #getTtlFunction() TTL expiration policy} to {@link Cache} read
-	 * operations as it does for {@link Cache} write operations. In effect, this will invoke the Redis {@literal GETEX}
+	 * operations as it does for {@link Cache} write operations. In effect, this will invoke the Valkey {@literal GETEX}
 	 * command in place of {@literal GET}.
 	 * <p>
-	 * Redis does not support the concept of {@literal TTI}, only {@literal TTL}. However, if {@literal TTL} expiration
+	 * Valkey does not support the concept of {@literal TTI}, only {@literal TTL}. However, if {@literal TTL} expiration
 	 * is applied to all {@link Cache} operations, both read and write alike, and {@link Cache} operations passed with
 	 * expiration are used consistently across the application, then in effect, an application can achieve
 	 * {@literal TTI} expiration-like behavior.
 	 * <p>
-	 * Requires Redis 6.2.0 or newer.
+	 * Requires Valkey 6.2.0 or newer.
 	 *
-	 * @return this {@link RedisCacheConfiguration}.
+	 * @return this {@link ValkeyCacheConfiguration}.
 	 * @see <a href="https://redis.io/commands/getex/">GETEX</a>
 	 * @since 3.2.0
 	 */
-	public RedisCacheConfiguration enableTimeToIdle() {
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), USE_TIME_TO_IDLE_EXPIRATION,
+	public ValkeyCacheConfiguration enableTimeToIdle() {
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), USE_TIME_TO_IDLE_EXPIRATION,
 				usePrefix(), getKeyPrefix(), getKeySerializationPair(), getValueSerializationPair(),
 				getConversionService());
 	}
@@ -235,9 +235,9 @@ public class RedisCacheConfiguration {
 	 * Set the ttl to apply for cache entries. Use {@link Duration#ZERO} to declare an eternal cache.
 	 *
 	 * @param ttl must not be {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration entryTtl(Duration ttl) {
+	public ValkeyCacheConfiguration entryTtl(Duration ttl) {
 
 		Assert.notNull(ttl, "TTL duration must not be null");
 
@@ -249,14 +249,14 @@ public class RedisCacheConfiguration {
 	 *
 	 * @param ttlFunction the {@link TtlFunction} to compute the time to live for cache entries, must not be
 	 *          {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 * @since 3.2
 	 */
-	public RedisCacheConfiguration entryTtl(TtlFunction ttlFunction) {
+	public ValkeyCacheConfiguration entryTtl(TtlFunction ttlFunction) {
 
 		Assert.notNull(ttlFunction, "TtlFunction must not be null");
 
-		return new RedisCacheConfiguration(ttlFunction, getAllowCacheNullValues(), isTimeToIdleEnabled(),
+		return new ValkeyCacheConfiguration(ttlFunction, getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				usePrefix(), getKeyPrefix(), getKeySerializationPair(), getValueSerializationPair(),
 				getConversionService());
 	}
@@ -265,13 +265,13 @@ public class RedisCacheConfiguration {
 	 * Define the {@link SerializationPair} used for de-/serializing cache keys.
 	 *
 	 * @param keySerializationPair must not be {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration serializeKeysWith(SerializationPair<String> keySerializationPair) {
+	public ValkeyCacheConfiguration serializeKeysWith(SerializationPair<String> keySerializationPair) {
 
 		Assert.notNull(keySerializationPair, "KeySerializationPair must not be null");
 
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				usePrefix(), getKeyPrefix(), keySerializationPair, getValueSerializationPair(), getConversionService());
 	}
 
@@ -279,13 +279,13 @@ public class RedisCacheConfiguration {
 	 * Define the {@link SerializationPair} used for de-/serializing cache values.
 	 *
 	 * @param valueSerializationPair must not be {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration serializeValuesWith(SerializationPair<?> valueSerializationPair) {
+	public ValkeyCacheConfiguration serializeValuesWith(SerializationPair<?> valueSerializationPair) {
 
 		Assert.notNull(valueSerializationPair, "ValueSerializationPair must not be null");
 
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				usePrefix(), getKeyPrefix(), getKeySerializationPair(), valueSerializationPair, getConversionService());
 	}
 
@@ -293,13 +293,13 @@ public class RedisCacheConfiguration {
 	 * Define the {@link ConversionService} used for cache key to {@link String} conversion.
 	 *
 	 * @param conversionService must not be {@literal null}.
-	 * @return new {@link RedisCacheConfiguration}.
+	 * @return new {@link ValkeyCacheConfiguration}.
 	 */
-	public RedisCacheConfiguration withConversionService(ConversionService conversionService) {
+	public ValkeyCacheConfiguration withConversionService(ConversionService conversionService) {
 
 		Assert.notNull(conversionService, "ConversionService must not be null");
 
-		return new RedisCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
+		return new ValkeyCacheConfiguration(getTtlFunction(), getAllowCacheNullValues(), isTimeToIdleEnabled(),
 				usePrefix(), getKeyPrefix(), getKeySerializationPair(), getValueSerializationPair(), conversionService);
 	}
 

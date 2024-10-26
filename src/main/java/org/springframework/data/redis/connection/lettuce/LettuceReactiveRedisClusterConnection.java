@@ -16,13 +16,13 @@
 package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.reactive.BaseRedisReactiveCommands;
-import io.lettuce.core.api.reactive.RedisReactiveCommands;
-import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.reactive.BaseValkeyReactiveCommands;
+import io.lettuce.core.api.reactive.ValkeyReactiveCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
 import io.lettuce.core.cluster.SlotHash;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.reactive.ValkeyClusterReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -38,34 +38,34 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.redis.connection.ClusterInfo;
 import org.springframework.data.redis.connection.ClusterTopologyProvider;
-import org.springframework.data.redis.connection.ReactiveRedisClusterConnection;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.ReactiveValkeyClusterConnection;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyNode;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ReactiveRedisClusterConnection} implementation for {@literal Lettuce}.
+ * {@link ReactiveValkeyClusterConnection} implementation for {@literal Lettuce}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 2.0
  */
-class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnection
-		implements ReactiveRedisClusterConnection {
+class LettuceReactiveValkeyClusterConnection extends LettuceReactiveValkeyConnection
+		implements ReactiveValkeyClusterConnection {
 
 	private final ClusterTopologyProvider topologyProvider;
 
 	/**
-	 * Creates new {@link LettuceReactiveRedisClusterConnection} given {@link LettuceConnectionProvider} and
-	 * {@link RedisClusterClient}.
+	 * Creates new {@link LettuceReactiveValkeyClusterConnection} given {@link LettuceConnectionProvider} and
+	 * {@link ValkeyClusterClient}.
 	 *
 	 * @param connectionProvider must not be {@literal null}.
 	 * @param client must not be {@literal null}.
 	 * @throws IllegalArgumentException when {@code client} is {@literal null}.
 	 */
-	LettuceReactiveRedisClusterConnection(LettuceConnectionProvider connectionProvider, RedisClusterClient client) {
+	LettuceReactiveValkeyClusterConnection(LettuceConnectionProvider connectionProvider, ValkeyClusterClient client) {
 
 		super(connectionProvider);
 
@@ -73,8 +73,8 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	/**
-	 * Creates new {@link LettuceReactiveRedisClusterConnection} given a shared {@link StatefulConnection connection},
-	 * {@link LettuceConnectionProvider} and {@link RedisClusterClient}.
+	 * Creates new {@link LettuceReactiveValkeyClusterConnection} given a shared {@link StatefulConnection connection},
+	 * {@link LettuceConnectionProvider} and {@link ValkeyClusterClient}.
 	 *
 	 * @param sharedConnection must not be {@literal null}.
 	 * @param connectionProvider must not be {@literal null}.
@@ -82,8 +82,8 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	 * @throws IllegalArgumentException when {@code client} is {@literal null}.
 	 * @since 2.0.1
 	 */
-	LettuceReactiveRedisClusterConnection(StatefulConnection<ByteBuffer, ByteBuffer> sharedConnection,
-			LettuceConnectionProvider connectionProvider, RedisClusterClient client) {
+	LettuceReactiveValkeyClusterConnection(StatefulConnection<ByteBuffer, ByteBuffer> sharedConnection,
+			LettuceConnectionProvider connectionProvider, ValkeyClusterClient client) {
 
 		super(sharedConnection, connectionProvider);
 
@@ -152,37 +152,37 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 
 	@Override
 	public Mono<String> ping() {
-		return clusterGetNodes().flatMap(node -> execute(node, BaseRedisReactiveCommands::ping)).last();
+		return clusterGetNodes().flatMap(node -> execute(node, BaseValkeyReactiveCommands::ping)).last();
 	}
 
 	@Override
-	public Mono<String> ping(RedisClusterNode node) {
-		return execute(node, BaseRedisReactiveCommands::ping).next();
+	public Mono<String> ping(ValkeyClusterNode node) {
+		return execute(node, BaseValkeyReactiveCommands::ping).next();
 	}
 
 	@Override
-	public Flux<RedisClusterNode> clusterGetNodes() {
+	public Flux<ValkeyClusterNode> clusterGetNodes() {
 		return Flux.fromStream(() -> doGetActiveNodes().stream());
 	}
 
 	@Override
-	public Flux<RedisClusterNode> clusterGetReplicas(RedisClusterNode master) {
+	public Flux<ValkeyClusterNode> clusterGetReplicas(ValkeyClusterNode master) {
 
 		Assert.notNull(master, "Master must not be null");
 
 		return Mono.fromSupplier(() -> lookup(master))
 				.flatMapMany(nodeToUse -> execute(nodeToUse, cmd -> cmd.clusterSlaves(nodeToUse.getId()) //
-						.flatMapIterable(LettuceConverters::toSetOfRedisClusterNodes)));
+						.flatMapIterable(LettuceConverters::toSetOfValkeyClusterNodes)));
 	}
 
 	@Override
-	public Mono<Map<RedisClusterNode, Collection<RedisClusterNode>>> clusterGetMasterReplicaMap() {
+	public Mono<Map<ValkeyClusterNode, Collection<ValkeyClusterNode>>> clusterGetMasterReplicaMap() {
 
 		return Flux.fromStream(() -> topologyProvider.getTopology().getActiveMasterNodes().stream()) //
 				.flatMap(node -> {
 					return Mono.just(node).zipWith(execute(node, cmd -> cmd.clusterSlaves(node.getId())) //
 							.collectList() //
-							.map(Converters::toSetOfRedisClusterNodes));
+							.map(Converters::toSetOfValkeyClusterNodes));
 				}).collect(Collectors.toMap(Tuple2::getT1, Tuple2::getT2));
 	}
 
@@ -192,14 +192,14 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	@Override
-	public Mono<RedisClusterNode> clusterGetNodeForSlot(int slot) {
+	public Mono<ValkeyClusterNode> clusterGetNodeForSlot(int slot) {
 
-		Set<RedisClusterNode> nodes = topologyProvider.getTopology().getSlotServingNodes(slot);
+		Set<ValkeyClusterNode> nodes = topologyProvider.getTopology().getSlotServingNodes(slot);
 		return nodes.isEmpty() ? Mono.empty() : Flux.fromIterable(nodes).next();
 	}
 
 	@Override
-	public Mono<RedisClusterNode> clusterGetNodeForKey(ByteBuffer key) {
+	public Mono<ValkeyClusterNode> clusterGetNodeForKey(ByteBuffer key) {
 
 		Assert.notNull(key, "Key must not be null");
 
@@ -209,19 +209,19 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	@Override
 	public Mono<ClusterInfo> clusterGetClusterInfo() {
 
-		return executeCommandOnArbitraryNode(RedisClusterReactiveCommands::clusterInfo) //
+		return executeCommandOnArbitraryNode(ValkeyClusterReactiveCommands::clusterInfo) //
 				.map(LettuceConverters::toProperties) //
 				.map(ClusterInfo::new) //
 				.single();
 	}
 
 	@Override
-	public Mono<Void> clusterAddSlots(RedisClusterNode node, int... slots) {
+	public Mono<Void> clusterAddSlots(ValkeyClusterNode node, int... slots) {
 		return execute(node, cmd -> cmd.clusterAddSlots(slots)).then();
 	}
 
 	@Override
-	public Mono<Void> clusterAddSlots(RedisClusterNode node, RedisClusterNode.SlotRange range) {
+	public Mono<Void> clusterAddSlots(ValkeyClusterNode node, ValkeyClusterNode.SlotRange range) {
 
 		Assert.notNull(range, "Range must not be null");
 
@@ -234,12 +234,12 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	@Override
-	public Mono<Void> clusterDeleteSlots(RedisClusterNode node, int... slots) {
+	public Mono<Void> clusterDeleteSlots(ValkeyClusterNode node, int... slots) {
 		return execute(node, cmd -> cmd.clusterDelSlots(slots)).then();
 	}
 
 	@Override
-	public Mono<Void> clusterDeleteSlotsInRange(RedisClusterNode node, RedisClusterNode.SlotRange range) {
+	public Mono<Void> clusterDeleteSlotsInRange(ValkeyClusterNode node, ValkeyClusterNode.SlotRange range) {
 
 		Assert.notNull(range, "Range must not be null");
 
@@ -247,20 +247,20 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	@Override
-	public Mono<Void> clusterForget(RedisClusterNode node) {
+	public Mono<Void> clusterForget(ValkeyClusterNode node) {
 
-		RedisClusterNode nodeToRemove = lookup(node);
+		ValkeyClusterNode nodeToRemove = lookup(node);
 
 		return Flux.fromStream(() -> {
 
-			List<RedisClusterNode> nodes = new ArrayList<>(doGetActiveNodes());
+			List<ValkeyClusterNode> nodes = new ArrayList<>(doGetActiveNodes());
 			nodes.remove(nodeToRemove);
 			return nodes.stream();
 		}).flatMap(actualNode -> execute(node, cmd -> cmd.clusterForget(nodeToRemove.getId()))).then();
 	}
 
 	@Override
-	public Mono<Void> clusterMeet(RedisClusterNode node) {
+	public Mono<Void> clusterMeet(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "Cluster node must not be null for CLUSTER MEET command");
 		Assert.hasText(node.getHost(), "Node to meet cluster must have a host");
@@ -271,14 +271,14 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	@Override
-	public Mono<Void> clusterSetSlot(RedisClusterNode node, int slot, AddSlots mode) {
+	public Mono<Void> clusterSetSlot(ValkeyClusterNode node, int slot, AddSlots mode) {
 
 		Assert.notNull(node, "Node must not be null");
 		Assert.notNull(mode, "AddSlots mode must not be null");
 
 		return execute(node, commands -> {
 
-			RedisClusterNode nodeToUse = lookup(node);
+			ValkeyClusterNode nodeToUse = lookup(node);
 			String nodeId = nodeToUse.getId();
 
 			return switch (mode) {
@@ -296,7 +296,7 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	@Override
-	public Mono<Void> clusterReplicate(RedisClusterNode master, RedisClusterNode replica) {
+	public Mono<Void> clusterReplicate(ValkeyClusterNode master, ValkeyClusterNode replica) {
 		return execute(replica, cmd -> cmd.clusterReplicate(lookup(master).getId())).then();
 	}
 
@@ -313,7 +313,7 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 
 		return Mono.fromSupplier(() -> {
 
-			List<RedisClusterNode> nodes = new ArrayList<>(doGetActiveNodes());
+			List<ValkeyClusterNode> nodes = new ArrayList<>(doGetActiveNodes());
 			int random = new Random().nextInt(nodes.size());
 
 			return nodes.get(random);
@@ -321,16 +321,16 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 	}
 
 	/**
-	 * Run {@link LettuceReactiveCallback} on given {@link RedisClusterNode}.
+	 * Run {@link LettuceReactiveCallback} on given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param callback must not be {@literal null}.
 	 * @throws IllegalArgumentException when {@code node} or {@code callback} is {@literal null}.
 	 * @return {@link Flux} emitting execution results.
 	 */
-	public <T> Flux<T> execute(RedisNode node, LettuceReactiveCallback<T> callback) {
+	public <T> Flux<T> execute(ValkeyNode node, LettuceReactiveCallback<T> callback) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 		Assert.notNull(callback, "ReactiveCallback must not be null");
 
 		return getCommands(node).flatMapMany(callback::doWithCommands).onErrorMap(translateException());
@@ -338,41 +338,41 @@ class LettuceReactiveRedisClusterConnection extends LettuceReactiveRedisConnecti
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	protected Mono<StatefulRedisClusterConnection<ByteBuffer, ByteBuffer>> getConnection() {
+	protected Mono<StatefulValkeyClusterConnection<ByteBuffer, ByteBuffer>> getConnection() {
 		return (Mono) super.getConnection();
 	}
 
-	protected Mono<RedisClusterReactiveCommands<ByteBuffer, ByteBuffer>> getCommands() {
-		return getConnection().map(StatefulRedisClusterConnection::reactive);
+	protected Mono<ValkeyClusterReactiveCommands<ByteBuffer, ByteBuffer>> getCommands() {
+		return getConnection().map(StatefulValkeyClusterConnection::reactive);
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	protected Mono<RedisReactiveCommands<ByteBuffer, ByteBuffer>> getCommands(RedisNode node) {
+	protected Mono<ValkeyReactiveCommands<ByteBuffer, ByteBuffer>> getCommands(ValkeyNode node) {
 
 		if (StringUtils.hasText(node.getId())) {
-			return getConnection().cast(StatefulRedisClusterConnection.class).flatMap(it -> {
-				StatefulRedisClusterConnection<ByteBuffer, ByteBuffer> connection = it;
+			return getConnection().cast(StatefulValkeyClusterConnection.class).flatMap(it -> {
+				StatefulValkeyClusterConnection<ByteBuffer, ByteBuffer> connection = it;
 				return Mono.fromCompletionStage(connection.getConnectionAsync(node.getId()))
-						.map(StatefulRedisConnection::reactive);
+						.map(StatefulValkeyConnection::reactive);
 			});
 		}
 
 		return getConnection().flatMap(it -> Mono.fromCompletionStage(it.getConnectionAsync(node.getHost(), node.getPort()))
-				.map(StatefulRedisConnection::reactive));
+				.map(StatefulValkeyConnection::reactive));
 	}
 
 	/**
-	 * Lookup a {@link RedisClusterNode} by using either ids {@link RedisClusterNode#getId() node id} or host and port to
+	 * Lookup a {@link ValkeyClusterNode} by using either ids {@link ValkeyClusterNode#getId() node id} or host and port to
 	 * obtain the full node details from the underlying {@link ClusterTopologyProvider}.
 	 *
 	 * @param nodeToLookup the node to lookup.
-	 * @return the {@link RedisClusterNode} from the topology lookup.
+	 * @return the {@link ValkeyClusterNode} from the topology lookup.
 	 */
-	private RedisClusterNode lookup(RedisClusterNode nodeToLookup) {
+	private ValkeyClusterNode lookup(ValkeyClusterNode nodeToLookup) {
 		return topologyProvider.getTopology().lookup(nodeToLookup);
 	}
 
-	private Set<RedisClusterNode> doGetActiveNodes() {
+	private Set<ValkeyClusterNode> doGetActiveNodes() {
 		return topologyProvider.getTopology().getActiveNodes();
 	}
 }

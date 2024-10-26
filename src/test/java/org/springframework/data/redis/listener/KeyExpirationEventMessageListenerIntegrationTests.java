@@ -30,11 +30,11 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Christoph Strobl
@@ -42,8 +42,8 @@ import org.springframework.data.redis.test.extension.RedisStanalone;
  */
 class KeyExpirationEventMessageListenerIntegrationTests {
 
-	private RedisMessageListenerContainer container;
-	private RedisConnectionFactory connectionFactory;
+	private ValkeyMessageListenerContainer container;
+	private ValkeyConnectionFactory connectionFactory;
 	private KeyExpirationEventMessageListener listener;
 
 	ApplicationEventPublisher publisherMock;
@@ -53,9 +53,9 @@ class KeyExpirationEventMessageListenerIntegrationTests {
 
 		publisherMock = mock(ApplicationEventPublisher.class);
 
-		this.connectionFactory = JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+		this.connectionFactory = JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 
-		container = new RedisMessageListenerContainer();
+		container = new ValkeyMessageListenerContainer();
 		container.setConnectionFactory(connectionFactory);
 		container.afterPropertiesSet();
 		container.start();
@@ -64,7 +64,7 @@ class KeyExpirationEventMessageListenerIntegrationTests {
 		listener.setApplicationEventPublisher(publisherMock);
 		listener.init();
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.flushAll();
 		}
 	}
@@ -86,7 +86,7 @@ class KeyExpirationEventMessageListenerIntegrationTests {
 			return null;
 		}).when(publisherMock).publishEvent(any(ApplicationEvent.class));
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 
 			connection.pSetEx(key, 1, key);
 			Awaitility.await().until(() -> !connection.exists(key));
@@ -105,7 +105,7 @@ class KeyExpirationEventMessageListenerIntegrationTests {
 
 		byte[] key = ("to-delete:" + UUID.randomUUID().toString()).getBytes();
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 
 			connection.setEx(key, 10, "foo".getBytes());
 			connection.del(key);

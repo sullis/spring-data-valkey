@@ -24,19 +24,19 @@ import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
 
 /**
- * Test of {@link DefaultRedisScript}
+ * Test of {@link DefaultValkeyScript}
  *
  * @author Jennifer Hickey
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-class DefaultRedisScriptTests {
+class DefaultValkeyScriptTests {
 
 	@Test
 	void testGetSha1() {
 
 		StaticScriptSource script = new StaticScriptSource("return KEYS[1]");
-		DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> redisScript = new DefaultValkeyScript<>();
 		redisScript.setScriptSource(script);
 		redisScript.setResultType(String.class);
 		String sha1 = redisScript.getSha1();
@@ -50,7 +50,7 @@ class DefaultRedisScriptTests {
 	@Test
 	void testGetScriptAsString() {
 
-		DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
+		DefaultValkeyScript<String> redisScript = new DefaultValkeyScript<>();
 		redisScript.setScriptText("return ARGS[1]");
 		redisScript.setResultType(String.class);
 		assertThat(redisScript.getScriptAsString()).isEqualTo("return ARGS[1]");
@@ -59,7 +59,7 @@ class DefaultRedisScriptTests {
 	@Test // DATAREDIS-1030
 	void testGetScriptAsStringFromResource() {
 
-		RedisScript<String> redisScript = RedisScript
+		ValkeyScript<String> redisScript = ValkeyScript
 				.of(new ClassPathResource("org/springframework/data/redis/core/script/cas.lua"));
 		assertThat(redisScript.getScriptAsString()).startsWith("local current = redis.call('GET', KEYS[1])");
 	}
@@ -67,7 +67,7 @@ class DefaultRedisScriptTests {
 	@Test
 	void testGetScriptAsStringError() {
 
-		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+		DefaultValkeyScript<Long> redisScript = new DefaultValkeyScript<>();
 		redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("nonexistent")));
 		redisScript.setResultType(Long.class);
 
@@ -77,7 +77,7 @@ class DefaultRedisScriptTests {
 	@Test
 	void initializeWithNoScript() throws Exception {
 
-		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+		DefaultValkeyScript<Long> redisScript = new DefaultValkeyScript<>();
 		assertThatIllegalStateException().isThrownBy(redisScript::afterPropertiesSet);
 	}
 }

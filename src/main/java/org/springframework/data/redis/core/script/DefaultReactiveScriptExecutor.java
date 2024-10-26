@@ -23,20 +23,20 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.core.ReactiveRedisCallback;
-import org.springframework.data.redis.serializer.RedisElementReader;
-import org.springframework.data.redis.serializer.RedisElementWriter;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.core.ReactiveValkeyCallback;
+import org.springframework.data.redis.serializer.ValkeyElementReader;
+import org.springframework.data.redis.serializer.ValkeyElementWriter;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
 import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link ReactiveScriptExecutor}. Optimizes performance by attempting to execute script first
- * using {@code EVALSHA}, then falling back to {@code EVAL} if Redis has not yet cached the script.
+ * using {@code EVALSHA}, then falling back to {@code EVAL} if Valkey has not yet cached the script.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -46,21 +46,21 @@ import org.springframework.util.Assert;
  */
 public class DefaultReactiveScriptExecutor<K> implements ReactiveScriptExecutor<K> {
 
-	private final ReactiveRedisConnectionFactory connectionFactory;
-	private final RedisSerializationContext<K, ?> serializationContext;
+	private final ReactiveValkeyConnectionFactory connectionFactory;
+	private final ValkeySerializationContext<K, ?> serializationContext;
 
 	/**
-	 * Creates a new {@link DefaultReactiveScriptExecutor} given {@link ReactiveRedisConnectionFactory} and
-	 * {@link RedisSerializationContext}.
+	 * Creates a new {@link DefaultReactiveScriptExecutor} given {@link ReactiveValkeyConnectionFactory} and
+	 * {@link ValkeySerializationContext}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param serializationContext must not be {@literal null}.
 	 */
-	public DefaultReactiveScriptExecutor(ReactiveRedisConnectionFactory connectionFactory,
-			RedisSerializationContext<K, ?> serializationContext) {
+	public DefaultReactiveScriptExecutor(ReactiveValkeyConnectionFactory connectionFactory,
+			ValkeySerializationContext<K, ?> serializationContext) {
 
-		Assert.notNull(connectionFactory, "ReactiveRedisConnectionFactory must not be null");
-		Assert.notNull(serializationContext, "RedisSerializationContext must not be null");
+		Assert.notNull(connectionFactory, "ReactiveValkeyConnectionFactory must not be null");
+		Assert.notNull(serializationContext, "ValkeySerializationContext must not be null");
 
 		this.connectionFactory = connectionFactory;
 		this.serializationContext = serializationContext;
@@ -68,23 +68,23 @@ public class DefaultReactiveScriptExecutor<K> implements ReactiveScriptExecutor<
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args) {
+	public <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args) {
 
-		Assert.notNull(script, "RedisScript must not be null");
+		Assert.notNull(script, "ValkeyScript must not be null");
 		Assert.notNull(keys, "Keys must not be null");
 		Assert.notNull(args, "Args must not be null");
 
 		SerializationPair<?> serializationPair = serializationContext.getValueSerializationPair();
 
 		return execute(script, keys, args, serializationPair.getWriter(),
-				(RedisElementReader<T>) serializationPair.getReader());
+				(ValkeyElementReader<T>) serializationPair.getReader());
 	}
 
 	@Override
-	public <T> Flux<T> execute(RedisScript<T> script, List<K> keys, List<?> args, RedisElementWriter<?> argsWriter,
-			RedisElementReader<T> resultReader) {
+	public <T> Flux<T> execute(ValkeyScript<T> script, List<K> keys, List<?> args, ValkeyElementWriter<?> argsWriter,
+			ValkeyElementReader<T> resultReader) {
 
-		Assert.notNull(script, "RedisScript must not be null");
+		Assert.notNull(script, "ValkeyScript must not be null");
 		Assert.notNull(argsWriter, "Argument Writer must not be null");
 		Assert.notNull(resultReader, "Result Reader must not be null");
 		Assert.notNull(keys, "Keys must not be null");
@@ -101,8 +101,8 @@ public class DefaultReactiveScriptExecutor<K> implements ReactiveScriptExecutor<
 		});
 	}
 
-	protected <T> Flux<T> eval(ReactiveRedisConnection connection, RedisScript<T> script, ReturnType returnType,
-			int numKeys, ByteBuffer[] keysAndArgs, RedisElementReader<T> resultReader) {
+	protected <T> Flux<T> eval(ReactiveValkeyConnection connection, ValkeyScript<T> script, ReturnType returnType,
+			int numKeys, ByteBuffer[] keysAndArgs, ValkeyElementReader<T> resultReader) {
 
 		Flux<T> result = connection.scriptingCommands().evalSha(script.getSha1(), returnType, numKeys, keysAndArgs);
 
@@ -113,24 +113,24 @@ public class DefaultReactiveScriptExecutor<K> implements ReactiveScriptExecutor<
 			}
 
 			return Flux.error(cause instanceof RuntimeException ? cause
-					: new RedisSystemException(cause.getMessage(), cause));
+					: new ValkeySystemException(cause.getMessage(), cause));
 		});
 
 		return script.returnsRawValue() ? result : deserializeResult(resultReader, result);
 	}
 
 	@SuppressWarnings({ "Convert2MethodRef", "rawtypes", "unchecked" })
-	protected ByteBuffer[] keysAndArgs(RedisElementWriter argsWriter, List<K> keys, List<?> args) {
+	protected ByteBuffer[] keysAndArgs(ValkeyElementWriter argsWriter, List<K> keys, List<?> args) {
 
 		return Stream.concat(keys.stream().map(t -> keySerializer().getWriter().write(t)),
 				args.stream().map(t -> argsWriter.write(t))).toArray(size -> new ByteBuffer[size]);
 	}
 
-	protected ByteBuffer scriptBytes(RedisScript<?> script) {
+	protected ByteBuffer scriptBytes(ValkeyScript<?> script) {
 		return serializationContext.getStringSerializationPair().getWriter().write(script.getScriptAsString());
 	}
 
-	protected <T> Flux<T> deserializeResult(RedisElementReader<T> reader, Flux<T> result) {
+	protected <T> Flux<T> deserializeResult(ValkeyElementReader<T> reader, Flux<T> result) {
 
 		return result.map(it -> {
 
@@ -156,17 +156,17 @@ public class DefaultReactiveScriptExecutor<K> implements ReactiveScriptExecutor<
 	 * @param action callback object to execute
 	 * @return object returned by the action
 	 */
-	private <T> Flux<T> execute(ReactiveRedisCallback<T> action) {
+	private <T> Flux<T> execute(ReactiveValkeyCallback<T> action) {
 
 		Assert.notNull(action, "Callback object must not be null");
 
-		ReactiveRedisConnectionFactory factory = getConnectionFactory();
+		ReactiveValkeyConnectionFactory factory = getConnectionFactory();
 
-		return Flux.usingWhen(Mono.fromSupplier(factory::getReactiveConnection), action::doInRedis,
-				ReactiveRedisConnection::closeLater);
+		return Flux.usingWhen(Mono.fromSupplier(factory::getReactiveConnection), action::doInValkey,
+				ReactiveValkeyConnection::closeLater);
 	}
 
-	public ReactiveRedisConnectionFactory getConnectionFactory() {
+	public ReactiveValkeyConnectionFactory getConnectionFactory() {
 		return this.connectionFactory;
 	}
 }

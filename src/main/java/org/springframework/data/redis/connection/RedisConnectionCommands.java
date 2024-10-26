@@ -18,19 +18,19 @@ package org.springframework.data.redis.connection;
 import org.springframework.lang.Nullable;
 
 /**
- * Connection-specific commands supported by Redis.
+ * Connection-specific commands supported by Valkey.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public interface RedisConnectionCommands {
+public interface ValkeyConnectionCommands {
 
 	/**
 	 * Select the DB with given positive {@code dbIndex}.
 	 *
 	 * @param dbIndex the database index.
-	 * @see <a href="https://redis.io/commands/select">Redis Documentation: SELECT</a>
+	 * @see <a href="https://redis.io/commands/select">Valkey Documentation: SELECT</a>
 	 */
 	void select(int dbIndex);
 
@@ -39,7 +39,7 @@ public interface RedisConnectionCommands {
 	 *
 	 * @param message the message to echo.
 	 * @return the message or {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/echo">Redis Documentation: ECHO</a>
+	 * @see <a href="https://redis.io/commands/echo">Valkey Documentation: ECHO</a>
 	 */
 	@Nullable
 	byte[] echo(byte[] message);
@@ -48,7 +48,7 @@ public interface RedisConnectionCommands {
 	 * Test connection.
 	 *
 	 * @return Server response message - usually {@literal PONG}. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/ping">Redis Documentation: PING</a>
+	 * @see <a href="https://redis.io/commands/ping">Valkey Documentation: PING</a>
 	 */
 	@Nullable
 	String ping();

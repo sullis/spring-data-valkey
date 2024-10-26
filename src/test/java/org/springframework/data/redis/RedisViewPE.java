@@ -24,7 +24,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 /**
  * @author Costin Leau
  */
-public class RedisViewPE {
+public class ValkeyViewPE {
 
 	private ValueOperations<String, String> valueOps;
 	private ListOperations<String, String> listOps;

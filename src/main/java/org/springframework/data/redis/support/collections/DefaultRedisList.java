@@ -25,14 +25,14 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisListCommands;
+import org.springframework.data.redis.connection.ValkeyListCommands;
 import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation for {@link RedisList}. Suitable for not just lists, but also queues (FIFO ordering) or stacks
+ * Default implementation for {@link ValkeyList}. Suitable for not just lists, but also queues (FIFO ordering) or stacks
  * (LIFO ordering) and deques (or double ended queues). Allows the maximum size (or the cap) to be specified to prevent
  * the list from over growing. Note that all write operations will execute immediately, whether a cap is specified or
  * not - the list will always accept new items (trimming the tail after each insert in case of capped collections).
@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @author Jinbeom Kim
  */
-public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements RedisList<E> {
+public class DefaultValkeyList<E> extends AbstractValkeyCollection<E> implements ValkeyList<E> {
 
 	private volatile boolean capped = false;
 
@@ -52,43 +52,43 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 	private final BoundListOperations<String, E> listOps;
 
 	/**
-	 * Constructs a new, uncapped {@link DefaultRedisList} instance.
+	 * Constructs a new, uncapped {@link DefaultValkeyList} instance.
 	 *
-	 * @param key Redis key of this list.
-	 * @param operations {@link RedisOperations} used to retrieve values of the declared {@link E type} from this list.
+	 * @param key Valkey key of this list.
+	 * @param operations {@link ValkeyOperations} used to retrieve values of the declared {@link E type} from this list.
 	 */
-	public DefaultRedisList(String key, RedisOperations<String, E> operations) {
+	public DefaultValkeyList(String key, ValkeyOperations<String, E> operations) {
 		this(operations.boundListOps(key));
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisList} instance constrained to the given {@link Integer max size}.
+	 * Constructs a new {@link DefaultValkeyList} instance constrained to the given {@link Integer max size}.
 	 *
-	 * @param key Redis key of this list.
-	 * @param operations {@link RedisOperations} used to retrieve values of the declared {@link E type} from this list.
+	 * @param key Valkey key of this list.
+	 * @param operations {@link ValkeyOperations} used to retrieve values of the declared {@link E type} from this list.
 	 * @param maxSize {@link Integer maximum number of elements} allowed to be stored in this list.
 	 * @since 2.6
 	 */
-	public DefaultRedisList(String key, RedisOperations<String, E> operations, int maxSize) {
+	public DefaultValkeyList(String key, ValkeyOperations<String, E> operations, int maxSize) {
 		this(operations.boundListOps(key), maxSize);
 	}
 
 	/**
-	 * Constructs a new, uncapped {@link DefaultRedisList} instance.
+	 * Constructs a new, uncapped {@link DefaultValkeyList} instance.
 	 *
 	 * @param boundOps {@link BoundListOperations} for the value type of this list.
 	 */
-	public DefaultRedisList(BoundListOperations<String, E> boundOps) {
+	public DefaultValkeyList(BoundListOperations<String, E> boundOps) {
 		this(boundOps, 0);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisList} instance constrained to the given {@link Integer max size}.
+	 * Constructs a new {@link DefaultValkeyList} instance constrained to the given {@link Integer max size}.
 	 *
 	 * @param boundOps {@link BoundListOperations} for the value type of this list.
 	 * @param maxSize {@link Integer maximum number of elements} allowed to be stored in this list.
 	 */
-	public DefaultRedisList(BoundListOperations<String, E> boundOps, int maxSize) {
+	public DefaultValkeyList(BoundListOperations<String, E> boundOps, int maxSize) {
 
 		super(boundOps.getKey(), boundOps.getOperations());
 
@@ -108,58 +108,58 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 	}
 
 	@Override
-	public E moveFirstTo(RedisList<E> destination, RedisListCommands.Direction destinationPosition) {
+	public E moveFirstTo(ValkeyList<E> destination, ValkeyListCommands.Direction destinationPosition) {
 
 		Assert.notNull(destination, "Destination must not be null");
 		Assert.notNull(destinationPosition, "Destination position must not be null");
 
-		E result = listOps.move(RedisListCommands.Direction.first(), destination.getKey(), destinationPosition);
+		E result = listOps.move(ValkeyListCommands.Direction.first(), destination.getKey(), destinationPosition);
 		potentiallyCap(destination);
 		return result;
 	}
 
 	@Override
-	public E moveFirstTo(RedisList<E> destination, RedisListCommands.Direction destinationPosition, long timeout,
+	public E moveFirstTo(ValkeyList<E> destination, ValkeyListCommands.Direction destinationPosition, long timeout,
 			TimeUnit unit) {
 
 		Assert.notNull(destination, "Destination must not be null");
 		Assert.notNull(destinationPosition, "Destination position must not be null");
 		Assert.notNull(unit, "TimeUnit must not be null");
 
-		E result = listOps.move(RedisListCommands.Direction.first(), destination.getKey(), destinationPosition, timeout,
+		E result = listOps.move(ValkeyListCommands.Direction.first(), destination.getKey(), destinationPosition, timeout,
 				unit);
 		potentiallyCap(destination);
 		return result;
 	}
 
 	@Override
-	public E moveLastTo(RedisList<E> destination, RedisListCommands.Direction destinationPosition) {
+	public E moveLastTo(ValkeyList<E> destination, ValkeyListCommands.Direction destinationPosition) {
 
 		Assert.notNull(destination, "Destination must not be null");
 		Assert.notNull(destinationPosition, "Destination position must not be null");
 
-		E result = listOps.move(RedisListCommands.Direction.last(), destination.getKey(), destinationPosition);
+		E result = listOps.move(ValkeyListCommands.Direction.last(), destination.getKey(), destinationPosition);
 		potentiallyCap(destination);
 		return result;
 	}
 
 	@Override
-	public E moveLastTo(RedisList<E> destination, RedisListCommands.Direction destinationPosition, long timeout,
+	public E moveLastTo(ValkeyList<E> destination, ValkeyListCommands.Direction destinationPosition, long timeout,
 			TimeUnit unit) {
 
 		Assert.notNull(destination, "Destination must not be null");
 		Assert.notNull(destinationPosition, "Destination position must not be null");
 		Assert.notNull(unit, "TimeUnit must not be null");
 
-		E result = listOps.move(RedisListCommands.Direction.last(), destination.getKey(), destinationPosition, timeout,
+		E result = listOps.move(ValkeyListCommands.Direction.last(), destination.getKey(), destinationPosition, timeout,
 				unit);
 		potentiallyCap(destination);
 		return result;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void potentiallyCap(RedisList<E> destination) {
-		if (destination instanceof DefaultRedisList<?> redisList) {
+	private void potentiallyCap(ValkeyList<E> destination) {
+		if (destination instanceof DefaultValkeyList<?> redisList) {
 			redisList.cap();
 		}
 	}
@@ -170,13 +170,13 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 	}
 
 	@Override
-	public RedisList<E> trim(int start, int end) {
+	public ValkeyList<E> trim(int start, int end) {
 		listOps.trim(start, end);
 		return this;
 	}
 
 	@Override
-	public RedisList<E> trim(long start, long end) {
+	public ValkeyList<E> trim(long start, long end) {
 		listOps.trim(start, end);
 		return this;
 	}
@@ -185,7 +185,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 	public Iterator<E> iterator() {
 		List<E> list = content();
 		checkResult(list);
-		return new DefaultRedisListIterator(list.iterator());
+		return new DefaultValkeyListIterator(list.iterator());
 	}
 
 	@Override
@@ -232,7 +232,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 			throw new IndexOutOfBoundsException();
 		}
 
-		throw new IllegalArgumentException("Redis supports insertion only at the beginning or the end of the list");
+		throw new IllegalArgumentException("Valkey supports insertion only at the beginning or the end of the list");
 	}
 
 	@Override
@@ -256,7 +256,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 			throw new IndexOutOfBoundsException();
 		}
 
-		throw new IllegalArgumentException("Redis supports insertion only at the beginning or the end of the list");
+		throw new IllegalArgumentException("Valkey supports insertion only at the beginning or the end of the list");
 	}
 
 	@Override
@@ -376,7 +376,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 	public Iterator<E> descendingIterator() {
 		List<E> content = content();
 		Collections.reverse(content);
-		return new DefaultRedisListIterator(content.iterator());
+		return new DefaultValkeyListIterator(content.iterator());
 	}
 
 	@Override
@@ -583,15 +583,15 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 		}
 	}
 
-	private class DefaultRedisListIterator extends RedisIterator<E> {
+	private class DefaultValkeyListIterator extends ValkeyIterator<E> {
 
-		public DefaultRedisListIterator(Iterator<E> delegate) {
+		public DefaultValkeyListIterator(Iterator<E> delegate) {
 			super(delegate);
 		}
 
 		@Override
-		protected void removeFromRedisStorage(E item) {
-			DefaultRedisList.this.remove(item);
+		protected void removeFromValkeyStorage(E item) {
+			DefaultValkeyList.this.remove(item);
 		}
 	}
 
@@ -635,7 +635,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 			Assert.state(this.lastReturnedElement != null,
 				"Next must be called before remove");
 
-			if (!DefaultRedisList.this.remove(this.lastReturnedElement)) {
+			if (!DefaultValkeyList.this.remove(this.lastReturnedElement)) {
 				throw new ConcurrentModificationException();
 			}
 
@@ -671,7 +671,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 
 			try {
 				int index = this.cursor;
-				DefaultRedisList.this.add(index, element);
+				DefaultValkeyList.this.add(index, element);
 				this.lastReturnedElementIndex = -1;
 				this.lastReturnedElement = null;
 				this.cursor = index + 1;
@@ -702,7 +702,7 @@ public class DefaultRedisList<E> extends AbstractRedisCollection<E> implements R
 				"next() or previous() must be called before set(:E)");
 
 			try {
-				DefaultRedisList.this.set(this.lastReturnedElementIndex, element);
+				DefaultValkeyList.this.set(this.lastReturnedElementIndex, element);
 			} catch (IndexOutOfBoundsException ignore) {
 				throw new ConcurrentModificationException();
 			}

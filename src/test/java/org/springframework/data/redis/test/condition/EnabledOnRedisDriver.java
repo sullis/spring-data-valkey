@@ -23,11 +23,11 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
- * {@code @EnabledOnRedisDriver} is used to signal that the annotated test class or test method is only <em>enabled</em>
- * when one of the {@link #value() specified Redis Clients} is used.
+ * {@code @EnabledOnValkeyDriver} is used to signal that the annotated test class or test method is only <em>enabled</em>
+ * when one of the {@link #value() specified Valkey Clients} is used.
  * <p>
  * This annotation must be used in combination with {@link DriverQualifier @DriverQualifier} so the extension can
- * identify the driver from a {@link org.springframework.data.redis.connection.RedisConnectionFactory}.
+ * identify the driver from a {@link org.springframework.data.redis.connection.ValkeyConnectionFactory}.
  * <p>
  * If a test method is disabled via this annotation, that does not prevent the test class from being instantiated.
  * Rather, it prevents the execution of the test method and method-level lifecycle callbacks such as {@code @BeforeEach}
@@ -35,21 +35,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * @author Thomas Darimont
  * @author Mark Paluch
- * @see org.springframework.data.redis.connection.RedisConnectionFactory
+ * @see org.springframework.data.redis.connection.ValkeyConnectionFactory
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(EnabledOnRedisDriverCondition.class)
-public @interface EnabledOnRedisDriver {
+@ExtendWith(EnabledOnValkeyDriverCondition.class)
+public @interface EnabledOnValkeyDriver {
 
 	/**
-	 * One or more Redis drivers that enable the condition.
+	 * One or more Valkey drivers that enable the condition.
 	 */
-	RedisDriver[] value() default {};
+	ValkeyDriver[] value() default {};
 
 	/**
 	 * Annotation to identify the field that holds the
-	 * {@link org.springframework.data.redis.connection.RedisConnectionFactory} to inspect.
+	 * {@link org.springframework.data.redis.connection.ValkeyConnectionFactory} to inspect.
 	 */
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)

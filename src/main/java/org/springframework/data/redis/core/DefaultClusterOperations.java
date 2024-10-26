@@ -19,12 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.data.redis.connection.RedisClusterCommands.AddSlots;
-import org.springframework.data.redis.connection.RedisClusterConnection;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.connection.RedisServerCommands.MigrateOption;
+import org.springframework.data.redis.connection.ValkeyClusterCommands.AddSlots;
+import org.springframework.data.redis.connection.ValkeyClusterConnection;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.connection.ValkeyServerCommands.MigrateOption;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -39,21 +39,21 @@ import org.springframework.util.Assert;
  */
 class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements ClusterOperations<K, V> {
 
-	private final RedisTemplate<K, V> template;
+	private final ValkeyTemplate<K, V> template;
 
 	/**
-	 * Creates new {@link DefaultClusterOperations} delegating to the given {@link RedisTemplate}.
+	 * Creates new {@link DefaultClusterOperations} delegating to the given {@link ValkeyTemplate}.
 	 *
 	 * @param template must not be {@literal null}.
 	 */
-	DefaultClusterOperations(RedisTemplate<K, V> template) {
+	DefaultClusterOperations(ValkeyTemplate<K, V> template) {
 
 		super(template);
 		this.template = template;
 	}
 
 	@Override
-	public Set<K> keys(RedisClusterNode node, K pattern) {
+	public Set<K> keys(ValkeyClusterNode node, K pattern) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
@@ -61,7 +61,7 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	@Override
-	public K randomKey(RedisClusterNode node) {
+	public K randomKey(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
@@ -69,7 +69,7 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	@Override
-	public String ping(RedisClusterNode node) {
+	public String ping(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
@@ -77,18 +77,18 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	@Override
-	public void addSlots(RedisClusterNode node, int... slots) {
+	public void addSlots(ValkeyClusterNode node, int... slots) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.clusterAddSlots(node, slots);
 			return null;
 		});
 	}
 
 	@Override
-	public void addSlots(RedisClusterNode node, SlotRange range) {
+	public void addSlots(ValkeyClusterNode node, SlotRange range) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 		Assert.notNull(range, "Range must not be null");
@@ -97,73 +97,73 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	@Override
-	public void bgReWriteAof(RedisClusterNode node) {
+	public void bgReWriteAof(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.bgReWriteAof(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void bgSave(RedisClusterNode node) {
+	public void bgSave(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.bgSave(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void meet(RedisClusterNode node) {
+	public void meet(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.clusterMeet(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void forget(RedisClusterNode node) {
+	public void forget(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.clusterForget(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node) {
+	public void flushDb(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.flushDb(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void flushDb(RedisClusterNode node, FlushOption option) {
+	public void flushDb(ValkeyClusterNode node, FlushOption option) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.flushDb(node, option);
 			return null;
 		});
 	}
 
 	@Override
-	public Collection<RedisClusterNode> getReplicas(final RedisClusterNode node) {
+	public Collection<ValkeyClusterNode> getReplicas(final ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
@@ -171,34 +171,34 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	@Override
-	public void save(RedisClusterNode node) {
+	public void save(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.save(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void shutdown(RedisClusterNode node) {
+	public void shutdown(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "ClusterNode must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 			connection.shutdown(node);
 			return null;
 		});
 	}
 
 	@Override
-	public void reshard(RedisClusterNode source, int slot, RedisClusterNode target) {
+	public void reshard(ValkeyClusterNode source, int slot, ValkeyClusterNode target) {
 
 		Assert.notNull(source, "Source node must not be null");
 		Assert.notNull(target, "Target node must not be null");
 
-		doInCluster((RedisClusterCallback<Void>) connection -> {
+		doInCluster((ValkeyClusterCallback<Void>) connection -> {
 
 			connection.clusterSetSlot(target, slot, AddSlots.IMPORTING);
 			connection.clusterSetSlot(source, slot, AddSlots.MIGRATING);
@@ -213,18 +213,18 @@ class DefaultClusterOperations<K, V> extends AbstractOperations<K, V> implements
 	}
 
 	/**
-	 * Executed wrapped command upon {@link RedisClusterConnection}.
+	 * Executed wrapped command upon {@link ValkeyClusterConnection}.
 	 *
 	 * @param callback must not be {@literal null}.
 	 * @return execution result. Can be {@literal null}.
 	 */
 	@Nullable
-	<T> T doInCluster(RedisClusterCallback<T> callback) {
+	<T> T doInCluster(ValkeyClusterCallback<T> callback) {
 
 		Assert.notNull(callback, "ClusterCallback must not be null");
 
-		try (RedisClusterConnection connection = template.getConnectionFactory().getClusterConnection()) {
-			return callback.doInRedis(connection);
+		try (ValkeyClusterConnection connection = template.getConnectionFactory().getClusterConnection()) {
+			return callback.doInValkey(connection);
 		}
 	}
 

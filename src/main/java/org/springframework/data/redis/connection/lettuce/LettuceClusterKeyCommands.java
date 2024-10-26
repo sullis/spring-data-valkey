@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.lettuce.LettuceClusterConnection.LettuceClusterCommandCallback;
 import org.springframework.data.redis.core.Cursor;
@@ -94,7 +94,7 @@ class LettuceClusterKeyCommands extends LettuceKeyCommands {
 	}
 
 	@Nullable
-	public byte[] randomKey(RedisClusterNode node) {
+	public byte[] randomKey(ValkeyClusterNode node) {
 
 		return connection.getClusterCommandExecutor()
 				.executeCommandOnSingleNode((LettuceClusterCommandCallback<byte[]>) client -> client.randomkey(), node)
@@ -102,7 +102,7 @@ class LettuceClusterKeyCommands extends LettuceKeyCommands {
 	}
 
 	@Nullable
-	public Set<byte[]> keys(RedisClusterNode node, byte[] pattern) {
+	public Set<byte[]> keys(ValkeyClusterNode node, byte[] pattern) {
 
 		Assert.notNull(pattern, "Pattern must not be null");
 
@@ -112,16 +112,16 @@ class LettuceClusterKeyCommands extends LettuceKeyCommands {
 	}
 
 	/**
-	 * Use a {@link Cursor} to iterate over keys stored at the given {@link RedisClusterNode}.
+	 * Use a {@link Cursor} to iterate over keys stored at the given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	Cursor<byte[]> scan(RedisClusterNode node, ScanOptions options) {
+	Cursor<byte[]> scan(ValkeyClusterNode node, ScanOptions options) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 		Assert.notNull(options, "Options must not be null");
 
 		return connection.getClusterCommandExecutor()

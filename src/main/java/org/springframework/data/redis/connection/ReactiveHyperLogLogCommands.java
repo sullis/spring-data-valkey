@@ -25,14 +25,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.Command;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.Command;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.util.Assert;
 
 /**
- * Redis HyperLogLog commands executed using reactive infrastructure.
+ * Valkey HyperLogLog commands executed using reactive infrastructure.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -44,7 +44,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * {@code PFADD} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
 	 */
 	class PfAddCommand extends KeyCommand {
 
@@ -109,7 +109,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
 	 */
 	default Mono<Long> pfAdd(ByteBuffer key, ByteBuffer value) {
 
@@ -124,7 +124,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * @param key must not be {@literal null}.
 	 * @param values must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
 	 */
 	default Mono<Long> pfAdd(ByteBuffer key, Collection<ByteBuffer> values) {
 
@@ -139,7 +139,7 @@ public interface ReactiveHyperLogLogCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfadd">Redis Documentation: PFADD</a>
+	 * @see <a href="https://redis.io/commands/pfadd">Valkey Documentation: PFADD</a>
 	 */
 	Flux<NumericResponse<PfAddCommand, Long>> pfAdd(Publisher<PfAddCommand> commands);
 
@@ -147,7 +147,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * {@code PFCOUNT} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
 	 */
 	class PfCountCommand implements Command {
 
@@ -203,7 +203,7 @@ public interface ReactiveHyperLogLogCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
 	 */
 	default Mono<Long> pfCount(ByteBuffer key) {
 
@@ -217,7 +217,7 @@ public interface ReactiveHyperLogLogCommands {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
 	 */
 	default Mono<Long> pfCount(Collection<ByteBuffer> keys) {
 
@@ -231,7 +231,7 @@ public interface ReactiveHyperLogLogCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfcount">Redis Documentation: PFCOUNT</a>
+	 * @see <a href="https://redis.io/commands/pfcount">Valkey Documentation: PFCOUNT</a>
 	 */
 	Flux<NumericResponse<PfCountCommand, Long>> pfCount(Publisher<PfCountCommand> commands);
 
@@ -239,7 +239,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * {@code PFMERGE} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/pfmerge">Redis Documentation: PFMERGE</a>
+	 * @see <a href="https://redis.io/commands/pfmerge">Valkey Documentation: PFMERGE</a>
 	 */
 	class PfMergeCommand extends KeyCommand {
 
@@ -292,7 +292,7 @@ public interface ReactiveHyperLogLogCommands {
 	 * @param destinationKey must not be {@literal null}.
 	 * @param sourceKeys must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfmerge">Redis Documentation: PFMERGE</a>
+	 * @see <a href="https://redis.io/commands/pfmerge">Valkey Documentation: PFMERGE</a>
 	 */
 	default Mono<Boolean> pfMerge(ByteBuffer destinationKey, Collection<ByteBuffer> sourceKeys) {
 
@@ -308,7 +308,7 @@ public interface ReactiveHyperLogLogCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/pfmerge">Redis Documentation: PFMERGE</a>
+	 * @see <a href="https://redis.io/commands/pfmerge">Valkey Documentation: PFMERGE</a>
 	 */
 	Flux<BooleanResponse<PfMergeCommand>> pfMerge(Publisher<PfMergeCommand> commands);
 }

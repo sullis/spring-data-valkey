@@ -24,11 +24,11 @@ import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.core.ReactiveOperationsTestParams.Fixture;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration tests for {@link DefaultReactiveHyperLogLogOperations}.
@@ -40,7 +40,7 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @SuppressWarnings("unchecked")
 public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 
-	private final ReactiveRedisTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> redisTemplate;
 	private final ReactiveHyperLogLogOperations<K, V> hyperLogLogOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -61,13 +61,13 @@ public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		RedisConnectionFactory connectionFactory = (RedisConnectionFactory) redisTemplate.getConnectionFactory();
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void add() {
 
 		K key = keyFactory.instance();
@@ -79,7 +79,7 @@ public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 		hyperLogLogOperations.size(key).as(StepVerifier::create).expectNext(2L).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void union() {
 
 		K mergedKey = keyFactory.instance();
@@ -101,7 +101,7 @@ public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 		}).verifyComplete();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-602
+	@ParameterizedValkeyTest // DATAREDIS-602
 	void delete() {
 
 		K key = keyFactory.instance();

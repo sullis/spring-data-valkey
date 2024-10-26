@@ -21,47 +21,47 @@ import org.springframework.util.ClassUtils;
 /**
  * Basic interface serialization and deserialization of Objects to byte arrays (binary data). It is recommended that
  * implementations are designed to handle {@literal null} objects/empty arrays on serialization and deserialization
- * side. Note that Redis does not accept {@literal null} keys or values but can return null replies (for non-existing
+ * side. Note that Valkey does not accept {@literal null} keys or values but can return null replies (for non-existing
  * keys).
  *
  * @author Mark Pollack
  * @author Costin Leau
  * @author Christoph Strobl
  */
-public interface RedisSerializer<T> {
+public interface ValkeySerializer<T> {
 
 	/**
-	 * Obtain a {@link RedisSerializer} using java serialization. <strong>Note:</strong> Ensure that your domain objects
+	 * Obtain a {@link ValkeySerializer} using java serialization. <strong>Note:</strong> Ensure that your domain objects
 	 * are actually {@link java.io.Serializable serializable}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	static RedisSerializer<Object> java() {
+	static ValkeySerializer<Object> java() {
 		return java(null);
 	}
 
 	/**
-	 * Obtain a {@link RedisSerializer} using java serialization with the given {@link ClassLoader}.
+	 * Obtain a {@link ValkeySerializer} using java serialization with the given {@link ClassLoader}.
 	 * <strong>Note:</strong> Ensure that your domain objects are actually {@link java.io.Serializable serializable}.
 	 *
 	 * @param classLoader the {@link ClassLoader} to use for deserialization. Can be {@literal null}.
-	 * @return new instance of {@link RedisSerializer}. Never {@literal null}.
+	 * @return new instance of {@link ValkeySerializer}. Never {@literal null}.
 	 * @since 2.1
 	 */
-	static RedisSerializer<Object> java(@Nullable ClassLoader classLoader) {
-		return new JdkSerializationRedisSerializer(classLoader);
+	static ValkeySerializer<Object> java(@Nullable ClassLoader classLoader) {
+		return new JdkSerializationValkeySerializer(classLoader);
 	}
 
 	/**
-	 * Obtain a {@link RedisSerializer} that can read and write JSON using
+	 * Obtain a {@link ValkeySerializer} that can read and write JSON using
 	 * <a href="https://github.com/FasterXML/jackson-core">Jackson</a>.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	static RedisSerializer<Object> json() {
-		return new GenericJackson2JsonRedisSerializer();
+	static ValkeySerializer<Object> json() {
+		return new GenericJackson2JsonValkeySerializer();
 	}
 
 	/**
@@ -71,18 +71,18 @@ public interface RedisSerializer<T> {
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	static RedisSerializer<String> string() {
-		return StringRedisSerializer.UTF_8;
+	static ValkeySerializer<String> string() {
+		return StringValkeySerializer.UTF_8;
 	}
 
 	/**
-	 * Obtain a {@link RedisSerializer} that passes thru {@code byte[]}.
+	 * Obtain a {@link ValkeySerializer} that passes thru {@code byte[]}.
 	 *
 	 * @return never {@literal null}.
 	 * @since 2.2
 	 */
-	static RedisSerializer<byte[]> byteArray() {
-		return ByteArrayRedisSerializer.INSTANCE;
+	static ValkeySerializer<byte[]> byteArray() {
+		return ByteArrayValkeySerializer.INSTANCE;
 	}
 
 	/**

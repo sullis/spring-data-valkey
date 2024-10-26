@@ -15,15 +15,15 @@
  */
 package org.springframework.data.redis.connection.lettuce.observability;
 
-import io.lettuce.core.protocol.RedisCommand;
+import io.lettuce.core.protocol.ValkeyCommand;
 import io.lettuce.core.tracing.Tracing.Endpoint;
 import io.micrometer.common.KeyValues;
 
 import java.net.InetSocketAddress;
 import java.util.Locale;
 
-import org.springframework.data.redis.connection.lettuce.observability.RedisObservation.HighCardinalityCommandKeyNames;
-import org.springframework.data.redis.connection.lettuce.observability.RedisObservation.LowCardinalityCommandKeyNames;
+import org.springframework.data.redis.connection.lettuce.observability.ValkeyObservation.HighCardinalityCommandKeyNames;
+import org.springframework.data.redis.connection.lettuce.observability.ValkeyObservation.LowCardinalityCommandKeyNames;
 
 /**
  * Default {@link LettuceObservationConvention} implementation.
@@ -64,7 +64,7 @@ record DefaultLettuceObservationConvention(
 	@Override
 	public KeyValues getHighCardinalityKeyValues(LettuceObservationContext context) {
 
-		RedisCommand<?, ?, ?> command = context.getRequiredCommand();
+		ValkeyCommand<?, ?, ?> command = context.getRequiredCommand();
 
 		if (includeCommandArgsInSpanTags) {
 

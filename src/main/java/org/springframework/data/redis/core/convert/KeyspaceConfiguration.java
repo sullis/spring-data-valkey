@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -27,7 +27,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * {@link KeyspaceConfiguration} allows programmatic setup of keyspaces and time to live options for certain types. This
- * is suitable for cases where there is no option to use the equivalent {@link RedisHash} or {@link TimeToLive}
+ * is suitable for cases where there is no option to use the equivalent {@link ValkeyHash} or {@link TimeToLive}
  * annotations.
  *
  * @author Christoph Strobl

@@ -17,7 +17,7 @@ package org.springframework.data.redis.domain.geo;
 
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -48,13 +48,13 @@ public interface GeoReference<T> {
 	}
 
 	/**
-	 * Creates a {@link GeoReference} from a {@link RedisGeoCommands.GeoLocation geoset member}.
+	 * Creates a {@link GeoReference} from a {@link ValkeyGeoCommands.GeoLocation geoset member}.
 	 *
 	 * @param member must not be {@literal null}.
 	 * @param <T>
 	 * @return
 	 */
-	static <T> GeoReference<T> fromMember(RedisGeoCommands.GeoLocation<T> member) {
+	static <T> GeoReference<T> fromMember(ValkeyGeoCommands.GeoLocation<T> member) {
 
 		Assert.notNull(member, "GeoLocation must not be null");
 
@@ -94,7 +94,7 @@ public interface GeoReference<T> {
 	 * @param <T>
 	 * @return
 	 */
-	static <T> GeoReference<T> fromCoordinate(RedisGeoCommands.GeoLocation<?> location) {
+	static <T> GeoReference<T> fromCoordinate(ValkeyGeoCommands.GeoLocation<?> location) {
 
 		Assert.notNull(location, "GeoLocation must not be null");
 		Assert.notNull(location.getPoint(), "GeoLocation point must not be null");

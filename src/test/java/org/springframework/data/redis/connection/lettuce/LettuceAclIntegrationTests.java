@@ -24,30 +24,30 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyStaticMasterReplicaConfiguration;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.condition.EnabledOnRedisAvailable;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyAvailable;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 import org.springframework.data.redis.util.ConnectionVerifier;
 
 /**
- * Integration tests for Redis 6 ACL.
+ * Integration tests for Valkey 6 ACL.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  */
-@EnabledOnRedisAvailable(6382)
+@EnabledOnValkeyAvailable(6382)
 @EnabledOnCommand("HELLO")
 class LettuceAclIntegrationTests {
 
 	@Test // DATAREDIS-1046
 	void shouldConnectWithDefaultAuthentication() {
 
-		RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration("localhost", 6382);
+		ValkeyStandaloneConfiguration standaloneConfiguration = new ValkeyStandaloneConfiguration("localhost", 6382);
 		standaloneConfiguration.setPassword("foobared");
 
 		LettuceClientConfiguration clientConfiguration = LettuceClientConfiguration.builder()
@@ -66,7 +66,7 @@ class LettuceAclIntegrationTests {
 	@Test // DATAREDIS-1046
 	void shouldConnectStandaloneWithAclAuthentication() {
 
-		RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration("localhost", 6382);
+		ValkeyStandaloneConfiguration standaloneConfiguration = new ValkeyStandaloneConfiguration("localhost", 6382);
 		standaloneConfiguration.setUsername("spring");
 		standaloneConfiguration.setPassword("data");
 
@@ -84,7 +84,7 @@ class LettuceAclIntegrationTests {
 	}
 
 	@Test // DATAREDIS-1145
-	@EnabledOnRedisSentinelAvailable(26382)
+	@EnabledOnValkeySentinelAvailable(26382)
 	void shouldConnectSentinelWithAuthentication() throws IOException {
 
 		// Note: As per https://github.com/redis/redis/issues/7708, Sentinel does not support ACL authentication yet.
@@ -92,7 +92,7 @@ class LettuceAclIntegrationTests {
 		LettuceClientConfiguration configuration = LettuceTestClientConfiguration.builder()
 				.clientOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.RESP2).build()).build();
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration("mymaster",
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration("mymaster",
 				Collections.singleton("localhost:26382"));
 		sentinelConfiguration.setSentinelPassword("foobared");
 
@@ -100,7 +100,7 @@ class LettuceAclIntegrationTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		try (RedisSentinelConnection connection = connectionFactory.getSentinelConnection()) {
+		try (ValkeySentinelConnection connection = connectionFactory.getSentinelConnection()) {
 			assertThat(connection.masters()).isNotEmpty();
 		} finally {
 			connectionFactory.destroy();
@@ -110,7 +110,7 @@ class LettuceAclIntegrationTests {
 	@Test // DATAREDIS-1046
 	void shouldConnectMasterReplicaWithAclAuthentication() {
 
-		RedisStaticMasterReplicaConfiguration masterReplicaConfiguration = new RedisStaticMasterReplicaConfiguration(
+		ValkeyStaticMasterReplicaConfiguration masterReplicaConfiguration = new ValkeyStaticMasterReplicaConfiguration(
 				"localhost", 6382);
 		masterReplicaConfiguration.setUsername("spring");
 		masterReplicaConfiguration.setPassword("data");

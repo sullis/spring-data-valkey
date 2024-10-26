@@ -25,8 +25,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.reactivestreams.Publisher
 import org.springframework.data.geo.*
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 

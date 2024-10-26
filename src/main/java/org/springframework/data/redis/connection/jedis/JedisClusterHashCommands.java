@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisHashCommands;
+import org.springframework.data.redis.connection.ValkeyHashCommands;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanCursor;
 import org.springframework.data.redis.core.ScanIteration;
@@ -34,14 +34,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Cluster {@link RedisHashCommands} implementation for Jedis.
+ * Cluster {@link ValkeyHashCommands} implementation for Jedis.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author John Blum
  * @since 2.0
  */
-class JedisClusterHashCommands implements RedisHashCommands {
+class JedisClusterHashCommands implements ValkeyHashCommands {
 
 	private final JedisClusterConnection connection;
 

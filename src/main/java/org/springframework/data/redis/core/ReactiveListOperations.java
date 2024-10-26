@@ -30,17 +30,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Reactive Redis operations for List Commands.
+ * Reactive Valkey operations for List Commands.
  * <p>
  * Streams of methods returning {@code Mono<K>} or {@code Flux<M>} are terminated with
  * {@link org.springframework.dao.InvalidDataAccessApiUsageException} when
- * {@link org.springframework.data.redis.serializer.RedisElementReader#read(ByteBuffer)} returns {@literal null} for a
+ * {@link org.springframework.data.redis.serializer.ValkeyElementReader#read(ByteBuffer)} returns {@literal null} for a
  * particular element as Reactive Streams prohibit the usage of {@literal null} values.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author John Blum
- * @see <a href="https://redis.io/commands#list">Redis Documentation: List Commands</a>
+ * @see <a href="https://redis.io/commands#list">Valkey Documentation: List Commands</a>
  * @since 2.0
  */
 public interface ReactiveListOperations<K, V> {
@@ -52,7 +52,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see <a href="https://redis.io/commands/lrange">Redis Documentation: LRANGE</a>
+	 * @see <a href="https://redis.io/commands/lrange">Valkey Documentation: LRANGE</a>
 	 */
 	Flux<V> range(K key, long start, long end);
 
@@ -62,7 +62,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param start
 	 * @param end
-	 * @see <a href="https://redis.io/commands/ltrim">Redis Documentation: LTRIM</a>
+	 * @see <a href="https://redis.io/commands/ltrim">Valkey Documentation: LTRIM</a>
 	 */
 	Mono<Boolean> trim(K key, long start, long end);
 
@@ -71,7 +71,7 @@ public interface ReactiveListOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/llen">Redis Documentation: LLEN</a>
+	 * @see <a href="https://redis.io/commands/llen">Valkey Documentation: LLEN</a>
 	 */
 	Mono<Long> size(K key);
 
@@ -81,7 +81,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpush">Redis Documentation: LPUSH</a>
+	 * @see <a href="https://redis.io/commands/lpush">Valkey Documentation: LPUSH</a>
 	 */
 	Mono<Long> leftPush(K key, V value);
 
@@ -91,7 +91,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpush">Redis Documentation: LPUSH</a>
+	 * @see <a href="https://redis.io/commands/lpush">Valkey Documentation: LPUSH</a>
 	 */
 	Mono<Long> leftPushAll(K key, V... values);
 
@@ -102,7 +102,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param values must not be {@literal null}.
 	 * @return
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/lpush">Redis Documentation: LPUSH</a>
+	 * @see <a href="https://redis.io/commands/lpush">Valkey Documentation: LPUSH</a>
 	 */
 	Mono<Long> leftPushAll(K key, Collection<V> values);
 
@@ -112,7 +112,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpushx">Redis Documentation: LPUSHX</a>
+	 * @see <a href="https://redis.io/commands/lpushx">Valkey Documentation: LPUSHX</a>
 	 */
 	Mono<Long> leftPushIfPresent(K key, V value);
 
@@ -123,7 +123,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param pivot must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/linsert">Redis Documentation: LINSERT</a>
+	 * @see <a href="https://redis.io/commands/linsert">Valkey Documentation: LINSERT</a>
 	 */
 	Mono<Long> leftPush(K key, V pivot, V value);
 
@@ -133,7 +133,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpush">Redis Documentation: RPUSH</a>
+	 * @see <a href="https://redis.io/commands/rpush">Valkey Documentation: RPUSH</a>
 	 */
 	Mono<Long> rightPush(K key, V value);
 
@@ -143,7 +143,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param values
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpush">Redis Documentation: RPUSH</a>
+	 * @see <a href="https://redis.io/commands/rpush">Valkey Documentation: RPUSH</a>
 	 */
 	Mono<Long> rightPushAll(K key, V... values);
 
@@ -154,7 +154,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param values
 	 * @return
 	 * @since 1.5
-	 * @see <a href="https://redis.io/commands/rpush">Redis Documentation: RPUSH</a>
+	 * @see <a href="https://redis.io/commands/rpush">Valkey Documentation: RPUSH</a>
 	 */
 	Mono<Long> rightPushAll(K key, Collection<V> values);
 
@@ -164,7 +164,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpushx">Redis Documentation: RPUSHX</a>
+	 * @see <a href="https://redis.io/commands/rpushx">Valkey Documentation: RPUSHX</a>
 	 */
 	Mono<Long> rightPushIfPresent(K key, V value);
 
@@ -175,7 +175,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param pivot must not be {@literal null}.
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/linsert">Redis Documentation: LINSERT</a>
+	 * @see <a href="https://redis.io/commands/linsert">Valkey Documentation: LINSERT</a>
 	 */
 	Mono<Long> rightPush(K key, V pivot, V value);
 
@@ -188,7 +188,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param to must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/lmove">Redis Documentation: LMOVE</a>
+	 * @see <a href="https://redis.io/commands/lmove">Valkey Documentation: LMOVE</a>
 	 */
 	default Mono<V> move(MoveFrom<K> from, MoveTo<K> to) {
 
@@ -209,7 +209,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param to must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/lmove">Redis Documentation: LMOVE</a>
+	 * @see <a href="https://redis.io/commands/lmove">Valkey Documentation: LMOVE</a>
 	 */
 	Mono<V> move(K sourceKey, Direction from, K destinationKey, Direction to);
 
@@ -225,7 +225,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param timeout
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/blmove">Redis Documentation: BLMOVE</a>
+	 * @see <a href="https://redis.io/commands/blmove">Valkey Documentation: BLMOVE</a>
 	 */
 	default Mono<V> move(MoveFrom<K> from, MoveTo<K> to, Duration timeout) {
 
@@ -252,7 +252,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param timeout
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/blmove">Redis Documentation: BLMOVE</a>
+	 * @see <a href="https://redis.io/commands/blmove">Valkey Documentation: BLMOVE</a>
 	 */
 	Mono<V> move(K sourceKey, Direction from, K destinationKey, Direction to, Duration timeout);
 
@@ -262,7 +262,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param index
 	 * @param value
-	 * @see <a href="https://redis.io/commands/lset">Redis Documentation: LSET</a>
+	 * @see <a href="https://redis.io/commands/lset">Valkey Documentation: LSET</a>
 	 */
 	Mono<Boolean> set(K key, long index, V value);
 
@@ -273,7 +273,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param count
 	 * @param value
 	 * @return
-	 * @see <a href="https://redis.io/commands/lrem">Redis Documentation: LREM</a>
+	 * @see <a href="https://redis.io/commands/lrem">Valkey Documentation: LREM</a>
 	 */
 	Mono<Long> remove(K key, long count, Object value);
 
@@ -307,31 +307,31 @@ public interface ReactiveListOperations<K, V> {
 	 * @param key must not be {@literal null}.
 	 * @param index
 	 * @return
-	 * @see <a href="https://redis.io/commands/lindex">Redis Documentation: LINDEX</a>
+	 * @see <a href="https://redis.io/commands/lindex">Valkey Documentation: LINDEX</a>
 	 */
 	Mono<V> index(K key, long index);
 
 	/**
 	 * Returns the index of the first occurrence of the specified value in the list at at {@code key}. <br />
-	 * Requires Redis 6.0.6 or newer.
+	 * Requires Valkey 6.0.6 or newer.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/lpos">Redis Documentation: LPOS</a>
+	 * @see <a href="https://redis.io/commands/lpos">Valkey Documentation: LPOS</a>
 	 */
 	Mono<Long> indexOf(K key, V value);
 
 	/**
 	 * Returns the index of the last occurrence of the specified value in the list at at {@code key}. <br />
-	 * Requires Redis 6.0.6 or newer.
+	 * Requires Valkey 6.0.6 or newer.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
 	 * @since 2.4
-	 * @see <a href="https://redis.io/commands/lpos">Redis Documentation: LPOS</a>
+	 * @see <a href="https://redis.io/commands/lpos">Valkey Documentation: LPOS</a>
 	 */
 	Mono<Long> lastIndexOf(K key, V value);
 
@@ -340,18 +340,18 @@ public interface ReactiveListOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/lpop">Redis Documentation: LPOP</a>
+	 * @see <a href="https://redis.io/commands/lpop">Valkey Documentation: LPOP</a>
 	 */
 	Mono<V> leftPop(K key);
 
 	/**
-	 * Removes {@link Long count} elements from the left-side of the Redis list stored at key.
+	 * Removes {@link Long count} elements from the left-side of the Valkey list stored at key.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @param count {@link Long count} of the number of elements to remove from the left-side of the Redis list.
-	 * @return a {@link Flux} containing the elements removed from the Redis list.
+	 * @param count {@link Long count} of the number of elements to remove from the left-side of the Valkey list.
+	 * @return a {@link Flux} containing the elements removed from the Valkey list.
 	 * @since 3.2
-	 * @see <a href="https://redis.io/commands/lpop">Redis Documentation: LPOP</a>
+	 * @see <a href="https://redis.io/commands/lpop">Valkey Documentation: LPOP</a>
 	 */
 	Flux<V> leftPop(K key, long count);
 
@@ -364,7 +364,7 @@ public interface ReactiveListOperations<K, V> {
 	 *          {@link Duration#ZERO} or greater {@link 1 second}, must not be {@literal null}. A timeout of zero can be
 	 *          used to wait indefinitely. Durations between zero and one second are not supported.
 	 * @return
-	 * @see <a href="https://redis.io/commands/blpop">Redis Documentation: BLPOP</a>
+	 * @see <a href="https://redis.io/commands/blpop">Valkey Documentation: BLPOP</a>
 	 */
 	Mono<V> leftPop(K key, Duration timeout);
 
@@ -373,18 +373,18 @@ public interface ReactiveListOperations<K, V> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpop">Redis Documentation: RPOP</a>
+	 * @see <a href="https://redis.io/commands/rpop">Valkey Documentation: RPOP</a>
 	 */
 	Mono<V> rightPop(K key);
 
 	/**
-	 * Removes {@link Long count} elements from the right-side of the Redis list stored at key.
+	 * Removes {@link Long count} elements from the right-side of the Valkey list stored at key.
 	 *
 	 * @param key must not be {@literal null}.
-	 * @param count {@link Long count} of the number of elements to remove from the right-side of the Redis list.
-	 * @return a {@link Flux} containing the elements removed from the Redis list.
+	 * @param count {@link Long count} of the number of elements to remove from the right-side of the Valkey list.
+	 * @return a {@link Flux} containing the elements removed from the Valkey list.
 	 * @since 3.2
-	 * @see <a href="https://redis.io/commands/rpop">Redis Documentation: RPOP</a>
+	 * @see <a href="https://redis.io/commands/rpop">Valkey Documentation: RPOP</a>
 	 */
 	Flux<V> rightPop(K key, long count);
 
@@ -397,7 +397,7 @@ public interface ReactiveListOperations<K, V> {
 	 *          {@link Duration#ZERO} or greater {@link 1 second}, must not be {@literal null}. A timeout of zero can be
 	 *          used to wait indefinitely. Durations between zero and one second are not supported.
 	 * @return
-	 * @see <a href="https://redis.io/commands/brpop">Redis Documentation: BRPOP</a>
+	 * @see <a href="https://redis.io/commands/brpop">Valkey Documentation: BRPOP</a>
 	 */
 	Mono<V> rightPop(K key, Duration timeout);
 
@@ -407,7 +407,7 @@ public interface ReactiveListOperations<K, V> {
 	 * @param sourceKey must not be {@literal null}.
 	 * @param destinationKey must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/rpoplpush">Redis Documentation: RPOPLPUSH</a>
+	 * @see <a href="https://redis.io/commands/rpoplpush">Valkey Documentation: RPOPLPUSH</a>
 	 */
 	Mono<V> rightPopAndLeftPush(K sourceKey, K destinationKey);
 
@@ -421,7 +421,7 @@ public interface ReactiveListOperations<K, V> {
 	 *          either {@link Duration#ZERO} or greater {@link 1 second}, must not be {@literal null}. A timeout of zero
 	 *          can be used to wait indefinitely. Durations between zero and one second are not supported.
 	 * @return
-	 * @see <a href="https://redis.io/commands/brpoplpush">Redis Documentation: BRPOPLPUSH</a>
+	 * @see <a href="https://redis.io/commands/brpoplpush">Valkey Documentation: BRPOPLPUSH</a>
 	 */
 	Mono<V> rightPopAndLeftPush(K sourceKey, K destinationKey, Duration timeout);
 

@@ -23,14 +23,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * @author Artem Bilian
@@ -38,26 +38,26 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
  * @author Mark Paluch
  */
 @MethodSource("testParams")
-public class MultithreadedRedisTemplateIntegrationTests {
+public class MultithreadedValkeyTemplateIntegrationTests {
 
-	private final RedisConnectionFactory factory;
+	private final ValkeyConnectionFactory factory;
 
-	public MultithreadedRedisTemplateIntegrationTests(RedisConnectionFactory factory) {
+	public MultithreadedValkeyTemplateIntegrationTests(ValkeyConnectionFactory factory) {
 		this.factory = factory;
 	}
 
 	public static Collection<Object> testParams() {
 
-		JedisConnectionFactory jedis = JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
-		LettuceConnectionFactory lettuce = LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+		JedisConnectionFactory jedis = JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
+		LettuceConnectionFactory lettuce = LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 
 		return Arrays.asList(jedis, lettuce);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-300
-	void assertResouresAreReleasedProperlyWhenSharingRedisTemplate() throws InterruptedException {
+	@ParameterizedValkeyTest // DATAREDIS-300
+	void assertResouresAreReleasedProperlyWhenSharingValkeyTemplate() throws InterruptedException {
 
-		final RedisTemplate<Object, Object> template = new RedisTemplate<>();
+		final ValkeyTemplate<Object, Object> template = new ValkeyTemplate<>();
 		template.setConnectionFactory(factory);
 		template.afterPropertiesSet();
 

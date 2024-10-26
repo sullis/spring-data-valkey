@@ -33,7 +33,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.geo.Shape;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
 import org.springframework.data.redis.core.convert.ConversionTestEntities.Person;
-import org.springframework.data.redis.repository.query.RedisOperationChain.PathAndValue;
+import org.springframework.data.redis.repository.query.ValkeyOperationChain.PathAndValue;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.DefaultParameters;
@@ -42,23 +42,23 @@ import org.springframework.data.repository.query.ParametersSource;
 import org.springframework.data.repository.query.parser.PartTree;
 
 /**
- * Unit tests for {@link RedisQueryCreator}.
+ * Unit tests for {@link ValkeyQueryCreator}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
-class RedisQueryCreatorUnitTests {
+class ValkeyQueryCreatorUnitTests {
 
 	private @Mock RepositoryMetadata metadataMock;
 
 	@Test // DATAREDIS-425
 	void findBySingleSimpleProperty() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByFirstname", String.class), new Object[] { "eddard" });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getSismember()).hasSize(1);
 		assertThat(query.getCriteria().getSismember()).contains(new PathAndValue("firstname", "eddard"));
@@ -67,11 +67,11 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-425
 	void findByMultipleSimpleProperties() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByFirstnameAndAge", String.class, Integer.class),
 				new Object[] { "eddard", 43 });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getSismember()).hasSize(2);
 		assertThat(query.getCriteria().getSismember()).contains(new PathAndValue("firstname", "eddard"));
@@ -81,11 +81,11 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-425
 	void findByMultipleSimplePropertiesUsingOr() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByAgeOrFirstname", Integer.class, String.class),
 				new Object[] { 43, "eddard" });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getOrSismember()).hasSize(2);
 		assertThat(query.getCriteria().getOrSismember()).contains(new PathAndValue("age", 43));
@@ -95,11 +95,11 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findWithinCircle() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationWithin", Circle.class),
 				new Object[] { new Circle(new Point(1, 2), new Distance(200, Metrics.KILOMETERS)) });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getNear()).isNotNull();
 		assertThat(query.getCriteria().getNear().getPoint()).isEqualTo(new Point(1, 2));
@@ -109,11 +109,11 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findNearWithPointAndDistance() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationNear", Point.class, Distance.class),
 				new Object[] { new Point(1, 2), new Distance(200, Metrics.KILOMETERS) });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getNear()).isNotNull();
 		assertThat(query.getCriteria().getNear().getPoint()).isEqualTo(new Point(1, 2));
@@ -123,11 +123,11 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findNearWithPointAndNumericValueDefaultsToKilometers() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationNear", Shape.class, Object.class),
 				new Object[] { new Point(1, 2), 200F });
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getNear()).isNotNull();
 		assertThat(query.getCriteria().getNear().getPoint()).isEqualTo(new Point(1, 2));
@@ -137,7 +137,7 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findNearWithInvalidShapeParameter() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationNear", Shape.class, Object.class),
 				new Object[] { new Box(new Point(0, 0), new Point(1, 1)), 200F });
 
@@ -148,7 +148,7 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findNearWithInvalidDistanceParameter() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationNear", Shape.class, Object.class),
 				new Object[] { new Point(0, 0), "200" });
 
@@ -159,7 +159,7 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-533
 	void findNearWithMissingDistanceParameter() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByLocationNear", Shape.class), new Object[] { new Point(0, 0) });
 
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(creator::createQuery)
@@ -169,10 +169,10 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-771
 	void findByBooleanIsTrue() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByAliveIsTrue"), new Object[0]);
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getSismember()).hasSize(1);
 		assertThat(query.getCriteria().getSismember()).contains(new PathAndValue("alive", true));
@@ -181,19 +181,19 @@ class RedisQueryCreatorUnitTests {
 	@Test // DATAREDIS-771
 	void findByBooleanIsFalse() throws SecurityException, NoSuchMethodException {
 
-		RedisQueryCreator creator = createQueryCreatorForMethodWithArgs(
+		ValkeyQueryCreator creator = createQueryCreatorForMethodWithArgs(
 				SampleRepository.class.getMethod("findByAliveIsFalse"), new Object[0]);
 
-		KeyValueQuery<RedisOperationChain> query = creator.createQuery();
+		KeyValueQuery<ValkeyOperationChain> query = creator.createQuery();
 
 		assertThat(query.getCriteria().getSismember()).hasSize(1);
 		assertThat(query.getCriteria().getSismember()).contains(new PathAndValue("alive", false));
 	}
 
-	private RedisQueryCreator createQueryCreatorForMethodWithArgs(Method method, Object[] args) {
+	private ValkeyQueryCreator createQueryCreatorForMethodWithArgs(Method method, Object[] args) {
 
 		PartTree partTree = new PartTree(method.getName(), method.getReturnType());
-		RedisQueryCreator creator = new RedisQueryCreator(partTree,
+		ValkeyQueryCreator creator = new ValkeyQueryCreator(partTree,
 				new ParametersParameterAccessor(new DefaultParameters(ParametersSource.of(method)), args));
 
 		return creator;

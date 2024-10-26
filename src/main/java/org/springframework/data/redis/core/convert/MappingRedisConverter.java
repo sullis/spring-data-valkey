@@ -51,9 +51,9 @@ import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.PartialUpdate.PropertyUpdate;
 import org.springframework.data.redis.core.PartialUpdate.UpdateCommand;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.core.mapping.RedisPersistentProperty;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentProperty;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.data.util.ProxyUtils;
 import org.springframework.data.util.TypeInformation;
@@ -66,15 +66,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.NullSafeComparator;
 
 /**
- * {@link RedisConverter} implementation creating flat binary map structure out of a given domain type. Considers
+ * {@link ValkeyConverter} implementation creating flat binary map structure out of a given domain type. Considers
  * {@link Indexed} annotation for enabling helper structures for finder operations. <br />
  * <br />
- * <strong>NOTE</strong> {@link MappingRedisConverter} is an {@link InitializingBean} and requires
- * {@link MappingRedisConverter#afterPropertiesSet()} to be called.
+ * <strong>NOTE</strong> {@link MappingValkeyConverter} is an {@link InitializingBean} and requires
+ * {@link MappingValkeyConverter#afterPropertiesSet()} to be called.
  *
  * <pre>
  * <code>
- * &#64;RedisHash("persons")
+ * &#64;ValkeyHash("persons")
  * class Person {
  *
  *   &#64;Id String id;
@@ -111,14 +111,14 @@ import org.springframework.util.comparator.NullSafeComparator;
  * @author Golam Mazid Sajib
  * @since 1.7
  */
-public class MappingRedisConverter implements RedisConverter, InitializingBean {
+public class MappingValkeyConverter implements ValkeyConverter, InitializingBean {
 
 	private static final String INVALID_TYPE_ASSIGNMENT = "Value of type %s cannot be assigned to property %s of type %s";
 
-	private final RedisMappingContext mappingContext;
+	private final ValkeyMappingContext mappingContext;
 	private final GenericConversionService conversionService;
 	private final EntityInstantiators entityInstantiators;
-	private final RedisTypeMapper typeMapper;
+	private final ValkeyTypeMapper typeMapper;
 	private final Comparator<String> listKeyComparator = new NullSafeComparator<>(NaturalOrderingKeyComparator.INSTANCE,
 			true);
 
@@ -127,29 +127,29 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	private CustomConversions customConversions;
 
 	/**
-	 * Creates new {@link MappingRedisConverter}.
+	 * Creates new {@link MappingValkeyConverter}.
 	 *
 	 * @param context can be {@literal null}.
 	 * @since 2.4
 	 */
-	public MappingRedisConverter(RedisMappingContext context) {
+	public MappingValkeyConverter(ValkeyMappingContext context) {
 		this(context, null, null, null);
 	}
 
 	/**
-	 * Creates new {@link MappingRedisConverter} and defaults {@link RedisMappingContext} when {@literal null}.
+	 * Creates new {@link MappingValkeyConverter} and defaults {@link ValkeyMappingContext} when {@literal null}.
 	 *
 	 * @param mappingContext can be {@literal null}.
 	 * @param indexResolver can be {@literal null}.
 	 * @param referenceResolver can be not be {@literal null}.
 	 */
-	public MappingRedisConverter(@Nullable RedisMappingContext mappingContext, @Nullable IndexResolver indexResolver,
+	public MappingValkeyConverter(@Nullable ValkeyMappingContext mappingContext, @Nullable IndexResolver indexResolver,
 			@Nullable ReferenceResolver referenceResolver) {
 		this(mappingContext, indexResolver, referenceResolver, null);
 	}
 
 	/**
-	 * Creates new {@link MappingRedisConverter} and defaults {@link RedisMappingContext} when {@literal null}.
+	 * Creates new {@link MappingValkeyConverter} and defaults {@link ValkeyMappingContext} when {@literal null}.
 	 *
 	 * @param mappingContext can be {@literal null}.
 	 * @param indexResolver can be {@literal null}.
@@ -157,16 +157,16 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param typeMapper can be {@literal null}.
 	 * @since 2.1
 	 */
-	public MappingRedisConverter(@Nullable RedisMappingContext mappingContext, @Nullable IndexResolver indexResolver,
-			@Nullable ReferenceResolver referenceResolver, @Nullable RedisTypeMapper typeMapper) {
+	public MappingValkeyConverter(@Nullable ValkeyMappingContext mappingContext, @Nullable IndexResolver indexResolver,
+			@Nullable ReferenceResolver referenceResolver, @Nullable ValkeyTypeMapper typeMapper) {
 
-		this.mappingContext = mappingContext != null ? mappingContext : new RedisMappingContext();
+		this.mappingContext = mappingContext != null ? mappingContext : new ValkeyMappingContext();
 
 		this.entityInstantiators = new EntityInstantiators();
 		this.conversionService = new DefaultConversionService();
-		this.customConversions = new RedisCustomConversions();
+		this.customConversions = new ValkeyCustomConversions();
 		this.typeMapper = typeMapper != null ? typeMapper
-				: new DefaultRedisTypeMapper(DefaultRedisTypeMapper.DEFAULT_TYPE_KEY, this.mappingContext);
+				: new DefaultValkeyTypeMapper(DefaultValkeyTypeMapper.DEFAULT_TYPE_KEY, this.mappingContext);
 
 		this.indexResolver = indexResolver != null ? indexResolver : new PathIndexResolver(this.mappingContext);
 		this.referenceResolver = referenceResolver;
@@ -174,7 +174,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R> R read(Class<R> type, RedisData source) {
+	public <R> R read(Class<R> type, ValkeyData source) {
 
 		TypeInformation<?> readType = typeMapper.readType(source.getBucket().getPath(), TypeInformation.of(type));
 
@@ -185,12 +185,12 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	}
 
 	@Nullable
-	private <R> R readInternal(String path, Class<R> type, RedisData source) {
+	private <R> R readInternal(String path, Class<R> type, ValkeyData source) {
 		return source.getBucket().isEmpty() ? null : doReadInternal(path, type, source);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <R> R doReadInternal(String path, Class<R> type, RedisData source) {
+	private <R> R doReadInternal(String path, Class<R> type, ValkeyData source) {
 
 		TypeInformation<?> readType = typeMapper.readType(source.getBucket().getPath(), TypeInformation.of(type));
 
@@ -209,7 +209,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 			}
 			R instance = (R) conversionService.convert(partial, readType.getType());
 
-			RedisPersistentEntity<?> entity = mappingContext.getPersistentEntity(readType);
+			ValkeyPersistentEntity<?> entity = mappingContext.getPersistentEntity(readType);
 			if (entity != null && entity.hasIdProperty()) {
 
 				PersistentPropertyAccessor<R> propertyAccessor = entity.getPropertyAccessor(instance);
@@ -225,18 +225,18 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 					readType.getType());
 		}
 
-		RedisPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(readType);
+		ValkeyPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(readType);
 		EntityInstantiator instantiator = entityInstantiators.getInstantiatorFor(entity);
 
-		Object instance = instantiator.createInstance((RedisPersistentEntity<RedisPersistentProperty>) entity,
+		Object instance = instantiator.createInstance((ValkeyPersistentEntity<ValkeyPersistentProperty>) entity,
 				new PersistentEntityParameterValueProvider<>(entity,
 						new ConverterAwareParameterValueProvider(path, source, conversionService), this.conversionService));
 
 		PersistentPropertyAccessor<Object> accessor = entity.getPropertyAccessor(instance);
 
-		entity.doWithProperties((PropertyHandler<RedisPersistentProperty>) persistentProperty -> {
+		entity.doWithProperties((PropertyHandler<ValkeyPersistentProperty>) persistentProperty -> {
 
-			InstanceCreatorMetadata<RedisPersistentProperty> creator = entity.getInstanceCreatorMetadata();
+			InstanceCreatorMetadata<ValkeyPersistentProperty> creator = entity.getInstanceCreatorMetadata();
 
 			if (creator != null && creator.isCreatorParameter(persistentProperty)) {
 				return;
@@ -255,7 +255,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	}
 
 	@Nullable
-	protected Object readProperty(String path, RedisData source, RedisPersistentProperty persistentProperty) {
+	protected Object readProperty(String path, ValkeyData source, ValkeyPersistentProperty persistentProperty) {
 
 		String currentPath = !path.isEmpty() ? path + "." + persistentProperty.getName() : persistentProperty.getName();
 		TypeInformation<?> typeInformation = typeMapper.readType(source.getBucket().getPropertyPath(currentPath),
@@ -306,7 +306,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 			Bucket bucket = source.getBucket().extract(currentPath + ".");
 
-			RedisData newBucket = new RedisData(bucket);
+			ValkeyData newBucket = new ValkeyData(bucket);
 
 			return readInternal(currentPath, typeInformation.getType(), newBucket);
 		}
@@ -333,10 +333,10 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 		return fromBytes(sourceBytes, typeToUse);
 	}
 
-	private void readAssociation(String path, RedisData source, RedisPersistentEntity<?> entity,
+	private void readAssociation(String path, ValkeyData source, ValkeyPersistentEntity<?> entity,
 			PersistentPropertyAccessor<?> accessor) {
 
-		entity.doWithAssociations((AssociationHandler<RedisPersistentProperty>) association -> {
+		entity.doWithAssociations((AssociationHandler<ValkeyPersistentProperty>) association -> {
 
 			String currentPath = !path.isEmpty() ? path + "." + association.getInverse().getName()
 					: association.getInverse().getName();
@@ -361,7 +361,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 							identifier.getKeyspace());
 
 					if (!CollectionUtils.isEmpty(rawHash)) {
-						target.add(read(association.getInverse().getActualType(), new RedisData(rawHash)));
+						target.add(read(association.getInverse().getActualType(), new ValkeyData(rawHash)));
 					}
 				}
 
@@ -384,7 +384,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 					if (!CollectionUtils.isEmpty(rawHash)) {
 						accessor.setProperty(association.getInverse(),
-								read(association.getInverse().getActualType(), new RedisData(rawHash)));
+								read(association.getInverse().getActualType(), new ValkeyData(rawHash)));
 					}
 				}
 			}
@@ -393,7 +393,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 	@Override
 	@SuppressWarnings({ "rawtypes" })
-	public void write(Object source, RedisData sink) {
+	public void write(Object source, ValkeyData sink) {
 
 		if (source == null) {
 			return;
@@ -404,7 +404,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 			return;
 		}
 
-		RedisPersistentEntity<?> entity = mappingContext.getPersistentEntity(source.getClass());
+		ValkeyPersistentEntity<?> entity = mappingContext.getPersistentEntity(source.getClass());
 
 		if (!customConversions.hasCustomWriteTarget(source.getClass())) {
 			typeMapper.writeType(ClassUtils.getUserClass(source), sink.getBucket().getPath());
@@ -442,9 +442,9 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 		}
 	}
 
-	protected void writePartialUpdate(PartialUpdate<?> update, RedisData sink) {
+	protected void writePartialUpdate(PartialUpdate<?> update, ValkeyData sink) {
 
-		RedisPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(update.getTarget());
+		ValkeyPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(update.getTarget());
 
 		write(update.getValue(), sink);
 
@@ -480,10 +480,10 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param entity
 	 * @param path
 	 */
-	private void writePartialPropertyUpdate(PartialUpdate<?> update, PropertyUpdate pUpdate, RedisData sink,
-			RedisPersistentEntity<?> entity, String path) {
+	private void writePartialPropertyUpdate(PartialUpdate<?> update, PropertyUpdate pUpdate, ValkeyData sink,
+			ValkeyPersistentEntity<?> entity, String path) {
 
-		RedisPersistentProperty targetProperty = getTargetPropertyOrNullForPath(path, update.getTarget());
+		ValkeyPersistentProperty targetProperty = getTargetPropertyOrNullForPath(path, update.getTarget());
 
 		if (targetProperty == null) {
 
@@ -502,7 +502,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 			if (targetProperty.isCollectionLike()) {
 
-				RedisPersistentEntity<?> ref = mappingContext.getPersistentEntity(targetProperty.getRequiredAssociation()
+				ValkeyPersistentEntity<?> ref = mappingContext.getPersistentEntity(targetProperty.getRequiredAssociation()
 						.getInverse().getTypeInformation().getRequiredComponentType().getRequiredActualType());
 
 				int i = 0;
@@ -516,7 +516,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 				}
 			} else {
 
-				RedisPersistentEntity<?> ref = mappingContext
+				ValkeyPersistentEntity<?> ref = mappingContext
 						.getRequiredPersistentEntity(targetProperty.getRequiredAssociation().getInverse().getTypeInformation());
 
 				Object refId = ref.getPropertyAccessor(pUpdate.getValue()).getProperty(ref.getRequiredIdProperty());
@@ -564,11 +564,11 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	}
 
 	@Nullable
-	RedisPersistentProperty getTargetPropertyOrNullForPath(String path, Class<?> type) {
+	ValkeyPersistentProperty getTargetPropertyOrNullForPath(String path, Class<?> type) {
 
 		try {
 
-			PersistentPropertyPath<RedisPersistentProperty> persistentPropertyPath = mappingContext
+			PersistentPropertyPath<ValkeyPersistentProperty> persistentPropertyPath = mappingContext
 					.getPersistentPropertyPath(path, type);
 			return persistentPropertyPath.getLeafProperty();
 		} catch (Exception ignore) {
@@ -585,7 +585,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param sink
 	 */
 	private void writeInternal(@Nullable String keyspace, String path, @Nullable Object value,
-			TypeInformation<?> typeHint, RedisData sink) {
+			TypeInformation<?> typeHint, ValkeyData sink) {
 
 		if (value == null) {
 			return;
@@ -617,10 +617,10 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 			typeMapper.writeType(value.getClass(), sink.getBucket().getPropertyPath(path));
 		}
 
-		RedisPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(value.getClass());
+		ValkeyPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(value.getClass());
 		PersistentPropertyAccessor<Object> accessor = entity.getPropertyAccessor(value);
 
-		entity.doWithProperties((PropertyHandler<RedisPersistentProperty>) persistentProperty -> {
+		entity.doWithProperties((PropertyHandler<ValkeyPersistentProperty>) persistentProperty -> {
 
 			String propertyStringPath = (!path.isEmpty() ? path + "." : "") + persistentProperty.getName();
 
@@ -674,7 +674,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 		writeAssociation(path, entity, value, sink);
 	}
 
-	private void writeAssociation(String path, RedisPersistentEntity<?> entity, @Nullable Object value, RedisData sink) {
+	private void writeAssociation(String path, ValkeyPersistentEntity<?> entity, @Nullable Object value, ValkeyData sink) {
 
 		if (value == null) {
 			return;
@@ -682,7 +682,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 		PersistentPropertyAccessor<Object> accessor = entity.getPropertyAccessor(value);
 
-		entity.doWithAssociations((AssociationHandler<RedisPersistentProperty>) association -> {
+		entity.doWithAssociations((AssociationHandler<ValkeyPersistentProperty>) association -> {
 
 			Object refObject = accessor.getProperty(association.getInverse());
 			if (refObject == null) {
@@ -691,7 +691,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 			if (association.getInverse().isCollectionLike()) {
 
-				RedisPersistentEntity<?> ref = mappingContext.getRequiredPersistentEntity(
+				ValkeyPersistentEntity<?> ref = mappingContext.getRequiredPersistentEntity(
 						association.getInverse().getTypeInformation().getRequiredComponentType().getRequiredActualType());
 
 				String keyspace = ref.getKeySpace();
@@ -709,7 +709,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 			} else {
 
-				RedisPersistentEntity<?> ref = mappingContext
+				ValkeyPersistentEntity<?> ref = mappingContext
 						.getRequiredPersistentEntity(association.getInverse().getTypeInformation());
 				String keyspace = ref.getKeySpace();
 
@@ -733,7 +733,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param sink
 	 */
 	private void writeCollection(@Nullable String keyspace, String path, @Nullable Iterable<?> values,
-			TypeInformation<?> typeHint, RedisData sink) {
+			TypeInformation<?> typeHint, ValkeyData sink) {
 
 		if (values == null) {
 			return;
@@ -762,7 +762,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 		}
 	}
 
-	private void writeToBucket(String path, @Nullable Object value, RedisData sink, Class<?> propertyType) {
+	private void writeToBucket(String path, @Nullable Object value, ValkeyData sink, Class<?> propertyType) {
 
 		if (value == null || (value instanceof Optional && !((Optional<?>) value).isPresent())) {
 			return;
@@ -823,7 +823,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 			if (conversionService.canConvert(byte[].class, typeToUse)) {
 				target.add(fromBytes(elementData.get(key), typeToUse));
 			} else {
-				target.add(readInternal(key, typeToUse, new RedisData(elementData)));
+				target.add(readInternal(key, typeToUse, new ValkeyData(elementData)));
 			}
 		}
 
@@ -838,7 +838,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param sink
 	 */
 	private void writeMap(@Nullable String keyspace, String path, Class<?> mapValueType, Map<?, ?> source,
-			RedisData sink) {
+			ValkeyData sink) {
 
 		if (CollectionUtils.isEmpty(source)) {
 			return;
@@ -884,7 +884,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 */
 	@Nullable
 	private Map<?, ?> readMapOfSimpleTypes(String path, Class<?> mapType, Class<?> keyType, Class<?> valueType,
-			RedisData source) {
+			ValkeyData source) {
 
 		Bucket partial = source.getBucket().extract(path + ".[");
 
@@ -914,7 +914,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 */
 	@Nullable
 	private Map<?, ?> readMapOfComplexTypes(String path, Class<?> mapType, Class<?> keyType, Class<?> valueType,
-			RedisData source) {
+			ValkeyData source) {
 
 		Set<String> keys = source.getBucket().extractAllKeysFor(path);
 
@@ -929,7 +929,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 			TypeInformation<?> typeInformation = typeMapper.readType(source.getBucket().getPropertyPath(key),
 					TypeInformation.of(valueType));
 
-			Object o = readInternal(key, typeInformation.getType(), new RedisData(partial));
+			Object o = readInternal(key, typeInformation.getType(), new ValkeyData(partial));
 			target.put(mapKey, o);
 		}
 
@@ -1039,11 +1039,11 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @param customConversions
 	 */
 	public void setCustomConversions(@Nullable CustomConversions customConversions) {
-		this.customConversions = customConversions != null ? customConversions : new RedisCustomConversions();
+		this.customConversions = customConversions != null ? customConversions : new ValkeyCustomConversions();
 	}
 
 	@Override
-	public RedisMappingContext getMappingContext() {
+	public ValkeyMappingContext getMappingContext() {
 		return this.mappingContext;
 	}
 
@@ -1072,7 +1072,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 		customConversions.registerConvertersIn(conversionService);
 	}
 
-	private static boolean isByteArray(RedisPersistentProperty property) {
+	private static boolean isByteArray(ValkeyPersistentProperty property) {
 		return property.getType().equals(byte[].class);
 	}
 
@@ -1084,13 +1084,13 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
 	 */
-	private class ConverterAwareParameterValueProvider implements PropertyValueProvider<RedisPersistentProperty> {
+	private class ConverterAwareParameterValueProvider implements PropertyValueProvider<ValkeyPersistentProperty> {
 
 		private final String path;
-		private final RedisData source;
+		private final ValkeyData source;
 		private final ConversionService conversionService;
 
-		ConverterAwareParameterValueProvider(String path, RedisData source, ConversionService conversionService) {
+		ConverterAwareParameterValueProvider(String path, ValkeyData source, ConversionService conversionService) {
 
 			this.path = path;
 			this.source = source;
@@ -1099,7 +1099,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public <T> T getPropertyValue(RedisPersistentProperty property) {
+		public <T> T getPropertyValue(ValkeyPersistentProperty property) {
 
 			Object value = readProperty(path, source, property);
 
@@ -1190,7 +1190,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	}
 
 	/**
-	 * Value object representing a Redis Hash/Object identifier composed from keyspace and object id in the form of
+	 * Value object representing a Valkey Hash/Object identifier composed from keyspace and object id in the form of
 	 * {@literal keyspace:id}.
 	 *
 	 * @author Mark Paluch
@@ -1270,7 +1270,7 @@ public class MappingRedisConverter implements RedisConverter, InitializingBean {
 	}
 
 	/**
-	 * Value object representing a binary Redis Hash/Object identifier composed from keyspace and object id in the form of
+	 * Value object representing a binary Valkey Hash/Object identifier composed from keyspace and object id in the form of
 	 * {@literal keyspace:id}.
 	 *
 	 * @author Mark Paluch

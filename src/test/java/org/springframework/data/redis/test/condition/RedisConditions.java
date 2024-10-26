@@ -15,10 +15,10 @@
  */
 package org.springframework.data.redis.test.condition;
 
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.sync.ValkeyCommands;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.sync.ValkeyClusterCommands;
 import io.lettuce.core.models.command.CommandDetail;
 import io.lettuce.core.models.command.CommandDetailParser;
 
@@ -36,12 +36,12 @@ import org.springframework.data.util.Version;
  *
  * @author Mark Paluch
  */
-class RedisConditions {
+class ValkeyConditions {
 
 	private final Map<String, Integer> commands;
 	private final Version version;
 
-	private RedisConditions(RedisClusterCommands<String, String> commands) {
+	private ValkeyConditions(ValkeyClusterCommands<String, String> commands) {
 
 		List<CommandDetail> result = CommandDetailParser.parse(commands.command());
 
@@ -63,39 +63,39 @@ class RedisConditions {
 	}
 
 	/**
-	 * Create {@link RedisCommands} given {@link StatefulRedisConnection}.
+	 * Create {@link ValkeyCommands} given {@link StatefulValkeyConnection}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 * @return
 	 */
-	public static RedisConditions of(StatefulRedisConnection<String, String> connection) {
-		return new RedisConditions(connection.sync());
+	public static ValkeyConditions of(StatefulValkeyConnection<String, String> connection) {
+		return new ValkeyConditions(connection.sync());
 	}
 
 	/**
-	 * Create {@link RedisCommands} given {@link StatefulRedisClusterConnection}.
+	 * Create {@link ValkeyCommands} given {@link StatefulValkeyClusterConnection}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 * @return
 	 */
-	public static RedisConditions of(StatefulRedisClusterConnection<String, String> connection) {
-		return new RedisConditions(connection.sync());
+	public static ValkeyConditions of(StatefulValkeyClusterConnection<String, String> connection) {
+		return new ValkeyConditions(connection.sync());
 	}
 
 	/**
-	 * Create {@link RedisConditions} given {@link RedisCommands}.
+	 * Create {@link ValkeyConditions} given {@link ValkeyCommands}.
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 */
-	public static RedisConditions of(RedisClusterCommands<String, String> commands) {
-		return new RedisConditions(commands);
+	public static ValkeyConditions of(ValkeyClusterCommands<String, String> commands) {
+		return new ValkeyConditions(commands);
 	}
 
 	/**
-	 * @return the Redis {@link Version}.
+	 * @return the Valkey {@link Version}.
 	 */
-	public Version getRedisVersion() {
+	public Version getValkeyVersion() {
 		return version;
 	}
 

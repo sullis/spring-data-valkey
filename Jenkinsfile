@@ -20,7 +20,7 @@ pipeline {
 	stages {
 		stage("Docker Images") {
 			parallel {
-				stage('Publish JDK 17 + Redis 6.2 Docker Image') {
+				stage('Publish JDK 17 + Valkey 6.2 Docker Image') {
 					when {
 						anyOf {
 							changeset "ci/openjdk17-redis-6.2/Dockerfile"
@@ -40,7 +40,7 @@ pipeline {
 						}
 					}
 				}
-				stage('Publish JDK 17 + Redis 7.2 Docker Image') {
+				stage('Publish JDK 17 + Valkey 7.2 Docker Image') {
 					when {
 						anyOf {
 							changeset "ci/openjdk17-redis-7.2/Dockerfile"
@@ -80,7 +80,7 @@ pipeline {
 						}
 					}
 				}
-				stage('Publish JDK 21 + Redis 6.2 Docker Image') {
+				stage('Publish JDK 21 + Valkey 6.2 Docker Image') {
 					when {
 						anyOf {
 							changeset "ci/openjdk21-redis-6.2/Dockerfile"
@@ -177,7 +177,7 @@ pipeline {
 						}
 					}
 				}
-				stage("test: Redis 7") {
+				stage("test: Valkey 7") {
 					agent {
 						label 'data'
 					}

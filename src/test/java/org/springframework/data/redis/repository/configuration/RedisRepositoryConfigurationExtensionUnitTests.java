@@ -31,29 +31,29 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.repository.KeyValueRepository;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
+import org.springframework.data.redis.core.ValkeyHash;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.data.repository.config.RepositoryConfiguration;
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
 /**
- * Unit tests for {@link RedisRepositoryConfigurationExtension}.
+ * Unit tests for {@link ValkeyRepositoryConfigurationExtension}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-class RedisRepositoryConfigurationExtensionUnitTests {
+class ValkeyRepositoryConfigurationExtensionUnitTests {
 
 	private StandardAnnotationMetadata metadata = new StandardAnnotationMetadata(Config.class, true);
 	private ResourceLoader loader = new PathMatchingResourcePatternResolver();
 	private Environment environment = new StandardEnvironment();
 	private BeanDefinitionRegistry registry = new DefaultListableBeanFactory();
 	private RepositoryConfigurationSource configurationSource = new AnnotationRepositoryConfigurationSource(metadata,
-			EnableRedisRepositories.class, loader, environment, registry);
+			EnableValkeyRepositories.class, loader, environment, registry);
 
-	private RedisRepositoryConfigurationExtension extension = new RedisRepositoryConfigurationExtension();
+	private ValkeyRepositoryConfigurationExtension extension = new ValkeyRepositoryConfigurationExtension();
 
 	@Test // DATAREDIS-425
 	void isStrictMatchIfDomainTypeIsAnnotatedWithDocument() {
@@ -147,9 +147,9 @@ class RedisRepositoryConfigurationExtensionUnitTests {
 		BeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
 
 		RepositoryConfigurationSource configurationSource = new AnnotationRepositoryConfigurationSource(metadata,
-				EnableRedisRepositories.class, loader, environment, registry);
+				EnableValkeyRepositories.class, loader, environment, registry);
 
-		RedisRepositoryConfigurationExtension extension = new RedisRepositoryConfigurationExtension();
+		ValkeyRepositoryConfigurationExtension extension = new ValkeyRepositoryConfigurationExtension();
 
 		extension.registerBeansForRoot(registry, configurationSource);
 
@@ -166,29 +166,29 @@ class RedisRepositoryConfigurationExtensionUnitTests {
 				.getPropertyValue("keyspaceNotificationsConfigParameter").getValue();
 	}
 
-	@EnableRedisRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
+	@EnableValkeyRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
 	private static class Config {
 
 	}
 
-	@EnableRedisRepositories(considerNestedRepositories = true)
+	@EnableValkeyRepositories(considerNestedRepositories = true)
 	private static class ConfigWithKeyspaceEventsDisabled {
 
 	}
 
-	@EnableRedisRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP,
+	@EnableValkeyRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP,
 			keyspaceNotificationsConfigParameter = "KEA")
 	private static class ConfigWithKeyspaceEventsEnabledAndCustomEventConfig {
 
 	}
 
-	@EnableRedisRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP,
+	@EnableValkeyRepositories(considerNestedRepositories = true, enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP,
 			keyspaceNotificationsConfigParameter = "")
 	private static class ConfigWithEmptyConfigParameter {
 
 	}
 
-	@RedisHash
+	@ValkeyHash
 	static class Sample {
 		@Id String id;
 	}

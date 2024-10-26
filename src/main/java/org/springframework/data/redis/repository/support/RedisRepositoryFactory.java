@@ -17,11 +17,11 @@ package org.springframework.data.redis.repository.support;
 
 import org.springframework.data.keyvalue.core.KeyValueOperations;
 import org.springframework.data.keyvalue.repository.support.KeyValueRepositoryFactory;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.repository.core.MappingRedisEntityInformation;
-import org.springframework.data.redis.repository.query.RedisPartTreeQuery;
-import org.springframework.data.redis.repository.query.RedisQueryCreator;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.repository.core.MappingValkeyEntityInformation;
+import org.springframework.data.redis.repository.query.ValkeyPartTreeQuery;
+import org.springframework.data.redis.repository.query.ValkeyQueryCreator;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments;
@@ -32,7 +32,7 @@ import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
 
 /**
- * {@link RepositoryFactorySupport} specific of handing Redis
+ * {@link RepositoryFactorySupport} specific of handing Valkey
  * {@link org.springframework.data.keyvalue.repository.KeyValueRepository}.
  *
  * @author Christoph Strobl
@@ -40,7 +40,7 @@ import org.springframework.data.repository.query.parser.AbstractQueryCreator;
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
+public class ValkeyRepositoryFactory extends KeyValueRepositoryFactory {
 
 	private final KeyValueOperations operations;
 
@@ -48,8 +48,8 @@ public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
 	 * @param keyValueOperations
 	 * @see KeyValueRepositoryFactory#KeyValueRepositoryFactory(KeyValueOperations)
 	 */
-	public RedisRepositoryFactory(KeyValueOperations keyValueOperations) {
-		this(keyValueOperations, RedisQueryCreator.class);
+	public ValkeyRepositoryFactory(KeyValueOperations keyValueOperations) {
+		this(keyValueOperations, ValkeyQueryCreator.class);
 	}
 
 	/**
@@ -57,9 +57,9 @@ public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
 	 * @param queryCreator
 	 * @see KeyValueRepositoryFactory#KeyValueRepositoryFactory(KeyValueOperations, Class)
 	 */
-	public RedisRepositoryFactory(KeyValueOperations keyValueOperations,
+	public ValkeyRepositoryFactory(KeyValueOperations keyValueOperations,
 			Class<? extends AbstractQueryCreator<?, ?>> queryCreator) {
-		this(keyValueOperations, queryCreator, RedisPartTreeQuery.class);
+		this(keyValueOperations, queryCreator, ValkeyPartTreeQuery.class);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
 	 * @param repositoryQueryType
 	 * @see KeyValueRepositoryFactory#KeyValueRepositoryFactory(KeyValueOperations, Class, Class)
 	 */
-	public RedisRepositoryFactory(KeyValueOperations keyValueOperations,
+	public ValkeyRepositoryFactory(KeyValueOperations keyValueOperations,
 			Class<? extends AbstractQueryCreator<?, ?>> queryCreator, Class<? extends RepositoryQuery> repositoryQueryType) {
 		super(keyValueOperations, queryCreator, repositoryQueryType);
 
@@ -82,12 +82,12 @@ public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
 
 		if (QueryByExampleExecutor.class.isAssignableFrom(metadata.getRepositoryInterface())) {
 
-			RedisMappingContext mappingContext = (RedisMappingContext) this.operations.getMappingContext();
-			RedisPersistentEntity<?> persistentEntity = mappingContext.getRequiredPersistentEntity(metadata.getDomainType());
-			MappingRedisEntityInformation<?, ?> entityInformation = new MappingRedisEntityInformation<>(persistentEntity);
+			ValkeyMappingContext mappingContext = (ValkeyMappingContext) this.operations.getMappingContext();
+			ValkeyPersistentEntity<?> persistentEntity = mappingContext.getRequiredPersistentEntity(metadata.getDomainType());
+			MappingValkeyEntityInformation<?, ?> entityInformation = new MappingValkeyEntityInformation<>(persistentEntity);
 
 			fragments = fragments.append(RepositoryFragment.implemented(QueryByExampleExecutor.class,
-					instantiateClass(QueryByExampleRedisExecutor.class, entityInformation, operations)));
+					instantiateClass(QueryByExampleValkeyExecutor.class, entityInformation, operations)));
 		}
 
 		return fragments;
@@ -97,9 +97,9 @@ public class RedisRepositoryFactory extends KeyValueRepositoryFactory {
 	@SuppressWarnings("unchecked")
 	public <T, ID> EntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 
-		RedisPersistentEntity<T> entity = (RedisPersistentEntity<T>) operations.getMappingContext()
+		ValkeyPersistentEntity<T> entity = (ValkeyPersistentEntity<T>) operations.getMappingContext()
 				.getRequiredPersistentEntity(domainClass);
 
-		return new MappingRedisEntityInformation<>(entity);
+		return new MappingValkeyEntityInformation<>(entity);
 	}
 }

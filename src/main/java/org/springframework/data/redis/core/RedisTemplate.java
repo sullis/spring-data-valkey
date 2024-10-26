@@ -31,28 +31,28 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisKeyCommands;
-import org.springframework.data.redis.connection.RedisServerCommands;
-import org.springframework.data.redis.connection.RedisTxCommands;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
+import org.springframework.data.redis.connection.ValkeyServerCommands;
+import org.springframework.data.redis.connection.ValkeyTxCommands;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.core.query.QueryUtils;
 import org.springframework.data.redis.core.query.SortQuery;
 import org.springframework.data.redis.core.script.DefaultScriptExecutor;
-import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.core.script.ValkeyScript;
 import org.springframework.data.redis.core.script.ScriptExecutor;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationValkeySerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.serializer.SerializationUtils;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -60,15 +60,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Helper class that simplifies Redis data access code.
+ * Helper class that simplifies Valkey data access code.
  * <p>
  * Performs automatic serialization/deserialization between the given objects and the underlying binary data in the
- * Redis store. By default, it uses Java serialization for its objects (through {@link JdkSerializationRedisSerializer}
- * ). For String intensive operations consider the dedicated {@link StringRedisTemplate}.
+ * Valkey store. By default, it uses Java serialization for its objects (through {@link JdkSerializationValkeySerializer}
+ * ). For String intensive operations consider the dedicated {@link StringValkeyTemplate}.
  * <p>
- * The central method is {@link #execute(RedisCallback)}, supporting Redis access code implementing the
- * {@link RedisCallback} interface. It provides {@link RedisConnection} handling such that neither the
- * {@link RedisCallback} implementation nor the calling code needs to explicitly care about retrieving/closing Redis
+ * The central method is {@link #execute(ValkeyCallback)}, supporting Valkey access code implementing the
+ * {@link ValkeyCallback} interface. It provides {@link ValkeyConnection} handling such that neither the
+ * {@link ValkeyCallback} implementation nor the calling code needs to explicitly care about retrieving/closing Valkey
  * connections, or handling Connection lifecycle exceptions. For typical single step actions, there are various
  * convenience methods.
  * <p>
@@ -77,7 +77,7 @@ import org.springframework.util.CollectionUtils;
  * Note that while the template is generified, it is up to the serializers/deserializers to properly convert the given
  * Objects to and from binary data.
  * <p>
- * <b>This is the central class in Redis support</b>.
+ * <b>This is the central class in Valkey support</b>.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -88,24 +88,24 @@ import org.springframework.util.CollectionUtils;
  * @author ihaohong
  * @author Chen Li
  * @author Vedran Pavic
- * @param <K> the Redis key type against which the template works (usually a String)
- * @param <V> the Redis value type against which the template works
- * @see StringRedisTemplate
+ * @param <K> the Valkey key type against which the template works (usually a String)
+ * @param <V> the Valkey value type against which the template works
+ * @see StringValkeyTemplate
  */
-public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperations<K, V>, BeanClassLoaderAware {
+public class ValkeyTemplate<K, V> extends ValkeyAccessor implements ValkeyOperations<K, V>, BeanClassLoaderAware {
 
 	private boolean enableTransactionSupport = false;
 	private boolean exposeConnection = false;
 	private boolean initialized = false;
 	private boolean enableDefaultSerializer = true;
-	private @Nullable RedisSerializer<?> defaultSerializer;
+	private @Nullable ValkeySerializer<?> defaultSerializer;
 	private @Nullable ClassLoader classLoader;
 
-	@SuppressWarnings("rawtypes") private @Nullable RedisSerializer keySerializer = null;
-	@SuppressWarnings("rawtypes") private @Nullable RedisSerializer valueSerializer = null;
-	@SuppressWarnings("rawtypes") private @Nullable RedisSerializer hashKeySerializer = null;
-	@SuppressWarnings("rawtypes") private @Nullable RedisSerializer hashValueSerializer = null;
-	private RedisSerializer<String> stringSerializer = RedisSerializer.string();
+	@SuppressWarnings("rawtypes") private @Nullable ValkeySerializer keySerializer = null;
+	@SuppressWarnings("rawtypes") private @Nullable ValkeySerializer valueSerializer = null;
+	@SuppressWarnings("rawtypes") private @Nullable ValkeySerializer hashKeySerializer = null;
+	@SuppressWarnings("rawtypes") private @Nullable ValkeySerializer hashValueSerializer = null;
+	private ValkeySerializer<String> stringSerializer = ValkeySerializer.string();
 
 	private @Nullable ScriptExecutor<K> scriptExecutor;
 
@@ -122,9 +122,9 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	private final ClusterOperations<K, V> clusterOps = new DefaultClusterOperations<>(this);
 
 	/**
-	 * Constructs a new {@code RedisTemplate} instance.
+	 * Constructs a new {@code ValkeyTemplate} instance.
 	 */
-	public RedisTemplate() {}
+	public ValkeyTemplate() {}
 
 	@Override
 	public void afterPropertiesSet() {
@@ -133,7 +133,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 
 		if (defaultSerializer == null) {
 
-			defaultSerializer = new JdkSerializationRedisSerializer(
+			defaultSerializer = new JdkSerializationValkeySerializer(
 					classLoader != null ? classLoader : this.getClass().getClassLoader());
 		}
 
@@ -161,24 +161,24 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	/**
-	 * Returns whether the underlying RedisConnection should be directly exposed to the RedisCallback code, or rather a
+	 * Returns whether the underlying ValkeyConnection should be directly exposed to the ValkeyCallback code, or rather a
 	 * connection proxy (default behavior).
 	 *
-	 * @return {@literal true} to expose the native Redis connection or {@literal false} to provide a proxied connection
-	 *         to RedisCallback code.
+	 * @return {@literal true} to expose the native Valkey connection or {@literal false} to provide a proxied connection
+	 *         to ValkeyCallback code.
 	 */
 	public boolean isExposeConnection() {
 		return exposeConnection;
 	}
 
 	/**
-	 * Sets whether the underlying RedisConnection should be directly exposed to the RedisCallback code. By default, the
+	 * Sets whether the underlying ValkeyConnection should be directly exposed to the ValkeyCallback code. By default, the
 	 * connection is not exposed, and a proxy is used instead. This proxy suppresses potentially disruptive operations,
 	 * such as {@code quit} and {@code disconnect} commands, ensuring that the connection remains stable during the
 	 * callback execution. Defaults to proxy use.
 	 *
-	 * @param exposeConnection {@literal true} to expose the actual Redis connection to RedisCallback code, allowing full
-	 *          access to Redis commands, including quit and disconnect. {@literal false} to proxy connections that
+	 * @param exposeConnection {@literal true} to expose the actual Valkey connection to ValkeyCallback code, allowing full
+	 *          access to Valkey commands, including quit and disconnect. {@literal false} to proxy connections that
 	 *          suppress the quit and disconnect commands, protecting the connection from being inadvertently closed
 	 *          during callback execution.
 	 */
@@ -215,7 +215,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @param enableTransactionSupport {@literal true}to participate in ongoing transactions; {@literal false} to not
 	 *          track transactions.
 	 * @since 1.3
-	 * @see RedisConnectionUtils#getConnection(RedisConnectionFactory, boolean)
+	 * @see ValkeyConnectionUtils#getConnection(ValkeyConnectionFactory, boolean)
 	 * @see TransactionSynchronizationManager#isActualTransactionActive()
 	 */
 	public void setEnableTransactionSupport(boolean enableTransactionSupport) {
@@ -223,8 +223,8 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	/**
-	 * Sets the {@link ClassLoader} to be used for the default {@link JdkSerializationRedisSerializer} in case no other
-	 * {@link RedisSerializer} is explicitly set as the default one.
+	 * Sets the {@link ClassLoader} to be used for the default {@link JdkSerializationValkeySerializer} in case no other
+	 * {@link ValkeySerializer} is explicitly set as the default one.
 	 *
 	 * @param classLoader can be {@literal null}.
 	 * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader
@@ -241,18 +241,18 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @return template default serializer.
 	 */
 	@Nullable
-	public RedisSerializer<?> getDefaultSerializer() {
+	public ValkeySerializer<?> getDefaultSerializer() {
 		return defaultSerializer;
 	}
 
 	/**
 	 * Sets the default serializer to use for this template. All serializers (except the
-	 * {@link #setStringSerializer(RedisSerializer)}) are initialized to this value unless explicitly set. Defaults to
-	 * {@link JdkSerializationRedisSerializer}.
+	 * {@link #setStringSerializer(ValkeySerializer)}) are initialized to this value unless explicitly set. Defaults to
+	 * {@link JdkSerializationValkeySerializer}.
 	 *
 	 * @param serializer default serializer to use.
 	 */
-	public void setDefaultSerializer(RedisSerializer<?> serializer) {
+	public void setDefaultSerializer(ValkeySerializer<?> serializer) {
 		this.defaultSerializer = serializer;
 	}
 
@@ -261,7 +261,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param serializer the key serializer to be used by this template.
 	 */
-	public void setKeySerializer(RedisSerializer<?> serializer) {
+	public void setKeySerializer(ValkeySerializer<?> serializer) {
 		this.keySerializer = serializer;
 	}
 
@@ -271,7 +271,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @return the key serializer used by this template.
 	 */
 	@Override
-	public RedisSerializer<?> getKeySerializer() {
+	public ValkeySerializer<?> getKeySerializer() {
 		return keySerializer;
 	}
 
@@ -280,7 +280,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param serializer the value serializer to be used by this template.
 	 */
-	public void setValueSerializer(RedisSerializer<?> serializer) {
+	public void setValueSerializer(ValkeySerializer<?> serializer) {
 		this.valueSerializer = serializer;
 	}
 
@@ -290,7 +290,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @return the value serializer used by this template.
 	 */
 	@Override
-	public RedisSerializer<?> getValueSerializer() {
+	public ValkeySerializer<?> getValueSerializer() {
 		return valueSerializer;
 	}
 
@@ -300,7 +300,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @return Returns the hashKeySerializer
 	 */
 	@Override
-	public RedisSerializer<?> getHashKeySerializer() {
+	public ValkeySerializer<?> getHashKeySerializer() {
 		return hashKeySerializer;
 	}
 
@@ -309,7 +309,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param hashKeySerializer The hashKeySerializer to set.
 	 */
-	public void setHashKeySerializer(RedisSerializer<?> hashKeySerializer) {
+	public void setHashKeySerializer(ValkeySerializer<?> hashKeySerializer) {
 		this.hashKeySerializer = hashKeySerializer;
 	}
 
@@ -319,7 +319,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * @return Returns the hashValueSerializer
 	 */
 	@Override
-	public RedisSerializer<?> getHashValueSerializer() {
+	public ValkeySerializer<?> getHashValueSerializer() {
 		return hashValueSerializer;
 	}
 
@@ -328,7 +328,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param hashValueSerializer The hashValueSerializer to set.
 	 */
-	public void setHashValueSerializer(RedisSerializer<?> hashValueSerializer) {
+	public void setHashValueSerializer(ValkeySerializer<?> hashValueSerializer) {
 		this.hashValueSerializer = hashValueSerializer;
 	}
 
@@ -337,23 +337,23 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @return Returns the stringSerializer
 	 */
-	public RedisSerializer<String> getStringSerializer() {
+	public ValkeySerializer<String> getStringSerializer() {
 		return stringSerializer;
 	}
 
 	/**
 	 * Sets the string value serializer to be used by this template (when the arguments or return types are always
-	 * strings). Defaults to {@link StringRedisSerializer}.
+	 * strings). Defaults to {@link StringValkeySerializer}.
 	 *
 	 * @see ValueOperations#get(Object, long, long)
 	 * @param stringSerializer The stringValueSerializer to set.
 	 */
-	public void setStringSerializer(RedisSerializer<String> stringSerializer) {
+	public void setStringSerializer(ValkeySerializer<String> stringSerializer) {
 		this.stringSerializer = stringSerializer;
 	}
 
 	/**
-	 * @param scriptExecutor The {@link ScriptExecutor} to use for executing Redis scripts
+	 * @param scriptExecutor The {@link ScriptExecutor} to use for executing Valkey scripts
 	 */
 	public void setScriptExecutor(ScriptExecutor<K> scriptExecutor) {
 		this.scriptExecutor = scriptExecutor;
@@ -361,7 +361,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 
 	@Override
 	@Nullable
-	public <T> T execute(RedisCallback<T> action) {
+	public <T> T execute(ValkeyCallback<T> action) {
 		return execute(action, isExposeConnection());
 	}
 
@@ -369,12 +369,12 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 * Executes the given action object within a connection, which can be exposed or not.
 	 *
 	 * @param <T> return type
-	 * @param action callback object that specifies the Redis action
-	 * @param exposeConnection whether to enforce exposure of the native Redis Connection to callback code
+	 * @param action callback object that specifies the Valkey action
+	 * @param exposeConnection whether to enforce exposure of the native Valkey Connection to callback code
 	 * @return object returned by the action
 	 */
 	@Nullable
-	public <T> T execute(RedisCallback<T> action, boolean exposeConnection) {
+	public <T> T execute(ValkeyCallback<T> action, boolean exposeConnection) {
 		return execute(action, exposeConnection, false);
 	}
 
@@ -384,31 +384,31 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param <T> return type
 	 * @param action callback object to execute
-	 * @param exposeConnection whether to enforce exposure of the native Redis Connection to callback code
+	 * @param exposeConnection whether to enforce exposure of the native Valkey Connection to callback code
 	 * @param pipeline whether to pipeline or not the connection for the execution
 	 * @return object returned by the action
 	 */
 	@Nullable
-	public <T> T execute(RedisCallback<T> action, boolean exposeConnection, boolean pipeline) {
+	public <T> T execute(ValkeyCallback<T> action, boolean exposeConnection, boolean pipeline) {
 
 		Assert.isTrue(initialized, "template not initialized; call afterPropertiesSet() before using it");
 		Assert.notNull(action, "Callback object must not be null");
 
-		RedisConnectionFactory factory = getRequiredConnectionFactory();
-		RedisConnection conn = RedisConnectionUtils.getConnection(factory, enableTransactionSupport);
+		ValkeyConnectionFactory factory = getRequiredConnectionFactory();
+		ValkeyConnection conn = ValkeyConnectionUtils.getConnection(factory, enableTransactionSupport);
 
 		try {
 
 			boolean existingConnection = TransactionSynchronizationManager.hasResource(factory);
-			RedisConnection connToUse = preProcessConnection(conn, existingConnection);
+			ValkeyConnection connToUse = preProcessConnection(conn, existingConnection);
 
 			boolean pipelineStatus = connToUse.isPipelined();
 			if (pipeline && !pipelineStatus) {
 				connToUse.openPipeline();
 			}
 
-			RedisConnection connToExpose = (exposeConnection ? connToUse : createRedisConnectionProxy(connToUse));
-			T result = action.doInRedis(connToExpose);
+			ValkeyConnection connToExpose = (exposeConnection ? connToUse : createValkeyConnectionProxy(connToUse));
+			T result = action.doInValkey(connToExpose);
 
 			// close pipeline
 			if (pipeline && !pipelineStatus) {
@@ -417,7 +417,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 
 			return postProcessResult(result, connToUse, existingConnection);
 		} finally {
-			RedisConnectionUtils.releaseConnection(conn, factory);
+			ValkeyConnectionUtils.releaseConnection(conn, factory);
 		}
 	}
 
@@ -427,13 +427,13 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 		Assert.isTrue(initialized, "template not initialized; call afterPropertiesSet() before using it");
 		Assert.notNull(session, "Callback object must not be null");
 
-		RedisConnectionFactory factory = getRequiredConnectionFactory();
+		ValkeyConnectionFactory factory = getRequiredConnectionFactory();
 		// bind connection
-		RedisConnectionUtils.bindConnection(factory, enableTransactionSupport);
+		ValkeyConnectionUtils.bindConnection(factory, enableTransactionSupport);
 		try {
 			return session.execute(this);
 		} finally {
-			RedisConnectionUtils.unbindConnection(factory);
+			ValkeyConnectionUtils.unbindConnection(factory);
 		}
 	}
 
@@ -443,16 +443,16 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@Override
-	public List<Object> executePipelined(SessionCallback<?> session, @Nullable RedisSerializer<?> resultSerializer) {
+	public List<Object> executePipelined(SessionCallback<?> session, @Nullable ValkeySerializer<?> resultSerializer) {
 
 		Assert.isTrue(initialized, "template not initialized; call afterPropertiesSet() before using it");
 		Assert.notNull(session, "Callback object must not be null");
 
-		RedisConnectionFactory factory = getRequiredConnectionFactory();
+		ValkeyConnectionFactory factory = getRequiredConnectionFactory();
 		// bind connection
-		RedisConnectionUtils.bindConnection(factory, enableTransactionSupport);
+		ValkeyConnectionUtils.bindConnection(factory, enableTransactionSupport);
 		try {
-			return execute((RedisCallback<List<Object>>) connection -> {
+			return execute((ValkeyCallback<List<Object>>) connection -> {
 				connection.openPipeline();
 				boolean pipelinedClosed = false;
 				try {
@@ -471,23 +471,23 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 				}
 			});
 		} finally {
-			RedisConnectionUtils.unbindConnection(factory);
+			ValkeyConnectionUtils.unbindConnection(factory);
 		}
 	}
 
 	@Override
-	public List<Object> executePipelined(RedisCallback<?> action) {
+	public List<Object> executePipelined(ValkeyCallback<?> action) {
 		return executePipelined(action, valueSerializer);
 	}
 
 	@Override
-	public List<Object> executePipelined(RedisCallback<?> action, @Nullable RedisSerializer<?> resultSerializer) {
+	public List<Object> executePipelined(ValkeyCallback<?> action, @Nullable ValkeySerializer<?> resultSerializer) {
 
-		return execute((RedisCallback<List<Object>>) connection -> {
+		return execute((ValkeyCallback<List<Object>>) connection -> {
 			connection.openPipeline();
 			boolean pipelinedClosed = false;
 			try {
-				Object result = action.doInRedis(connection);
+				Object result = action.doInValkey(connection);
 				if (result != null) {
 					throw new InvalidDataAccessApiUsageException(
 							"Callback cannot return a non-null value as it gets overwritten by the pipeline");
@@ -504,39 +504,39 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@Override
-	public <T> T execute(RedisScript<T> script, List<K> keys, Object... args) {
+	public <T> T execute(ValkeyScript<T> script, List<K> keys, Object... args) {
 		return scriptExecutor.execute(script, keys, args);
 	}
 
 	@Override
-	public <T> T execute(RedisScript<T> script, RedisSerializer<?> argsSerializer, RedisSerializer<T> resultSerializer,
+	public <T> T execute(ValkeyScript<T> script, ValkeySerializer<?> argsSerializer, ValkeySerializer<T> resultSerializer,
 			List<K> keys, Object... args) {
 		return scriptExecutor.execute(script, argsSerializer, resultSerializer, keys, args);
 	}
 
 	@Override
-	public <T extends Closeable> T executeWithStickyConnection(RedisCallback<T> callback) {
+	public <T extends Closeable> T executeWithStickyConnection(ValkeyCallback<T> callback) {
 
 		Assert.isTrue(initialized, "template not initialized; call afterPropertiesSet() before using it");
 		Assert.notNull(callback, "Callback object must not be null");
 
-		RedisConnectionFactory factory = getRequiredConnectionFactory();
+		ValkeyConnectionFactory factory = getRequiredConnectionFactory();
 
-		RedisConnection connection = preProcessConnection(RedisConnectionUtils.doGetConnection(factory, true, false, false),
+		ValkeyConnection connection = preProcessConnection(ValkeyConnectionUtils.doGetConnection(factory, true, false, false),
 				false);
 
-		return callback.doInRedis(connection);
+		return callback.doInValkey(connection);
 	}
 
 	private Object executeSession(SessionCallback<?> session) {
 		return session.execute(this);
 	}
 
-	protected RedisConnection createRedisConnectionProxy(RedisConnection connection) {
+	protected ValkeyConnection createValkeyConnectionProxy(ValkeyConnection connection) {
 
 		Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(connection.getClass(), getClass().getClassLoader());
 
-		return (RedisConnection) Proxy.newProxyInstance(connection.getClass().getClassLoader(), ifcs,
+		return (ValkeyConnection) Proxy.newProxyInstance(connection.getClass().getClassLoader(), ifcs,
 				new CloseSuppressingInvocationHandler(connection));
 	}
 
@@ -546,17 +546,17 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	 *
 	 * @param connection redis connection
 	 */
-	protected RedisConnection preProcessConnection(RedisConnection connection, boolean existingConnection) {
+	protected ValkeyConnection preProcessConnection(ValkeyConnection connection, boolean existingConnection) {
 		return connection;
 	}
 
 	@Nullable
-	protected <T> T postProcessResult(@Nullable T result, RedisConnection conn, boolean existingConnection) {
+	protected <T> T postProcessResult(@Nullable T result, ValkeyConnection conn, boolean existingConnection) {
 		return result;
 	}
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Keys
+	// Methods dealing with Valkey Keys
 	// -------------------------------------------------------------------------
 
 	@Override
@@ -650,14 +650,14 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 		Assert.notNull(options, "ScanOptions must not be null");
 
 		return executeWithStickyConnection(
-				(RedisCallback<Cursor<K>>) connection -> new ConvertingCursor<>(connection.scan(options),
+				(ValkeyCallback<Cursor<K>>) connection -> new ConvertingCursor<>(connection.scan(options),
 						this::deserializeKey));
 	}
 
 	@Override
 	public K randomKey() {
 
-		byte[] rawKey = doWithKeys(RedisKeyCommands::randomKey);
+		byte[] rawKey = doWithKeys(ValkeyKeyCommands::randomKey);
 		return deserializeKey(rawKey);
 	}
 
@@ -691,7 +691,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 			try {
 				return connection.pExpire(rawKey, rawTimeout);
 			} catch (Exception ignore) {
-				// Driver may not support pExpire or we may be running on Redis 2.4
+				// Driver may not support pExpire or we may be running on Valkey 2.4
 				return connection.expire(rawKey, TimeoutUtils.toSeconds(timeout, unit));
 			}
 		});
@@ -733,7 +733,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 			try {
 				return connection.pTtl(rawKey, timeUnit);
 			} catch (Exception ignore) {
-				// Driver may not support pTtl or we may be running on Redis 2.4
+				// Driver may not support pTtl or we may be running on Valkey 2.4
 				return connection.ttl(rawKey, timeUnit);
 			}
 		});
@@ -747,7 +747,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	/**
-	 * Executes the Redis dump command and returns the results. Redis uses a non-standard serialization mechanism and
+	 * Executes the Valkey dump command and returns the results. Valkey uses a non-standard serialization mechanism and
 	 * includes checksum information, thus the raw bytes are returned as opposed to deserializing with valueSerializer.
 	 * Use the return value of dump as the value argument to restore
 	 *
@@ -762,15 +762,15 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	/**
-	 * Executes the Redis restore command. The value passed in should be the exact serialized data returned from
-	 * {@link #dump(Object)}, since Redis uses a non-standard serialization mechanism.
+	 * Executes the Valkey restore command. The value passed in should be the exact serialized data returned from
+	 * {@link #dump(Object)}, since Valkey uses a non-standard serialization mechanism.
 	 *
 	 * @param key The key to restore
 	 * @param value The value to restore, as returned by {@link #dump(Object)}
 	 * @param timeToLive An expiration for the restored key, or 0 for no expiration
 	 * @param unit The time unit for timeToLive
 	 * @param replace use {@literal true} to replace a potentially existing value instead of erroring.
-	 * @throws RedisSystemException if the key you are attempting to restore already exists and {@code replace} is set to
+	 * @throws ValkeySystemException if the key you are attempting to restore already exists and {@code replace} is set to
 	 *           {@literal false}.
 	 */
 	@Override
@@ -786,8 +786,8 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@Nullable
-	private <T> T doWithKeys(Function<RedisKeyCommands, T> action) {
-		return execute((RedisCallback<? extends T>) connection -> action.apply(connection.keyCommands()), true);
+	private <T> T doWithKeys(Function<ValkeyKeyCommands, T> action) {
+		return execute((ValkeyCallback<? extends T>) connection -> action.apply(connection.keyCommands()), true);
 	}
 
 	// -------------------------------------------------------------------------
@@ -801,7 +801,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@Override
-	public <T> List<T> sort(SortQuery<K> query, @Nullable RedisSerializer<T> resultSerializer) {
+	public <T> List<T> sort(SortQuery<K> query, @Nullable ValkeySerializer<T> resultSerializer) {
 
 		byte[] rawKey = rawKey(query.getKey());
 		SortParameters params = QueryUtils.convertQuery(query, stringSerializer);
@@ -819,7 +819,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 
 	@Override
 	public <T, S> List<T> sort(SortQuery<K> query, BulkMapper<T, S> bulkMapper,
-			@Nullable RedisSerializer<S> resultSerializer) {
+			@Nullable ValkeySerializer<S> resultSerializer) {
 
 		List<S> values = sort(query, resultSerializer);
 
@@ -877,23 +877,23 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@Override
 	public void unwatch() {
 
-		executeWithoutResult(RedisTxCommands::unwatch);
+		executeWithoutResult(ValkeyTxCommands::unwatch);
 	}
 
 	@Override
 	public void multi() {
-		executeWithoutResult(RedisTxCommands::multi);
+		executeWithoutResult(ValkeyTxCommands::multi);
 	}
 
 	@Override
 	public void discard() {
-		executeWithoutResult(RedisTxCommands::discard);
+		executeWithoutResult(ValkeyTxCommands::discard);
 	}
 
 	/**
-	 * Execute a transaction, using the default {@link RedisSerializer}s to deserialize any results that are byte[]s or
+	 * Execute a transaction, using the default {@link ValkeySerializer}s to deserialize any results that are byte[]s or
 	 * Collections or Maps of byte[]s or Tuples. Other result types (Long, Boolean, etc) are left as-is in the converted
-	 * results. If conversion of tx results has been disabled in the {@link RedisConnectionFactory}, the results of exec
+	 * results. If conversion of tx results has been disabled in the {@link ValkeyConnectionFactory}, the results of exec
 	 * will be returned without deserialization. This check is mostly for backwards compatibility with 1.0.
 	 *
 	 * @return The (possibly deserialized) results of transaction exec
@@ -910,23 +910,23 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@Override
-	public List<Object> exec(RedisSerializer<?> valueSerializer) {
+	public List<Object> exec(ValkeySerializer<?> valueSerializer) {
 		return deserializeMixedResults(execRaw(), valueSerializer, valueSerializer, valueSerializer);
 	}
 
 	protected List<Object> execRaw() {
 
-		List<Object> raw = execute(RedisTxCommands::exec);
+		List<Object> raw = execute(ValkeyTxCommands::exec);
 		return raw == null ? Collections.emptyList() : raw;
 	}
 
 	// -------------------------------------------------------------------------
-	// Methods dealing with Redis Server Commands
+	// Methods dealing with Valkey Server Commands
 	// -------------------------------------------------------------------------
 
 	@Override
-	public List<RedisClientInfo> getClientList() {
-		return execute(RedisServerCommands::getClientList);
+	public List<ValkeyClientInfo> getClientList() {
+		return execute(ValkeyServerCommands::getClientList);
 	}
 
 	@Override
@@ -935,7 +935,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	/*
-	 * @see org.springframework.data.redis.core.RedisOperations#replicaOf(java.lang.String, int)
+	 * @see org.springframework.data.redis.core.ValkeyOperations#replicaOf(java.lang.String, int)
 	 */
 	@Override
 	public void replicaOf(String host, int port) {
@@ -944,7 +944,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 
 	@Override
 	public void replicaOfNoOne() {
-		executeWithoutResult(RedisServerCommands::replicaOfNoOne);
+		executeWithoutResult(ValkeyServerCommands::replicaOfNoOne);
 	}
 
 	@Override
@@ -958,7 +958,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 		return execute(connection -> connection.publish(rawChannel, rawMessage), true);
 	}
 
-	private void executeWithoutResult(Consumer<RedisConnection> action) {
+	private void executeWithoutResult(Consumer<ValkeyConnection> action) {
 		execute(it -> {
 
 			action.accept(it);
@@ -983,7 +983,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@Override
 	@SuppressWarnings("unchecked")
 	public BoundGeoOperations<K, V> boundGeoOps(K key) {
-		return boundOperations.createProxy(BoundGeoOperations.class, key, DataType.ZSET, this, RedisOperations::opsForGeo);
+		return boundOperations.createProxy(BoundGeoOperations.class, key, DataType.ZSET, this, ValkeyOperations::opsForGeo);
 	}
 
 	@Override
@@ -1012,13 +1012,13 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@SuppressWarnings("unchecked")
 	public BoundListOperations<K, V> boundListOps(K key) {
 		return boundOperations.createProxy(BoundListOperations.class, key, DataType.LIST, this,
-				RedisOperations::opsForList);
+				ValkeyOperations::opsForList);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public BoundSetOperations<K, V> boundSetOps(K key) {
-		return boundOperations.createProxy(BoundSetOperations.class, key, DataType.SET, this, RedisOperations::opsForSet);
+		return boundOperations.createProxy(BoundSetOperations.class, key, DataType.SET, this, ValkeyOperations::opsForSet);
 	}
 
 	@Override
@@ -1047,7 +1047,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@SuppressWarnings("unchecked")
 	public BoundValueOperations<K, V> boundValueOps(K key) {
 		return boundOperations.createProxy(BoundValueOperations.class, key, DataType.STRING, this,
-				RedisOperations::opsForValue);
+				ValkeyOperations::opsForValue);
 	}
 
 	@Override
@@ -1059,7 +1059,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@SuppressWarnings("unchecked")
 	public BoundZSetOperations<K, V> boundZSetOps(K key) {
 		return boundOperations.createProxy(BoundZSetOperations.class, key, DataType.ZSET, this,
-				RedisOperations::opsForZSet);
+				ValkeyOperations::opsForZSet);
 	}
 
 	@Override
@@ -1107,8 +1107,8 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Nullable
 	private List<Object> deserializeMixedResults(@Nullable List<Object> rawValues,
-			@Nullable RedisSerializer valueSerializer, @Nullable RedisSerializer hashKeySerializer,
-			@Nullable RedisSerializer hashValueSerializer) {
+			@Nullable ValkeySerializer valueSerializer, @Nullable ValkeySerializer hashKeySerializer,
+			@Nullable ValkeySerializer hashValueSerializer) {
 
 		if (rawValues == null) {
 			return null;
@@ -1135,7 +1135,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Set<?> deserializeSet(Set rawSet, @Nullable RedisSerializer valueSerializer) {
+	private Set<?> deserializeSet(Set rawSet, @Nullable ValkeySerializer valueSerializer) {
 
 		if (rawSet.isEmpty()) {
 			return rawSet;
@@ -1153,7 +1153,7 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Set<TypedTuple<V>> convertTupleValues(Set<Tuple> rawValues, @Nullable RedisSerializer valueSerializer) {
+	private Set<TypedTuple<V>> convertTupleValues(Set<Tuple> rawValues, @Nullable ValkeySerializer valueSerializer) {
 
 		Set<TypedTuple<V>> set = new LinkedHashSet<>(rawValues.size());
 		for (Tuple rawValue : rawValues) {

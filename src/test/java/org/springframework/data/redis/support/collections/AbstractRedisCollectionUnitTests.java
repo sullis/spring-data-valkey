@@ -31,29 +31,29 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.core.ValkeyTemplate;
 
 /**
  * @author Christoph Strobl
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class AbstractRedisCollectionUnitTests {
+class AbstractValkeyCollectionUnitTests {
 
-	private AbstractRedisCollection<String> collection;
+	private AbstractValkeyCollection<String> collection;
 
 	@SuppressWarnings("rawtypes")//
-	private RedisTemplate redisTemplateSpy;
-	private @Mock RedisConnectionFactory connectionFactoryMock;
-	private @Mock(answer = Answers.RETURNS_MOCKS) RedisConnection connectionMock;
+	private ValkeyTemplate redisTemplateSpy;
+	private @Mock ValkeyConnectionFactory connectionFactoryMock;
+	private @Mock(answer = Answers.RETURNS_MOCKS) ValkeyConnection connectionMock;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@BeforeEach
 	void setUp() {
 
-		redisTemplateSpy = spy(new RedisTemplate() {
+		redisTemplateSpy = spy(new ValkeyTemplate() {
 
 			public Boolean hasKey(Object key) {
 				return false;
@@ -62,7 +62,7 @@ class AbstractRedisCollectionUnitTests {
 		redisTemplateSpy.setConnectionFactory(connectionFactoryMock);
 		redisTemplateSpy.afterPropertiesSet();
 
-		collection = new AbstractRedisCollection<String>("key", redisTemplateSpy) {
+		collection = new AbstractValkeyCollection<String>("key", redisTemplateSpy) {
 
 			private List<String> delegate = new ArrayList<>();
 
@@ -98,7 +98,7 @@ class AbstractRedisCollectionUnitTests {
 
 	@SuppressWarnings("unchecked")
 	@Test // DATAREDIS-188
-	void testRenameOfEmptyCollectionShouldNotTriggerRedisOperation() {
+	void testRenameOfEmptyCollectionShouldNotTriggerValkeyOperation() {
 
 		collection.rename("new-key");
 		verify(redisTemplateSpy, never()).rename(eq("key"), eq("new-key"));
@@ -106,7 +106,7 @@ class AbstractRedisCollectionUnitTests {
 
 	@SuppressWarnings("unchecked")
 	@Test // DATAREDIS-188
-	void testRenameCollectionShouldTriggerRedisOperation() {
+	void testRenameCollectionShouldTriggerValkeyOperation() {
 
 		when(redisTemplateSpy.hasKey(any())).thenReturn(Boolean.TRUE);
 

@@ -31,8 +31,8 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ReactiveListCommands;
 import org.springframework.data.redis.connection.ReactiveListCommands.Direction;
 import org.springframework.data.redis.connection.ReactiveListCommands.LPosCommand;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -46,11 +46,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveListOperations<K, V> implements ReactiveListOperations<K, V> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, V> serializationContext;
 
-	DefaultReactiveListOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, V> serializationContext) {
+	DefaultReactiveListOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, V> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;

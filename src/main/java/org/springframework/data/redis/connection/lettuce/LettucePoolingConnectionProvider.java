@@ -15,9 +15,9 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.AbstractValkeyClient;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 import io.lettuce.core.support.AsyncConnectionPoolSupport;
 import io.lettuce.core.support.AsyncPool;
 import io.lettuce.core.support.BoundedPoolConfig;
@@ -58,7 +58,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see #getConnection(Class)
  */
-class LettucePoolingConnectionProvider implements LettuceConnectionProvider, RedisClientProvider, DisposableBean {
+class LettucePoolingConnectionProvider implements LettuceConnectionProvider, ValkeyClientProvider, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(LettucePoolingConnectionProvider.class);
 
@@ -129,13 +129,13 @@ class LettucePoolingConnectionProvider implements LettuceConnectionProvider, Red
 	}
 
 	@Override
-	public AbstractRedisClient getRedisClient() {
+	public AbstractValkeyClient getValkeyClient() {
 
-		if (connectionProvider instanceof RedisClientProvider) {
-			return ((RedisClientProvider) connectionProvider).getRedisClient();
+		if (connectionProvider instanceof ValkeyClientProvider) {
+			return ((ValkeyClientProvider) connectionProvider).getValkeyClient();
 		}
 
-		throw new IllegalStateException("Underlying connection provider %s does not implement RedisClientProvider"
+		throw new IllegalStateException("Underlying connection provider %s does not implement ValkeyClientProvider"
 				.formatted(connectionProvider.getClass().getName()));
 	}
 
@@ -164,7 +164,7 @@ class LettucePoolingConnectionProvider implements LettuceConnectionProvider, Red
 
 	private void discardIfNecessary(StatefulConnection<?, ?> connection) {
 
-		if (connection instanceof StatefulRedisConnection<?, ?> redisConnection) {
+		if (connection instanceof StatefulValkeyConnection<?, ?> redisConnection) {
 
 			if (redisConnection.isMulti()) {
 				redisConnection.async().discard();

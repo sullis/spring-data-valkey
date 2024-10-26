@@ -28,21 +28,21 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
 import org.springframework.data.keyvalue.repository.config.QueryCreatorType;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.ShadowCopy;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.EnableKeyspaceEvents;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.ShadowCopy;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
-import org.springframework.data.redis.repository.query.RedisPartTreeQuery;
-import org.springframework.data.redis.repository.query.RedisQueryCreator;
-import org.springframework.data.redis.repository.support.RedisRepositoryFactoryBean;
+import org.springframework.data.redis.repository.query.ValkeyPartTreeQuery;
+import org.springframework.data.redis.repository.query.ValkeyQueryCreator;
+import org.springframework.data.redis.repository.support.ValkeyRepositoryFactoryBean;
 import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 
 /**
- * Annotation to activate Redis repositories. If no base package is configured through either {@link #value()},
+ * Annotation to activate Valkey repositories. If no base package is configured through either {@link #value()},
  * {@link #basePackages()} or {@link #basePackageClasses()} it will trigger scanning of the package of annotated class.
  *
  * @author Christoph Strobl
@@ -53,14 +53,14 @@ import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(RedisRepositoriesRegistrar.class)
-@QueryCreatorType(value = RedisQueryCreator.class, repositoryQueryType = RedisPartTreeQuery.class)
-public @interface EnableRedisRepositories {
+@Import(ValkeyRepositoriesRegistrar.class)
+@QueryCreatorType(value = ValkeyQueryCreator.class, repositoryQueryType = ValkeyPartTreeQuery.class)
+public @interface EnableValkeyRepositories {
 
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation declarations e.g.:
-	 * {@code @EnableRedisRepositories("org.my.pkg")} instead of
-	 * {@code @EnableRedisRepositories(basePackages="org.my.pkg")}.
+	 * {@code @EnableValkeyRepositories("org.my.pkg")} instead of
+	 * {@code @EnableValkeyRepositories(basePackages="org.my.pkg")}.
 	 */
 	String[] value() default {};
 
@@ -114,11 +114,11 @@ public @interface EnableRedisRepositories {
 
 	/**
 	 * Returns the {@link FactoryBean} class to be used for each repository instance. Defaults to
-	 * {@link RedisRepositoryFactoryBean}.
+	 * {@link ValkeyRepositoryFactoryBean}.
 	 *
 	 * @return
 	 */
-	Class<?> repositoryFactoryBeanClass() default RedisRepositoryFactoryBean.class;
+	Class<?> repositoryFactoryBeanClass() default ValkeyRepositoryFactoryBean.class;
 
 	/**
 	 * Configure the repository base class to be used to create repository proxies for this particular configuration.
@@ -148,7 +148,7 @@ public @interface EnableRedisRepositories {
 	boolean considerNestedRepositories() default false;
 
 	/**
-	 * Configures the bean name of the {@link RedisOperations} to be used. Defaulted to {@literal redisTemplate}.
+	 * Configures the bean name of the {@link ValkeyOperations} to be used. Defaulted to {@literal redisTemplate}.
 	 *
 	 * @return
 	 */
@@ -177,9 +177,9 @@ public @interface EnableRedisRepositories {
 	EnableKeyspaceEvents enableKeyspaceEvents() default EnableKeyspaceEvents.OFF;
 
 	/**
-	 * Configure the name of the {@link org.springframework.data.redis.listener.RedisMessageListenerContainer} bean to be
+	 * Configure the name of the {@link org.springframework.data.redis.listener.ValkeyMessageListenerContainer} bean to be
 	 * used for keyspace event subscriptions. Defaults to use an anonymous managed instance by
-	 * {@link org.springframework.data.redis.core.RedisKeyValueAdapter}.
+	 * {@link org.springframework.data.redis.core.ValkeyKeyValueAdapter}.
 	 *
 	 * @return
 	 * @since 2.7.2
@@ -188,7 +188,7 @@ public @interface EnableRedisRepositories {
 
 	/**
 	 * Configuration flag controlling storage of phantom keys (shadow copies) of expiring entities to read them later when
-	 * publishing {@link org.springframework.data.redis.core.RedisKeyspaceEvent keyspace events}.
+	 * publishing {@link org.springframework.data.redis.core.ValkeyKeyspaceEvent keyspace events}.
 	 *
 	 * @return
 	 * @since 2.4

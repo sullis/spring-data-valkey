@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection;
 import org.springframework.lang.Nullable;
 
 /**
- * Listener of messages published in Redis. A MessageListener can implement {@link SubscriptionListener} to receive
+ * Listener of messages published in Valkey. A MessageListener can implement {@link SubscriptionListener} to receive
  * notifications for subscription states.
  *
  * @author Costin Leau
@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
 public interface MessageListener {
 
 	/**
-	 * Callback for processing received objects through Redis.
+	 * Callback for processing received objects through Valkey.
 	 *
 	 * @param message message must not be {@literal null}.
 	 * @param pattern pattern matching the channel (if specified) - can be {@literal null}.

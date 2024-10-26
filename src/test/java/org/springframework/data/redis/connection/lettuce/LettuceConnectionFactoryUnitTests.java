@@ -18,23 +18,23 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.redis.connection.ClusterTestVariables.*;
-import static org.springframework.data.redis.connection.RedisConfiguration.*;
+import static org.springframework.data.redis.connection.ValkeyConfiguration.*;
 import static org.springframework.data.redis.test.extension.LettuceTestClientResources.*;
 import static org.springframework.test.util.ReflectionTestUtils.*;
 
-import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.AbstractValkeyClient;
 import io.lettuce.core.ClientOptions;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SslVerifyMode;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.sync.ValkeyAdvancedClusterCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
-import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.codec.ValkeyCodec;
 import io.lettuce.core.resource.ClientResources;
 import reactor.test.StepVerifier;
 
@@ -53,17 +53,17 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.data.redis.ConnectionFactoryTracker;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.PoolException;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisClusterConnection;
-import org.springframework.data.redis.connection.RedisConfiguration;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisSocketConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterConnection;
+import org.springframework.data.redis.connection.ValkeyConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeyPassword;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeySocketConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 
 /**
@@ -81,11 +81,11 @@ import org.springframework.data.redis.test.extension.LettuceTestClientResources;
  */
 class LettuceConnectionFactoryUnitTests {
 
-	private RedisClusterConfiguration clusterConfig;
+	private ValkeyClusterConfiguration clusterConfig;
 
 	@BeforeEach
 	void setUp() {
-		clusterConfig = new RedisClusterConfiguration().clusterNode("127.0.0.1", 6379).clusterNode("127.0.0.1", 6380);
+		clusterConfig = new ValkeyClusterConfiguration().clusterNode("127.0.0.1", 6379).clusterNode("127.0.0.1", 6380);
 	}
 
 	@AfterEach
@@ -101,7 +101,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		assertThat(getField(connectionFactory, "client")).isInstanceOf(RedisClusterClient.class);
+		assertThat(getField(connectionFactory, "client")).isInstanceOf(ValkeyClusterClient.class);
 	}
 
 	@Test // DATAREDIS-315
@@ -114,12 +114,12 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 			assertThat(uri.getTimeout()).isEqualTo(Duration.ofMillis(connectionFactory.getTimeout()));
 		}
 	}
@@ -127,7 +127,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-930
 	void portShouldBeReturnedProperlyBasedOnConfiguration() {
 
-		RedisConfiguration redisConfiguration = new RedisStandaloneConfiguration("localhost", 16379);
+		ValkeyConfiguration redisConfiguration = new ValkeyStandaloneConfiguration("localhost", 16379);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfiguration,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -136,9 +136,9 @@ class LettuceConnectionFactoryUnitTests {
 	}
 
 	@Test // DATAREDIS-930
-	void portShouldBeReturnedProperlyBasedOnCustomRedisConfiguration() {
+	void portShouldBeReturnedProperlyBasedOnCustomValkeyConfiguration() {
 
-		RedisConfiguration redisConfiguration = new CustomRedisConfiguration("localhost", 16379);
+		ValkeyConfiguration redisConfiguration = new CustomValkeyConfiguration("localhost", 16379);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfiguration,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -150,7 +150,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-930
 	void hostNameShouldBeReturnedProperlyBasedOnConfiguration() {
 
-		RedisConfiguration redisConfiguration = new RedisStandaloneConfiguration("external");
+		ValkeyConfiguration redisConfiguration = new ValkeyStandaloneConfiguration("external");
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfiguration,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -159,9 +159,9 @@ class LettuceConnectionFactoryUnitTests {
 	}
 
 	@Test // DATAREDIS-930
-	void hostNameShouldBeReturnedProperlyBasedOnCustomRedisConfiguration() {
+	void hostNameShouldBeReturnedProperlyBasedOnCustomValkeyConfiguration() {
 
-		RedisConfiguration redisConfiguration = new CustomRedisConfiguration("external");
+		ValkeyConfiguration redisConfiguration = new CustomValkeyConfiguration("external");
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfiguration,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -180,12 +180,12 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 			assertThat(uri.getPassword()).isEqualTo(connectionFactory.getPassword().toCharArray());
 		}
 	}
@@ -198,17 +198,17 @@ class LettuceConnectionFactoryUnitTests {
 		clusterConfig.setPassword("bar");
 
 		LettuceClientConfiguration clientConfiguration = LettuceTestClientConfiguration.builder()
-				.redisCredentialsProviderFactory(new RedisCredentialsProviderFactory() {}).build();
+				.redisCredentialsProviderFactory(new ValkeyCredentialsProviderFactory() {}).build();
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(clusterConfig, clientConfiguration);
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 
 			uri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 				assertThat(actual.getUsername()).isEqualTo("foo");
@@ -220,21 +220,21 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2376
 	void credentialsProviderShouldBeSetCorrectlyOnStandaloneClient() {
 
-		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost");
+		ValkeyStandaloneConfiguration config = new ValkeyStandaloneConfiguration("localhost");
 		config.setUsername("foo");
 		config.setPassword("bar");
 
 		LettuceClientConfiguration clientConfiguration = LettuceTestClientConfiguration.builder()
 				.clientResources(getSharedClientResources())
-				.redisCredentialsProviderFactory(new RedisCredentialsProviderFactory() {}).build();
+				.redisCredentialsProviderFactory(new ValkeyCredentialsProviderFactory() {}).build();
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config, clientConfiguration);
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI uri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI uri = (ValkeyURI) getField(client, "redisURI");
 
 		uri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 			assertThat(actual.getUsername()).isEqualTo("foo");
@@ -246,20 +246,20 @@ class LettuceConnectionFactoryUnitTests {
 	void passwordShouldNotBeSetOnSentinelClient() {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(
-				new RedisSentinelConfiguration("mymaster", Collections.singleton("host:1234")),
+				new ValkeySentinelConfiguration("mymaster", Collections.singleton("host:1234")),
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("o_O");
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.getPassword()).isEqualTo(connectionFactory.getPassword().toCharArray());
 
-		for (RedisURI sentinel : redisUri.getSentinels()) {
+		for (ValkeyURI sentinel : redisUri.getSentinels()) {
 			assertThat(sentinel.getPassword()).isNull();
 		}
 	}
@@ -267,7 +267,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-1060
 	void sentinelPasswordShouldBeSetOnSentinelClient() {
 
-		RedisSentinelConfiguration config = new RedisSentinelConfiguration("mymaster", Collections.singleton("host:1234"));
+		ValkeySentinelConfiguration config = new ValkeySentinelConfiguration("mymaster", Collections.singleton("host:1234"));
 		config.setSentinelPassword("sentinel-pwd");
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config,
@@ -276,14 +276,14 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.getPassword()).isEqualTo(connectionFactory.getPassword().toCharArray());
 
-		for (RedisURI sentinel : redisUri.getSentinels()) {
+		for (ValkeyURI sentinel : redisUri.getSentinels()) {
 			assertThat(sentinel.getPassword()).isEqualTo("sentinel-pwd".toCharArray());
 		}
 	}
@@ -291,29 +291,29 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2376
 	void sentinelCredentialsProviderShouldBeSetOnSentinelClient() {
 
-		RedisSentinelConfiguration config = new RedisSentinelConfiguration("mymaster", Collections.singleton("host:1234"));
+		ValkeySentinelConfiguration config = new ValkeySentinelConfiguration("mymaster", Collections.singleton("host:1234"));
 		config.setUsername("data-user");
 		config.setPassword("data-pwd");
 		config.setSentinelPassword("sentinel-pwd");
 
 		LettuceClientConfiguration clientConfiguration = LettuceTestClientConfiguration.builder()
-				.redisCredentialsProviderFactory(new RedisCredentialsProviderFactory() {}).build();
+				.redisCredentialsProviderFactory(new ValkeyCredentialsProviderFactory() {}).build();
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config, clientConfiguration);
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		redisUri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 			assertThat(actual.getUsername()).isEqualTo("data-user");
 			assertThat(new String(actual.getPassword())).isEqualTo("data-pwd");
 		}).verifyComplete();
 
-		for (RedisURI sentinelUri : redisUri.getSentinels()) {
+		for (ValkeyURI sentinelUri : redisUri.getSentinels()) {
 
 			sentinelUri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 				assertThat(actual.getUsername()).isNull();
@@ -325,7 +325,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-1060
 	void sentinelPasswordShouldNotLeakIntoDataNodeClient() {
 
-		RedisSentinelConfiguration config = new RedisSentinelConfiguration("mymaster", Collections.singleton("host:1234"));
+		ValkeySentinelConfiguration config = new ValkeySentinelConfiguration("mymaster", Collections.singleton("host:1234"));
 		config.setSentinelPassword("sentinel-pwd");
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config,
@@ -333,14 +333,14 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.getPassword()).isNull();
 
-		for (RedisURI sentinel : redisUri.getSentinels()) {
+		for (ValkeyURI sentinel : redisUri.getSentinels()) {
 			assertThat(sentinel.getPassword()).isEqualTo("sentinel-pwd".toCharArray());
 		}
 	}
@@ -354,22 +354,22 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 	}
 
 	@Test // DATAREDIS-480
 	void sslOptionsShouldBeDisabledByDefaultOnClient() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isSsl()).isFalse();
 		assertThat(connectionFactory.isUseSsl()).isFalse();
@@ -384,15 +384,15 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-476
 	void sslShouldBeSetCorrectlyOnClient() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.builder().useSsl().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isSsl()).isTrue();
 		assertThat(connectionFactory.isUseSsl()).isTrue();
@@ -405,16 +405,16 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-480
 	void verifyPeerOptionShouldBeSetCorrectlyOnClient() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.builder().useSsl().disablePeerVerification().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 		connectionFactory.start();
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isVerifyPeer()).isFalse();
 		assertThat(redisUri.getVerifyMode().equals(SslVerifyMode.NONE));
@@ -425,16 +425,16 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-480
 	void startTLSOptionShouldBeSetCorrectlyOnClient() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.builder().useSsl().startTls().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 		connectionFactory.start();
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isStartTls()).isTrue();
 		assertThat(connectionFactory.isStartTls()).isTrue();
@@ -443,17 +443,17 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-990
 	void sslShouldBeSetCorrectlyOnSentinelClient() {
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration("myMaster",
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration("myMaster",
 				Collections.singleton("localhost:1234"));
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(sentinelConfiguration,
 				LettuceTestClientConfiguration.builder().useSsl().startTls().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isSsl()).isTrue();
 		assertThat(connectionFactory.isUseSsl()).isTrue();
@@ -466,17 +466,17 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-990
 	void verifyPeerOptionShouldBeSetCorrectlyOnSentinelClient() {
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration("myMaster",
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration("myMaster",
 				Collections.singleton("localhost:1234"));
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(sentinelConfiguration,
 				LettuceTestClientConfiguration.builder().useSsl().disablePeerVerification().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isVerifyPeer()).isFalse();
 		assertThat(connectionFactory.isVerifyPeer()).isFalse();
@@ -486,17 +486,17 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-990
 	void startTLSOptionShouldBeSetCorrectlyOnSentinelClient() {
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration("myMaster",
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration("myMaster",
 				Collections.singleton("localhost:1234"));
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(sentinelConfiguration,
 				LettuceTestClientConfiguration.builder().useSsl().startTls().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.isStartTls()).isTrue();
 		assertThat(connectionFactory.isStartTls()).isTrue();
@@ -506,17 +506,17 @@ class LettuceConnectionFactoryUnitTests {
 	void sslShouldBeSetCorrectlyOnClusterClient() {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(
-				new RedisClusterConfiguration().clusterNode(CLUSTER_NODE_1),
+				new ValkeyClusterConfiguration().clusterNode(CLUSTER_NODE_1),
 				LettuceTestClientConfiguration.builder().useSsl().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 			assertThat(uri.isSsl()).isTrue();
 		}
 	}
@@ -525,17 +525,17 @@ class LettuceConnectionFactoryUnitTests {
 	void startTLSOptionShouldBeSetCorrectlyOnClusterClient() {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(
-				new RedisClusterConfiguration().clusterNode(CLUSTER_NODE_1),
+				new ValkeyClusterConfiguration().clusterNode(CLUSTER_NODE_1),
 				LettuceTestClientConfiguration.builder().useSsl().startTls().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 			assertThat(uri.isStartTls()).isTrue();
 		}
 	}
@@ -544,17 +544,17 @@ class LettuceConnectionFactoryUnitTests {
 	void verifyPeerTLSOptionShouldBeSetCorrectlyOnClusterClient() {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(
-				new RedisClusterConfiguration().clusterNode(CLUSTER_NODE_1),
+				new ValkeyClusterConfiguration().clusterNode(CLUSTER_NODE_1),
 				LettuceTestClientConfiguration.builder().useSsl().startTls().build());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClusterClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClusterClient.class);
 
-		Iterable<RedisURI> initialUris = (Iterable<RedisURI>) getField(client, "initialUris");
+		Iterable<ValkeyURI> initialUris = (Iterable<ValkeyURI>) getField(client, "initialUris");
 
-		for (RedisURI uri : initialUris) {
+		for (ValkeyURI uri : initialUris) {
 			assertThat(uri.isVerifyPeer()).isTrue();
 			assertThat(uri.getVerifyMode().equals(SslVerifyMode.FULL));
 		}
@@ -563,15 +563,15 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-682
 	void socketShouldBeSetOnStandaloneClient() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisSocketConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeySocketConfiguration(),
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.getSocket()).isEqualTo("/tmp/redis.sock");
 	}
@@ -579,8 +579,8 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReadStandalonePassword() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -591,22 +591,22 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteStandalonePassword() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadSentinelPassword() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -617,36 +617,36 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteSentinelPassword() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-682
 	void shouldWriteSocketPassword() {
 
-		RedisSocketConfiguration envConfig = new RedisSocketConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeySocketConfiguration envConfig = new ValkeySocketConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadClusterPassword() {
 
-		RedisClusterConfiguration envConfig = new RedisClusterConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyClusterConfiguration envConfig = new ValkeyClusterConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
@@ -657,21 +657,21 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteClusterPassword() {
 
-		RedisClusterConfiguration envConfig = new RedisClusterConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyClusterConfiguration envConfig = new ValkeyClusterConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadStandaloneDatabaseIndex() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
 		envConfig.setDatabase(2);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
@@ -683,7 +683,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteStandaloneDatabaseIndex() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
 		envConfig.setDatabase(2);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
@@ -697,7 +697,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReadSentinelDatabaseIndex() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
 		envConfig.setDatabase(2);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
@@ -709,7 +709,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteSentinelDatabaseIndex() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
 		envConfig.setDatabase(2);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
@@ -723,7 +723,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-682
 	void shouldWriteSocketDatabaseIndex() {
 
-		RedisSocketConfiguration envConfig = new RedisSocketConfiguration();
+		ValkeySocketConfiguration envConfig = new ValkeySocketConfiguration();
 		envConfig.setDatabase(2);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(envConfig,
@@ -750,7 +750,7 @@ class LettuceConnectionFactoryUnitTests {
 				.shutdownTimeout(Duration.ofHours(2)) //
 				.build();
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				configuration);
 
 		assertThat(connectionFactory.getClientConfiguration()).isEqualTo(configuration);
@@ -767,7 +767,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnStandaloneConfiguration() {
 
-		RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration configuration = new ValkeyStandaloneConfiguration();
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(configuration,
 				LettuceTestClientConfiguration.defaultConfiguration());
 
@@ -779,7 +779,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-682
 	void shouldReturnSocketConfiguration() {
 
-		RedisSocketConfiguration configuration = new RedisSocketConfiguration("/var/redis/socket");
+		ValkeySocketConfiguration configuration = new ValkeySocketConfiguration("/var/redis/socket");
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(configuration,
 				LettuceTestClientConfiguration.defaultConfiguration());
 
@@ -792,7 +792,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnSentinelConfiguration() {
 
-		RedisSentinelConfiguration configuration = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration configuration = new ValkeySentinelConfiguration();
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(configuration,
 				LettuceTestClientConfiguration.defaultConfiguration());
 
@@ -804,7 +804,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnClusterConfiguration() {
 
-		RedisClusterConfiguration configuration = new RedisClusterConfiguration();
+		ValkeyClusterConfiguration configuration = new ValkeyClusterConfiguration();
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(configuration,
 				LettuceTestClientConfiguration.defaultConfiguration());
 
@@ -816,7 +816,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldDenyChangesToImmutableClientConfiguration() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.defaultConfiguration());
 
 		assertThatIllegalStateException().isThrownBy(() -> connectionFactory.setUseSsl(false));
@@ -833,7 +833,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		RedisClusterConnection clusterConnection = connectionFactory.getClusterConnection();
+		ValkeyClusterConnection clusterConnection = connectionFactory.getClusterConnection();
 		assertThat(getField(clusterConnection, "timeout")).isEqualTo(2000L);
 
 		clusterConnection.close();
@@ -849,7 +849,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		RedisClusterConnection clusterConnection = connectionFactory.getClusterConnection();
+		ValkeyClusterConnection clusterConnection = connectionFactory.getClusterConnection();
 		assertThat(getField(clusterConnection, "timeout")).isEqualTo(2000L);
 
 		clusterConnection.close();
@@ -858,8 +858,8 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-731
 	void shouldShareNativeConnectionWithCluster() {
 
-		RedisClusterClient clientMock = mock(RedisClusterClient.class);
-		StatefulRedisClusterConnection<byte[], byte[]> connectionMock = mock(StatefulRedisClusterConnection.class);
+		ValkeyClusterClient clientMock = mock(ValkeyClusterClient.class);
+		StatefulValkeyClusterConnection<byte[], byte[]> connectionMock = mock(StatefulValkeyClusterConnection.class);
 		when(clientMock.connectAsync(ByteArrayCodec.INSTANCE))
 				.thenReturn(CompletableFuture.completedFuture(connectionMock));
 
@@ -867,7 +867,7 @@ class LettuceConnectionFactoryUnitTests {
 				LettuceTestClientConfiguration.defaultConfiguration()) {
 
 			@Override
-			protected AbstractRedisClient createClient() {
+			protected AbstractValkeyClient createClient() {
 				return clientMock;
 			}
 		};
@@ -880,15 +880,15 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.getClusterConnection().close();
 		connectionFactory.getClusterConnection().close();
 
-		verify(clientMock).connectAsync(ArgumentMatchers.any(RedisCodec.class));
+		verify(clientMock).connectAsync(ArgumentMatchers.any(ValkeyCodec.class));
 	}
 
 	@Test // DATAREDIS-950
 	void shouldValidateSharedClusterConnection() {
 
-		RedisClusterClient clientMock = mock(RedisClusterClient.class);
-		StatefulRedisClusterConnection<byte[], byte[]> connectionMock = mock(StatefulRedisClusterConnection.class);
-		RedisAdvancedClusterCommands<byte[], byte[]> syncMock = mock(RedisAdvancedClusterCommands.class);
+		ValkeyClusterClient clientMock = mock(ValkeyClusterClient.class);
+		StatefulValkeyClusterConnection<byte[], byte[]> connectionMock = mock(StatefulValkeyClusterConnection.class);
+		ValkeyAdvancedClusterCommands<byte[], byte[]> syncMock = mock(ValkeyAdvancedClusterCommands.class);
 		when(clientMock.connectAsync(ByteArrayCodec.INSTANCE))
 				.thenReturn(CompletableFuture.completedFuture(connectionMock));
 		when(connectionMock.isOpen()).thenReturn(true);
@@ -898,7 +898,7 @@ class LettuceConnectionFactoryUnitTests {
 				LettuceTestClientConfiguration.defaultConfiguration()) {
 
 			@Override
-			protected AbstractRedisClient createClient() {
+			protected AbstractValkeyClient createClient() {
 				return clientMock;
 			}
 		};
@@ -907,7 +907,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			connection.ping();
 		}
 
@@ -917,8 +917,8 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-953
 	void shouldReleaseSharedConnectionOnlyOnce() {
 
-		RedisClusterClient clientMock = mock(RedisClusterClient.class);
-		StatefulRedisClusterConnection<byte[], byte[]> connectionMock = mock(StatefulRedisClusterConnection.class);
+		ValkeyClusterClient clientMock = mock(ValkeyClusterClient.class);
+		StatefulValkeyClusterConnection<byte[], byte[]> connectionMock = mock(StatefulValkeyClusterConnection.class);
 		when(clientMock.connectAsync(ByteArrayCodec.INSTANCE))
 				.thenReturn(CompletableFuture.completedFuture(connectionMock));
 		when(connectionMock.isOpen()).thenReturn(false);
@@ -928,7 +928,7 @@ class LettuceConnectionFactoryUnitTests {
 				LettuceTestClientConfiguration.defaultConfiguration()) {
 
 			@Override
-			protected AbstractRedisClient createClient() {
+			protected AbstractValkeyClient createClient() {
 				return clientMock;
 			}
 		};
@@ -947,15 +947,15 @@ class LettuceConnectionFactoryUnitTests {
 	void shouldEagerlyInitializeSharedConnection() {
 
 		LettuceConnectionProvider connectionProviderMock = mock(LettuceConnectionProvider.class);
-		StatefulRedisConnection connectionMock = mock(StatefulRedisConnection.class);
+		StatefulValkeyConnection connectionMock = mock(StatefulValkeyConnection.class);
 
 		when(connectionProviderMock.getConnectionAsync(any()))
 				.thenReturn(CompletableFuture.completedFuture(connectionMock));
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory() {
 			@Override
-			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractRedisClient client,
-					RedisCodec<?, ?> codec) {
+			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractValkeyClient client,
+					ValkeyCodec<?, ?> codec) {
 				return connectionProviderMock;
 			}
 		};
@@ -977,8 +977,8 @@ class LettuceConnectionFactoryUnitTests {
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory() {
 			@Override
-			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractRedisClient client,
-					RedisCodec<?, ?> codec) {
+			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractValkeyClient client,
+					ValkeyCodec<?, ?> codec) {
 				return connectionProviderMock;
 			}
 		};
@@ -986,7 +986,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		assertThatExceptionOfType(RedisConnectionFailureException.class)
+		assertThatExceptionOfType(ValkeyConnectionFailureException.class)
 				.isThrownBy(() -> connectionFactory.getConnection().ping()).withCauseInstanceOf(PoolException.class);
 	}
 
@@ -997,8 +997,8 @@ class LettuceConnectionFactoryUnitTests {
 				withSettings().extraInterfaces(DisposableBean.class));
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory() {
 			@Override
-			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractRedisClient client,
-					RedisCodec<?, ?> codec) {
+			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractValkeyClient client,
+					ValkeyCodec<?, ?> codec) {
 				return connectionProviderMock;
 			}
 		};
@@ -1014,7 +1014,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-842
 	void databaseShouldBeSetCorrectlyOnSentinelClient() {
 
-		RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration("mymaster",
+		ValkeySentinelConfiguration redisSentinelConfiguration = new ValkeySentinelConfiguration("mymaster",
 				Collections.singleton("host:1234"));
 		redisSentinelConfiguration.setDatabase(1);
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisSentinelConfiguration,
@@ -1023,10 +1023,10 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
-		assertThat(client).isInstanceOf(RedisClient.class);
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
+		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		RedisURI redisUri = (RedisURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
 
 		assertThat(redisUri.getDatabase()).isEqualTo(1);
 	}
@@ -1034,7 +1034,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-949
 	void maxRedirectsShouldBeSetOnClientOptions() {
 
-		RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+		ValkeyClusterConfiguration clusterConfiguration = new ValkeyClusterConfiguration();
 		clusterConfiguration.clusterNode("localhost", 1234).setMaxRedirects(42);
 
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(clusterConfiguration,
@@ -1042,7 +1042,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		RedisClusterClient client = (RedisClusterClient) getField(connectionFactory, "client");
+		ValkeyClusterClient client = (ValkeyClusterClient) getField(connectionFactory, "client");
 
 		ClusterClientOptions options = (ClusterClientOptions) client.getOptions();
 
@@ -1054,7 +1054,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // DATAREDIS-949
 	void maxRedirectsShouldBeSetOnClusterClientOptions() {
 
-		RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+		ValkeyClusterConfiguration clusterConfiguration = new ValkeyClusterConfiguration();
 		clusterConfiguration.clusterNode("localhost", 1234).setMaxRedirects(42);
 
 		LettuceClientConfiguration clientConfiguration = LettuceTestClientConfiguration.builder()
@@ -1065,7 +1065,7 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		ConnectionFactoryTracker.add(connectionFactory);
 
-		RedisClusterClient client = (RedisClusterClient) getField(connectionFactory, "client");
+		ValkeyClusterClient client = (ValkeyClusterClient) getField(connectionFactory, "client");
 
 		ClusterClientOptions options = (ClusterClientOptions) client.getOptions();
 
@@ -1075,7 +1075,7 @@ class LettuceConnectionFactoryUnitTests {
 	}
 
 	@Test // DATAREDIS-1142
-	void shouldFallbackToReactiveRedisClusterConnectionWhenGetReactiveConnectionWithClusterConfig() {
+	void shouldFallbackToReactiveValkeyClusterConnectionWhenGetReactiveConnectionWithClusterConfig() {
 
 		LettuceConnectionProvider connectionProviderMock = mock(LettuceConnectionProvider.class);
 		StatefulConnection<?, ?> statefulConnection = mock(StatefulConnection.class);
@@ -1083,8 +1083,8 @@ class LettuceConnectionFactoryUnitTests {
 		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(clusterConfig) {
 
 			@Override
-			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractRedisClient client,
-					RedisCodec<?, ?> codec) {
+			protected LettuceConnectionProvider doCreateConnectionProvider(AbstractValkeyClient client,
+					ValkeyCodec<?, ?> codec) {
 				return connectionProviderMock;
 			}
 		};
@@ -1092,9 +1092,9 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		LettuceReactiveRedisConnection reactiveConnection = connectionFactory.getReactiveConnection();
+		LettuceReactiveValkeyConnection reactiveConnection = connectionFactory.getReactiveConnection();
 
-		assertThat(reactiveConnection).isInstanceOf(LettuceReactiveRedisClusterConnection.class);
+		assertThat(reactiveConnection).isInstanceOf(LettuceReactiveValkeyClusterConnection.class);
 	}
 
 	@Test // GH-1745
@@ -1105,14 +1105,14 @@ class LettuceConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		assertThat(connectionFactory.getNativeClient()).isInstanceOf(RedisClient.class);
+		assertThat(connectionFactory.getNativeClient()).isInstanceOf(ValkeyClient.class);
 
 		connectionFactory = new LettuceConnectionFactory(clusterConfig);
 		connectionFactory.setClientResources(getSharedClientResources());
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		assertThat(connectionFactory.getRequiredNativeClient()).isInstanceOf(RedisClusterClient.class);
+		assertThat(connectionFactory.getRequiredNativeClient()).isInstanceOf(ValkeyClusterClient.class);
 	}
 
 	@Test // GH-1745
@@ -1137,106 +1137,106 @@ class LettuceConnectionFactoryUnitTests {
 	}
 
 	@Test // GH-2116
-	void createRedisConfigurationRequiresRedisUri() {
+	void createValkeyConfigurationRequiresValkeyUri() {
 
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> LettuceConnectionFactory.createRedisConfiguration((RedisURI) null))
-				.withMessage("RedisURI must not be null");
+				.isThrownBy(() -> LettuceConnectionFactory.createValkeyConfiguration((ValkeyURI) null))
+				.withMessage("ValkeyURI must not be null");
 	}
 
 	@Test // GH-2116
-	void createMinimalRedisStandaloneConfiguration() {
+	void createMinimalValkeyStandaloneConfiguration() {
 
-		RedisURI redisURI = RedisURI.create("redis://myserver");
+		ValkeyURI redisURI = ValkeyURI.create("redis://myserver");
 
-		RedisStandaloneConfiguration expected = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration expected = new ValkeyStandaloneConfiguration();
 		expected.setHostName("myserver");
 
-		RedisConfiguration configuration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration configuration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(configuration).isEqualTo(expected);
 	}
 
 	@Test // GH-2116
-	void createFullRedisStanaloneConfiguration() {
+	void createFullValkeyStanaloneConfiguration() {
 
-		RedisURI redisURI = RedisURI.create("redis://fooUser:fooPass@myserver1:111/7");
+		ValkeyURI redisURI = ValkeyURI.create("redis://fooUser:fooPass@myserver1:111/7");
 
-		RedisStandaloneConfiguration expected = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration expected = new ValkeyStandaloneConfiguration();
 		expected.setHostName("myserver1");
 		expected.setPort(111);
 		expected.setDatabase(7);
 		expected.setUsername("fooUser");
 		expected.setPassword("fooPass");
 
-		RedisConfiguration configuration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration configuration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(configuration).isEqualTo(expected);
 	}
 
 	@Test // GH-2116
-	void createMinimalRedisSocketConfiguration() {
+	void createMinimalValkeySocketConfiguration() {
 
-		RedisURI redisURI = RedisURI.Builder.socket("mysocket").build();
+		ValkeyURI redisURI = ValkeyURI.Builder.socket("mysocket").build();
 
-		RedisSocketConfiguration expected = new RedisSocketConfiguration();
+		ValkeySocketConfiguration expected = new ValkeySocketConfiguration();
 		expected.setSocket("mysocket");
 
-		RedisConfiguration socketConfiguration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration socketConfiguration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(socketConfiguration).isEqualTo(expected);
 	}
 
 	@Test // GH-2116
-	void createFullRedisSocketConfiguration() {
+	void createFullValkeySocketConfiguration() {
 
-		RedisURI redisURI = RedisURI.Builder.socket("mysocket").withAuthentication("fooUser", "fooPass".toCharArray())
+		ValkeyURI redisURI = ValkeyURI.Builder.socket("mysocket").withAuthentication("fooUser", "fooPass".toCharArray())
 				.withDatabase(7).build();
 
-		RedisSocketConfiguration expected = new RedisSocketConfiguration();
+		ValkeySocketConfiguration expected = new ValkeySocketConfiguration();
 		expected.setSocket("mysocket");
 		expected.setUsername("fooUser");
 		expected.setPassword("fooPass");
 		expected.setDatabase(7);
 
-		RedisConfiguration socketConfiguration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration socketConfiguration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(socketConfiguration).isEqualTo(expected);
 	}
 
 	@Test // GH-2116
-	void createMinimalRedisSentinelConfiguration() {
+	void createMinimalValkeySentinelConfiguration() {
 
-		RedisURI redisURI = RedisURI.create("redis-sentinel://myserver?sentinelMasterId=5150");
+		ValkeyURI redisURI = ValkeyURI.create("redis-sentinel://myserver?sentinelMasterId=5150");
 
-		RedisSentinelConfiguration expected = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration expected = new ValkeySentinelConfiguration();
 		expected.setMaster("5150");
-		expected.addSentinel(new RedisNode("myserver", 26379));
+		expected.addSentinel(new ValkeyNode("myserver", 26379));
 
-		RedisConfiguration sentinelConfiguration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration sentinelConfiguration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(sentinelConfiguration).isEqualTo(expected);
 	}
 
 	@Test // GH-2116
-	void createFullRedisSentinelConfiguration() {
+	void createFullValkeySentinelConfiguration() {
 
-		RedisURI redisURI = RedisURI
+		ValkeyURI redisURI = ValkeyURI
 				.create("redis-sentinel://fooUser:fooPass@myserver1:111,myserver2:222/7?sentinelMasterId=5150");
 		// Set the passwords directly on the sentinels so that it gets picked up by converter
 		char[] sentinelPass = "changeme".toCharArray();
-		redisURI.getSentinels().forEach(sentinelRedisUri -> sentinelRedisUri.setPassword(sentinelPass));
+		redisURI.getSentinels().forEach(sentinelValkeyUri -> sentinelValkeyUri.setPassword(sentinelPass));
 
-		RedisSentinelConfiguration expected = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration expected = new ValkeySentinelConfiguration();
 		expected.setMaster("5150");
 		expected.setDatabase(7);
 		expected.setUsername("fooUser");
 		expected.setPassword("fooPass");
 		expected.setSentinelPassword(sentinelPass);
-		expected.addSentinel(new RedisNode("myserver1", 111));
-		expected.addSentinel(new RedisNode("myserver2", 222));
+		expected.addSentinel(new ValkeyNode("myserver1", 111));
+		expected.addSentinel(new ValkeyNode("myserver2", 222));
 
-		RedisConfiguration configuration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
+		ValkeyConfiguration configuration = LettuceConnectionFactory.createValkeyConfiguration(redisURI);
 
 		assertThat(configuration).isEqualTo(expected);
 	}
@@ -1251,32 +1251,32 @@ class LettuceConnectionFactoryUnitTests {
 	}
 
 	@Test // GH-2594
-	void createRedisConfigurationWithNullInvalidRedisUriString() {
+	void createValkeyConfigurationWithNullInvalidValkeyUriString() {
 
 		Arrays.asList("  ", "", null)
 				.forEach(redisUri -> assertThatIllegalArgumentException()
-						.isThrownBy(() -> LettuceConnectionFactory.createRedisConfiguration(redisUri))
-						.withMessage("RedisURI must not be null or empty").withNoCause());
+						.isThrownBy(() -> LettuceConnectionFactory.createValkeyConfiguration(redisUri))
+						.withMessage("ValkeyURI must not be null or empty").withNoCause());
 	}
 
 	@Test // GH-2594
-	void createRedisConfigurationWithValidRedisUriString() {
+	void createValkeyConfigurationWithValidValkeyUriString() {
 
-		RedisConfiguration redisConfiguration = LettuceConnectionFactory.createRedisConfiguration("redis://skullbox:6789");
+		ValkeyConfiguration redisConfiguration = LettuceConnectionFactory.createValkeyConfiguration("redis://skullbox:6789");
 
-		assertThat(redisConfiguration).isInstanceOf(RedisStandaloneConfiguration.class);
+		assertThat(redisConfiguration).isInstanceOf(ValkeyStandaloneConfiguration.class);
 
-		assertThat(redisConfiguration).asInstanceOf(InstanceOfAssertFactories.type(RedisStandaloneConfiguration.class))
-				.extracting(RedisStandaloneConfiguration::getHostName).isEqualTo("skullbox");
+		assertThat(redisConfiguration).asInstanceOf(InstanceOfAssertFactories.type(ValkeyStandaloneConfiguration.class))
+				.extracting(ValkeyStandaloneConfiguration::getHostName).isEqualTo("skullbox");
 
-		assertThat(redisConfiguration).asInstanceOf(InstanceOfAssertFactories.type(RedisStandaloneConfiguration.class))
-				.extracting(RedisStandaloneConfiguration::getPort).isEqualTo(6789);
+		assertThat(redisConfiguration).asInstanceOf(InstanceOfAssertFactories.type(ValkeyStandaloneConfiguration.class))
+				.extracting(ValkeyStandaloneConfiguration::getPort).isEqualTo(6789);
 	}
 
 	@Test // GH-2866
 	void earlyStartupDoesNotStartConnectionFactory() {
 
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.defaultConfiguration());
 		connectionFactory.setEarlyStartup(false);
 		connectionFactory.afterPropertiesSet();
@@ -1285,20 +1285,20 @@ class LettuceConnectionFactoryUnitTests {
 		assertThat(connectionFactory.isAutoStartup()).isTrue();
 		assertThat(connectionFactory.isRunning()).isFalse();
 
-		AbstractRedisClient client = (AbstractRedisClient) getField(connectionFactory, "client");
+		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isNull();
 	}
 
-	static class CustomRedisConfiguration implements RedisConfiguration, WithHostAndPort {
+	static class CustomValkeyConfiguration implements ValkeyConfiguration, WithHostAndPort {
 
 		private String hostName;
 		private int port;
 
-		CustomRedisConfiguration(String hostName) {
+		CustomValkeyConfiguration(String hostName) {
 			this(hostName, 6379);
 		}
 
-		CustomRedisConfiguration(String hostName, int port) {
+		CustomValkeyConfiguration(String hostName, int port) {
 			this.hostName = hostName;
 			this.port = port;
 		}
@@ -1330,7 +1330,7 @@ class LettuceConnectionFactoryUnitTests {
 				return true;
 			}
 
-			if (!(obj instanceof CustomRedisConfiguration that)) {
+			if (!(obj instanceof CustomValkeyConfiguration that)) {
 				return false;
 			}
 
@@ -1345,7 +1345,7 @@ class LettuceConnectionFactoryUnitTests {
 		@Override
 		public String toString() {
 
-			return "CustomRedisConfiguration{" + "hostName='" + hostName + '\'' + ", port=" + port + '}';
+			return "CustomValkeyConfiguration{" + "hostName='" + hostName + '\'' + ", port=" + port + '}';
 		}
 	}
 }

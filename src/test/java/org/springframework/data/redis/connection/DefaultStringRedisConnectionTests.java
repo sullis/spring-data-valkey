@@ -42,14 +42,14 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.connection.RedisServerCommands.ShutdownOption;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
-import org.springframework.data.redis.connection.RedisStringCommands.BitOperation;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.connection.ValkeyServerCommands.ShutdownOption;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyStringCommands.BitOperation;
+import org.springframework.data.redis.connection.StringValkeyConnection.StringTuple;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ReadOffset;
@@ -61,10 +61,10 @@ import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
 /**
- * Unit test of {@link DefaultStringRedisConnection}
+ * Unit test of {@link DefaultStringValkeyConnection}
  *
  * @author Jennifer Hickey
  * @author Christoph Strobl
@@ -75,15 +75,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class DefaultStringRedisConnectionTests {
+public class DefaultStringValkeyConnectionTests {
 
 	protected List<Object> actual = new ArrayList<>();
 
-	RedisConnection nativeConnection;
+	ValkeyConnection nativeConnection;
 
-	protected DefaultStringRedisConnection connection;
+	protected DefaultStringValkeyConnection connection;
 
-	protected StringRedisSerializer serializer = StringRedisSerializer.UTF_8;
+	protected StringValkeySerializer serializer = StringValkeySerializer.UTF_8;
 
 	protected String foo = "foo";
 
@@ -124,8 +124,8 @@ public class DefaultStringRedisConnectionTests {
 	@BeforeEach
 	public void setUp() {
 
-		this.nativeConnection = mock(RedisConnection.class);
-		this.connection = new DefaultStringRedisConnection(nativeConnection);
+		this.nativeConnection = mock(ValkeyConnection.class);
+		this.connection = new DefaultStringValkeyConnection(nativeConnection);
 		bytesMap.put(fooBytes, barBytes);
 		stringMap.put(foo, bar);
 		points.add(point);

@@ -15,12 +15,12 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import static org.springframework.data.redis.connection.RedisGeoCommands.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.*;
 import static org.springframework.data.redis.domain.geo.GeoReference.*;
 
 import io.lettuce.core.*;
 import io.lettuce.core.cluster.models.partitions.Partitions;
-import io.lettuce.core.cluster.models.partitions.RedisClusterNode.NodeFlag;
+import io.lettuce.core.cluster.models.partitions.ValkeyClusterNode.NodeFlag;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -40,22 +40,22 @@ import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldInc
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldSet;
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldSubCommand;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisClusterNode.Flag;
-import org.springframework.data.redis.connection.RedisClusterNode.LinkState;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
-import org.springframework.data.redis.connection.RedisListCommands.Direction;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.connection.RedisNode.NodeType;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyClusterNode.Flag;
+import org.springframework.data.redis.connection.ValkeyClusterNode.LinkState;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyListCommands.Direction;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.connection.ValkeyNode.NodeType;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.connection.SortParameters.Order;
 import org.springframework.data.redis.connection.convert.Converters;
-import org.springframework.data.redis.connection.convert.StringToRedisClientInfoConverter;
+import org.springframework.data.redis.connection.convert.StringToValkeyClientInfoConverter;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.KeyScanOptions;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.domain.geo.BoundingBox;
 import org.springframework.data.redis.domain.geo.BoxShape;
 import org.springframework.data.redis.domain.geo.GeoReference;
@@ -106,8 +106,8 @@ public abstract class LettuceConverters extends Converters {
 				: null;
 	}
 
-	public static Converter<String, List<RedisClientInfo>> stringToRedisClientListConverter() {
-		return LettuceConverters::toListOfRedisClientInformation;
+	public static Converter<String, List<ValkeyClientInfo>> stringToValkeyClientListConverter() {
+		return LettuceConverters::toListOfValkeyClientInformation;
 	}
 
 	public static Converter<List<ScoredValue<byte[]>>, List<Tuple>> scoredValuesToTupleList() {
@@ -260,13 +260,13 @@ public abstract class LettuceConverters extends Converters {
 		return args;
 	}
 
-	public static List<RedisClientInfo> toListOfRedisClientInformation(String clientList) {
+	public static List<ValkeyClientInfo> toListOfValkeyClientInformation(String clientList) {
 
 		if (!StringUtils.hasText(clientList)) {
 			return Collections.emptyList();
 		}
 
-		return StringToRedisClientInfoConverter.INSTANCE.convert(clientList.split("\\r?\\n"));
+		return StringToValkeyClientInfoConverter.INSTANCE.convert(clientList.split("\\r?\\n"));
 	}
 
 	/**
@@ -281,7 +281,7 @@ public abstract class LettuceConverters extends Converters {
 	}
 
 	/**
-	 * Convert a {@link org.springframework.data.redis.connection.RedisZSetCommands.Range} to a lettuce {@link Range}.
+	 * Convert a {@link org.springframework.data.redis.connection.ValkeyZSetCommands.Range} to a lettuce {@link Range}.
 	 *
 	 * @since 2.0
 	 */
@@ -326,19 +326,19 @@ public abstract class LettuceConverters extends Converters {
 	/**
 	 * @param source List of Maps containing node details from SENTINEL REPLICAS or SENTINEL MASTERS. May be empty or
 	 *          {@literal null}.
-	 * @return List of {@link RedisServer}'s. List is empty if List of Maps is empty.
+	 * @return List of {@link ValkeyServer}'s. List is empty if List of Maps is empty.
 	 * @since 1.5
 	 */
-	public static List<RedisServer> toListOfRedisServer(List<Map<String, String>> source) {
+	public static List<ValkeyServer> toListOfValkeyServer(List<Map<String, String>> source) {
 
 		if (CollectionUtils.isEmpty(source)) {
 			return Collections.emptyList();
 		}
 
-		List<RedisServer> sentinels = new ArrayList<>();
+		List<ValkeyServer> sentinels = new ArrayList<>();
 
 		for (Map<String, String> info : source) {
-			sentinels.add(RedisServer.newServerFrom(Converters.toProperties(info)));
+			sentinels.add(ValkeyServer.newServerFrom(Converters.toProperties(info)));
 		}
 
 		return sentinels;
@@ -347,20 +347,20 @@ public abstract class LettuceConverters extends Converters {
 	/**
 	 * @param sentinelConfiguration the sentinel configuration containing one or more sentinels and a master name. Must
 	 *          not be {@literal null}
-	 * @return A {@link RedisURI} containing Redis Sentinel addresses of {@link RedisSentinelConfiguration}
+	 * @return A {@link ValkeyURI} containing Valkey Sentinel addresses of {@link ValkeySentinelConfiguration}
 	 * @since 1.5
 	 */
-	public static RedisURI sentinelConfigurationToRedisURI(RedisSentinelConfiguration sentinelConfiguration) {
+	public static ValkeyURI sentinelConfigurationToValkeyURI(ValkeySentinelConfiguration sentinelConfiguration) {
 
-		Assert.notNull(sentinelConfiguration, "RedisSentinelConfiguration is required");
+		Assert.notNull(sentinelConfiguration, "ValkeySentinelConfiguration is required");
 
-		Set<RedisNode> sentinels = sentinelConfiguration.getSentinels();
-		RedisPassword sentinelPassword = sentinelConfiguration.getSentinelPassword();
-		RedisURI.Builder builder = RedisURI.builder();
+		Set<ValkeyNode> sentinels = sentinelConfiguration.getSentinels();
+		ValkeyPassword sentinelPassword = sentinelConfiguration.getSentinelPassword();
+		ValkeyURI.Builder builder = ValkeyURI.builder();
 
-		for (RedisNode sentinel : sentinels) {
+		for (ValkeyNode sentinel : sentinels) {
 
-			RedisURI.Builder sentinelBuilder = RedisURI.Builder.redis(sentinel.getHost(), sentinel.getPort());
+			ValkeyURI.Builder sentinelBuilder = ValkeyURI.Builder.redis(sentinel.getHost(), sentinel.getPort());
 
 			String sentinelUsername = sentinelConfiguration.getSentinelUsername();
 			if (StringUtils.hasText(sentinelUsername) && sentinelPassword.isPresent()) {
@@ -374,7 +374,7 @@ public abstract class LettuceConverters extends Converters {
 		}
 
 		String username = sentinelConfiguration.getUsername();
-		RedisPassword password = sentinelConfiguration.getPassword();
+		ValkeyPassword password = sentinelConfiguration.getPassword();
 
 		if (StringUtils.hasText(username) && password.isPresent()) {
 			// See https://github.com/lettuce-io/lettuce-core/issues/1404
@@ -389,15 +389,15 @@ public abstract class LettuceConverters extends Converters {
 	}
 
 	/**
-	 * Converts a {@link RedisURI} to its corresponding {@link RedisStandaloneConfiguration}.
+	 * Converts a {@link ValkeyURI} to its corresponding {@link ValkeyStandaloneConfiguration}.
 	 *
-	 * @param redisURI the uri containing the Redis connection info
-	 * @return a {@link RedisStandaloneConfiguration} representing the connection information in the Redis URI.
+	 * @param redisURI the uri containing the Valkey connection info
+	 * @return a {@link ValkeyStandaloneConfiguration} representing the connection information in the Valkey URI.
 	 * @since 2.5.3
 	 */
-	static RedisStandaloneConfiguration createRedisStandaloneConfiguration(RedisURI redisURI) {
+	static ValkeyStandaloneConfiguration createValkeyStandaloneConfiguration(ValkeyURI redisURI) {
 
-		RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration standaloneConfiguration = new ValkeyStandaloneConfiguration();
 
 		standaloneConfiguration.setHostName(redisURI.getHost());
 		standaloneConfiguration.setPort(redisURI.getPort());
@@ -409,15 +409,15 @@ public abstract class LettuceConverters extends Converters {
 	}
 
 	/**
-	 * Converts a {@link RedisURI} to its corresponding {@link RedisSocketConfiguration}.
+	 * Converts a {@link ValkeyURI} to its corresponding {@link ValkeySocketConfiguration}.
 	 *
-	 * @param redisURI the uri containing the Redis connection info using a local unix domain socket
-	 * @return a {@link RedisSocketConfiguration} representing the connection information in the Redis URI.
+	 * @param redisURI the uri containing the Valkey connection info using a local unix domain socket
+	 * @return a {@link ValkeySocketConfiguration} representing the connection information in the Valkey URI.
 	 * @since 2.5.3
 	 */
-	static RedisSocketConfiguration createRedisSocketConfiguration(RedisURI redisURI) {
+	static ValkeySocketConfiguration createValkeySocketConfiguration(ValkeyURI redisURI) {
 
-		RedisSocketConfiguration socketConfiguration = new RedisSocketConfiguration();
+		ValkeySocketConfiguration socketConfiguration = new ValkeySocketConfiguration();
 
 		socketConfiguration.setSocket(redisURI.getSocket());
 		socketConfiguration.setDatabase(redisURI.getDatabase());
@@ -428,15 +428,15 @@ public abstract class LettuceConverters extends Converters {
 	}
 
 	/**
-	 * Converts a {@link RedisURI} to its corresponding {@link RedisSentinelConfiguration}.
+	 * Converts a {@link ValkeyURI} to its corresponding {@link ValkeySentinelConfiguration}.
 	 *
-	 * @param redisURI the uri containing the Redis Sentinel connection info
-	 * @return a {@link RedisSentinelConfiguration} representing the Redis Sentinel information in the Redis URI.
+	 * @param redisURI the uri containing the Valkey Sentinel connection info
+	 * @return a {@link ValkeySentinelConfiguration} representing the Valkey Sentinel information in the Valkey URI.
 	 * @since 2.5.3
 	 */
-	static RedisSentinelConfiguration createRedisSentinelConfiguration(RedisURI redisURI) {
+	static ValkeySentinelConfiguration createValkeySentinelConfiguration(ValkeyURI redisURI) {
 
-		RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration();
 
 		if (!ObjectUtils.isEmpty(redisURI.getSentinelMasterId())) {
 			sentinelConfiguration.setMaster(redisURI.getSentinelMasterId());
@@ -444,12 +444,12 @@ public abstract class LettuceConverters extends Converters {
 
 		sentinelConfiguration.setDatabase(redisURI.getDatabase());
 
-		for (RedisURI sentinelNodeRedisUri : redisURI.getSentinels()) {
+		for (ValkeyURI sentinelNodeValkeyUri : redisURI.getSentinels()) {
 
-			RedisNode sentinelNode = new RedisNode(sentinelNodeRedisUri.getHost(), sentinelNodeRedisUri.getPort());
+			ValkeyNode sentinelNode = new ValkeyNode(sentinelNodeValkeyUri.getHost(), sentinelNodeValkeyUri.getPort());
 
-			if (sentinelNodeRedisUri.getPassword() != null) {
-				sentinelConfiguration.setSentinelPassword(sentinelNodeRedisUri.getPassword());
+			if (sentinelNodeValkeyUri.getPassword() != null) {
+				sentinelConfiguration.setSentinelPassword(sentinelNodeValkeyUri.getPassword());
 			}
 
 			sentinelConfiguration.addSentinel(sentinelNode);
@@ -460,7 +460,7 @@ public abstract class LettuceConverters extends Converters {
 		return sentinelConfiguration;
 	}
 
-	private static void applyAuthentication(RedisURI redisURI, RedisConfiguration.WithAuthentication redisConfiguration) {
+	private static void applyAuthentication(ValkeyURI redisURI, ValkeyConfiguration.WithAuthentication redisConfiguration) {
 
 		if (StringUtils.hasText(redisURI.getUsername())) {
 			redisConfiguration.setUsername(redisURI.getUsername());
@@ -490,16 +490,16 @@ public abstract class LettuceConverters extends Converters {
 		return toBytes(String.valueOf(source));
 	}
 
-	public static List<RedisClusterNode> partitionsToClusterNodes(@Nullable Partitions source) {
+	public static List<ValkeyClusterNode> partitionsToClusterNodes(@Nullable Partitions source) {
 
 		if (source == null) {
 			return Collections.emptyList();
 		}
 
-		List<RedisClusterNode> nodes = new ArrayList<>();
+		List<ValkeyClusterNode> nodes = new ArrayList<>();
 
-		for (io.lettuce.core.cluster.models.partitions.RedisClusterNode node : source) {
-			nodes.add(toRedisClusterNode(node));
+		for (io.lettuce.core.cluster.models.partitions.ValkeyClusterNode node : source) {
+			nodes.add(toValkeyClusterNode(node));
 		}
 
 		return nodes;
@@ -508,11 +508,11 @@ public abstract class LettuceConverters extends Converters {
 	/**
 	 * @since 1.7
 	 */
-	public static RedisClusterNode toRedisClusterNode(io.lettuce.core.cluster.models.partitions.RedisClusterNode source) {
+	public static ValkeyClusterNode toValkeyClusterNode(io.lettuce.core.cluster.models.partitions.ValkeyClusterNode source) {
 
 		Set<Flag> flags = parseFlags(source.getFlags());
 
-		return RedisClusterNode.newRedisClusterNode().listeningAt(source.getUri().getHost(), source.getUri().getPort())
+		return ValkeyClusterNode.newValkeyClusterNode().listeningAt(source.getUri().getHost(), source.getUri().getPort())
 				.withId(source.getNodeId()).promotedAs(flags.contains(Flag.MASTER) ? NodeType.MASTER : NodeType.REPLICA)
 				.serving(new SlotRange(source.getSlots())).withFlags(flags)
 				.linkState(source.isConnected() ? LinkState.CONNECTED : LinkState.DISCONNECTED).replicaOf(source.getSlaveOf())
@@ -888,7 +888,7 @@ public abstract class LettuceConverters extends Converters {
 		throw new IllegalArgumentException("Cannot convert %s to Lettuce GeoRef".formatted(reference));
 	}
 
-	static FlushMode toFlushMode(@Nullable RedisServerCommands.FlushOption option) {
+	static FlushMode toFlushMode(@Nullable ValkeyServerCommands.FlushOption option) {
 
 		if (option == null) {
 			return FlushMode.SYNC;

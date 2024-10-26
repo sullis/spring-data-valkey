@@ -30,7 +30,7 @@ class LettuceReactiveClusterNumberCommands extends LettuceReactiveNumberCommands
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterNumberCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterNumberCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 }

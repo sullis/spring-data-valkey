@@ -17,7 +17,7 @@ package org.springframework.data.redis.connection;
 
 import java.util.Properties;
 
-import org.springframework.data.redis.core.types.RedisClientInfo.INFO;
+import org.springframework.data.redis.core.types.ValkeyClientInfo.INFO;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 

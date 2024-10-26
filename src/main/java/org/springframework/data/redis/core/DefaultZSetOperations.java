@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  */
 class DefaultZSetOperations<K, V> extends AbstractOperations<K, V> implements ZSetOperations<K, V> {
 
-	DefaultZSetOperations(RedisTemplate<K, V> template) {
+	DefaultZSetOperations(ValkeyTemplate<K, V> template) {
 		super(template);
 	}
 

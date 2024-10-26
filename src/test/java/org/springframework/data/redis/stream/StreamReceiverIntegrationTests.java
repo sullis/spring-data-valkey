@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.ValkeySystemException;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.connection.stream.ByteBufferRecord;
@@ -43,11 +43,11 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.core.ReactiveValkeyTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.stream.StreamReceiver.StreamReceiverOptions;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
 
@@ -67,25 +67,25 @@ import reactor.test.StepVerifier;
 public class StreamReceiverIntegrationTests {
 
 	final LettuceConnectionFactory connectionFactory;
-	final StringRedisTemplate redisTemplate;
-	final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
+	final StringValkeyTemplate redisTemplate;
+	final ReactiveValkeyTemplate<String, String> reactiveValkeyTemplate;
 
 	public StreamReceiverIntegrationTests(LettuceConnectionFactory connectionFactory) {
 
 		this.connectionFactory = connectionFactory;
-		this.redisTemplate = new StringRedisTemplate(connectionFactory);
+		this.redisTemplate = new StringValkeyTemplate(connectionFactory);
 
-		RedisSerializationContext<String, String> serializationContext = RedisSerializationContext
-				.<String, String> newSerializationContext(StringRedisSerializer.UTF_8).hashKey(SerializationPair.raw())
+		ValkeySerializationContext<String, String> serializationContext = ValkeySerializationContext
+				.<String, String> newSerializationContext(StringValkeySerializer.UTF_8).hashKey(SerializationPair.raw())
 				.hashValue(SerializationPair.raw()).build();
 
-		this.reactiveRedisTemplate = new ReactiveRedisTemplate<>(connectionFactory, serializationContext);
+		this.reactiveValkeyTemplate = new ReactiveValkeyTemplate<>(connectionFactory, serializationContext);
 	}
 
 	@BeforeEach
 	void before() {
 
-		RedisConnection connection = connectionFactory.getConnection();
+		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushDb();
 		connection.close();
 	}
@@ -99,7 +99,7 @@ public class StreamReceiverIntegrationTests {
 				.receive(StreamOffset.create("my-stream", ReadOffset.from("0-0")));
 
 		messages.as(StepVerifier::create) //
-				.then(() -> reactiveRedisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"))
+				.then(() -> reactiveValkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"))
 						.subscribe())
 				.consumeNextWith(it -> {
 
@@ -122,7 +122,7 @@ public class StreamReceiverIntegrationTests {
 		Flux<ObjectRecord<String, String>> messages = receiver.receive(StreamOffset.fromStart("my-stream"));
 
 		messages.as(StepVerifier::create) //
-				.then(() -> reactiveRedisTemplate.opsForStream().add(ObjectRecord.create("my-stream", "foobar")).subscribe())
+				.then(() -> reactiveValkeyTemplate.opsForStream().add(ObjectRecord.create("my-stream", "foobar")).subscribe())
 				.consumeNextWith(it -> {
 
 					assertThat(it.getStream()).isEqualTo("my-stream");
@@ -144,7 +144,7 @@ public class StreamReceiverIntegrationTests {
 		Flux<ObjectRecord<String, LoginEvent>> messages = receiver.receive(StreamOffset.fromStart("my-logins"));
 
 		messages.as(StepVerifier::create) //
-				.then(() -> reactiveRedisTemplate.opsForStream()
+				.then(() -> reactiveValkeyTemplate.opsForStream()
 						.add(ObjectRecord.create("my-logins", new LoginEvent("Walter", "White"))).subscribe())
 				.consumeNextWith(it -> {
 
@@ -169,7 +169,7 @@ public class StreamReceiverIntegrationTests {
 
 		Flux<MapRecord<String, String, Integer>> messages = receiver.receive(StreamOffset.fromStart("my-stream"));
 
-		messages.as(StepVerifier::create).then(() -> reactiveRedisTemplate.opsForStream()
+		messages.as(StepVerifier::create).then(() -> reactiveValkeyTemplate.opsForStream()
 				.add("my-stream", Collections.singletonMap("Jesse", "Pinkman")).subscribe()).consumeNextWith(it -> {
 					assertThat(it.getStream()).isEqualTo("my-stream");
 					assertThat(it.getValue()).contains(entry("Jesse", 345920));
@@ -193,16 +193,16 @@ public class StreamReceiverIntegrationTests {
 				.thenRequest(1) //
 				.thenAwait(Duration.ofMillis(500)) //
 				.then(() -> {
-					reactiveRedisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1")).subscribe();
+					reactiveValkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1")).subscribe();
 				}) //
 				.expectNextCount(1) //
 				.then(() -> {
-					reactiveRedisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2")).subscribe();
+					reactiveValkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2")).subscribe();
 				}) //
 				.thenRequest(1) //
 				.thenAwait(Duration.ofMillis(500)) //
 				.then(() -> {
-					reactiveRedisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value3")).subscribe();
+					reactiveValkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value3")).subscribe();
 				}).consumeNextWith(it -> {
 
 					assertThat(it.getStream()).isEqualTo("my-stream");
@@ -256,8 +256,8 @@ public class StreamReceiverIntegrationTests {
 
 		messages.as(StepVerifier::create) //
 				.expectNextCount(1) //
-				.then(() -> reactiveRedisTemplate.delete("my-stream").subscribe()) //
-				.expectError(RedisSystemException.class) //
+				.then(() -> reactiveValkeyTemplate.delete("my-stream").subscribe()) //
+				.expectError(ValkeySystemException.class) //
 				.verify(Duration.ofSeconds(5));
 	}
 

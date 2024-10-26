@@ -17,23 +17,23 @@ package org.springframework.data.redis.core.convert;
 
 import org.springframework.data.convert.EntityConverter;
 import org.springframework.data.mapping.model.EntityInstantiators;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.core.mapping.RedisPersistentProperty;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentProperty;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis specific {@link EntityConverter}.
+ * Valkey specific {@link EntityConverter}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public interface RedisConverter
-		extends EntityConverter<RedisPersistentEntity<?>, RedisPersistentProperty, Object, RedisData> {
+public interface ValkeyConverter
+		extends EntityConverter<ValkeyPersistentEntity<?>, ValkeyPersistentProperty, Object, ValkeyData> {
 
 	@Override
-	RedisMappingContext getMappingContext();
+	ValkeyMappingContext getMappingContext();
 
 	/**
 	 * @return the configured {@link IndexResolver}, may be {@literal null}.

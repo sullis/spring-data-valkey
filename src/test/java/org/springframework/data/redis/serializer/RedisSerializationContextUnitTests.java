@@ -24,22 +24,22 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RedisSerializationContext}.
+ * Unit tests for {@link ValkeySerializationContext}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Zhou KQ
  */
-class RedisSerializationContextUnitTests {
+class ValkeySerializationContextUnitTests {
 
 	@Test // DATAREDIS-602
 	void shouldRejectBuildIfKeySerializerIsNotSet() {
 
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> RedisSerializationContext.<String, String> newSerializationContext() //
-				.value(StringRedisSerializer.UTF_8) //
-				.hashKey(StringRedisSerializer.UTF_8) //
-				.hashValue(StringRedisSerializer.UTF_8) //
+				.isThrownBy(() -> ValkeySerializationContext.<String, String> newSerializationContext() //
+				.value(StringValkeySerializer.UTF_8) //
+				.hashKey(StringValkeySerializer.UTF_8) //
+				.hashValue(StringValkeySerializer.UTF_8) //
 						.build());
 	}
 
@@ -47,10 +47,10 @@ class RedisSerializationContextUnitTests {
 	void shouldRejectBuildIfValueSerializerIsNotSet() {
 
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> RedisSerializationContext.<String, String> newSerializationContext() //
-				.key(StringRedisSerializer.UTF_8) //
-				.hashKey(StringRedisSerializer.UTF_8) //
-				.hashValue(StringRedisSerializer.UTF_8) //
+				.isThrownBy(() -> ValkeySerializationContext.<String, String> newSerializationContext() //
+				.key(StringValkeySerializer.UTF_8) //
+				.hashKey(StringValkeySerializer.UTF_8) //
+				.hashValue(StringValkeySerializer.UTF_8) //
 						.build());
 	}
 
@@ -58,10 +58,10 @@ class RedisSerializationContextUnitTests {
 	void shouldRejectBuildIfHashKeySerializerIsNotSet() {
 
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> RedisSerializationContext.<String, String> newSerializationContext() //
-				.key(StringRedisSerializer.UTF_8) //
-				.value(StringRedisSerializer.UTF_8) //
-				.hashValue(StringRedisSerializer.UTF_8) //
+				.isThrownBy(() -> ValkeySerializationContext.<String, String> newSerializationContext() //
+				.key(StringValkeySerializer.UTF_8) //
+				.value(StringValkeySerializer.UTF_8) //
+				.hashValue(StringValkeySerializer.UTF_8) //
 						.build());
 	}
 
@@ -69,10 +69,10 @@ class RedisSerializationContextUnitTests {
 	void shouldRejectBuildIfHashValueSerializerIsNotSet() {
 
 		assertThatIllegalArgumentException()
-				.isThrownBy(() -> RedisSerializationContext.<String, String> newSerializationContext() //
-				.key(StringRedisSerializer.UTF_8) //
-				.value(StringRedisSerializer.UTF_8) //
-				.hashKey(StringRedisSerializer.UTF_8) //
+				.isThrownBy(() -> ValkeySerializationContext.<String, String> newSerializationContext() //
+				.key(StringValkeySerializer.UTF_8) //
+				.value(StringValkeySerializer.UTF_8) //
+				.hashKey(StringValkeySerializer.UTF_8) //
 						.build());
 	}
 
@@ -80,7 +80,7 @@ class RedisSerializationContextUnitTests {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	void shouldUseDefaultIfSet() {
 
-		RedisSerializationContext.<String, String>newSerializationContext(StringRedisSerializer.UTF_8)
+		ValkeySerializationContext.<String, String>newSerializationContext(StringValkeySerializer.UTF_8)
 				.key(new GenericToStringSerializer(Long.class)) //
 				.build();
 	}
@@ -88,7 +88,7 @@ class RedisSerializationContextUnitTests {
 	@Test // DATAREDIS-602
 	void shouldBuildSerializationContext() {
 
-		RedisSerializationContext<String, Long> serializationContext = createSerializationContext();
+		ValkeySerializationContext<String, Long> serializationContext = createSerializationContext();
 
 		assertThat(serializationContext.getKeySerializationPair()).isNotNull();
 		assertThat(serializationContext.getValueSerializationPair()).isNotNull();
@@ -100,7 +100,7 @@ class RedisSerializationContextUnitTests {
 	@Test // DATAREDIS-602
 	void shouldEncodeAndDecodeKey() {
 
-		RedisSerializationContext<String, Long> serializationContext = createSerializationContext();
+		ValkeySerializationContext<String, Long> serializationContext = createSerializationContext();
 
 		String deserialized = serializationContext.getKeySerializationPair()
 				.read(serializationContext.getKeySerializationPair().write("foo"));
@@ -111,7 +111,7 @@ class RedisSerializationContextUnitTests {
 	@Test // DATAREDIS-602
 	void shouldEncodeAndDecodeValue() {
 
-		RedisSerializationContext<String, Long> serializationContext = createSerializationContext();
+		ValkeySerializationContext<String, Long> serializationContext = createSerializationContext();
 
 		long deserialized = serializationContext.getValueSerializationPair()
 				.read(serializationContext.getValueSerializationPair().write(42L));
@@ -122,7 +122,7 @@ class RedisSerializationContextUnitTests {
 	@Test // DATAREDIS-1000
 	void shouldEncodeAndDecodeRawByteBufferValue() {
 
-		RedisSerializationContext<ByteBuffer, ByteBuffer> serializationContext = RedisSerializationContext.byteBuffer();
+		ValkeySerializationContext<ByteBuffer, ByteBuffer> serializationContext = ValkeySerializationContext.byteBuffer();
 
 		ByteBuffer deserialized = serializationContext.getValueSerializationPair()
 				.read(serializationContext.getValueSerializationPair()
@@ -134,7 +134,7 @@ class RedisSerializationContextUnitTests {
 	@Test // DATAREDIS-1000
 	void shouldEncodeAndDecodeByteArrayValue() {
 
-		RedisSerializationContext<byte[], byte[]> serializationContext = RedisSerializationContext.byteArray();
+		ValkeySerializationContext<byte[], byte[]> serializationContext = ValkeySerializationContext.byteArray();
 
 		byte[] deserialized = serializationContext.getValueSerializationPair()
 				.read(serializationContext.getValueSerializationPair()
@@ -146,8 +146,8 @@ class RedisSerializationContextUnitTests {
 	@Test // GH-2651
 	void shouldEncodeAndDecodeUtf8StringValue() {
 
-		RedisSerializationContext.SerializationPair<String> serializationPair =
-				buildStringSerializationContext(StringRedisSerializer.UTF_8).getStringSerializationPair();
+		ValkeySerializationContext.SerializationPair<String> serializationPair =
+				buildStringSerializationContext(StringValkeySerializer.UTF_8).getStringSerializationPair();
 
 		assertThat(serializationPair.write("üßØ")).isEqualTo(StandardCharsets.UTF_8.encode("üßØ"));
 		assertThat(serializationPair.read(StandardCharsets.UTF_8.encode("üßØ"))).isEqualTo("üßØ");
@@ -156,8 +156,8 @@ class RedisSerializationContextUnitTests {
 	@Test // GH-2651
 	void shouldEncodeAndDecodeAsciiStringValue() {
 
-		RedisSerializationContext.SerializationPair<String> serializationPair =
-				buildStringSerializationContext(StringRedisSerializer.US_ASCII).getStringSerializationPair();
+		ValkeySerializationContext.SerializationPair<String> serializationPair =
+				buildStringSerializationContext(StringValkeySerializer.US_ASCII).getStringSerializationPair();
 
 		assertThat(serializationPair.write("üßØ")).isEqualTo(StandardCharsets.US_ASCII.encode("???"));
 		assertThat(serializationPair.read(StandardCharsets.US_ASCII.encode("üßØ"))).isEqualTo("???");
@@ -166,27 +166,27 @@ class RedisSerializationContextUnitTests {
 	@Test  // GH-2651
 	void shouldEncodeAndDecodeIso88591StringValue() {
 
-		RedisSerializationContext.SerializationPair<String> serializationPair =
-				buildStringSerializationContext(StringRedisSerializer.ISO_8859_1).getStringSerializationPair();
+		ValkeySerializationContext.SerializationPair<String> serializationPair =
+				buildStringSerializationContext(StringValkeySerializer.ISO_8859_1).getStringSerializationPair();
 
 		assertThat(serializationPair.write("üßØ")).isEqualTo(StandardCharsets.ISO_8859_1.encode("üßØ"));
 		assertThat(serializationPair.read(StandardCharsets.ISO_8859_1.encode("üßØ"))).isEqualTo("üßØ");
 	}
 
-	private RedisSerializationContext<String, Long> createSerializationContext() {
+	private ValkeySerializationContext<String, Long> createSerializationContext() {
 
-		return RedisSerializationContext.<String, Long> newSerializationContext() //
-				.key(StringRedisSerializer.UTF_8) //
+		return ValkeySerializationContext.<String, Long> newSerializationContext() //
+				.key(StringValkeySerializer.UTF_8) //
 				.value(ByteBuffer::getLong, value -> ByteBuffer.allocate(8).putLong(value).flip()) //
-				.hashKey(StringRedisSerializer.UTF_8) //
-				.hashValue(StringRedisSerializer.UTF_8) //
+				.hashKey(StringValkeySerializer.UTF_8) //
+				.hashValue(StringValkeySerializer.UTF_8) //
 				.build();
 	}
 
-	private RedisSerializationContext<String, String> buildStringSerializationContext(
-			RedisSerializer<String> stringSerializer) {
+	private ValkeySerializationContext<String, String> buildStringSerializationContext(
+			ValkeySerializer<String> stringSerializer) {
 
-		return RedisSerializationContext.<String, String>newSerializationContext(stringSerializer)
+		return ValkeySerializationContext.<String, String>newSerializationContext(stringSerializer)
 				.string(stringSerializer)
 				.build();
 	}

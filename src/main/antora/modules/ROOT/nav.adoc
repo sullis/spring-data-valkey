@@ -7,7 +7,7 @@
 ** xref:redis/getting-started.adoc[]
 ** xref:redis/drivers.adoc[]
 ** xref:redis/connection-modes.adoc[]
-** xref:redis/template.adoc[RedisTemplate]
+** xref:redis/template.adoc[ValkeyTemplate]
 ** xref:redis/redis-cache.adoc[]
 ** xref:redis/cluster.adoc[]
 ** xref:redis/hash-mappers.adoc[]

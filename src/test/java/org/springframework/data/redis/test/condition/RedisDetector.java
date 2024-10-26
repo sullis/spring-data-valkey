@@ -26,11 +26,11 @@ import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.util.Lazy;
 
 /**
- * Utility to detect Redis operation modes.
+ * Utility to detect Valkey operation modes.
  *
  * @author Mark Paluch
  */
-public class RedisDetector {
+public class ValkeyDetector {
 
 	private static final Lazy<Boolean> CLUSTER_AVAILABLE = Lazy.of(() -> {
 

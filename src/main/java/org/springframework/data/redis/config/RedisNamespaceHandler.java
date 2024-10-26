@@ -19,15 +19,15 @@ import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * {@link NamespaceHandler} for Spring Data Redis namespace.
+ * {@link NamespaceHandler} for Spring Data Valkey namespace.
  *
  * @author Costin Leau
  */
-class RedisNamespaceHandler extends NamespaceHandlerSupport {
+class ValkeyNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
 
-		registerBeanDefinitionParser("listener-container", new RedisListenerContainerParser());
-		registerBeanDefinitionParser("collection", new RedisCollectionParser());
+		registerBeanDefinitionParser("listener-container", new ValkeyListenerContainerParser());
+		registerBeanDefinitionParser("collection", new ValkeyCollectionParser());
 	}
 }

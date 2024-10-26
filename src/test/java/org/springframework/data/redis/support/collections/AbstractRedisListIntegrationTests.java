@@ -30,31 +30,31 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.ObjectFactory;
-import org.springframework.data.redis.connection.RedisListCommands;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.ValkeyListCommands;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
- * Integration tests for RedisList
+ * Integration tests for ValkeyList
  *
  * @author Costin Leau
  * @author Jennifer Hickey
  * @author Mark Paluch
  * @author John Blum
  */
-public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedisCollectionIntegrationTests<T> {
+public abstract class AbstractValkeyListIntegrationTests<T> extends AbstractValkeyCollectionIntegrationTests<T> {
 
-	protected RedisList<T> list;
+	protected ValkeyList<T> list;
 
 	/**
-	 * Constructs a new {@link AbstractRedisListIntegrationTests}.
+	 * Constructs a new {@link AbstractValkeyListIntegrationTests}.
 	 *
 	 * @param factory {@link ObjectFactory} used to create different types of elements to store in the list.
-	 * @param template {@link RedisTemplate} used to perform operations on Redis.
+	 * @param template {@link ValkeyTemplate} used to perform operations on Valkey.
 	 */
 	@SuppressWarnings("rawtypes")
-	AbstractRedisListIntegrationTests(ObjectFactory<T> factory, RedisTemplate template) {
+	AbstractValkeyListIntegrationTests(ObjectFactory<T> factory, ValkeyTemplate template) {
 		super(factory, template);
 	}
 
@@ -63,10 +63,10 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 	public void setUp() throws Exception {
 
 		super.setUp();
-		this.list = (RedisList<T>) this.collection;
+		this.list = (ValkeyList<T>) this.collection;
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddIndexObjectHead() {
 
 		T t1 = getT();
@@ -81,7 +81,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(0)).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddIndexObjectTail() {
 
 		T t1 = getT();
@@ -96,7 +96,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(2)).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddIndexObjectMiddle() {
 
 		T t1 = getT();
@@ -110,7 +110,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThatIllegalArgumentException().isThrownBy(() -> list.add(1, t3));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void addAllIndexCollectionHead() {
 
 		T t1 = getT();
@@ -132,7 +132,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(1)).isEqualTo(t4);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void addAllIndexCollectionTail() {
 
 		T t1 = getT();
@@ -153,7 +153,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(3)).isEqualTo(t4);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void addAllIndexCollectionMiddle() {
 
 		T t1 = getT();
@@ -170,7 +170,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThatIllegalArgumentException().isThrownBy(() -> list.addAll(1, asList));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1196
+	@ParameterizedValkeyTest // DATAREDIS-1196
 	@EnabledOnCommand("LPOS")
 	void testIndexOfObject() {
 
@@ -186,7 +186,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.indexOf(t2)).isEqualTo(1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testOffer() {
 
 		T t1 = getT();
@@ -195,7 +195,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(0)).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPeek() {
 
 		assertThat(list.peek()).isNull();
@@ -211,7 +211,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.peek()).isNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testElement() {
 
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(list::element);
@@ -225,12 +225,12 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(list::element);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPop() {
 		testPoll();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPoll() {
 
 		assertThat(list.poll()).isNull();
@@ -243,7 +243,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.poll()).isNull();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPollTimeout() throws InterruptedException {
 
 		T t1 = getT();
@@ -251,7 +251,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.poll(1, TimeUnit.MILLISECONDS)).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemove() {
 
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(list::remove);
@@ -264,12 +264,12 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(list::remove);
 	}
 
-	@ParameterizedRedisTest // GH-2039
+	@ParameterizedValkeyTest // GH-2039
 	@EnabledOnCommand("LMOVE")
 	@SuppressWarnings("unchecked")
 	void testMoveFirstTo() {
 
-		RedisList<T> target = new DefaultRedisList<T>(template.boundListOps(collection.getKey() + ":target"));
+		ValkeyList<T> target = new DefaultValkeyList<T>(template.boundListOps(collection.getKey() + ":target"));
 
 		T t1 = getT();
 		T t2 = getT();
@@ -279,19 +279,19 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		list.add(t2);
 		list.add(t3);
 
-		assertThat(list.moveFirstTo(target, RedisListCommands.Direction.first())).isEqualTo(t1);
-		assertThat(list.moveFirstTo(target, RedisListCommands.Direction.first())).isEqualTo(t2);
-		assertThat(list.moveFirstTo(target, RedisListCommands.Direction.last())).isEqualTo(t3);
+		assertThat(list.moveFirstTo(target, ValkeyListCommands.Direction.first())).isEqualTo(t1);
+		assertThat(list.moveFirstTo(target, ValkeyListCommands.Direction.first())).isEqualTo(t2);
+		assertThat(list.moveFirstTo(target, ValkeyListCommands.Direction.last())).isEqualTo(t3);
 		assertThat(list).isEmpty();
 		assertThat(target).hasSize(3).containsSequence(t2, t1, t3);
 	}
 
-	@ParameterizedRedisTest // GH-2039
+	@ParameterizedValkeyTest // GH-2039
 	@EnabledOnCommand("LMOVE")
 	@SuppressWarnings("unchecked")
 	void testMoveLastTo() {
 
-		RedisList<T> target = new DefaultRedisList<T>(template.boundListOps(collection.getKey() + ":target"));
+		ValkeyList<T> target = new DefaultValkeyList<T>(template.boundListOps(collection.getKey() + ":target"));
 
 		T t1 = getT();
 		T t2 = getT();
@@ -301,14 +301,14 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		list.add(t2);
 		list.add(t3);
 
-		assertThat(list.moveLastTo(target, RedisListCommands.Direction.first())).isEqualTo(t3);
-		assertThat(list.moveLastTo(target, RedisListCommands.Direction.first())).isEqualTo(t2);
-		assertThat(list.moveLastTo(target, RedisListCommands.Direction.last())).isEqualTo(t1);
+		assertThat(list.moveLastTo(target, ValkeyListCommands.Direction.first())).isEqualTo(t3);
+		assertThat(list.moveLastTo(target, ValkeyListCommands.Direction.first())).isEqualTo(t2);
+		assertThat(list.moveLastTo(target, ValkeyListCommands.Direction.last())).isEqualTo(t1);
 		assertThat(list).isEmpty();
 		assertThat(target).hasSize(3).containsSequence(t2, t3, t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRange() {
 
 		T t1 = getT();
@@ -324,12 +324,12 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.range(1, 1).get(0)).isEqualTo(t2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveIndex() {
 		assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> list.remove(0));
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testSet() {
 
 		T t1 = getT();
@@ -342,7 +342,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.get(0)).isEqualTo(t2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testTrim() {
 
 		T t1 = getT();
@@ -361,10 +361,10 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testCappedCollection() {
 
-		RedisList<T> cappedList = new DefaultRedisList<T>(template.boundListOps(collection.getKey() + ":capped"), 1);
+		ValkeyList<T> cappedList = new DefaultValkeyList<T>(template.boundListOps(collection.getKey() + ":capped"), 1);
 
 		T first = getT();
 
@@ -383,7 +383,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(cappedList.get(0)).isEqualTo(first);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddFirst() {
 
 		T t1 = getT();
@@ -399,7 +399,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(iterator.next()).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testAddLast() {
 
 		T t1 = getT();
@@ -415,7 +415,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(iterator.next()).isEqualTo(t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDescendingIterator() {
 
 		T t1 = getT();
@@ -433,7 +433,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(iterator.next()).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testListIteratorAddNextPreviousIsCorrect() {
 
 		T t1 = getT();
@@ -461,7 +461,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(listIterator.hasPrevious()).isTrue();
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	public void testListIteratorSetIsCorrect() {
 
 		T t1 = getT();
@@ -488,7 +488,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(this.list).containsExactly(t1, t2, t3, t4, t5);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDrainToCollectionWithMaxElements() {
 
 		T t1 = getT();
@@ -507,7 +507,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(c).hasSize(2).contains(t1, t2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDrainToCollection() {
 
 		T t1 = getT();
@@ -526,7 +526,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(c).hasSize(3).contains(t1, t2, t3);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testGetFirst() {
 
 		T t1 = getT();
@@ -538,27 +538,27 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.getFirst()).isEqualTo(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testLast() {
 		testAdd();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testOfferFirst() {
 		testAddFirst();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testOfferLast() {
 		testAddLast();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPeekFirst() {
 		testPeek();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPeekLast() {
 
 		T t1 = getT();
@@ -571,12 +571,12 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list).hasSize(2);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPollFirst() {
 		testPoll();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPollLast() {
 
 		T t1 = getT();
@@ -591,7 +591,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list).hasSize(1).contains(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPollLastTimeout() throws InterruptedException {
 
 		T t1 = getT();
@@ -606,42 +606,42 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list).hasSize(1).contains(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPut() {
 		testOffer();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPutFirst() {
 		testAdd();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testPutLast() {
 		testPut();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemainingCapacity() {
 		assertThat(list.remainingCapacity()).isEqualTo(Integer.MAX_VALUE);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveFirst() {
 		testPop();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveFirstOccurrence() {
 		testRemove();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRemoveLast() {
 		testPollLast();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testRmoveLastOccurrence() {
 
 		T t1 = getT();
@@ -656,22 +656,22 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list).hasSize(3).containsExactly(t1, t2, t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testTake() {
 		testPoll();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testTakeFirst() {
 		testTake();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testTakeLast() {
 		testPollLast();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1196
+	@ParameterizedValkeyTest // DATAREDIS-1196
 	@EnabledOnCommand("LPOS")
 	void lastIndexOf() {
 
@@ -687,7 +687,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(list.lastIndexOf(t1)).isEqualTo(2);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testReversed() {
 
 		T elementOne = getT();
@@ -698,7 +698,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		assertThat(this.list).containsExactly(elementOne, elementTwo, elementThree);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		assertThat(reversedList).isNotNull();
 		assertThat(reversedList).isNotSameAs(this.list);
@@ -707,7 +707,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 		assertThat(reversedList.reversed()).isEqualTo(this.list);
 	}
 
-	@ParameterizedRedisTest // // GH-2602
+	@ParameterizedValkeyTest // // GH-2602
 	public void testReversedListIterator() {
 
 		T elementOne = getT();
@@ -721,7 +721,7 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		List<T> expectedList = Arrays.asList(elementFour, elementThree, elementTwo, elementOne);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		assertThat(reversedList).containsExactly(elementFour, elementThree, elementTwo, elementOne);
 
@@ -742,14 +742,14 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		assertThat(reversedList).containsExactly(elementFour, elementTwo, elementOne);
 
-		RedisList<T> reorderedList = reversedList.reversed();
+		ValkeyList<T> reorderedList = reversedList.reversed();
 
 		assertThat(reorderedList).isEqualTo(this.list);
 		assertThat(reorderedList).hasSameSizeAs(reversedList);
 		assertThat(reorderedList).containsExactly(elementOne, elementTwo, elementFour);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testReversedWithAddFirst() {
 
 		T elementOne = getT();
@@ -758,18 +758,18 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		Collections.addAll(this.list, elementOne, elementTwo);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		reversedList.addFirst(elementThree);
 
 		assertThat(reversedList).containsExactly(elementThree, elementTwo, elementOne);
 
-		RedisList<T> reorderedList = reversedList.reversed();
+		ValkeyList<T> reorderedList = reversedList.reversed();
 
 		assertThat(reorderedList).containsExactly(elementOne, elementTwo, elementThree);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testReversedWithAddLast() {
 
 		T elementZero = getT();
@@ -780,18 +780,18 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		assertThat(this.list).containsExactly(elementOne, elementTwo);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		reversedList.addLast(elementZero);
 
 		assertThat(reversedList).containsExactly(elementTwo, elementOne, elementZero);
 
-		RedisList<T> reorderedList = reversedList.reversed();
+		ValkeyList<T> reorderedList = reversedList.reversed();
 
 		assertThat(reorderedList).containsExactly(elementZero, elementOne, elementTwo);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testReversedWithRemoveFirst() {
 
 		T elementOne = getT();
@@ -800,18 +800,18 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		Collections.addAll(this.list, elementOne, elementTwo, elementThree);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		assertThat(reversedList).containsExactly(elementThree, elementTwo, elementOne);
 		assertThat(reversedList.removeFirst()).isEqualTo(elementThree);
 		assertThat(reversedList).containsExactly(elementTwo, elementOne);
 
-		RedisList<T> reorderedList = reversedList.reversed();
+		ValkeyList<T> reorderedList = reversedList.reversed();
 
 		assertThat(reorderedList).containsExactly(elementOne, elementTwo);
 	}
 
-	@ParameterizedRedisTest // GH-2602
+	@ParameterizedValkeyTest // GH-2602
 	void testReversedWithRemoveLast() {
 
 		T elementOne = getT();
@@ -820,13 +820,13 @@ public abstract class AbstractRedisListIntegrationTests<T> extends AbstractRedis
 
 		Collections.addAll(this.list, elementOne, elementTwo, elementThree);
 
-		RedisList<T> reversedList = this.list.reversed();
+		ValkeyList<T> reversedList = this.list.reversed();
 
 		assertThat(reversedList).containsExactly(elementThree, elementTwo, elementOne);
 		assertThat(reversedList.removeLast()).isEqualTo(elementOne);
 		assertThat(reversedList).containsExactly(elementThree, elementTwo);
 
-		RedisList<T> reorderedList = reversedList.reversed();
+		ValkeyList<T> reorderedList = reversedList.reversed();
 
 		assertThat(reorderedList).containsExactly(elementTwo, elementThree);
 	}

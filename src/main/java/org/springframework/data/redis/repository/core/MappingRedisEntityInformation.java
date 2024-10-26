@@ -16,26 +16,26 @@
 package org.springframework.data.redis.repository.core;
 
 import org.springframework.data.mapping.MappingException;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
 import org.springframework.data.repository.core.support.PersistentEntityInformation;
 
 /**
- * {@link RedisEntityInformation} implementation using a {@link RedisPersistentEntity} instance to lookup the necessary
+ * {@link ValkeyEntityInformation} implementation using a {@link ValkeyPersistentEntity} instance to lookup the necessary
  * information. Can be configured with a custom collection to be returned which will trump the one returned by the
- * {@link RedisPersistentEntity} if given.
+ * {@link ValkeyPersistentEntity} if given.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @param <T>
  * @param <ID>
  */
-public class MappingRedisEntityInformation<T, ID> extends PersistentEntityInformation<T, ID>
-		implements RedisEntityInformation<T, ID> {
+public class MappingValkeyEntityInformation<T, ID> extends PersistentEntityInformation<T, ID>
+		implements ValkeyEntityInformation<T, ID> {
 
 	/**
 	 * @param entity
 	 */
-	public MappingRedisEntityInformation(RedisPersistentEntity<T> entity) {
+	public MappingValkeyEntityInformation(ValkeyPersistentEntity<T> entity) {
 
 		super(entity);
 

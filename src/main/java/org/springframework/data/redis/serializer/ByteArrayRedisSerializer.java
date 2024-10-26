@@ -18,12 +18,12 @@ package org.springframework.data.redis.serializer;
 import org.springframework.lang.Nullable;
 
 /**
- * Raw {@link RedisSerializer} using {@code byte[]}.
+ * Raw {@link ValkeySerializer} using {@code byte[]}.
  *
  * @author Mark Paluch
  * @since 2.2
  */
-enum ByteArrayRedisSerializer implements RedisSerializer<byte[]> {
+enum ByteArrayValkeySerializer implements ValkeySerializer<byte[]> {
 
 	INSTANCE;
 

@@ -102,32 +102,32 @@ public class ClusterCommandExecutor implements DisposableBean {
 
 		Assert.notNull(commandCallback, "ClusterCommandCallback must not be null");
 
-		List<RedisClusterNode> nodes = new ArrayList<>(getClusterTopology().getActiveNodes());
+		List<ValkeyClusterNode> nodes = new ArrayList<>(getClusterTopology().getActiveNodes());
 
-		RedisClusterNode arbitraryNode = nodes.get(new Random().nextInt(nodes.size()));
+		ValkeyClusterNode arbitraryNode = nodes.get(new Random().nextInt(nodes.size()));
 
 		return executeCommandOnSingleNode(commandCallback, arbitraryNode);
 	}
 
 	/**
-	 * Run {@link ClusterCommandCallback} on given {@link RedisClusterNode}.
+	 * Run {@link ClusterCommandCallback} on given {@link ValkeyClusterNode}.
 	 *
 	 * @param commandCallback must not be {@literal null}.
 	 * @param node must not be {@literal null}.
-	 * @return the {@link NodeResult} from the single, targeted {@link RedisClusterNode}.
+	 * @return the {@link NodeResult} from the single, targeted {@link ValkeyClusterNode}.
 	 * @throws IllegalArgumentException in case no resource can be acquired for given node.
 	 */
 	public <S, T> NodeResult<T> executeCommandOnSingleNode(ClusterCommandCallback<S, T> commandCallback,
-			RedisClusterNode node) {
+			ValkeyClusterNode node) {
 
 		return executeCommandOnSingleNode(commandCallback, node, 0);
 	}
 
 	private <S, T> NodeResult<T> executeCommandOnSingleNode(ClusterCommandCallback<S, T> commandCallback,
-			RedisClusterNode node, int redirectCount) {
+			ValkeyClusterNode node, int redirectCount) {
 
 		Assert.notNull(commandCallback, "ClusterCommandCallback must not be null");
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 
 		if (redirectCount > this.maxRedirects) {
 			throw new TooManyClusterRedirectionsException(("Cannot follow Cluster Redirects over more than %s legs;"
@@ -135,7 +135,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 					.formatted(redirectCount, this.maxRedirects));
 		}
 
-		RedisClusterNode nodeToUse = lookupNode(node);
+		ValkeyClusterNode nodeToUse = lookupNode(node);
 
 		S client = this.resourceProvider.getResourceForSpecificNode(nodeToUse);
 
@@ -151,7 +151,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 
 				String targetHost = clusterRedirectException.getTargetHost();
 				int targetPort = clusterRedirectException.getTargetPort();
-				RedisClusterNode clusterNode = topologyProvider.getTopology().lookup(targetHost, targetPort);
+				ValkeyClusterNode clusterNode = topologyProvider.getTopology().lookup(targetHost, targetPort);
 
 				return executeCommandOnSingleNode(commandCallback, clusterNode, redirectCount + 1);
 			} else {
@@ -163,14 +163,14 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	/**
-	 * Lookup {@link RedisClusterNode node} from the {@link ClusterTopology topology}.
+	 * Lookup {@link ValkeyClusterNode node} from the {@link ClusterTopology topology}.
 	 *
-	 * @param node {@link RedisClusterNode node} to lookup; must not be {@literal null}.
-	 * @return the resolved {@link RedisClusterNode node} from the {@link ClusterTopology topology}; never
+	 * @param node {@link ValkeyClusterNode node} to lookup; must not be {@literal null}.
+	 * @return the resolved {@link ValkeyClusterNode node} from the {@link ClusterTopology topology}; never
 	 *         {@literal null}.
 	 * @throws IllegalArgumentException in case the node could not be resolved to a topology-known node
 	 */
-	private RedisClusterNode lookupNode(RedisClusterNode node) {
+	private ValkeyClusterNode lookupNode(ValkeyClusterNode node) {
 
 		try {
 			return topologyProvider.getTopology().lookup(node);
@@ -185,7 +185,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	 * @param commandCallback must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @throws ClusterCommandExecutionFailureException if a failure occurs while executing the given
-	 *           {@link ClusterCommandCallback command} on any given {@link RedisClusterNode node}.
+	 *           {@link ClusterCommandCallback command} on any given {@link ValkeyClusterNode node}.
 	 */
 	public <S, T> MultiNodeResult<T> executeCommandOnAllNodes(ClusterCommandCallback<S, T> commandCallback) {
 		return executeCommandAsyncOnNodes(commandCallback, getClusterTopology().getActiveMasterNodes());
@@ -196,21 +196,21 @@ public class ClusterCommandExecutor implements DisposableBean {
 	 * @param nodes must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @throws ClusterCommandExecutionFailureException if a failure occurs while executing the given
-	 *           {@link ClusterCommandCallback command} on any given {@link RedisClusterNode node}.
+	 *           {@link ClusterCommandCallback command} on any given {@link ValkeyClusterNode node}.
 	 * @throws IllegalArgumentException in case the node could not be resolved to a topology-known node
 	 */
 	public <S, T> MultiNodeResult<T> executeCommandAsyncOnNodes(ClusterCommandCallback<S, T> commandCallback,
-			Iterable<RedisClusterNode> nodes) {
+			Iterable<ValkeyClusterNode> nodes) {
 
 		Assert.notNull(commandCallback, "Callback must not be null");
 		Assert.notNull(nodes, "Nodes must not be null");
 
 		ClusterTopology topology = this.topologyProvider.getTopology();
-		List<RedisClusterNode> resolvedRedisClusterNodes = new ArrayList<>();
+		List<ValkeyClusterNode> resolvedValkeyClusterNodes = new ArrayList<>();
 
-		for (RedisClusterNode node : nodes) {
+		for (ValkeyClusterNode node : nodes) {
 			try {
-				resolvedRedisClusterNodes.add(topology.lookup(node));
+				resolvedValkeyClusterNodes.add(topology.lookup(node));
 			} catch (ClusterStateFailureException ex) {
 				throw new IllegalArgumentException("Node %s is unknown to cluster".formatted(node), ex);
 			}
@@ -218,7 +218,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 
 		Map<NodeExecution, Future<NodeResult<T>>> futures = new LinkedHashMap<>();
 
-		for (RedisClusterNode node : resolvedRedisClusterNodes) {
+		for (ValkeyClusterNode node : resolvedValkeyClusterNodes) {
 			Callable<NodeResult<T>> nodeCommandExecution = () -> executeCommandOnSingleNode(commandCallback, node);
 			futures.put(new NodeExecution(node), executor.submit(nodeCommandExecution));
 		}
@@ -281,18 +281,18 @@ public class ClusterCommandExecutor implements DisposableBean {
 	public <S, T> MultiNodeResult<T> executeMultiKeyCommand(MultiKeyClusterCommandCallback<S, T> commandCallback,
 			Iterable<byte[]> keys) {
 
-		Map<RedisClusterNode, PositionalKeys> nodeKeyMap = new HashMap<>();
+		Map<ValkeyClusterNode, PositionalKeys> nodeKeyMap = new HashMap<>();
 		int index = 0;
 
 		for (byte[] key : keys) {
-			for (RedisClusterNode node : getClusterTopology().getKeyServingNodes(key)) {
+			for (ValkeyClusterNode node : getClusterTopology().getKeyServingNodes(key)) {
 				nodeKeyMap.computeIfAbsent(node, val -> PositionalKeys.empty()).append(PositionalKey.of(key, index++));
 			}
 		}
 
 		Map<NodeExecution, Future<NodeResult<T>>> futures = new LinkedHashMap<>();
 
-		for (Map.Entry<RedisClusterNode, PositionalKeys> entry : nodeKeyMap.entrySet()) {
+		for (Map.Entry<ValkeyClusterNode, PositionalKeys> entry : nodeKeyMap.entrySet()) {
 
 			if (entry.getKey().isMaster()) {
 				for (PositionalKey key : entry.getValue()) {
@@ -306,10 +306,10 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	private <S, T> NodeResult<T> executeMultiKeyCommandOnSingleNode(MultiKeyClusterCommandCallback<S, T> commandCallback,
-			RedisClusterNode node, byte[] key) {
+			ValkeyClusterNode node, byte[] key) {
 
 		Assert.notNull(commandCallback, "MultiKeyCommandCallback must not be null");
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 		Assert.notNull(key, "Keys for execution must not be null");
 
 		S client = this.resourceProvider.getResourceForSpecificNode(node);
@@ -355,7 +355,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	/**
-	 * Callback interface for Redis 'low level' code using the cluster client directly. To be used with
+	 * Callback interface for Valkey 'low level' code using the cluster client directly. To be used with
 	 * {@link ClusterCommandExecutor} execution methods.
 	 *
 	 * @author Christoph Strobl
@@ -368,7 +368,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	/**
-	 * Callback interface for Redis 'low level' code using the cluster client to execute multi key commands.
+	 * Callback interface for Valkey 'low level' code using the cluster client to execute multi key commands.
 	 *
 	 * @author Christoph Strobl
 	 * @param <T> native driver connection
@@ -388,23 +388,23 @@ public class ClusterCommandExecutor implements DisposableBean {
 	 */
 	static class NodeExecution {
 
-		private final RedisClusterNode node;
+		private final ValkeyClusterNode node;
 		private final @Nullable PositionalKey positionalKey;
 
-		NodeExecution(RedisClusterNode node) {
+		NodeExecution(ValkeyClusterNode node) {
 			this(node, null);
 		}
 
-		NodeExecution(RedisClusterNode node, @Nullable PositionalKey positionalKey) {
+		NodeExecution(ValkeyClusterNode node, @Nullable PositionalKey positionalKey) {
 
 			this.node = node;
 			this.positionalKey = positionalKey;
 		}
 
 		/**
-		 * Get the {@link RedisClusterNode} the execution happens on.
+		 * Get the {@link ValkeyClusterNode} the execution happens on.
 		 */
-		RedisClusterNode getNode() {
+		ValkeyClusterNode getNode() {
 			return this.node;
 		}
 
@@ -424,7 +424,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 
 	/**
 	 * {@link NodeResult} encapsulates the actual {@link T value} returned by a {@link ClusterCommandCallback} on a given
-	 * {@link RedisClusterNode}.
+	 * {@link ValkeyClusterNode}.
 	 *
 	 * @param <T> {@link Class Type} of the {@link Object value} returned in the result.
 	 * @author Christoph Strobl
@@ -433,7 +433,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	 */
 	public static class NodeResult<T> {
 
-		private final RedisClusterNode node;
+		private final ValkeyClusterNode node;
 		private final ByteArrayWrapper key;
 		private final @Nullable T value;
 
@@ -443,7 +443,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 		 * @param node must not be {@literal null}.
 		 * @param value can be {@literal null}.
 		 */
-		public NodeResult(RedisClusterNode node, @Nullable T value) {
+		public NodeResult(ValkeyClusterNode node, @Nullable T value) {
 			this(node, value, new byte[] {});
 		}
 
@@ -454,7 +454,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 		 * @param value can be {@literal null}.
 		 * @param key must not be {@literal null}.
 		 */
-		public NodeResult(RedisClusterNode node, @Nullable T value, byte[] key) {
+		public NodeResult(ValkeyClusterNode node, @Nullable T value, byte[] key) {
 
 			this.node = node;
 			this.key = new ByteArrayWrapper(key);
@@ -462,18 +462,18 @@ public class ClusterCommandExecutor implements DisposableBean {
 		}
 
 		/**
-		 * Get the {@link RedisClusterNode} the command was executed on.
+		 * Get the {@link ValkeyClusterNode} the command was executed on.
 		 *
 		 * @return never {@literal null}.
 		 */
-		public RedisClusterNode getNode() {
+		public ValkeyClusterNode getNode() {
 			return this.node;
 		}
 
 		/**
-		 * Return the {@link byte[] key} mapped to the value stored in Redis.
+		 * Return the {@link byte[] key} mapped to the value stored in Valkey.
 		 *
-		 * @return a {@link byte[] byte array} of the key mapped to the value stored in Redis.
+		 * @return a {@link byte[] byte array} of the key mapped to the value stored in Valkey.
 		 */
 		public byte[] getKey() {
 			return this.key.getArray();
@@ -534,7 +534,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	/**
-	 * {@link MultiNodeResult} holds all {@link NodeResult} of a command executed on multiple {@link RedisClusterNode}.
+	 * {@link MultiNodeResult} holds all {@link NodeResult} of a command executed on multiple {@link ValkeyClusterNode}.
 	 *
 	 * @author Christoph Strobl
 	 * @author Mark Paluch
@@ -676,7 +676,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	}
 
 	/**
-	 * Value object representing a Redis key at a particular command position.
+	 * Value object representing a Valkey key at a particular command position.
 	 *
 	 * @author Mark Paluch
 	 * @author Christoph Strobl
@@ -805,7 +805,7 @@ public class ClusterCommandExecutor implements DisposableBean {
 	 */
 	private class NodeExceptionCollector {
 
-		private final Map<RedisClusterNode, Throwable> exceptions = new HashMap<>();
+		private final Map<ValkeyClusterNode, Throwable> exceptions = new HashMap<>();
 
 		/**
 		 * @return {@code true} if the collector contains at least one exception.

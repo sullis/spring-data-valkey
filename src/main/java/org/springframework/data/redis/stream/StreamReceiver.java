@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -34,16 +34,16 @@ import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A receiver to consume Redis Streams using reactive infrastructure.
+ * A receiver to consume Valkey Streams using reactive infrastructure.
  * <p>
- * Once created, a {@link StreamReceiver} can subscribe to a Redis Stream and consume incoming {@link Record records}.
+ * Once created, a {@link StreamReceiver} can subscribe to a Valkey Stream and consume incoming {@link Record records}.
  * Consider a {@link Flux} of {@link Record} infinite. Cancelling the {@link org.reactivestreams.Subscription}
  * terminates eventually background polling. Records are converted using {@link SerializationPair key and value
  * serializers} to support various serialization strategies. <br/>
@@ -88,7 +88,7 @@ import org.springframework.util.Assert;
  * See the following example code how to use {@link StreamReceiver}:
  *
  * <pre class="code">
- * ReactiveRedisConnectionFactory factory = …;
+ * ReactiveValkeyConnectionFactory factory = …;
  *
  * StreamReceiver<String, String, String> receiver = StreamReceiver.create(factory);
  * Flux<MapRecord<String, String, String>> records = receiver.receive(StreamOffset.fromStart("my-stream"));
@@ -103,46 +103,46 @@ import org.springframework.util.Assert;
  * @since 2.2
  * @see StreamReceiverOptions#builder()
  * @see org.springframework.data.redis.core.ReactiveStreamOperations
- * @see ReactiveRedisConnectionFactory
+ * @see ReactiveValkeyConnectionFactory
  * @see StreamMessageListenerContainer
  */
 public interface StreamReceiver<K, V extends Record<K, ?>> {
 
 	/**
-	 * Create a new {@link StreamReceiver} using {@link StringRedisSerializer string serializers} given
-	 * {@link ReactiveRedisConnectionFactory}.
+	 * Create a new {@link StreamReceiver} using {@link StringValkeySerializer string serializers} given
+	 * {@link ReactiveValkeyConnectionFactory}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @return the new {@link StreamReceiver}.
 	 */
 	static StreamReceiver<String, MapRecord<String, String, String>> create(
-			ReactiveRedisConnectionFactory connectionFactory) {
+			ReactiveValkeyConnectionFactory connectionFactory) {
 
-		Assert.notNull(connectionFactory, "ReactiveRedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ReactiveValkeyConnectionFactory must not be null");
 
-		SerializationPair<String> serializationPair = SerializationPair.fromSerializer(StringRedisSerializer.UTF_8);
+		SerializationPair<String> serializationPair = SerializationPair.fromSerializer(StringValkeySerializer.UTF_8);
 		return create(connectionFactory, StreamReceiverOptions.builder().serializer(serializationPair).build());
 	}
 
 	/**
-	 * Create a new {@link StreamReceiver} given {@link ReactiveRedisConnectionFactory} and {@link StreamReceiverOptions}.
+	 * Create a new {@link StreamReceiver} given {@link ReactiveValkeyConnectionFactory} and {@link StreamReceiverOptions}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @param options must not be {@literal null}.
 	 * @return the new {@link StreamReceiver}.
 	 */
-	static <K, V extends Record<K, ?>> StreamReceiver<K, V> create(ReactiveRedisConnectionFactory connectionFactory,
+	static <K, V extends Record<K, ?>> StreamReceiver<K, V> create(ReactiveValkeyConnectionFactory connectionFactory,
 			StreamReceiverOptions<K, V> options) {
 
-		Assert.notNull(connectionFactory, "ReactiveRedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ReactiveValkeyConnectionFactory must not be null");
 		Assert.notNull(options, "StreamReceiverOptions must not be null");
 
 		return new DefaultStreamReceiver<>(connectionFactory, options);
 	}
 
 	/**
-	 * Starts a Redis Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
-	 * are consumed from Redis and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
+	 * Starts a Valkey Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
+	 * are consumed from Valkey and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
 	 * is closed when the returned {@link Flux} terminates.
 	 * <p>
 	 * Every record must be acknowledged using
@@ -155,8 +155,8 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 	Flux<V> receive(StreamOffset<K> streamOffset);
 
 	/**
-	 * Starts a Redis Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
-	 * are consumed from Redis and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
+	 * Starts a Valkey Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
+	 * are consumed from Valkey and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
 	 * is closed when the returned {@link Flux} terminates.
 	 * <p>
 	 * Every record is acknowledged when received.
@@ -170,8 +170,8 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 	Flux<V> receiveAutoAck(Consumer consumer, StreamOffset<K> streamOffset);
 
 	/**
-	 * Starts a Redis Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
-	 * are consumed from Redis and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
+	 * Starts a Valkey Stream consumer that consumes {@link Record records} from the {@link StreamOffset stream}. Records
+	 * are consumed from Valkey and delivered on the returned {@link Flux} when requests are made on the Flux. The receiver
 	 * is closed when the returned {@link Flux} terminates.
 	 * <p>
 	 * Every record must be acknowledged using
@@ -225,7 +225,7 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 		 */
 		public static StreamReceiverOptionsBuilder<String, MapRecord<String, String, String>> builder() {
 
-			SerializationPair<String> serializer = SerializationPair.fromSerializer(StringRedisSerializer.UTF_8);
+			SerializationPair<String> serializer = SerializationPair.fromSerializer(StringValkeySerializer.UTF_8);
 			return new StreamReceiverOptionsBuilder<>().serializer(serializer);
 		}
 
@@ -236,7 +236,7 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 		public static <T> StreamReceiverOptionsBuilder<String, ObjectRecord<String, T>> builder(
 				HashMapper<T, byte[], byte[]> hashMapper) {
 
-			SerializationPair<String> serializer = SerializationPair.fromSerializer(StringRedisSerializer.UTF_8);
+			SerializationPair<String> serializer = SerializationPair.fromSerializer(StringValkeySerializer.UTF_8);
 			SerializationPair<ByteBuffer> raw = SerializationPair.raw();
 			return new StreamReceiverOptionsBuilder<>().keySerializer(serializer).hashKeySerializer(raw)
 					.hashValueSerializer(raw).objectMapper(hashMapper);
@@ -355,7 +355,7 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 		/**
 		 * Configure a resume {@link Function} to resume the main sequence when polling the stream fails. The function can
 		 * either resume by suppressing the error or fail the main sequence by emitting the error to stop receiving. Receive
-		 * errors (Redis errors, Serialization failures) stop receiving by default.
+		 * errors (Valkey errors, Serialization failures) stop receiving by default.
 		 *
 		 * @param resumeFunction must not be {@literal null}.
 		 * @return {@code this} {@link StreamReceiverOptionsBuilder}.
@@ -396,9 +396,9 @@ public interface StreamReceiver<K, V extends Record<K, ?>> {
 		 */
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T> StreamReceiverOptionsBuilder<T, MapRecord<T, T, T>> serializer(
-				RedisSerializationContext<T, ?> serializationContext) {
+				ValkeySerializationContext<T, ?> serializationContext) {
 
-			Assert.notNull(serializationContext, "RedisSerializationContext must not be null");
+			Assert.notNull(serializationContext, "ValkeySerializationContext must not be null");
 
 			this.keySerializer = (SerializationPair) serializationContext.getKeySerializationPair();
 			this.hashKeySerializer = serializationContext.getHashKeySerializationPair();

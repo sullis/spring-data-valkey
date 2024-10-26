@@ -30,30 +30,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Integration test for Redis set.
+ * Integration test for Valkey set.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Thomas Darimont
  */
-public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisCollectionIntegrationTests<T> {
+public abstract class AbstractValkeySetIntegrationTests<T> extends AbstractValkeyCollectionIntegrationTests<T> {
 
-	protected RedisSet<T> set;
+	protected ValkeySet<T> set;
 
 	/**
-	 * Constructs a new <code>AbstractRedisSetTests</code> instance.
+	 * Constructs a new <code>AbstractValkeySetTests</code> instance.
 	 *
 	 * @param factory
 	 * @param template
 	 */
 	@SuppressWarnings("rawtypes")
-	AbstractRedisSetIntegrationTests(ObjectFactory<T> factory, RedisTemplate template) {
+	AbstractValkeySetIntegrationTests(ObjectFactory<T> factory, ValkeyTemplate template) {
 		super(factory, template);
 	}
 
@@ -61,15 +61,15 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
-		set = (RedisSet<T>) collection;
+		set = (ValkeySet<T>) collection;
 	}
 
 	@SuppressWarnings("unchecked")
-	private RedisSet<T> createSetFor(String key) {
-		return new DefaultRedisSet<>((BoundSetOperations<String, T>) set.getOperations().boundSetOps(key));
+	private ValkeySet<T> createSetFor(String key) {
+		return new DefaultValkeySet<>((BoundSetOperations<String, T>) set.getOperations().boundSetOps(key));
 	}
 
-	@ParameterizedRedisTest // GH-2037
+	@ParameterizedValkeyTest // GH-2037
 	@EnabledOnCommand("SMISMEMBER")
 	void testContainsAll() {
 		
@@ -85,10 +85,10 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		assertThat(set.containsAll(Collections.emptyList())).isTrue();
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDiff() {
-		RedisSet<T> diffSet1 = createSetFor("test:set:diff1");
-		RedisSet<T> diffSet2 = createSetFor("test:set:diff2");
+		ValkeySet<T> diffSet1 = createSetFor("test:set:diff1");
+		ValkeySet<T> diffSet2 = createSetFor("test:set:diff2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -106,10 +106,10 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		assertThat(diff).contains(t1);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testDiffAndStore() {
-		RedisSet<T> diffSet1 = createSetFor("test:set:diff1");
-		RedisSet<T> diffSet2 = createSetFor("test:set:diff2");
+		ValkeySet<T> diffSet1 = createSetFor("test:set:diff1");
+		ValkeySet<T> diffSet2 = createSetFor("test:set:diff2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -125,17 +125,17 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		diffSet2.add(t4);
 
 		String resultName = "test:set:diff:result:1";
-		RedisSet<T> diff = set.diffAndStore(Arrays.asList(diffSet1, diffSet2), resultName);
+		ValkeySet<T> diff = set.diffAndStore(Arrays.asList(diffSet1, diffSet2), resultName);
 
 		assertThat(diff.size()).isEqualTo(1);
 		assertThat(diff).contains(t1);
 		assertThat(diff.getKey()).isEqualTo(resultName);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testIntersect() {
-		RedisSet<T> intSet1 = createSetFor("test:set:int1");
-		RedisSet<T> intSet2 = createSetFor("test:set:int2");
+		ValkeySet<T> intSet1 = createSetFor("test:set:int1");
+		ValkeySet<T> intSet2 = createSetFor("test:set:int2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -157,8 +157,8 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 	}
 
 	public void testIntersectAndStore() {
-		RedisSet<T> intSet1 = createSetFor("test:set:int1");
-		RedisSet<T> intSet2 = createSetFor("test:set:int2");
+		ValkeySet<T> intSet1 = createSetFor("test:set:int1");
+		ValkeySet<T> intSet2 = createSetFor("test:set:int2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -175,17 +175,17 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		intSet2.add(t3);
 
 		String resultName = "test:set:intersect:result:1";
-		RedisSet<T> inter = set.intersectAndStore(Arrays.asList(intSet1, intSet2), resultName);
+		ValkeySet<T> inter = set.intersectAndStore(Arrays.asList(intSet1, intSet2), resultName);
 		assertThat(inter.size()).isEqualTo(1);
 		assertThat(inter).contains(t2);
 		assertThat(inter.getKey()).isEqualTo(resultName);
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testUnion() {
-		RedisSet<T> unionSet1 = createSetFor("test:set:union1");
-		RedisSet<T> unionSet2 = createSetFor("test:set:union2");
+		ValkeySet<T> unionSet1 = createSetFor("test:set:union1");
+		ValkeySet<T> unionSet2 = createSetFor("test:set:union2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -205,10 +205,10 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testUnionAndStore() {
-		RedisSet<T> unionSet1 = createSetFor("test:set:union1");
-		RedisSet<T> unionSet2 = createSetFor("test:set:union2");
+		ValkeySet<T> unionSet1 = createSetFor("test:set:union1");
+		ValkeySet<T> unionSet2 = createSetFor("test:set:union2");
 
 		T t1 = getT();
 		T t2 = getT();
@@ -223,13 +223,13 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		unionSet2.add(t3);
 
 		String resultName = "test:set:union:result:1";
-		RedisSet<T> union = set.unionAndStore(Arrays.asList(unionSet1, unionSet2), resultName);
+		ValkeySet<T> union = set.unionAndStore(Arrays.asList(unionSet1, unionSet2), resultName);
 		assertThat(union.size()).isEqualTo(4);
 		assertThat(union).contains(t1, t2, t3, t4);
 		assertThat(union.getKey()).isEqualTo(resultName);
 	}
 
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testIterator() {
 		T t1 = getT();
 		T t2 = getT();
@@ -258,7 +258,7 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArray() {
 		Object[] expectedArray = new Object[] { getT(), getT(), getT() };
 		List<T> list = (List<T>) Arrays.asList(expectedArray);
@@ -283,7 +283,7 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 	}
 
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	public void testToArrayWithGenerics() {
 		Object[] expectedArray = new Object[] { getT(), getT(), getT() };
 		List<T> list = (List<T>) Arrays.asList(expectedArray);
@@ -308,7 +308,7 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 
 	// DATAREDIS-314
 	@SuppressWarnings("unchecked")
-	@ParameterizedRedisTest
+	@ParameterizedValkeyTest
 	void testScanWorksCorrectly() throws IOException {
 
 		Object[] expectedArray = new Object[] { getT(), getT(), getT() };
@@ -321,7 +321,7 @@ public abstract class AbstractRedisSetIntegrationTests<T> extends AbstractRedisC
 		cursor.close();
 	}
 
-	@ParameterizedRedisTest // GH-2049
+	@ParameterizedValkeyTest // GH-2049
 	void randMemberReturnsSomething() {
 
 		Object[] valuesArray = new Object[]{getT(), getT(), getT()};

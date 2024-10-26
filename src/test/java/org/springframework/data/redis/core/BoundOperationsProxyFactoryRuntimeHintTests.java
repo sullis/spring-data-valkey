@@ -22,11 +22,11 @@ import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.test.agent.EnabledIfRuntimeHintsAgent;
 import org.springframework.aot.test.agent.RuntimeHintsInvocations;
 import org.springframework.aot.test.agent.RuntimeHintsRecorder;
-import org.springframework.data.redis.aot.RedisRuntimeHints;
+import org.springframework.data.redis.aot.ValkeyRuntimeHints;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * @author Christoph Strobl
@@ -38,20 +38,20 @@ class BoundOperationsProxyFactoryRuntimeHintTests {
 	void boundOpsRuntimeHints() {
 
 		LettuceConnectionFactory connectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
-		RedisTemplate template = new RedisTemplate<>();
+				.getConnectionFactory(ValkeyStanalone.class);
+		ValkeyTemplate template = new ValkeyTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 		template.afterPropertiesSet();
 
 		BoundOperationsProxyFactory factory = new BoundOperationsProxyFactory();
 		BoundListOperations listOp = factory.createProxy(BoundListOperations.class, "key", DataType.LIST, template,
-				RedisOperations::opsForList);
+				ValkeyOperations::opsForList);
 
 		RuntimeHintsInvocations invocations = RuntimeHintsRecorder.record(() -> {
 			listOp.trim(0, 10);
 		});
 
-		RuntimeHints hints = RedisRuntimeHints.redisHints(it -> {
+		RuntimeHints hints = ValkeyRuntimeHints.redisHints(it -> {
 			// hints that should come from another module
 			it.reflection().registerType(ScopedObject.class,
 					hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS));

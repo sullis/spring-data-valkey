@@ -28,14 +28,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.Address;
 import org.springframework.data.redis.Person;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.hash.Jackson2HashMapper;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration tests for {@link Jackson2HashMapper}.
@@ -47,11 +47,11 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @MethodSource("params")
 public class Jackson2HashMapperIntegrationTests {
 
-	RedisTemplate<String, Object> template;
-	RedisConnectionFactory factory;
+	ValkeyTemplate<String, Object> template;
+	ValkeyConnectionFactory factory;
 	Jackson2HashMapper mapper;
 
-	public Jackson2HashMapperIntegrationTests(RedisConnectionFactory factory) throws Exception {
+	public Jackson2HashMapperIntegrationTests(ValkeyConnectionFactory factory) throws Exception {
 
 		this.factory = factory;
 		if (factory instanceof InitializingBean initializingBean) {
@@ -59,23 +59,23 @@ public class Jackson2HashMapperIntegrationTests {
 		}
 	}
 
-	public static Collection<RedisConnectionFactory> params() {
+	public static Collection<ValkeyConnectionFactory> params() {
 
-		return Arrays.asList(JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class),
-				LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class));
+		return Arrays.asList(JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class),
+				LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class));
 	}
 
 	@BeforeEach
 	public void setUp() {
 
-		this.template = new RedisTemplate<>();
+		this.template = new ValkeyTemplate<>();
 		this.template.setConnectionFactory(factory);
 		template.afterPropertiesSet();
 
 		this.mapper = new Jackson2HashMapper(true);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-423
+	@ParameterizedValkeyTest // DATAREDIS-423
 	public void shouldWriteReadHashCorrectly() {
 
 		Person jon = new Person("jon", "snow", 19);
@@ -90,7 +90,7 @@ public class Jackson2HashMapperIntegrationTests {
 		assertThat(result).isEqualTo(jon);
 	}
 
-	@ParameterizedRedisTest // GH-2565
+	@ParameterizedValkeyTest // GH-2565
 	public void shouldPreserveListPropertyOrderOnHashedSource() {
 
 		User jonDoe = User.as("Jon Doe")

@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.pubsub.RedisPubSubListener;
+import io.lettuce.core.pubsub.ValkeyPubSubListener;
 
 import java.nio.ByteBuffer;
 
@@ -24,18 +24,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper around {@link RedisPubSubListener} that converts {@link ByteBuffer} into {@code byte[]}.
+ * Wrapper around {@link ValkeyPubSubListener} that converts {@link ByteBuffer} into {@code byte[]}.
  *
  * @author Mark Paluch
  * @since 2.6
  */
-class LettuceByteBufferPubSubListenerWrapper implements RedisPubSubListener<ByteBuffer, ByteBuffer> {
+class LettuceByteBufferPubSubListenerWrapper implements ValkeyPubSubListener<ByteBuffer, ByteBuffer> {
 
-	private final RedisPubSubListener<byte[], byte[]> delegate;
+	private final ValkeyPubSubListener<byte[], byte[]> delegate;
 
-	LettuceByteBufferPubSubListenerWrapper(RedisPubSubListener<byte[], byte[]> delegate) {
+	LettuceByteBufferPubSubListenerWrapper(ValkeyPubSubListener<byte[], byte[]> delegate) {
 
-		Assert.notNull(delegate, "RedisPubSubListener must not be null");
+		Assert.notNull(delegate, "ValkeyPubSubListener must not be null");
 
 		this.delegate = delegate;
 	}

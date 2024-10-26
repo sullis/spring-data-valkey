@@ -34,7 +34,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisStreamCommands;
+import org.springframework.data.redis.connection.ValkeyStreamCommands;
 import org.springframework.data.redis.connection.jedis.JedisInvoker.ResponseCommands;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  * @author Dengliming
  * @since 2.3
  */
-class JedisStreamCommands implements RedisStreamCommands {
+class JedisStreamCommands implements ValkeyStreamCommands {
 
 	private final JedisConnection connection;
 

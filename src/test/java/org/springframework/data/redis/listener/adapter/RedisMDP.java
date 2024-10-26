@@ -18,7 +18,7 @@ package org.springframework.data.redis.listener.adapter;
 /**
  * @author Costin Leau
  */
-public class RedisMDP {
+public class ValkeyMDP {
 
 	public void handleMessage(String message) {
 	}

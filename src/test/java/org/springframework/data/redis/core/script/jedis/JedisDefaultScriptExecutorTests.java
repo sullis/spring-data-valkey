@@ -19,11 +19,11 @@ import redis.clients.jedis.Jedis;
 
 import org.junit.jupiter.api.Disabled;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.core.script.AbstractDefaultScriptExecutorTests;
 import org.springframework.data.redis.core.script.DefaultScriptExecutor;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * Integration test of {@link DefaultScriptExecutor} with {@link Jedis}.
@@ -33,8 +33,8 @@ import org.springframework.data.redis.test.extension.RedisStanalone;
 public class JedisDefaultScriptExecutorTests extends AbstractDefaultScriptExecutorTests {
 
 	@Override
-	protected RedisConnectionFactory getConnectionFactory() {
-		return JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+	protected ValkeyConnectionFactory getConnectionFactory() {
+		return JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 	}
 
 	@Disabled("transactional execution is currently not supported with Jedis")

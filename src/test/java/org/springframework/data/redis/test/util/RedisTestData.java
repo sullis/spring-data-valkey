@@ -27,28 +27,28 @@ import org.assertj.core.api.MapAssert;
 import org.assertj.core.internal.Failures;
 
 import org.springframework.data.redis.core.convert.Bucket;
-import org.springframework.data.redis.core.convert.RedisData;
+import org.springframework.data.redis.core.convert.ValkeyData;
 
 /**
- * {@link AssertProvider} for {@link RedisTestData}.
+ * {@link AssertProvider} for {@link ValkeyTestData}.
  *
  * @author Mark Paluch
  */
-public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAssert> {
+public class ValkeyTestData implements AssertProvider<ValkeyTestData.ValkeyBucketAssert> {
 
-	private final RedisData redisData;
+	private final ValkeyData redisData;
 
-	RedisTestData(RedisData redisData) {
+	ValkeyTestData(ValkeyData redisData) {
 		this.redisData = redisData;
 	}
 
-	public static RedisTestData from(RedisData data) {
-		return new RedisTestData(data);
+	public static ValkeyTestData from(ValkeyData data) {
+		return new ValkeyTestData(data);
 	}
 
 	@Override
-	public RedisBucketAssert assertThat() {
-		return new RedisBucketAssert(redisData);
+	public ValkeyBucketAssert assertThat() {
+		return new ValkeyBucketAssert(redisData);
 	}
 
 	public Bucket getBucket() {
@@ -59,17 +59,17 @@ public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAs
 		return redisData.getId();
 	}
 
-	public RedisData getRedisData() {
+	public ValkeyData getValkeyData() {
 		return redisData;
 	}
 
-	public static class RedisBucketAssert extends MapAssert<String, String> {
+	public static class ValkeyBucketAssert extends MapAssert<String, String> {
 
 		private final Failures failures = Failures.instance();
 
-		private final RedisData redisData;
+		private final ValkeyData redisData;
 
-		RedisBucketAssert(RedisData redisData) {
+		ValkeyBucketAssert(ValkeyData redisData) {
 
 			super(toStringMap(redisData.getBucket().asMap()));
 			this.redisData = redisData;
@@ -82,7 +82,7 @@ public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAs
 		 * @param type
 		 * @return
 		 */
-		public RedisBucketAssert containingTypeHint(String path, Class<?> type) {
+		public ValkeyBucketAssert containingTypeHint(String path, Class<?> type) {
 
 			isNotNull();
 
@@ -109,7 +109,7 @@ public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAs
 		 * @param value
 		 * @return
 		 */
-		public RedisBucketAssert containsEntry(String path, String value) {
+		public ValkeyBucketAssert containsEntry(String path, String value) {
 			super.containsEntry(path, value);
 			return this;
 		}
@@ -121,7 +121,7 @@ public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAs
 		 * @param date
 		 * @return
 		 */
-		public RedisBucketAssert containsEntry(String path, Date date) {
+		public ValkeyBucketAssert containsEntry(String path, Date date) {
 			return containsEntry(path, "" + date.getTime());
 		}
 
@@ -131,7 +131,7 @@ public class RedisTestData implements AssertProvider<RedisTestData.RedisBucketAs
 		 * @param path
 		 * @return
 		 */
-		public RedisBucketAssert without(String path) {
+		public ValkeyBucketAssert without(String path) {
 
 			return this;
 		}

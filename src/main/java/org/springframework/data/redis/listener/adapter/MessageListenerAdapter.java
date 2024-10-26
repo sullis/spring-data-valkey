@@ -28,9 +28,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationValkeySerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
 /**
  * Message listener adapter that delegates the handling of messages to target listener methods via reflection, with
  * flexible message type conversion. Allows listener methods to operate on message content types, completely independent
- * from the Redis API.
+ * from the Valkey API.
  * <p>
  * Make sure to call {@link #afterPropertiesSet()} after setting all the parameters on the adapter.
  * <p>
@@ -52,10 +52,10 @@ import org.springframework.util.StringUtils;
  * <p>
  * Modeled as much as possible after the JMS MessageListenerAdapter in Spring Framework.
  * <p>
- * By default, the content of incoming Redis messages gets extracted before being passed into the target listener
+ * By default, the content of incoming Valkey messages gets extracted before being passed into the target listener
  * method, to let the target method operate on message content types such as String or byte array instead of the raw
- * {@link Message}. Message type conversion is delegated to a Spring Data {@link RedisSerializer}. By default, the
- * {@link JdkSerializationRedisSerializer} will be used. (If you do not want such automatic message conversion taking
+ * {@link Message}. Message type conversion is delegated to a Spring Data {@link ValkeySerializer}. By default, the
+ * {@link JdkSerializationValkeySerializer} will be used. (If you do not want such automatic message conversion taking
  * place, then be sure to set the {@link #setSerializer Serializer} to <code>null</code>.)
  * <p>
  * Find below some examples of method signatures compliant with this adapter class. This first example handles all
@@ -84,8 +84,8 @@ import org.springframework.util.StringUtils;
  *
  * For further examples and discussion please do refer to the Spring Data reference documentation which describes this
  * class (and its attendant configuration) in detail. <b>Important:</b> Due to the nature of messages, the default
- * serializer used by the adapter is {@link StringRedisSerializer}. If the messages are of a different type, change them
- * accordingly through {@link #setSerializer(RedisSerializer)}.
+ * serializer used by the adapter is {@link StringValkeySerializer}. If the messages are of a different type, change them
+ * accordingly through {@link #setSerializer(ValkeySerializer)}.
  *
  * @author Juergen Hoeller
  * @author Costin Leau
@@ -168,9 +168,9 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 
 	private String defaultListenerMethod = ORIGINAL_DEFAULT_LISTENER_METHOD;
 
-	private @Nullable RedisSerializer<?> serializer;
+	private @Nullable ValkeySerializer<?> serializer;
 
-	private @Nullable RedisSerializer<String> stringSerializer;
+	private @Nullable ValkeySerializer<String> stringSerializer;
 
 	/**
 	 * Create a new {@link MessageListenerAdapter} with default settings.
@@ -244,24 +244,24 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 	}
 
 	/**
-	 * Set the serializer that will convert incoming raw Redis messages to listener method arguments.
+	 * Set the serializer that will convert incoming raw Valkey messages to listener method arguments.
 	 * <p>
-	 * The default converter is a {@link StringRedisSerializer}.
+	 * The default converter is a {@link StringValkeySerializer}.
 	 *
 	 * @param serializer
 	 */
-	public void setSerializer(RedisSerializer<?> serializer) {
+	public void setSerializer(ValkeySerializer<?> serializer) {
 		this.serializer = serializer;
 	}
 
 	/**
 	 * Sets the serializer used for converting the channel/pattern to a String.
 	 * <p>
-	 * The default converter is a {@link StringRedisSerializer}.
+	 * The default converter is a {@link StringValkeySerializer}.
 	 *
 	 * @param serializer
 	 */
-	public void setStringSerializer(RedisSerializer<String> serializer) {
+	public void setStringSerializer(ValkeySerializer<String> serializer) {
 		this.stringSerializer = serializer;
 	}
 
@@ -278,12 +278,12 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 	}
 
 	/**
-	 * Standard Redis {@link MessageListener} entry point.
+	 * Standard Valkey {@link MessageListener} entry point.
 	 * <p>
 	 * Delegates the message to the target listener method, with appropriate conversion of the message argument. In case
 	 * of an exception, the {@link #handleListenerException(Throwable)} method will be invoked.
 	 *
-	 * @param message the incoming Redis message
+	 * @param message the incoming Valkey message
 	 * @see #handleListenerException
 	 */
 	@Override
@@ -313,12 +313,12 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 	/**
 	 * Initialize the default implementations for the adapter's strategies.
 	 *
-	 * @see #setSerializer(RedisSerializer)
-	 * @see JdkSerializationRedisSerializer
+	 * @see #setSerializer(ValkeySerializer)
+	 * @see JdkSerializationValkeySerializer
 	 */
 	protected void initDefaultStrategies() {
-		setSerializer(RedisSerializer.string());
-		setStringSerializer(RedisSerializer.string());
+		setSerializer(ValkeySerializer.string());
+		setStringSerializer(ValkeySerializer.string());
 	}
 
 	/**
@@ -332,9 +332,9 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 	}
 
 	/**
-	 * Extract the message body from the given Redis message.
+	 * Extract the message body from the given Valkey message.
 	 *
-	 * @param message the Redis <code>Message</code>
+	 * @param message the Valkey <code>Message</code>
 	 * @return the content of the message, to be passed into the listener method as argument
 	 */
 	protected Object extractMessage(Message message) {
@@ -349,8 +349,8 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 	 * <p>
 	 * The default implementation simply returns the configured default listener method, if any.
 	 *
-	 * @param originalMessage the Redis request message
-	 * @param extractedMessage the converted Redis request message, to be passed into the listener method as argument
+	 * @param originalMessage the Valkey request message
+	 * @param extractedMessage the converted Valkey request message, to be passed into the listener method as argument
 	 * @return the name of the listener method (never <code>null</code>)
 	 * @see #setDefaultListenerMethod
 	 */
@@ -375,11 +375,11 @@ public class MessageListenerAdapter implements InitializingBean, MessageListener
 			if (targetEx instanceof DataAccessException dataAccessException) {
 				throw dataAccessException;
 			} else {
-				throw new RedisListenerExecutionFailedException("Listener method '%s' threw exception".formatted(methodName),
+				throw new ValkeyListenerExecutionFailedException("Listener method '%s' threw exception".formatted(methodName),
 						targetEx);
 			}
 		} catch (Throwable ex) {
-			throw new RedisListenerExecutionFailedException("Failed to invoke target method '%s' with arguments %s"
+			throw new ValkeyListenerExecutionFailedException("Failed to invoke target method '%s' with arguments %s"
 					.formatted(methodName, ObjectUtils.nullSafeToString(arguments)), ex);
 		}
 	}

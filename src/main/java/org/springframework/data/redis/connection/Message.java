@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection;
 import java.io.Serializable;
 
 /**
- * Class encapsulating a Redis message body and its properties.
+ * Class encapsulating a Valkey message body and its properties.
  *
  * @author Costin Leau
  * @author Christoph Strobl

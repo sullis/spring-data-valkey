@@ -19,8 +19,8 @@ import io.lettuce.core.XAddArgs;
 import io.lettuce.core.XClaimArgs;
 import io.lettuce.core.XGroupCreateArgs;
 import io.lettuce.core.XReadArgs;
-import io.lettuce.core.api.async.RedisStreamAsyncCommands;
-import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
+import io.lettuce.core.api.async.ValkeyStreamAsyncCommands;
+import io.lettuce.core.cluster.api.async.ValkeyClusterAsyncCommands;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.function.Function;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisStreamCommands;
+import org.springframework.data.redis.connection.ValkeyStreamCommands;
 import org.springframework.data.redis.connection.stream.ByteRecord;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  * @author Mark John Moreno
  * @since 2.2
  */
-class LettuceStreamCommands implements RedisStreamCommands {
+class LettuceStreamCommands implements ValkeyStreamCommands {
 
 	private final LettuceConnection connection;
 
@@ -69,7 +69,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		String[] ids = entryIdsToString(recordIds);
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xack, key, LettuceConverters.toBytes(group), ids);
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xack, key, LettuceConverters.toBytes(group), ids);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		args.nomkstream(options.isNoMkStream());
 		args.approximateTrimming(options.isApproximateTrimming());
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xadd, record.getStream(), args, record.getValue())
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xadd, record.getStream(), args, record.getValue())
 				.get(RecordId::of);
 	}
 
@@ -101,7 +101,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 				LettuceConverters.toBytes(newOwner));
 		XClaimArgs args = StreamConverters.toXClaimArgs(options).justid();
 
-		return connection.invoke().fromMany(RedisStreamAsyncCommands::xclaim, key, from, args, ids)
+		return connection.invoke().fromMany(ValkeyStreamAsyncCommands::xclaim, key, from, args, ids)
 				.toList(it -> RecordId.of(it.getId()));
 	}
 
@@ -113,7 +113,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 				LettuceConverters.toBytes(newOwner));
 		XClaimArgs args = StreamConverters.toXClaimArgs(options);
 
-		return connection.invoke().fromMany(RedisStreamAsyncCommands::xclaim, key, from, args, ids)
+		return connection.invoke().fromMany(ValkeyStreamAsyncCommands::xclaim, key, from, args, ids)
 				.toList(StreamConverters.byteRecordConverter());
 	}
 
@@ -123,7 +123,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(recordIds, "recordIds must not be null");
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xdel, key, entryIdsToString(recordIds));
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xdel, key, entryIdsToString(recordIds));
 	}
 
 	@Override
@@ -140,7 +140,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		XReadArgs.StreamOffset<byte[]> streamOffset = XReadArgs.StreamOffset.from(key, readOffset.getOffset());
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xgroupCreate, streamOffset,
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xgroupCreate, streamOffset,
 				LettuceConverters.toBytes(groupName), XGroupCreateArgs.Builder.mkstream(mkSteam));
 	}
 
@@ -152,7 +152,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		io.lettuce.core.Consumer<byte[]> lettuceConsumer = toConsumer(consumer);
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xgroupDelconsumer, key, lettuceConsumer)
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xgroupDelconsumer, key, lettuceConsumer)
 				.get(Objects::nonNull);
 	}
 
@@ -162,7 +162,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.hasText(groupName, "Group name must not be null or empty");
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xgroupDestroy, key, LettuceConverters.toBytes(groupName));
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xgroupDestroy, key, LettuceConverters.toBytes(groupName));
 	}
 
 	@Override
@@ -170,7 +170,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xinfoStream, key).get(XInfoStream::fromList);
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xinfoStream, key).get(XInfoStream::fromList);
 	}
 
 	@Override
@@ -178,7 +178,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xinfoGroups, key).get(XInfoGroups::fromList);
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xinfoGroups, key).get(XInfoGroups::fromList);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(groupName, "GroupName must not be null");
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xinfoConsumers, key, LettuceConverters.toBytes(groupName))
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xinfoConsumers, key, LettuceConverters.toBytes(groupName))
 				.get(it -> XInfoConsumers.fromList(groupName, it));
 	}
 
@@ -196,7 +196,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xlen, key);
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xlen, key);
 	}
 
 	@Override
@@ -204,7 +204,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 
 		byte[] group = LettuceConverters.toBytes(groupName);
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xpending, key, group)
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xpending, key, group)
 				.get(it -> StreamConverters.toPendingMessagesInfo(groupName, it));
 	}
 
@@ -220,12 +220,12 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		if (options.hasConsumer()) {
 
 			return connection.invoke()
-					.from(RedisStreamAsyncCommands::xpending, key,
+					.from(ValkeyStreamAsyncCommands::xpending, key,
 							io.lettuce.core.Consumer.from(group, LettuceConverters.toBytes(options.getConsumerName())), range, limit)
 					.get(it -> StreamConverters.toPendingMessages(groupName, options.getRange(), it));
 		}
 
-		return connection.invoke().from(RedisStreamAsyncCommands::xpending, key, group, range, limit)
+		return connection.invoke().from(ValkeyStreamAsyncCommands::xpending, key, group, range, limit)
 				.get(it -> StreamConverters.toPendingMessages(groupName, options.getRange(), it));
 	}
 
@@ -239,7 +239,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		io.lettuce.core.Range<String> lettuceRange = RangeConverter.toRange(range, Function.identity());
 		io.lettuce.core.Limit lettuceLimit = LettuceConverters.toLimit(limit);
 
-		return connection.invoke().fromMany(RedisStreamAsyncCommands::xrange, key, lettuceRange, lettuceLimit)
+		return connection.invoke().fromMany(ValkeyStreamAsyncCommands::xrange, key, lettuceRange, lettuceLimit)
 				.toList(StreamConverters.byteRecordConverter());
 	}
 
@@ -255,11 +255,11 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		if (readOptions.isBlocking()) {
 
 			return connection.invoke(getAsyncDedicatedConnection())
-					.fromMany(RedisStreamAsyncCommands::xread, args, streamOffsets)
+					.fromMany(ValkeyStreamAsyncCommands::xread, args, streamOffsets)
 					.toList(StreamConverters.byteRecordConverter());
 		}
 
-		return connection.invoke().fromMany(RedisStreamAsyncCommands::xread, args, streamOffsets)
+		return connection.invoke().fromMany(ValkeyStreamAsyncCommands::xread, args, streamOffsets)
 				.toList(StreamConverters.byteRecordConverter());
 	}
 
@@ -278,11 +278,11 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		if (readOptions.isBlocking()) {
 
 			return connection.invoke(getAsyncDedicatedConnection())
-					.fromMany(RedisStreamAsyncCommands::xreadgroup, lettuceConsumer, args, streamOffsets)
+					.fromMany(ValkeyStreamAsyncCommands::xreadgroup, lettuceConsumer, args, streamOffsets)
 					.toList(StreamConverters.byteRecordConverter());
 		}
 
-		return connection.invoke().fromMany(RedisStreamAsyncCommands::xreadgroup, lettuceConsumer, args, streamOffsets)
+		return connection.invoke().fromMany(ValkeyStreamAsyncCommands::xreadgroup, lettuceConsumer, args, streamOffsets)
 				.toList(StreamConverters.byteRecordConverter());
 	}
 
@@ -297,7 +297,7 @@ class LettuceStreamCommands implements RedisStreamCommands {
 		io.lettuce.core.Limit lettuceLimit = LettuceConverters.toLimit(limit);
 
 		return connection.invoke()
-				.fromMany(RedisStreamAsyncCommands::xrevrange, key, lettuceRange, lettuceLimit)
+				.fromMany(ValkeyStreamAsyncCommands::xrevrange, key, lettuceRange, lettuceLimit)
 				.toList(StreamConverters.byteRecordConverter());
 	}
 
@@ -310,10 +310,10 @@ class LettuceStreamCommands implements RedisStreamCommands {
 	public Long xTrim(byte[] key, long count, boolean approximateTrimming) {
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisStreamAsyncCommands::xtrim, key, approximateTrimming, count);
+		return connection.invoke().just(ValkeyStreamAsyncCommands::xtrim, key, approximateTrimming, count);
 	}
 
-	RedisClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
+	ValkeyClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
 		return connection.getAsyncDedicatedConnection();
 	}
 

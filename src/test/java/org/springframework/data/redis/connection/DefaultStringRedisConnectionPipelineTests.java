@@ -26,12 +26,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.geo.Distance;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 
 /**
- * Unit test of {@link DefaultStringRedisConnection} that executes commands in a pipeline
+ * Unit test of {@link DefaultStringValkeyConnection} that executes commands in a pipeline
  *
  * @author Jennifer Hickey
  * @author Christoph Strobl
@@ -39,7 +39,7 @@ import org.springframework.data.redis.connection.stream.StreamRecords;
  * @author Mark Paluch
  * @author dengliming
  */
-public class DefaultStringRedisConnectionPipelineTests extends DefaultStringRedisConnectionTests {
+public class DefaultStringValkeyConnectionPipelineTests extends DefaultStringValkeyConnectionTests {
 
 	@BeforeEach
 	public void setUp() {

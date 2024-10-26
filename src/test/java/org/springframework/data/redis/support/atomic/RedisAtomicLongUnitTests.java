@@ -22,19 +22,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
- * Unit tests for {@link RedisAtomicLong}.
+ * Unit tests for {@link ValkeyAtomicLong}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
-class RedisAtomicLongUnitTests {
+class ValkeyAtomicLongUnitTests {
 
-	@Mock RedisOperations<String, Long> operationsMock;
+	@Mock ValkeyOperations<String, Long> operationsMock;
 	@Mock ValueOperations<String, Long> valueOperationsMock;
 
 	@Test // DATAREDIS-872
@@ -42,10 +42,10 @@ class RedisAtomicLongUnitTests {
 	void shouldUseSetIfAbsentForInitialValue() {
 
 		when(operationsMock.opsForValue()).thenReturn(valueOperationsMock);
-		when(operationsMock.getKeySerializer()).thenReturn(mock(RedisSerializer.class));
-		when(operationsMock.getValueSerializer()).thenReturn(mock(RedisSerializer.class));
+		when(operationsMock.getKeySerializer()).thenReturn(mock(ValkeySerializer.class));
+		when(operationsMock.getValueSerializer()).thenReturn(mock(ValkeySerializer.class));
 
-		new RedisAtomicLong("id", operationsMock);
+		new ValkeyAtomicLong("id", operationsMock);
 
 		verify(valueOperationsMock).setIfAbsent("id", 0L);
 	}

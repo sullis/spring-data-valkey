@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 
@@ -46,12 +46,12 @@ public interface ByteBufferRecord extends MapRecord<ByteBuffer, ByteBuffer, Byte
 
 	/**
 	 * Deserialize {@link #getStream() key} and {@link #getValue() field/value pairs} with the given
-	 * {@link RedisSerializer}. An already assigned {@link RecordId id} is carried over to the new instance.
+	 * {@link ValkeySerializer}. An already assigned {@link RecordId id} is carried over to the new instance.
 	 *
 	 * @param serializer can be {@literal null} if the {@link Record} only holds binary data.
 	 * @return new {@link MapRecord} holding the deserialized values.
 	 */
-	default <T> MapRecord<T, T, T> deserialize(@Nullable RedisSerializer<T> serializer) {
+	default <T> MapRecord<T, T, T> deserialize(@Nullable ValkeySerializer<T> serializer) {
 		return deserialize(serializer, serializer, serializer);
 	}
 
@@ -65,9 +65,9 @@ public interface ByteBufferRecord extends MapRecord<ByteBuffer, ByteBuffer, Byte
 	 * @param valueSerializer can be {@literal null} if the values suite already the target format.
 	 * @return new {@link MapRecord} holding the deserialized values.
 	 */
-	default <K, HK, HV> MapRecord<K, HK, HV> deserialize(@Nullable RedisSerializer<? extends K> streamSerializer,
-			@Nullable RedisSerializer<? extends HK> fieldSerializer,
-			@Nullable RedisSerializer<? extends HV> valueSerializer) {
+	default <K, HK, HV> MapRecord<K, HK, HV> deserialize(@Nullable ValkeySerializer<? extends K> streamSerializer,
+			@Nullable ValkeySerializer<? extends HK> fieldSerializer,
+			@Nullable ValkeySerializer<? extends HV> valueSerializer) {
 
 		return mapEntries(it -> {
 

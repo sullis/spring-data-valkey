@@ -30,7 +30,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ReactiveSetCommands;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -45,11 +45,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveSetOperations<K, V> implements ReactiveSetOperations<K, V> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<K, V> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<K, V> serializationContext;
 
-	DefaultReactiveSetOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<K, V> serializationContext) {
+	DefaultReactiveSetOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<K, V> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;

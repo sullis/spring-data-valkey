@@ -26,7 +26,7 @@ import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.util.Assert;
@@ -37,14 +37,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * Parser for the Redis <code>&lt;listener-container&gt;</code> element.
+ * Parser for the Valkey <code>&lt;listener-container&gt;</code> element.
  *
  * @author Costin Leau
  */
-class RedisListenerContainerParser extends AbstractSimpleBeanDefinitionParser {
+class ValkeyListenerContainerParser extends AbstractSimpleBeanDefinitionParser {
 
-	protected Class<RedisMessageListenerContainer> getBeanClass(Element element) {
-		return RedisMessageListenerContainer.class;
+	protected Class<ValkeyMessageListenerContainer> getBeanClass(Element element) {
+		return ValkeyMessageListenerContainer.class;
 	}
 
 	@SuppressWarnings("unchecked")

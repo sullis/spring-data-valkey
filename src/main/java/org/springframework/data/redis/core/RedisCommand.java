@@ -25,8 +25,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link Enum Enumeration} of well-known {@literal Redis commands}. This enumeration serves as non-exhaustive set of
- * built-in commands for a typical Redis server.
+ * {@link Enum Enumeration} of well-known {@literal Valkey commands}. This enumeration serves as non-exhaustive set of
+ * built-in commands for a typical Valkey server.
  *
  * @author Christoph Strobl
  * @author Thomas Darimont
@@ -37,10 +37,10 @@ import org.springframework.util.StringUtils;
  * @author John Blum
  * @since 1.3
  * @link <a href=
- *       "https://github.com/antirez/redis/blob/843de8b786562d8d77c78d83a971060adc61f77a/src/server.c#L180">Redis
+ *       "https://github.com/antirez/redis/blob/843de8b786562d8d77c78d83a971060adc61f77a/src/server.c#L180">Valkey
  *       command list</a>
  */
-public enum RedisCommand {
+public enum ValkeyCommand {
 
 	// -- A
 	APPEND("rw", 2, 2), //
@@ -220,18 +220,18 @@ public enum RedisCommand {
 	// -- UNKNOWN / DEFAULT
 	UNKNOWN("rw", -1);
 
-	private static final Map<String, RedisCommand> commandLookup;
+	private static final Map<String, ValkeyCommand> commandLookup;
 
 	static {
 		commandLookup = buildCommandLookupTable();
 	}
 
-	private static Map<String, RedisCommand> buildCommandLookupTable() {
+	private static Map<String, ValkeyCommand> buildCommandLookupTable() {
 
-		RedisCommand[] commands = RedisCommand.values();
-		Map<String, RedisCommand> map = new HashMap<>(commands.length + 5, 1.0f);
+		ValkeyCommand[] commands = ValkeyCommand.values();
+		Map<String, ValkeyCommand> map = new HashMap<>(commands.length + 5, 1.0f);
 
-		for (RedisCommand command : commands) {
+		for (ValkeyCommand command : commands) {
 
 			map.put(command.name().toLowerCase(), command);
 
@@ -247,10 +247,10 @@ public enum RedisCommand {
 	 * Returns the command represented by the given {@code key}, otherwise returns {@link #UNKNOWN} if no matching command
 	 * could be found.
 	 *
-	 * @param key {@link String key} to the {@link RedisCommand} to lookup.
-	 * @return a matching {@link RedisCommand} for the given {@code key}, otherwise {@link #UNKNOWN}.
+	 * @param key {@link String key} to the {@link ValkeyCommand} to lookup.
+	 * @return a matching {@link ValkeyCommand} for the given {@code key}, otherwise {@link #UNKNOWN}.
 	 */
-	public static RedisCommand failsafeCommandLookup(String key) {
+	public static ValkeyCommand failsafeCommandLookup(String key) {
 		return StringUtils.hasText(key) ? commandLookup.getOrDefault(key.toLowerCase(), UNKNOWN) : UNKNOWN;
 	}
 
@@ -263,38 +263,38 @@ public enum RedisCommand {
 	private final @Nullable String alias;
 
 	/**
-	 * Creates a new {@link RedisCommand}.
+	 * Creates a new {@link ValkeyCommand}.
 	 *
 	 * @param mode {@link String} containing the mode ({@literal r} for read, {@literal w} for write or {@literal rw} for
-	 *          read-write) of the Redis command.
-	 * @param minArgs minimum number of arguments accepted by the Redis command.
+	 *          read-write) of the Valkey command.
+	 * @param minArgs minimum number of arguments accepted by the Valkey command.
 	 */
-	RedisCommand(String mode, int minArgs) {
+	ValkeyCommand(String mode, int minArgs) {
 		this(mode, minArgs, -1);
 	}
 
 	/**
-	 * Creates a new {@link RedisCommand}.
+	 * Creates a new {@link ValkeyCommand}.
 	 *
 	 * @param mode {@link String} containing the mode ({@literal r} for read, {@literal w} for write or {@literal rw} for
-	 *          read-write) of the Redis command.
-	 * @param minArgs minimum number of arguments accepted by the Redis command.
-	 * @param maxArgs maximum number of arguments accepted by the Redis command.
+	 *          read-write) of the Valkey command.
+	 * @param minArgs minimum number of arguments accepted by the Valkey command.
+	 * @param maxArgs maximum number of arguments accepted by the Valkey command.
 	 */
-	RedisCommand(String mode, int minArgs, int maxArgs) {
+	ValkeyCommand(String mode, int minArgs, int maxArgs) {
 		this(mode, minArgs, maxArgs, null);
 	}
 
 	/**
-	 * Creates a new {@link RedisCommand}.
+	 * Creates a new {@link ValkeyCommand}.
 	 *
 	 * @param mode {@link String} containing the mode ({@literal r} for read, {@literal w} for write or {@literal rw} for
-	 *          read-write) of the Redis command.
-	 * @param minArgs minimum number of arguments accepted by the Redis command.
-	 * @param maxArgs maximum number of arguments accepted by the Redis command.
-	 * @param alias alternate command name used as alias for the Redis command, can be {@literal null}.
+	 *          read-write) of the Valkey command.
+	 * @param minArgs minimum number of arguments accepted by the Valkey command.
+	 * @param maxArgs maximum number of arguments accepted by the Valkey command.
+	 * @param alias alternate command name used as alias for the Valkey command, can be {@literal null}.
 	 */
-	RedisCommand(String mode, int minArgs, int maxArgs, @Nullable String alias) {
+	ValkeyCommand(String mode, int minArgs, int maxArgs, @Nullable String alias) {
 
 		if (StringUtils.hasText(mode)) {
 			this.read = mode.toLowerCase().contains("r");
@@ -324,9 +324,9 @@ public enum RedisCommand {
 	}
 
 	/**
-	 * Returns a {@link Set} of all {@link String aliases} for this {@link RedisCommand}.
+	 * Returns a {@link Set} of all {@link String aliases} for this {@link ValkeyCommand}.
 	 *
-	 * @return a {@link Set} of all {@link String aliases} for this {@link RedisCommand}.
+	 * @return a {@link Set} of all {@link String aliases} for this {@link ValkeyCommand}.
 	 */
 	Set<String> getAliases() {
 		return ObjectUtils.isEmpty(this.alias) ? Collections.emptySet() : Collections.singleton(this.alias);
@@ -354,10 +354,10 @@ public enum RedisCommand {
 	}
 
 	/**
-	 * {@link String#equalsIgnoreCase(String) Compares} the given {@link String} representing the {@literal Redis command}
-	 * to the {@link #toString()} representation of {@link RedisCommand} as well as any {@link #alias}.
+	 * {@link String#equalsIgnoreCase(String) Compares} the given {@link String} representing the {@literal Valkey command}
+	 * to the {@link #toString()} representation of {@link ValkeyCommand} as well as any {@link #alias}.
 	 *
-	 * @param command {@link String} representation of the {@literal Redis command} to match.
+	 * @param command {@link String} representation of the {@literal Valkey command} to match.
 	 * @return {@literal true} if a positive match.
 	 */
 	public boolean isRepresentedBy(String command) {
@@ -369,7 +369,7 @@ public enum RedisCommand {
 	/**
 	 * Validates given {@link Integer argument count} against expected ones.
 	 *
-	 * @param argumentCount {@link Integer number of arguments} passed to the Redis command.
+	 * @param argumentCount {@link Integer number of arguments} passed to the Valkey command.
 	 * @exception IllegalArgumentException if the given {@link Integer argument count} does not match expected.
 	 */
 	public void validateArgumentCount(int argumentCount) {

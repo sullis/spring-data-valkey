@@ -20,36 +20,36 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base implementation for {@link RedisCollection}. Provides a skeletal implementation. Note that the collection support
+ * Base implementation for {@link ValkeyCollection}. Provides a skeletal implementation. Note that the collection support
  * works only with normal, non-pipeline/multi-exec connections as it requires a reply to be sent right away.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public abstract class AbstractRedisCollection<E> extends AbstractCollection<E> implements RedisCollection<E> {
+public abstract class AbstractValkeyCollection<E> extends AbstractCollection<E> implements ValkeyCollection<E> {
 
 	public static final String ENCODING = "UTF-8";
 
 	private volatile String key;
 
-	private final RedisOperations<String, E> operations;
+	private final ValkeyOperations<String, E> operations;
 
 	/**
-	 * Constructs a new {@link AbstractRedisCollection} instance.
+	 * Constructs a new {@link AbstractValkeyCollection} instance.
 	 *
-	 * @param key Redis key of this collection.
-	 * @param operations {@link RedisOperations} for the value type of this collection.
+	 * @param key Valkey key of this collection.
+	 * @param operations {@link ValkeyOperations} for the value type of this collection.
 	 */
-	public AbstractRedisCollection(String key, RedisOperations<String, E> operations) {
+	public AbstractValkeyCollection(String key, ValkeyOperations<String, E> operations) {
 
 		Assert.hasText(key, "Key must not be empty");
-		Assert.notNull(operations, "RedisOperations must not be null");
+		Assert.notNull(operations, "ValkeyOperations must not be null");
 
 		this.key = key;
 		this.operations = operations;
@@ -61,7 +61,7 @@ public abstract class AbstractRedisCollection<E> extends AbstractCollection<E> i
 	}
 
 	@Override
-	public RedisOperations<String, E> getOperations() {
+	public ValkeyOperations<String, E> getOperations() {
 		return operations;
 	}
 
@@ -137,11 +137,11 @@ public abstract class AbstractRedisCollection<E> extends AbstractCollection<E> i
 		if (o == this)
 			return true;
 
-		if (o instanceof RedisStore redisStore) {
+		if (o instanceof ValkeyStore redisStore) {
 			return key.equals(redisStore.getKey());
 		}
 
-		if (o instanceof AbstractRedisCollection) {
+		if (o instanceof AbstractValkeyCollection) {
 			return o.hashCode() == hashCode();
 		}
 
@@ -165,7 +165,7 @@ public abstract class AbstractRedisCollection<E> extends AbstractCollection<E> i
 	protected void checkResult(@Nullable Object obj) {
 
 		if (obj == null) {
-			throw new IllegalStateException("Cannot read collection with Redis connection in pipeline/multi-exec mode");
+			throw new IllegalStateException("Cannot read collection with Valkey connection in pipeline/multi-exec mode");
 		}
 	}
 }

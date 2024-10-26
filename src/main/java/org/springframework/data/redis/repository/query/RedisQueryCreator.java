@@ -25,7 +25,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
-import org.springframework.data.redis.repository.query.RedisOperationChain.NearPath;
+import org.springframework.data.redis.repository.query.ValkeyOperationChain.NearPath;
 import org.springframework.data.repository.query.ParameterAccessor;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
 import org.springframework.data.repository.query.parser.Part;
@@ -35,7 +35,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * {@link AbstractQueryCreator} implementation for Redis.
+ * {@link AbstractQueryCreator} implementation for Valkey.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -43,18 +43,18 @@ import org.springframework.util.CollectionUtils;
  * @author Junghoon Ban
  * @since 1.7
  */
-public class RedisQueryCreator extends AbstractQueryCreator<KeyValueQuery<RedisOperationChain>, RedisOperationChain> {
+public class ValkeyQueryCreator extends AbstractQueryCreator<KeyValueQuery<ValkeyOperationChain>, ValkeyOperationChain> {
 
-	public RedisQueryCreator(PartTree tree, ParameterAccessor parameters) {
+	public ValkeyQueryCreator(PartTree tree, ParameterAccessor parameters) {
 		super(tree, parameters);
 	}
 
 	@Override
-	protected RedisOperationChain create(Part part, Iterator<Object> iterator) {
-		return from(part, iterator, new RedisOperationChain());
+	protected ValkeyOperationChain create(Part part, Iterator<Object> iterator) {
+		return from(part, iterator, new ValkeyOperationChain());
 	}
 
-	private RedisOperationChain from(Part part, Iterator<Object> iterator, RedisOperationChain sink) {
+	private ValkeyOperationChain from(Part part, Iterator<Object> iterator, ValkeyOperationChain sink) {
 
 		switch (part.getType()) {
 			case SIMPLE_PROPERTY -> sink.sismember(part.getProperty().toDotPath(), iterator.next());
@@ -62,27 +62,27 @@ public class RedisQueryCreator extends AbstractQueryCreator<KeyValueQuery<RedisO
 			case FALSE -> sink.sismember(part.getProperty().toDotPath(), false);
 			case WITHIN, NEAR -> sink.near(getNearPath(part, iterator));
 			default ->
-				throw new IllegalArgumentException("%s is not supported for Redis query derivation".formatted(part.getType()));
+				throw new IllegalArgumentException("%s is not supported for Valkey query derivation".formatted(part.getType()));
 		}
 
 		return sink;
 	}
 
 	@Override
-	protected RedisOperationChain and(Part part, RedisOperationChain base, Iterator<Object> iterator) {
+	protected ValkeyOperationChain and(Part part, ValkeyOperationChain base, Iterator<Object> iterator) {
 		return from(part, iterator, base);
 	}
 
 	@Override
-	protected RedisOperationChain or(RedisOperationChain base, RedisOperationChain criteria) {
+	protected ValkeyOperationChain or(ValkeyOperationChain base, ValkeyOperationChain criteria) {
 		base.orSismember(criteria.getSismember());
 		return base;
 	}
 
 	@Override
-	protected KeyValueQuery<RedisOperationChain> complete(@Nullable RedisOperationChain criteria, Sort sort) {
+	protected KeyValueQuery<ValkeyOperationChain> complete(@Nullable ValkeyOperationChain criteria, Sort sort) {
 
-		KeyValueQuery<RedisOperationChain> query = new KeyValueQuery<>(criteria);
+		KeyValueQuery<ValkeyOperationChain> query = new KeyValueQuery<>(criteria);
 
 		if (criteria != null && containsExactlyOne(criteria.getSismember())
 				&& containsExactlyOne(criteria.getOrSismember())) {

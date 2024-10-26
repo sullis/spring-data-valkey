@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.api.reactive.RedisServerReactiveCommands;
+import io.lettuce.core.api.reactive.ValkeyServerReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,8 +25,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.ReactiveServerCommands;
-import org.springframework.data.redis.connection.RedisServerCommands.FlushOption;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.connection.ValkeyServerCommands.FlushOption;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.util.Assert;
 
@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveServerCommands implements ReactiveServerCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveGeoCommands}.
@@ -47,7 +47,7 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 	 * @param connection must not be {@literal null}.
 	 * @throws IllegalArgumentException when {@code connection} is {@literal null}.
 	 */
-	LettuceReactiveServerCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveServerCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -56,32 +56,32 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 
 	@Override
 	public Mono<String> bgReWriteAof() {
-		return connection.execute(RedisServerReactiveCommands::bgrewriteaof).next();
+		return connection.execute(ValkeyServerReactiveCommands::bgrewriteaof).next();
 	}
 
 	@Override
 	public Mono<String> bgSave() {
-		return connection.execute(RedisServerReactiveCommands::bgsave).next();
+		return connection.execute(ValkeyServerReactiveCommands::bgsave).next();
 	}
 
 	@Override
 	public Mono<Long> lastSave() {
-		return connection.execute(RedisServerReactiveCommands::lastsave).next().map(Date::getTime);
+		return connection.execute(ValkeyServerReactiveCommands::lastsave).next().map(Date::getTime);
 	}
 
 	@Override
 	public Mono<String> save() {
-		return connection.execute(RedisServerReactiveCommands::save).next();
+		return connection.execute(ValkeyServerReactiveCommands::save).next();
 	}
 
 	@Override
 	public Mono<Long> dbSize() {
-		return connection.execute(RedisServerReactiveCommands::dbsize).next();
+		return connection.execute(ValkeyServerReactiveCommands::dbsize).next();
 	}
 
 	@Override
 	public Mono<String> flushDb() {
-		return connection.execute(RedisServerReactiveCommands::flushdb).next();
+		return connection.execute(ValkeyServerReactiveCommands::flushdb).next();
 	}
 
 	@Override
@@ -91,7 +91,7 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 
 	@Override
 	public Mono<String> flushAll() {
-		return connection.execute(RedisServerReactiveCommands::flushall).next();
+		return connection.execute(ValkeyServerReactiveCommands::flushall).next();
 	}
 
 	@Override
@@ -102,7 +102,7 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 	@Override
 	public Mono<Properties> info() {
 
-		return connection.execute(RedisServerReactiveCommands::info) //
+		return connection.execute(ValkeyServerReactiveCommands::info) //
 				.map(LettuceConverters::toProperties) //
 				.next();
 	}
@@ -137,13 +137,13 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 
 	@Override
 	public Mono<String> resetConfigStats() {
-		return connection.execute(RedisServerReactiveCommands::configResetstat).next();
+		return connection.execute(ValkeyServerReactiveCommands::configResetstat).next();
 	}
 
 	@Override
 	public Mono<Long> time(TimeUnit timeUnit) {
 
-		return connection.execute(RedisServerReactiveCommands::time) //
+		return connection.execute(ValkeyServerReactiveCommands::time) //
 				.map(ByteUtils::getBytes) //
 				.collectList() //
 				.map(LettuceConverters.toTimeConverter(timeUnit)::convert);
@@ -168,16 +168,16 @@ class LettuceReactiveServerCommands implements ReactiveServerCommands {
 	@Override
 	public Mono<String> getClientName() {
 
-		return connection.execute(RedisServerReactiveCommands::clientGetname) //
+		return connection.execute(ValkeyServerReactiveCommands::clientGetname) //
 				.map(ByteUtils::getBytes) //
 				.map(LettuceConverters::toString) //
 				.next();
 	}
 
 	@Override
-	public Flux<RedisClientInfo> getClientList() {
+	public Flux<ValkeyClientInfo> getClientList() {
 
-		return connection.execute(RedisServerReactiveCommands::clientList)
-				.concatMapIterable(s -> LettuceConverters.stringToRedisClientListConverter().convert(s));
+		return connection.execute(ValkeyServerReactiveCommands::clientList)
+				.concatMapIterable(s -> LettuceConverters.stringToValkeyClientListConverter().convert(s));
 	}
 }

@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection;
 
-import static org.springframework.data.redis.connection.RedisGeoCommands.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.*;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,18 +36,18 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.Flag;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.Flag;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Redis Geo commands executed using reactive infrastructure.
+ * Valkey Geo commands executed using reactive infrastructure.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -59,7 +59,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEOADD} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	class GeoAddCommand extends KeyCommand {
 
@@ -123,7 +123,7 @@ public interface ReactiveGeoCommands {
 	 * @param point must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	default Mono<Long> geoAdd(ByteBuffer key, Point point, ByteBuffer member) {
 
@@ -140,7 +140,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param location must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	default Mono<Long> geoAdd(ByteBuffer key, GeoLocation<ByteBuffer> location) {
 
@@ -156,7 +156,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param locations must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	default Mono<Long> geoAdd(ByteBuffer key, Collection<GeoLocation<ByteBuffer>> locations) {
 
@@ -171,7 +171,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	Flux<NumericResponse<GeoAddCommand, Long>> geoAdd(Publisher<GeoAddCommand> commands);
 
@@ -179,7 +179,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEODIST} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	class GeoDistCommand extends KeyCommand {
 
@@ -308,7 +308,7 @@ public interface ReactiveGeoCommands {
 	 * @param from must not be {@literal null}.
 	 * @param to must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	default Mono<Distance> geoDist(ByteBuffer key, ByteBuffer from, ByteBuffer to) {
 		return geoDist(key, from, to, DistanceUnit.METERS);
@@ -322,7 +322,7 @@ public interface ReactiveGeoCommands {
 	 * @param to must not be {@literal null}.
 	 * @param metric must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	default Mono<Distance> geoDist(ByteBuffer key, ByteBuffer from, ByteBuffer to, Metric metric) {
 
@@ -341,7 +341,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	Flux<CommandResponse<GeoDistCommand, Distance>> geoDist(Publisher<GeoDistCommand> commands);
 
@@ -349,7 +349,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEOHASH} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	class GeoHashCommand extends KeyCommand {
 
@@ -415,7 +415,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	default Mono<String> geoHash(ByteBuffer key, ByteBuffer member) {
 
@@ -431,7 +431,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	default Mono<List<String>> geoHash(ByteBuffer key, Collection<ByteBuffer> members) {
 
@@ -448,7 +448,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	Flux<MultiValueResponse<GeoHashCommand, String>> geoHash(Publisher<GeoHashCommand> commands);
 
@@ -456,7 +456,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEOPOS} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	class GeoPosCommand extends KeyCommand {
 
@@ -522,7 +522,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	default Mono<Point> geoPos(ByteBuffer key, ByteBuffer member) {
 
@@ -538,7 +538,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	default Mono<List<Point>> geoPos(ByteBuffer key, Collection<ByteBuffer> members) {
 
@@ -553,7 +553,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	Flux<MultiValueResponse<GeoPosCommand, Point>> geoPos(Publisher<GeoPosCommand> commands);
 
@@ -561,7 +561,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEORADIUS} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	class GeoRadiusCommand extends KeyCommand {
 
@@ -870,7 +870,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param circle must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	default Flux<GeoResult<GeoLocation<ByteBuffer>>> geoRadius(ByteBuffer key, Circle circle) {
 		return geoRadius(key, circle, GeoRadiusCommandArgs.newGeoRadiusArgs());
@@ -883,7 +883,7 @@ public interface ReactiveGeoCommands {
 	 * @param circle must not be {@literal null}.
 	 * @param geoRadiusArgs must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	default Flux<GeoResult<GeoLocation<ByteBuffer>>> geoRadius(ByteBuffer key, Circle circle,
 			GeoRadiusCommandArgs geoRadiusArgs) {
@@ -901,7 +901,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	Flux<CommandResponse<GeoRadiusCommand, Flux<GeoResult<GeoLocation<ByteBuffer>>>>> geoRadius(
 			Publisher<GeoRadiusCommand> commands);
@@ -910,7 +910,7 @@ public interface ReactiveGeoCommands {
 	 * {@code GEORADIUSBYMEMBER} command parameters.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	class GeoRadiusByMemberCommand extends KeyCommand {
 
@@ -1203,7 +1203,7 @@ public interface ReactiveGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	default Flux<GeoResult<GeoLocation<ByteBuffer>>> geoRadiusByMember(ByteBuffer key, ByteBuffer member,
 			Distance distance) {
@@ -1217,7 +1217,7 @@ public interface ReactiveGeoCommands {
 	 * @param member must not be {@literal null}.
 	 * @param geoRadiusArgs must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	default Flux<GeoResult<GeoLocation<ByteBuffer>>> geoRadiusByMember(ByteBuffer key, ByteBuffer member,
 			Distance distance, GeoRadiusCommandArgs geoRadiusArgs) {
@@ -1237,7 +1237,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	Flux<CommandResponse<GeoRadiusByMemberCommand, Flux<GeoResult<GeoLocation<ByteBuffer>>>>> geoRadiusByMember(
 			Publisher<GeoRadiusByMemberCommand> commands);
@@ -1247,7 +1247,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	class GeoSearchCommand extends KeyCommand {
 
@@ -1335,7 +1335,7 @@ public interface ReactiveGeoCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	class GeoSearchStoreCommand extends KeyCommand {
 
@@ -1449,7 +1449,7 @@ public interface ReactiveGeoCommands {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Flux<GeoResult<GeoLocation<ByteBuffer>>> geoSearch(ByteBuffer key, GeoReference<ByteBuffer> reference,
 			GeoShape shape, GeoSearchCommandArgs args) {
@@ -1463,7 +1463,7 @@ public interface ReactiveGeoCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	Flux<CommandResponse<GeoSearchCommand, Flux<GeoResult<GeoLocation<ByteBuffer>>>>> geoSearch(
 			Publisher<GeoSearchCommand> commands);
@@ -1478,7 +1478,7 @@ public interface ReactiveGeoCommands {
 	 * @param args must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	default Mono<Long> geoSearchStore(ByteBuffer destKey, ByteBuffer key, GeoReference<ByteBuffer> reference,
 			GeoShape shape, GeoSearchStoreCommandArgs args) {
@@ -1494,7 +1494,7 @@ public interface ReactiveGeoCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearchstore">Redis Documentation: GEOSEARCHSTORE</a>
+	 * @see <a href="https://redis.io/commands/geosearchstore">Valkey Documentation: GEOSEARCHSTORE</a>
 	 */
 	Flux<NumericResponse<GeoSearchStoreCommand, Long>> geoSearchStore(Publisher<GeoSearchStoreCommand> commands);
 

@@ -19,22 +19,22 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 /**
- * Utilities for examining a {@link RedisConnection}
+ * Utilities for examining a {@link ValkeyConnection}
  *
  * @author Jennifer Hickey
  * @author Thomas Darimont
  */
 public abstract class ConnectionUtils {
 
-	public static boolean isAsync(RedisConnectionFactory connectionFactory) {
+	public static boolean isAsync(ValkeyConnectionFactory connectionFactory) {
 		return (connectionFactory instanceof LettuceConnectionFactory);
 	}
 
-	public static boolean isLettuce(RedisConnectionFactory connectionFactory) {
+	public static boolean isLettuce(ValkeyConnectionFactory connectionFactory) {
 		return connectionFactory instanceof LettuceConnectionFactory;
 	}
 
-	public static boolean isJedis(RedisConnectionFactory connectionFactory) {
+	public static boolean isJedis(ValkeyConnectionFactory connectionFactory) {
 		return connectionFactory instanceof JedisConnectionFactory;
 	}
 }

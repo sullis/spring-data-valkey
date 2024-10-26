@@ -21,7 +21,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Represents a data type returned from Redis, currently used to denote the expected return type of Redis scripting
+ * Represents a data type returned from Valkey, currently used to denote the expected return type of Valkey scripting
  * commands
  *
  * @author Jennifer Hickey

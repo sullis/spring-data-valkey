@@ -24,19 +24,19 @@ import java.util.function.LongUnaryOperator;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.core.BoundKeyOperations;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Atomic long backed by Redis. Uses Redis atomic increment/decrement and watch/multi/exec operations for CAS
+ * Atomic long backed by Valkey. Uses Valkey atomic increment/decrement and watch/multi/exec operations for CAS
  * operations.
  *
  * @author Costin Leau
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  * @author Ning Wei
  * @see java.util.concurrent.atomic.AtomicLong
  */
-public class RedisAtomicLong extends Number implements Serializable, BoundKeyOperations<String> {
+public class ValkeyAtomicLong extends Number implements Serializable, BoundKeyOperations<String> {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -55,36 +55,36 @@ public class RedisAtomicLong extends Number implements Serializable, BoundKeyOpe
 	private volatile String key;
 
 	private final ValueOperations<String, Long> operations;
-	private final RedisOperations<String, Long> generalOps;
+	private final ValkeyOperations<String, Long> generalOps;
 
 	/**
-	 * Constructs a new {@link RedisAtomicLong} instance. Uses the value existing in Redis or {@code 0} if none is found.
+	 * Constructs a new {@link ValkeyAtomicLong} instance. Uses the value existing in Valkey or {@code 0} if none is found.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param factory connection factory.
 	 */
-	public RedisAtomicLong(String redisCounter, RedisConnectionFactory factory) {
+	public ValkeyAtomicLong(String redisCounter, ValkeyConnectionFactory factory) {
 		this(redisCounter, factory, null);
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicLong} instance with a {@code initialValue} that overwrites the existing value at
+	 * Constructs a new {@link ValkeyAtomicLong} instance with a {@code initialValue} that overwrites the existing value at
 	 * {@code redisCounter}.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param factory connection factory.
 	 * @param initialValue initial value to set.
 	 */
-	public RedisAtomicLong(String redisCounter, RedisConnectionFactory factory, long initialValue) {
+	public ValkeyAtomicLong(String redisCounter, ValkeyConnectionFactory factory, long initialValue) {
 		this(redisCounter, factory, Long.valueOf(initialValue));
 	}
 
-	private RedisAtomicLong(String redisCounter, RedisConnectionFactory factory, @Nullable Long initialValue) {
+	private ValkeyAtomicLong(String redisCounter, ValkeyConnectionFactory factory, @Nullable Long initialValue) {
 		Assert.hasText(redisCounter, "a valid counter name is required");
 		Assert.notNull(factory, "a valid factory is required");
 
-		RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
-		redisTemplate.setKeySerializer(RedisSerializer.string());
+		ValkeyTemplate<String, Long> redisTemplate = new ValkeyTemplate<>();
+		redisTemplate.setKeySerializer(ValkeySerializer.string());
 		redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
 		redisTemplate.setExposeConnection(true);
 		redisTemplate.setConnectionFactory(factory);
@@ -102,36 +102,36 @@ public class RedisAtomicLong extends Number implements Serializable, BoundKeyOpe
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicLong} instance. Uses the value existing in Redis or {@code 0} if none is found.
+	 * Constructs a new {@link ValkeyAtomicLong} instance. Uses the value existing in Valkey or {@code 0} if none is found.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param template the template.
-	 * @see #RedisAtomicLong(String, RedisConnectionFactory, long)
+	 * @see #ValkeyAtomicLong(String, ValkeyConnectionFactory, long)
 	 */
-	public RedisAtomicLong(String redisCounter, RedisOperations<String, Long> template) {
+	public ValkeyAtomicLong(String redisCounter, ValkeyOperations<String, Long> template) {
 		this(redisCounter, template, null);
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicLong} instance with a {@code initialValue} that overwrites the existing value.
+	 * Constructs a new {@link ValkeyAtomicLong} instance with a {@code initialValue} that overwrites the existing value.
 	 * <p>
-	 * Note: You need to configure the given {@code template} with appropriate {@link RedisSerializer} for the key and
+	 * Note: You need to configure the given {@code template} with appropriate {@link ValkeySerializer} for the key and
 	 * value. The key serializer must be able to deserialize to a {@link String} and the value serializer must be able to
 	 * deserialize to a {@link Long}.
 	 * <p>
-	 * As an alternative one could use the {@link #RedisAtomicLong(String, RedisConnectionFactory, Long)} constructor
-	 * which uses appropriate default serializers, in this case {@link StringRedisSerializer} for the key and
+	 * As an alternative one could use the {@link #ValkeyAtomicLong(String, ValkeyConnectionFactory, Long)} constructor
+	 * which uses appropriate default serializers, in this case {@link StringValkeySerializer} for the key and
 	 * {@link GenericToStringSerializer} for the value.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param template the template
-	 * @param initialValue initial value to set if the Redis key is absent.
+	 * @param initialValue initial value to set if the Valkey key is absent.
 	 */
-	public RedisAtomicLong(String redisCounter, RedisOperations<String, Long> template, long initialValue) {
+	public ValkeyAtomicLong(String redisCounter, ValkeyOperations<String, Long> template, long initialValue) {
 		this(redisCounter, template, Long.valueOf(initialValue));
 	}
 
-	private RedisAtomicLong(String redisCounter, RedisOperations<String, Long> template, @Nullable Long initialValue) {
+	private ValkeyAtomicLong(String redisCounter, ValkeyOperations<String, Long> template, @Nullable Long initialValue) {
 
 		Assert.hasText(redisCounter, "a valid counter name is required");
 		Assert.notNull(template, "a valid template is required");

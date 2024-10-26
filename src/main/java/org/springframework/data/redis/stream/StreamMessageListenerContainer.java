@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -31,8 +31,8 @@ import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.stream.DefaultStreamMessageListenerContainer.LoggingErrorHandler;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -42,10 +42,10 @@ import org.springframework.util.ErrorHandler;
  * Abstraction used by the framework representing a message listener container. <strong>Not</strong> meant to be
  * implemented externally.
  * <p>
- * Once created, a {@link StreamMessageListenerContainer} can subscribe to a Redis Stream and consume incoming
+ * Once created, a {@link StreamMessageListenerContainer} can subscribe to a Valkey Stream and consume incoming
  * {@link Record messages}. {@link StreamMessageListenerContainer} allows multiple stream read requests and returns a
  * {@link Subscription} handle per read request. Cancelling the {@link Subscription} terminates eventually background
- * polling. Messages are converted using {@link RedisSerializer key and value serializers} to support various
+ * polling. Messages are converted using {@link ValkeySerializer key and value serializers} to support various
  * serialization strategies. <br/>
  * {@link StreamMessageListenerContainer} supports multiple modes of stream consumption:
  * <ul>
@@ -92,7 +92,7 @@ import org.springframework.util.ErrorHandler;
  * See the following example code how to use {@link StreamMessageListenerContainer}:
  *
  * <pre class="code">
- * RedisConnectionFactory factory = …;
+ * ValkeyConnectionFactory factory = …;
  *
  * StreamMessageListenerContainer<String, MapRecord<String, String, String>> container = StreamMessageListenerContainer.create(factory);
  * Subscription subscription = container.receive(StreamOffset.fromStart("my-stream"), message -> …);
@@ -116,29 +116,29 @@ import org.springframework.util.ErrorHandler;
  * @see StreamMessageListenerContainerOptionsBuilder#executor(Executor)
  * @see ErrorHandler
  * @see org.springframework.data.redis.core.StreamOperations
- * @see RedisConnectionFactory
+ * @see ValkeyConnectionFactory
  * @see StreamReceiver
  */
 public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> extends SmartLifecycle {
 
 	/**
-	 * Create a new {@link StreamMessageListenerContainer} using {@link StringRedisSerializer string serializers} given
-	 * {@link RedisConnectionFactory}.
+	 * Create a new {@link StreamMessageListenerContainer} using {@link StringValkeySerializer string serializers} given
+	 * {@link ValkeyConnectionFactory}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
 	 * @return the new {@link StreamMessageListenerContainer}.
 	 */
 	static StreamMessageListenerContainer<String, MapRecord<String, String, String>> create(
-			RedisConnectionFactory connectionFactory) {
+			ValkeyConnectionFactory connectionFactory) {
 
-		Assert.notNull(connectionFactory, "RedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ValkeyConnectionFactory must not be null");
 
 		return create(connectionFactory,
-				StreamMessageListenerContainerOptions.builder().serializer(StringRedisSerializer.UTF_8).build());
+				StreamMessageListenerContainerOptions.builder().serializer(StringValkeySerializer.UTF_8).build());
 	}
 
 	/**
-	 * Create a new {@link StreamMessageListenerContainer} given {@link RedisConnectionFactory} and
+	 * Create a new {@link StreamMessageListenerContainer} given {@link ValkeyConnectionFactory} and
 	 * {@link StreamMessageListenerContainerOptions}.
 	 *
 	 * @param connectionFactory must not be {@literal null}.
@@ -146,16 +146,16 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	 * @return the new {@link StreamMessageListenerContainer}.
 	 */
 	static <K, V extends Record<K, ?>> StreamMessageListenerContainer<K, V> create(
-			RedisConnectionFactory connectionFactory, StreamMessageListenerContainerOptions<K, V> options) {
+			ValkeyConnectionFactory connectionFactory, StreamMessageListenerContainerOptions<K, V> options) {
 
-		Assert.notNull(connectionFactory, "RedisConnectionFactory must not be null");
+		Assert.notNull(connectionFactory, "ValkeyConnectionFactory must not be null");
 		Assert.notNull(options, "StreamMessageListenerContainerOptions must not be null");
 
 		return new DefaultStreamMessageListenerContainer<>(connectionFactory, options);
 	}
 
 	/**
-	 * Register a new subscription for a Redis Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
+	 * Register a new subscription for a Valkey Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
 	 * running} the {@link Subscription} will be added and run immediately, otherwise it'll be scheduled and started once
 	 * the container is actually {@link StreamMessageListenerContainer#start() started}.
 	 * <p>
@@ -174,7 +174,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	}
 
 	/**
-	 * Register a new subscription for a Redis Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
+	 * Register a new subscription for a Valkey Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
 	 * running} the {@link Subscription} will be added and run immediately, otherwise it'll be scheduled and started once
 	 * the container is actually {@link StreamMessageListenerContainer#start() started}.
 	 * <p>
@@ -200,7 +200,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	}
 
 	/**
-	 * Register a new subscription for a Redis Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
+	 * Register a new subscription for a Valkey Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
 	 * running} the {@link Subscription} will be added and run immediately, otherwise it'll be scheduled and started once
 	 * the container is actually {@link StreamMessageListenerContainer#start() started}.
 	 * <p>
@@ -223,7 +223,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	}
 
 	/**
-	 * Register a new subscription for a Redis Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
+	 * Register a new subscription for a Valkey Stream. If the {@link StreamMessageListenerContainer#isRunning() is already
 	 * running} the {@link Subscription} will be added and run immediately, otherwise it'll be scheduled and started once
 	 * the container is actually {@link StreamMessageListenerContainer#start() started}.
 	 * <p>
@@ -254,7 +254,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	void remove(Subscription subscription);
 
 	/**
-	 * Request to read a Redis Stream.
+	 * Request to read a Valkey Stream.
 	 *
 	 * @param <K> Stream key and Stream field type.
 	 * @see StreamReadRequestBuilder
@@ -295,7 +295,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 	}
 
 	/**
-	 * Request to read a Redis Stream with a {@link Consumer}.
+	 * Request to read a Valkey Stream with a {@link Consumer}.
 	 *
 	 * @param <K> Stream key and Stream field type.
 	 * @see StreamReadRequestBuilder
@@ -487,9 +487,9 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 
 		private final Duration pollTimeout;
 		private final @Nullable Integer batchSize;
-		private final RedisSerializer<K> keySerializer;
-		private final RedisSerializer<Object> hashKeySerializer;
-		private final RedisSerializer<Object> hashValueSerializer;
+		private final ValkeySerializer<K> keySerializer;
+		private final ValkeySerializer<Object> hashKeySerializer;
+		private final ValkeySerializer<Object> hashValueSerializer;
 		private final @Nullable Class<Object> targetType;
 		private final @Nullable HashMapper<Object, Object, Object> hashMapper;
 		private final ErrorHandler errorHandler;
@@ -497,8 +497,8 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 
 		@SuppressWarnings("unchecked")
 		private StreamMessageListenerContainerOptions(Duration pollTimeout, @Nullable Integer batchSize,
-				RedisSerializer<K> keySerializer, RedisSerializer<Object> hashKeySerializer,
-				RedisSerializer<Object> hashValueSerializer, @Nullable Class<?> targetType,
+				ValkeySerializer<K> keySerializer, ValkeySerializer<Object> hashKeySerializer,
+				ValkeySerializer<Object> hashValueSerializer, @Nullable Class<?> targetType,
 				@Nullable HashMapper<V, ?, ?> hashMapper, ErrorHandler errorHandler, Executor executor) {
 			this.pollTimeout = pollTimeout;
 			this.batchSize = batchSize;
@@ -515,7 +515,7 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 		 * @return a new builder for {@link StreamMessageListenerContainerOptions}.
 		 */
 		public static StreamMessageListenerContainerOptionsBuilder<String, MapRecord<String, String, String>> builder() {
-			return new StreamMessageListenerContainerOptionsBuilder<>().serializer(StringRedisSerializer.UTF_8);
+			return new StreamMessageListenerContainerOptionsBuilder<>().serializer(StringValkeySerializer.UTF_8);
 		}
 
 		/**
@@ -536,15 +536,15 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 			return batchSize != null ? OptionalInt.of(batchSize) : OptionalInt.empty();
 		}
 
-		public RedisSerializer<K> getKeySerializer() {
+		public ValkeySerializer<K> getKeySerializer() {
 			return keySerializer;
 		}
 
-		public RedisSerializer<Object> getHashKeySerializer() {
+		public ValkeySerializer<Object> getHashKeySerializer() {
 			return hashKeySerializer;
 		}
 
-		public RedisSerializer<Object> getHashValueSerializer() {
+		public ValkeySerializer<Object> getHashValueSerializer() {
 			return hashValueSerializer;
 		}
 
@@ -602,9 +602,9 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 
 		private Duration pollTimeout = Duration.ofSeconds(2);
 		private @Nullable Integer batchSize;
-		private RedisSerializer<K> keySerializer;
-		private RedisSerializer<Object> hashKeySerializer;
-		private RedisSerializer<Object> hashValueSerializer;
+		private ValkeySerializer<K> keySerializer;
+		private ValkeySerializer<Object> hashKeySerializer;
+		private ValkeySerializer<Object> hashValueSerializer;
 		private @Nullable HashMapper<V, ?, ?> hashMapper;
 		private @Nullable Class<?> targetType;
 		private ErrorHandler errorHandler = LoggingErrorHandler.INSTANCE;
@@ -676,13 +676,13 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 		 * @return {@code this} {@link StreamMessageListenerContainerOptionsBuilder}.
 		 */
 		public <T> StreamMessageListenerContainerOptionsBuilder<T, MapRecord<T, T, T>> serializer(
-				RedisSerializer<T> serializer) {
+				ValkeySerializer<T> serializer) {
 
-			Assert.notNull(serializer, "RedisSerializer must not be null");
+			Assert.notNull(serializer, "ValkeySerializer must not be null");
 
-			this.keySerializer = (RedisSerializer) serializer;
-			this.hashKeySerializer = (RedisSerializer) serializer;
-			this.hashValueSerializer = (RedisSerializer) serializer;
+			this.keySerializer = (ValkeySerializer) serializer;
+			this.hashKeySerializer = (ValkeySerializer) serializer;
+			this.hashValueSerializer = (ValkeySerializer) serializer;
 			return (StreamMessageListenerContainerOptionsBuilder) this;
 		}
 
@@ -693,11 +693,11 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 		 * @return {@code this} {@link StreamMessageListenerContainerOptionsBuilder}.
 		 */
 		public <NK, NV extends Record<NK, ?>> StreamMessageListenerContainerOptionsBuilder<NK, NV> keySerializer(
-				RedisSerializer<NK> serializer) {
+				ValkeySerializer<NK> serializer) {
 
-			Assert.notNull(serializer, "RedisSerializer must not be null");
+			Assert.notNull(serializer, "ValkeySerializer must not be null");
 
-			this.keySerializer = (RedisSerializer) serializer;
+			this.keySerializer = (ValkeySerializer) serializer;
 			return (StreamMessageListenerContainerOptionsBuilder) this;
 		}
 
@@ -708,11 +708,11 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 		 * @return {@code this} {@link StreamMessageListenerContainerOptionsBuilder}.
 		 */
 		public <HK, HV> StreamMessageListenerContainerOptionsBuilder<K, MapRecord<K, HK, HV>> hashKeySerializer(
-				RedisSerializer<HK> serializer) {
+				ValkeySerializer<HK> serializer) {
 
-			Assert.notNull(serializer, "RedisSerializer must not be null");
+			Assert.notNull(serializer, "ValkeySerializer must not be null");
 
-			this.hashKeySerializer = (RedisSerializer) serializer;
+			this.hashKeySerializer = (ValkeySerializer) serializer;
 			return (StreamMessageListenerContainerOptionsBuilder) this;
 		}
 
@@ -723,11 +723,11 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 		 * @return {@code this} {@link StreamMessageListenerContainerOptionsBuilder}.
 		 */
 		public <HK, HV> StreamMessageListenerContainerOptionsBuilder<K, MapRecord<K, HK, HV>> hashValueSerializer(
-				RedisSerializer<HV> serializer) {
+				ValkeySerializer<HV> serializer) {
 
-			Assert.notNull(serializer, "RedisSerializer must not be null");
+			Assert.notNull(serializer, "ValkeySerializer must not be null");
 
-			this.hashValueSerializer = (RedisSerializer) serializer;
+			this.hashValueSerializer = (ValkeySerializer) serializer;
 			return (StreamMessageListenerContainerOptionsBuilder) this;
 		}
 
@@ -746,8 +746,8 @@ public interface StreamMessageListenerContainer<K, V extends Record<K, ?>> exten
 
 			if (this.hashMapper == null) {
 
-				hashKeySerializer(RedisSerializer.byteArray());
-				hashValueSerializer(RedisSerializer.byteArray());
+				hashKeySerializer(ValkeySerializer.byteArray());
+				hashValueSerializer(ValkeySerializer.byteArray());
 				return (StreamMessageListenerContainerOptionsBuilder) objectMapper(ObjectHashMapper.getSharedInstance());
 			}
 

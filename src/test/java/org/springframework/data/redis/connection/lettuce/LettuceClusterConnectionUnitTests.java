@@ -19,18 +19,18 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.redis.connection.ClusterTestVariables.*;
 
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyFuture;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
-import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
-import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.async.ValkeyAsyncCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.async.ValkeyAdvancedClusterAsyncCommands;
+import io.lettuce.core.cluster.api.async.ValkeyClusterAsyncCommands;
+import io.lettuce.core.cluster.api.sync.ValkeyClusterCommands;
 import io.lettuce.core.cluster.models.partitions.Partitions;
-import io.lettuce.core.cluster.models.partitions.RedisClusterNode.NodeFlag;
+import io.lettuce.core.cluster.models.partitions.ValkeyClusterNode.NodeFlag;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -49,8 +49,8 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.redis.connection.ClusterCommandExecutor;
 import org.springframework.data.redis.connection.ClusterNodeResourceProvider;
 import org.springframework.data.redis.connection.ClusterTopologyProvider;
-import org.springframework.data.redis.connection.RedisClusterCommands.AddSlots;
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterCommands.AddSlots;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 
 /**
  * @author Christoph Strobl
@@ -68,17 +68,17 @@ class LettuceClusterConnectionUnitTests {
 
 	private static final byte[] KEY_3_BYTES = KEY_3.getBytes();
 
-	@Mock RedisClusterClient clusterMock;
+	@Mock ValkeyClusterClient clusterMock;
 	@Mock ClusterTopologyProvider topologyProviderMock;
 
 	@Mock LettuceConnectionProvider connectionProviderMock;
 	@Mock ClusterCommandExecutor executorMock;
 	@Mock ClusterNodeResourceProvider resourceProvider;
-	@Mock StatefulRedisClusterConnection<byte[], byte[]> sharedConnectionMock;
-	@Mock RedisClusterAsyncCommands<byte[], byte[]> dedicatedConnectionMock;
-	@Mock RedisClusterCommands<byte[], byte[]> clusterConnection1Mock;
-	@Mock RedisClusterCommands<byte[], byte[]> clusterConnection2Mock;
-	@Mock RedisClusterCommands<byte[], byte[]> clusterConnection3Mock;
+	@Mock StatefulValkeyClusterConnection<byte[], byte[]> sharedConnectionMock;
+	@Mock ValkeyClusterAsyncCommands<byte[], byte[]> dedicatedConnectionMock;
+	@Mock ValkeyClusterCommands<byte[], byte[]> clusterConnection1Mock;
+	@Mock ValkeyClusterCommands<byte[], byte[]> clusterConnection2Mock;
+	@Mock ValkeyClusterCommands<byte[], byte[]> clusterConnection3Mock;
 
 	private LettuceClusterConnection connection;
 
@@ -87,23 +87,23 @@ class LettuceClusterConnectionUnitTests {
 
 		Partitions partitions = new Partitions();
 
-		io.lettuce.core.cluster.models.partitions.RedisClusterNode partition1 = new io.lettuce.core.cluster.models.partitions.RedisClusterNode();
+		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition1 = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition1.setNodeId(CLUSTER_NODE_1.getId());
 		partition1.setConnected(true);
 		partition1.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition1.setUri(RedisURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
+		partition1.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
 
-		io.lettuce.core.cluster.models.partitions.RedisClusterNode partition2 = new io.lettuce.core.cluster.models.partitions.RedisClusterNode();
+		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition2 = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition2.setNodeId(CLUSTER_NODE_2.getId());
 		partition2.setConnected(true);
 		partition2.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition2.setUri(RedisURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_2_PORT));
+		partition2.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_2_PORT));
 
-		io.lettuce.core.cluster.models.partitions.RedisClusterNode partition3 = new io.lettuce.core.cluster.models.partitions.RedisClusterNode();
+		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition3 = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition3.setNodeId(CLUSTER_NODE_3.getId());
 		partition3.setConnected(true);
 		partition3.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition3.setUri(RedisURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_3_PORT));
+		partition3.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_3_PORT));
 
 		partitions.addPartition(partition1);
 		partitions.addPartition(partition2);
@@ -122,12 +122,12 @@ class LettuceClusterConnectionUnitTests {
 		connection = new LettuceClusterConnection(clusterMock, executor) {
 
 			@Override
-			protected RedisClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
+			protected ValkeyClusterAsyncCommands<byte[], byte[]> getAsyncDedicatedConnection() {
 				return dedicatedConnectionMock;
 			}
 
 			@Override
-			public List<RedisClusterNode> clusterGetNodes() {
+			public List<ValkeyClusterNode> clusterGetNodes() {
 				return Arrays.asList(CLUSTER_NODE_1, CLUSTER_NODE_2, CLUSTER_NODE_3);
 			}
 		};
@@ -242,7 +242,7 @@ class LettuceClusterConnectionUnitTests {
 	@Test // DATAREDIS-315
 	void clusterSetSlotShouldBeExecutedOnTargetNodeWhenNodeIdNotSet() {
 
-		connection.clusterSetSlot(new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT), 100, AddSlots.IMPORTING);
+		connection.clusterSetSlot(new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_2_PORT), 100, AddSlots.IMPORTING);
 
 		verify(clusterConnection2Mock, times(1)).clusterSetSlotImporting(eq(100), eq(CLUSTER_NODE_2.getId()));
 	}
@@ -270,7 +270,7 @@ class LettuceClusterConnectionUnitTests {
 	void timeShouldBeExecutedOnArbitraryNode() {
 
 		List<byte[]> values = Arrays.asList("1449655759".getBytes(), "92217".getBytes());
-		when(dedicatedConnectionMock.time()).thenReturn(new LettuceServerCommands.CompletedRedisFuture<>(values));
+		when(dedicatedConnectionMock.time()).thenReturn(new LettuceServerCommands.CompletedValkeyFuture<>(values));
 
 		connection.time();
 
@@ -331,10 +331,10 @@ class LettuceClusterConnectionUnitTests {
 	@Test // DATAREDIS-731, DATAREDIS-545
 	void shouldExecuteOnSharedConnection() {
 
-		RedisAdvancedClusterAsyncCommands<byte[], byte[]> async = mock(RedisAdvancedClusterAsyncCommands.class);
+		ValkeyAdvancedClusterAsyncCommands<byte[], byte[]> async = mock(ValkeyAdvancedClusterAsyncCommands.class);
 
 		when(sharedConnectionMock.async()).thenReturn(async);
-		when(async.del(any())).thenReturn(mock(RedisFuture.class));
+		when(async.del(any())).thenReturn(mock(ValkeyFuture.class));
 
 		LettuceClusterConnection connection = new LettuceClusterConnection(sharedConnectionMock, connectionProviderMock,
 				topologyProviderMock, executorMock, Duration.ZERO);
@@ -348,12 +348,12 @@ class LettuceClusterConnectionUnitTests {
 	@Test // DATAREDIS-731, DATAREDIS-545
 	void shouldExecuteOnDedicatedConnection() {
 
-		RedisAsyncCommands<byte[], byte[]> async = mock(RedisAsyncCommands.class);
-		StatefulRedisConnection<byte[], byte[]> dedicatedConnection = mock(StatefulRedisConnection.class);
+		ValkeyAsyncCommands<byte[], byte[]> async = mock(ValkeyAsyncCommands.class);
+		StatefulValkeyConnection<byte[], byte[]> dedicatedConnection = mock(StatefulValkeyConnection.class);
 
 		when(connectionProviderMock.getConnection(StatefulConnection.class)).thenReturn(dedicatedConnection);
 		when(dedicatedConnection.async()).thenReturn(async);
-		when(async.blpop(anyLong(), any())).thenReturn(mock(RedisFuture.class));
+		when(async.blpop(anyLong(), any())).thenReturn(mock(ValkeyFuture.class));
 
 		LettuceClusterConnection connection = new LettuceClusterConnection(sharedConnectionMock, connectionProviderMock,
 				topologyProviderMock, executorMock, Duration.ZERO);

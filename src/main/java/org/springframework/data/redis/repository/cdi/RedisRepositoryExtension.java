@@ -35,29 +35,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.data.keyvalue.core.KeyValueOperations;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyKeyValueTemplate;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.repository.cdi.CdiRepositoryBean;
 import org.springframework.data.repository.cdi.CdiRepositoryExtensionSupport;
 
 /**
- * CDI extension to export Redis repositories. This extension enables Redis
- * {@link org.springframework.data.repository.Repository} support. It requires either a {@link RedisKeyValueTemplate} or a
- * {@link RedisOperations} bean. If no {@link RedisKeyValueTemplate} or {@link RedisKeyValueAdapter} are provided by the
+ * CDI extension to export Valkey repositories. This extension enables Valkey
+ * {@link org.springframework.data.repository.Repository} support. It requires either a {@link ValkeyKeyValueTemplate} or a
+ * {@link ValkeyOperations} bean. If no {@link ValkeyKeyValueTemplate} or {@link ValkeyKeyValueAdapter} are provided by the
  * user, the extension creates own managed beans.
  *
  * @author Mark Paluch
  */
-public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
+public class ValkeyRepositoryExtension extends CdiRepositoryExtensionSupport {
 
-	private final Log log = LogFactory.getLog(RedisRepositoryExtension.class);
-	private final Map<Set<Annotation>, Bean<RedisKeyValueAdapter>> redisKeyValueAdapters = new HashMap<>();
+	private final Log log = LogFactory.getLog(ValkeyRepositoryExtension.class);
+	private final Map<Set<Annotation>, Bean<ValkeyKeyValueAdapter>> redisKeyValueAdapters = new HashMap<>();
 	private final Map<Set<Annotation>, Bean<KeyValueOperations>> redisKeyValueTemplates = new HashMap<>();
-	private final Map<Set<Annotation>, Bean<RedisOperations<?, ?>>> redisOperations = new HashMap<>();
+	private final Map<Set<Annotation>, Bean<ValkeyOperations<?, ?>>> redisOperations = new HashMap<>();
 
-	public RedisRepositoryExtension() {
-		log.info("Activating CDI extension for Spring Data Redis repositories.");
+	public ValkeyRepositoryExtension() {
+		log.info("Activating CDI extension for Spring Data Valkey repositories.");
 	}
 
 	/**
@@ -78,9 +78,9 @@ public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
 				beanType = ((ParameterizedType) beanType).getRawType();
 			}
 
-			if (beanType instanceof Class<?> && RedisKeyValueTemplate.class.isAssignableFrom((Class<?>) beanType)) {
+			if (beanType instanceof Class<?> && ValkeyKeyValueTemplate.class.isAssignableFrom((Class<?>) beanType)) {
 				if (log.isDebugEnabled()) {
-					log.debug("Discovered %s with qualifiers %s.".formatted(RedisKeyValueTemplate.class.getName(),
+					log.debug("Discovered %s with qualifiers %s.".formatted(ValkeyKeyValueTemplate.class.getName(),
 							bean.getQualifiers()));
 				}
 
@@ -88,25 +88,25 @@ public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
 				redisKeyValueTemplates.put(new HashSet<>(bean.getQualifiers()), (Bean<KeyValueOperations>) bean);
 			}
 
-			if (beanType instanceof Class<?> && RedisKeyValueAdapter.class.isAssignableFrom((Class<?>) beanType)) {
+			if (beanType instanceof Class<?> && ValkeyKeyValueAdapter.class.isAssignableFrom((Class<?>) beanType)) {
 				if (log.isDebugEnabled()) {
-					log.debug("Discovered %s with qualifiers %s.".formatted(RedisKeyValueAdapter.class.getName(),
+					log.debug("Discovered %s with qualifiers %s.".formatted(ValkeyKeyValueAdapter.class.getName(),
 							bean.getQualifiers()));
 				}
 
-				// Store the RedisKeyValueAdapter bean using its qualifiers.
-				redisKeyValueAdapters.put(new HashSet<>(bean.getQualifiers()), (Bean<RedisKeyValueAdapter>) bean);
+				// Store the ValkeyKeyValueAdapter bean using its qualifiers.
+				redisKeyValueAdapters.put(new HashSet<>(bean.getQualifiers()), (Bean<ValkeyKeyValueAdapter>) bean);
 			}
 
-			if (beanType instanceof Class<?> && RedisOperations.class.isAssignableFrom((Class<?>) beanType)) {
+			if (beanType instanceof Class<?> && ValkeyOperations.class.isAssignableFrom((Class<?>) beanType)) {
 				if (log.isDebugEnabled()) {
 					log.debug(
-							"Discovered %s with qualifiers %s.".formatted(RedisOperations.class.getName(),
+							"Discovered %s with qualifiers %s.".formatted(ValkeyOperations.class.getName(),
 							bean.getQualifiers()));
 				}
 
-				// Store the RedisOperations bean using its qualifiers.
-				redisOperations.put(new HashSet<>(bean.getQualifiers()), (Bean<RedisOperations<?, ?>>) bean);
+				// Store the ValkeyOperations bean using its qualifiers.
+				redisOperations.put(new HashSet<>(bean.getQualifiers()), (Bean<ValkeyOperations<?, ?>>) bean);
 			}
 		}
 	}
@@ -134,7 +134,7 @@ public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
 	}
 
 	/**
-	 * Register {@link RedisKeyValueAdapter} and {@link RedisKeyValueTemplate} if these beans are not provided by the CDI
+	 * Register {@link ValkeyKeyValueAdapter} and {@link ValkeyKeyValueTemplate} if these beans are not provided by the CDI
 	 * application.
 	 *
 	 * @param afterBeanDiscovery
@@ -149,21 +149,21 @@ public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
 
 			if (!redisKeyValueAdapters.containsKey(qualifiers)) {
 				if (log.isInfoEnabled()) {
-					log.info("Registering bean for %s with qualifiers %s.".formatted(RedisKeyValueAdapter.class.getName(),
+					log.info("Registering bean for %s with qualifiers %s.".formatted(ValkeyKeyValueAdapter.class.getName(),
 							qualifiers));
 				}
-				RedisKeyValueAdapterBean redisKeyValueAdapterBean = createRedisKeyValueAdapterBean(qualifiers, beanManager);
+				ValkeyKeyValueAdapterBean redisKeyValueAdapterBean = createValkeyKeyValueAdapterBean(qualifiers, beanManager);
 				redisKeyValueAdapters.put(qualifiers, redisKeyValueAdapterBean);
 				afterBeanDiscovery.addBean(redisKeyValueAdapterBean);
 			}
 
 			if (!redisKeyValueTemplates.containsKey(qualifiers)) {
 				if (log.isInfoEnabled()) {
-					log.info("Registering bean for %s with qualifiers %s.".formatted(RedisKeyValueTemplate.class.getName(),
+					log.info("Registering bean for %s with qualifiers %s.".formatted(ValkeyKeyValueTemplate.class.getName(),
 							qualifiers));
 				}
 
-				RedisKeyValueTemplateBean redisKeyValueTemplateBean = createRedisKeyValueTemplateBean(qualifiers, beanManager);
+				ValkeyKeyValueTemplateBean redisKeyValueTemplateBean = createValkeyKeyValueTemplateBean(qualifiers, beanManager);
 				redisKeyValueTemplates.put(qualifiers, redisKeyValueTemplateBean);
 				afterBeanDiscovery.addBean(redisKeyValueTemplateBean);
 			}
@@ -188,55 +188,55 @@ public class RedisRepositoryExtension extends CdiRepositoryExtensionSupport {
 
 		if (redisKeyValueTemplate == null) {
 			throw new UnsatisfiedResolutionException("Unable to resolve a bean for '%s' with qualifiers %s"
-					.formatted(RedisKeyValueTemplate.class.getName(), qualifiers));
+					.formatted(ValkeyKeyValueTemplate.class.getName(), qualifiers));
 		}
 
 		// Construct and return the repository bean.
-		return new RedisRepositoryBean<>(redisKeyValueTemplate, qualifiers, repositoryType, beanManager,
+		return new ValkeyRepositoryBean<>(redisKeyValueTemplate, qualifiers, repositoryType, beanManager,
 				getCustomImplementationDetector());
 	}
 
 	/**
-	 * Creates a {@link RedisKeyValueAdapterBean}, requires a {@link RedisOperations} bean with the same qualifiers.
+	 * Creates a {@link ValkeyKeyValueAdapterBean}, requires a {@link ValkeyOperations} bean with the same qualifiers.
 	 *
 	 * @param qualifiers the qualifiers to be applied to the bean.
 	 * @param beanManager the BeanManager instance.
 	 * @return
 	 */
-	private RedisKeyValueAdapterBean createRedisKeyValueAdapterBean(Set<Annotation> qualifiers, BeanManager beanManager) {
+	private ValkeyKeyValueAdapterBean createValkeyKeyValueAdapterBean(Set<Annotation> qualifiers, BeanManager beanManager) {
 
-		// Determine the RedisOperations bean which matches the qualifiers of the repository.
-		Bean<RedisOperations<?, ?>> redisOperationsBean = this.redisOperations.get(qualifiers);
+		// Determine the ValkeyOperations bean which matches the qualifiers of the repository.
+		Bean<ValkeyOperations<?, ?>> redisOperationsBean = this.redisOperations.get(qualifiers);
 
 		if (redisOperationsBean == null) {
 			throw new UnsatisfiedResolutionException("Unable to resolve a bean for '%s' with qualifiers %s."
-					.formatted(RedisOperations.class.getName(), qualifiers));
+					.formatted(ValkeyOperations.class.getName(), qualifiers));
 		}
 
 		// Construct and return the repository bean.
-		return new RedisKeyValueAdapterBean(redisOperationsBean, qualifiers, beanManager);
+		return new ValkeyKeyValueAdapterBean(redisOperationsBean, qualifiers, beanManager);
 	}
 
 	/**
-	 * Creates a {@link RedisKeyValueTemplateBean}, requires a {@link RedisKeyValueAdapter} bean with the same qualifiers.
+	 * Creates a {@link ValkeyKeyValueTemplateBean}, requires a {@link ValkeyKeyValueAdapter} bean with the same qualifiers.
 	 *
 	 * @param qualifiers the qualifiers to be applied to the bean.
 	 * @param beanManager the BeanManager instance.
 	 * @return
 	 */
-	private RedisKeyValueTemplateBean createRedisKeyValueTemplateBean(Set<Annotation> qualifiers,
+	private ValkeyKeyValueTemplateBean createValkeyKeyValueTemplateBean(Set<Annotation> qualifiers,
 			BeanManager beanManager) {
 
-		// Determine the RedisKeyValueAdapter bean which matches the qualifiers of the repository.
-		Bean<RedisKeyValueAdapter> redisKeyValueAdapterBean = this.redisKeyValueAdapters.get(qualifiers);
+		// Determine the ValkeyKeyValueAdapter bean which matches the qualifiers of the repository.
+		Bean<ValkeyKeyValueAdapter> redisKeyValueAdapterBean = this.redisKeyValueAdapters.get(qualifiers);
 
 		if (redisKeyValueAdapterBean == null) {
 			throw new UnsatisfiedResolutionException("Unable to resolve a bean for '%s' with qualifiers %s"
-					.formatted(RedisKeyValueAdapter.class.getName(), qualifiers));
+					.formatted(ValkeyKeyValueAdapter.class.getName(), qualifiers));
 		}
 
 		// Construct and return the repository bean.
-		return new RedisKeyValueTemplateBean(redisKeyValueAdapterBean, qualifiers, beanManager);
+		return new ValkeyKeyValueTemplateBean(redisKeyValueAdapterBean, qualifiers, beanManager);
 	}
 
 }

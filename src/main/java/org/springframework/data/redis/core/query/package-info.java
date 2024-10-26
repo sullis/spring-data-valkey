@@ -1,5 +1,5 @@
 /**
- * Query package for Redis template.
+ * Query package for Valkey template.
  */
 @org.springframework.lang.NonNullApi
 @org.springframework.lang.NonNullFields

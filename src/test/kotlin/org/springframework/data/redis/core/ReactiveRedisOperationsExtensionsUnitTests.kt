@@ -25,29 +25,29 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.data.redis.connection.DataType
 import org.springframework.data.redis.connection.ReactiveSubscription
-import org.springframework.data.redis.core.script.RedisScript
+import org.springframework.data.redis.core.script.ValkeyScript
 import org.springframework.data.redis.listener.ChannelTopic
-import org.springframework.data.redis.serializer.RedisElementReader
-import org.springframework.data.redis.serializer.RedisElementWriter
+import org.springframework.data.redis.serializer.ValkeyElementReader
+import org.springframework.data.redis.serializer.ValkeyElementWriter
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
 import java.time.Instant
 
 /**
- * Unit tests for `ReactiveRedisOperationsExtensions`.
+ * Unit tests for `ReactiveValkeyOperationsExtensions`.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @author Sebastien Deleuze
  */
-class ReactiveRedisOperationsExtensionsUnitTests {
+class ReactiveValkeyOperationsExtensionsUnitTests {
 
 	@Test // DATAREDIS-1033
 	fun `execute with calllback`() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
-		every { operations.execute(any<ReactiveRedisCallback<*>>()) } returns Flux.just("foo")
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
+		every { operations.execute(any<ReactiveValkeyCallback<*>>()) } returns Flux.just("foo")
 
 		runBlocking {
 			assertThat(operations.executeAsFlow { flow { emit("foo") } }
@@ -55,15 +55,15 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 		}
 
 		verify {
-			operations.execute(any<ReactiveRedisCallback<*>>())
+			operations.execute(any<ReactiveValkeyCallback<*>>())
 		}
 	}
 
 	@Test // GH-2110
 	fun `executeInSession with calllback`() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
-		every { operations.executeInSession(any<ReactiveRedisSessionCallback<String, String, *>>()) } returns Flux.just(
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
+		every { operations.executeInSession(any<ReactiveValkeySessionCallback<String, String, *>>()) } returns Flux.just(
 			"foo"
 		)
 
@@ -73,18 +73,18 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 		}
 
 		verify {
-			operations.executeInSession(any<ReactiveRedisSessionCallback<String, String, *>>())
+			operations.executeInSession(any<ReactiveValkeySessionCallback<String, String, *>>())
 		}
 	}
 
 	@Test // DATAREDIS-1033
 	fun `execute with script`() {
 
-		val script = RedisScript.of<String>("foo")
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val script = ValkeyScript.of<String>("foo")
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every {
 			operations.execute(
-				any<RedisScript<*>>(),
+				any<ValkeyScript<*>>(),
 				any(),
 				any()
 			)
@@ -102,11 +102,11 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-1033
 	fun `execute with script, argsWriter and resultReader`() {
 
-		val script = RedisScript.of<String>("foo")
-		val argsWriter = mockk<RedisElementWriter<Any>>(relaxed = true)
-		val resultReader = mockk<RedisElementReader<String>>(relaxed = true)
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
-		every { operations.execute(any<RedisScript<String>>(), any(), any(), any(), any()) } returns Flux.just("foo")
+		val script = ValkeyScript.of<String>("foo")
+		val argsWriter = mockk<ValkeyElementWriter<Any>>(relaxed = true)
+		val resultReader = mockk<ValkeyElementReader<String>>(relaxed = true)
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
+		every { operations.execute(any<ValkeyScript<String>>(), any(), any(), any(), any()) } returns Flux.just("foo")
 
 		runBlocking {
 			assertThat(operations.executeAsFlow(script, argsWriter = argsWriter, resultReader = resultReader).toList()).contains("foo")
@@ -120,7 +120,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun convertAndSend() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.convertAndSend(any(), any()) } returns Mono.just(1)
 
 		runBlocking {
@@ -136,7 +136,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	fun listenToChannel() {
 
 		val message = ReactiveSubscription.ChannelMessage("a", "b")
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.listenToChannel(any(), any()) } returns Flux.just(message)
 
 		runBlocking {
@@ -152,7 +152,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	fun listenToPattern() {
 
 		val message = ReactiveSubscription.ChannelMessage("a", "b")
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.listenToPattern(any(), any()) } returns Flux.just(message)
 
 		runBlocking {
@@ -170,7 +170,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 		val topic1 = ChannelTopic.of("foo")
 		val topic2 = ChannelTopic.of("bar")
 		val message = ReactiveSubscription.ChannelMessage("a", "b")
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.listenTo(any(), any()) } returns Flux.just(message)
 
 		runBlocking {
@@ -185,7 +185,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun hasKey() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.hasKey(any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -200,7 +200,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun type() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.type(any()) } returns Mono.just(DataType.HASH)
 
 		runBlocking {
@@ -215,7 +215,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-1033
 	fun keys() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.keys(any()) } returns Flux.just("bar")
 
 		runBlocking {
@@ -230,7 +230,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-1033
 	fun scan() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.scan(ScanOptions.NONE) } returns Flux.just("foo")
 
 		runBlocking {
@@ -245,7 +245,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun randomKey() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.randomKey() } returns Mono.just("foo")
 
 		runBlocking {
@@ -260,7 +260,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun `randomKey returning an empty Mono`() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.randomKey() } returns Mono.empty()
 
 		runBlocking {
@@ -275,7 +275,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun rename() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.rename(any(), any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -290,7 +290,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun renameIfAbsent() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.renameIfAbsent(any(), any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -305,7 +305,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun delete() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.delete("foo", "bar") } returns Mono.just(2)
 
 		runBlocking {
@@ -320,7 +320,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun unlink() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.unlink("foo", "bar") } returns Mono.just(2)
 
 		runBlocking {
@@ -335,7 +335,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun expire() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.expire(any(), any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -350,7 +350,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun expireAt() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.expireAt(any(), any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -365,7 +365,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun persist() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.persist(any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -381,7 +381,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun move() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.move(any(), any()) } returns Mono.just(true)
 
 		runBlocking {
@@ -396,7 +396,7 @@ class ReactiveRedisOperationsExtensionsUnitTests {
 	@Test // DATAREDIS-937
 	fun getExpire() {
 
-		val operations = mockk<ReactiveRedisOperations<String, String>>()
+		val operations = mockk<ReactiveValkeyOperations<String, String>>()
 		every { operations.getExpire(any()) } returns Mono.just(Duration.ofDays(1))
 
 		runBlocking {

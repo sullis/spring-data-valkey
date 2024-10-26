@@ -31,8 +31,8 @@ import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.redis.ObjectFactory;
 import org.springframework.data.redis.Person;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
@@ -47,13 +47,13 @@ import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver;
-import org.springframework.data.redis.test.condition.EnabledOnRedisVersion;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyVersion;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 
 /**
  * Integration test of {@link DefaultStreamOperations}
@@ -67,15 +67,15 @@ import org.springframework.data.redis.test.extension.parametrized.ParameterizedR
 @EnabledOnCommand("XADD")
 public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 
-	private final RedisTemplate<K, ?> redisTemplate;
-	private final @EnabledOnRedisDriver.DriverQualifier RedisConnectionFactory connectionFactory;
+	private final ValkeyTemplate<K, ?> redisTemplate;
+	private final @EnabledOnValkeyDriver.DriverQualifier ValkeyConnectionFactory connectionFactory;
 
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<HK> hashKeyFactory;
 	private final ObjectFactory<HV> hashValueFactory;
 	private final StreamOperations<K, HK, HV> streamOps;
 
-	public DefaultStreamOperationsIntegrationTests(RedisTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultStreamOperationsIntegrationTests(ValkeyTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<?> objectFactory) {
 
 		this.redisTemplate = redisTemplate;
@@ -90,19 +90,19 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 
 		List<Object[]> params = new ArrayList<>();
 		params.addAll(AbstractOperationsTestParams
-				.testParams(JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class)));
+				.testParams(JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class)));
 
-		if (RedisDetector.isClusterAvailable()) {
+		if (ValkeyDetector.isClusterAvailable()) {
 			params.addAll(AbstractOperationsTestParams
-					.testParams(JedisConnectionFactoryExtension.getConnectionFactory(RedisCluster.class)));
+					.testParams(JedisConnectionFactoryExtension.getConnectionFactory(ValkeyCluster.class)));
 		}
 
 		params.addAll(AbstractOperationsTestParams
-				.testParams(LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class)));
+				.testParams(LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class)));
 
-		if (RedisDetector.isClusterAvailable()) {
+		if (ValkeyDetector.isClusterAvailable()) {
 			params.addAll(AbstractOperationsTestParams
-					.testParams(LettuceConnectionFactoryExtension.getConnectionFactory(RedisCluster.class)));
+					.testParams(LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyCluster.class)));
 		}
 
 		return params;
@@ -111,13 +111,13 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 	@BeforeEach
 	void setUp() {
 
-		redisTemplate.execute((RedisCallback<Object>) connection -> {
+		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void addShouldAddMessage() {
 
 		K key = keyFactory.instance();
@@ -140,7 +140,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void addShouldAddReadSimpleMessage() {
 
 		K key = keyFactory.instance();
@@ -160,7 +160,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getValue()).isEqualTo(value);
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMaxLenShouldLimitMessagesSize() {
 
 		K key = keyFactory.instance();
@@ -189,7 +189,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMaxLenShouldLimitSimpleMessagesSize() {
 
 		K key = keyFactory.instance();
@@ -215,7 +215,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getValue()).isEqualTo(newValue);
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMinIdShouldEvictLowerIdMessages() {
 
 		K key = keyFactory.instance();
@@ -249,7 +249,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMinIdShouldEvictLowerIdSimpleMessages() {
 
 		K key = keyFactory.instance();
@@ -279,7 +279,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message2.getValue()).isEqualTo(value);
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMakeNoStreamShouldNotCreateStreamWhenNoStreamExists() {
 
 		K key = keyFactory.instance();
@@ -293,7 +293,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(streamOps.range(key, Range.unbounded())).isEmpty();
 	}
 
-	@ParameterizedRedisTest // GH-2915
+	@ParameterizedValkeyTest // GH-2915
 	void addMakeNoStreamShouldCreateStreamWhenStreamExists() {
 
 		K key = keyFactory.instance();
@@ -309,7 +309,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(streamOps.range(key, Range.unbounded())).hasSize(2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void simpleMessageReadWriteSymmetry() {
 
 		K key = keyFactory.instance();
@@ -331,7 +331,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getValue().values()).containsExactly(value);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void rangeShouldReportMessages() {
 
 		K key = keyFactory.instance();
@@ -352,8 +352,8 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getId()).isEqualTo(messageId1);
 	}
 
-	@ParameterizedRedisTest // GH-2044
-	@EnabledOnRedisVersion("6.2")
+	@ParameterizedValkeyTest // GH-2044
+	@EnabledOnValkeyVersion("6.2")
 	void exclusiveRangeShouldReportMessages() {
 
 		K key = keyFactory.instance();
@@ -374,7 +374,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(messages).hasSize(1).extracting(MapRecord::getId).contains(messageId1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void reverseRangeShouldReportMessages() {
 
 		K key = keyFactory.instance();
@@ -389,8 +389,8 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(messages).hasSize(2).extracting("id").containsSequence(messageId2, messageId1);
 	}
 
-	@ParameterizedRedisTest // GH-2044
-	@EnabledOnRedisVersion("6.2")
+	@ParameterizedValkeyTest // GH-2044
+	@EnabledOnValkeyVersion("6.2")
 	void exclusiveReverseRangeShouldReportMessages() {
 
 		K key = keyFactory.instance();
@@ -412,7 +412,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(messages).hasSize(2).extracting(MapRecord::getId).containsSequence(messageId2, messageId1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void reverseRangeShouldConvertSimpleMessages() {
 
 		K key = keyFactory.instance();
@@ -433,7 +433,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getValue()).isEqualTo(value);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void readShouldReadMessage() {
 
 		K key = keyFactory.instance();
@@ -456,7 +456,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void readShouldReadSimpleMessage() {
 
 		K key = keyFactory.instance();
@@ -478,7 +478,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(message.getValue()).isEqualTo(value);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void readShouldReadMessages() {
 
 		K key = keyFactory.instance();
@@ -494,7 +494,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(messages).hasSize(2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void readShouldReadMessageWithConsumerGroup() {
 
 		K key = keyFactory.instance();
@@ -519,7 +519,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		}
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-864
+	@ParameterizedValkeyTest // DATAREDIS-864
 	void sizeShouldReportStreamSize() {
 
 		K key = keyFactory.instance();
@@ -533,7 +533,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(streamOps.size(key)).isEqualTo(2);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1084
+	@ParameterizedValkeyTest // DATAREDIS-1084
 	void pendingShouldReadMessageSummary() {
 		// XPENDING summary not supported by Jedis
 		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
@@ -553,7 +553,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(pending.getGroupName()).isEqualTo("my-group");
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1084
+	@ParameterizedValkeyTest // DATAREDIS-1084
 	void pendingShouldReadMessageDetails() {
 
 		K key = keyFactory.instance();
@@ -573,7 +573,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 		assertThat(pending.get(0).getTotalDeliveryCount()).isOne();
 	}
 
-	@ParameterizedRedisTest // GH-2465
+	@ParameterizedValkeyTest // GH-2465
 	void claimShouldReadMessageDetails() {
 
 		K key = keyFactory.instance();

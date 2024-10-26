@@ -124,7 +124,7 @@ public abstract class ClusterSlotHashUtil {
 	/**
 	 * Calculate the slot from the given key.
 	 *
-	 * @param key {@link String} containing the Redis key to evaluate; must not be {@literal null} or {@literal empty}.
+	 * @param key {@link String} containing the Valkey key to evaluate; must not be {@literal null} or {@literal empty}.
 	 * @return the computed slot based on the given key.
 	 * @throws IllegalArgumentException if the given {@link String key} is {@literal null} or {@literal empty}.
 	 * @see #calculateSlot(byte[])
@@ -139,7 +139,7 @@ public abstract class ClusterSlotHashUtil {
 	/**
 	 * Calculate the slot from the given key.
 	 *
-	 * @param key array of bytes containing the Redis key to evaluate; must not be {@literal null}.
+	 * @param key array of bytes containing the Valkey key to evaluate; must not be {@literal null}.
 	 * @return the computed slot based on the given key.
 	 */
 	public static int calculateSlot(byte[] key) {

@@ -24,18 +24,18 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.core.BoundKeyOperations;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValkeyOperations;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Atomic double backed by Redis. Uses Redis atomic increment/decrement and watch/multi/exec operations for CAS
+ * Atomic double backed by Valkey. Uses Valkey atomic increment/decrement and watch/multi/exec operations for CAS
  * operations.
  *
  * @author Jennifer Hickey
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * @author Graham MacMaster
  * @author Ning Wei
  */
-public class RedisAtomicDouble extends Number implements Serializable, BoundKeyOperations<String> {
+public class ValkeyAtomicDouble extends Number implements Serializable, BoundKeyOperations<String> {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -53,37 +53,37 @@ public class RedisAtomicDouble extends Number implements Serializable, BoundKeyO
 	private volatile String key;
 
 	private final ValueOperations<String, Double> operations;
-	private final RedisOperations<String, Double> generalOps;
+	private final ValkeyOperations<String, Double> generalOps;
 
 	/**
-	 * Constructs a new {@link RedisAtomicDouble} instance. Uses the value existing in Redis or {@code 0} if none is
+	 * Constructs a new {@link ValkeyAtomicDouble} instance. Uses the value existing in Valkey or {@code 0} if none is
 	 * found.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param factory connection factory.
 	 */
-	public RedisAtomicDouble(String redisCounter, RedisConnectionFactory factory) {
+	public ValkeyAtomicDouble(String redisCounter, ValkeyConnectionFactory factory) {
 		this(redisCounter, factory, null);
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicDouble} instance with a {@code initialValue} that overwrites the existing value.
+	 * Constructs a new {@link ValkeyAtomicDouble} instance with a {@code initialValue} that overwrites the existing value.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param factory connection factory.
 	 * @param initialValue initial value to set.
 	 */
-	public RedisAtomicDouble(String redisCounter, RedisConnectionFactory factory, double initialValue) {
+	public ValkeyAtomicDouble(String redisCounter, ValkeyConnectionFactory factory, double initialValue) {
 		this(redisCounter, factory, Double.valueOf(initialValue));
 	}
 
-	private RedisAtomicDouble(String redisCounter, RedisConnectionFactory factory, @Nullable Double initialValue) {
+	private ValkeyAtomicDouble(String redisCounter, ValkeyConnectionFactory factory, @Nullable Double initialValue) {
 
 		Assert.hasText(redisCounter, "a valid counter name is required");
 		Assert.notNull(factory, "a valid factory is required");
 
-		RedisTemplate<String, Double> redisTemplate = new RedisTemplate<>();
-		redisTemplate.setKeySerializer(RedisSerializer.string());
+		ValkeyTemplate<String, Double> redisTemplate = new ValkeyTemplate<>();
+		redisTemplate.setKeySerializer(ValkeySerializer.string());
 		redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Double.class));
 		redisTemplate.setExposeConnection(true);
 		redisTemplate.setConnectionFactory(factory);
@@ -101,35 +101,35 @@ public class RedisAtomicDouble extends Number implements Serializable, BoundKeyO
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicDouble} instance. Uses the value existing in Redis or 0 if none is found.
+	 * Constructs a new {@link ValkeyAtomicDouble} instance. Uses the value existing in Valkey or 0 if none is found.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param template the template.
-	 * @see #RedisAtomicDouble(String, RedisConnectionFactory, double)
+	 * @see #ValkeyAtomicDouble(String, ValkeyConnectionFactory, double)
 	 */
-	public RedisAtomicDouble(String redisCounter, RedisOperations<String, Double> template) {
+	public ValkeyAtomicDouble(String redisCounter, ValkeyOperations<String, Double> template) {
 		this(redisCounter, template, null);
 	}
 
 	/**
-	 * Constructs a new {@link RedisAtomicDouble} instance with a {@code initialValue} that overwrites the existing value
+	 * Constructs a new {@link ValkeyAtomicDouble} instance with a {@code initialValue} that overwrites the existing value
 	 * at {@code redisCounter}.
 	 * <p>
-	 * Note: You need to configure the given {@code template} with appropriate {@link RedisSerializer} for the key and
+	 * Note: You need to configure the given {@code template} with appropriate {@link ValkeySerializer} for the key and
 	 * value.
 	 * <p>
-	 * As an alternative one could use the {@link #RedisAtomicDouble(String, RedisConnectionFactory, Double)} constructor
+	 * As an alternative one could use the {@link #ValkeyAtomicDouble(String, ValkeyConnectionFactory, Double)} constructor
 	 * which uses appropriate default serializers.
 	 *
-	 * @param redisCounter Redis key of this counter.
+	 * @param redisCounter Valkey key of this counter.
 	 * @param template the template
-	 * @param initialValue initial value to set if the Redis key is absent.
+	 * @param initialValue initial value to set if the Valkey key is absent.
 	 */
-	public RedisAtomicDouble(String redisCounter, RedisOperations<String, Double> template, double initialValue) {
+	public ValkeyAtomicDouble(String redisCounter, ValkeyOperations<String, Double> template, double initialValue) {
 		this(redisCounter, template, Double.valueOf(initialValue));
 	}
 
-	private RedisAtomicDouble(String redisCounter, RedisOperations<String, Double> template,
+	private ValkeyAtomicDouble(String redisCounter, ValkeyOperations<String, Double> template,
 			@Nullable Double initialValue) {
 
 		Assert.hasText(redisCounter, "a valid counter name is required");

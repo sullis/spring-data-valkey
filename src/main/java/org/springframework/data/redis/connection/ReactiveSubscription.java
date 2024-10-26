@@ -26,14 +26,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Subscription for Redis channels using reactive infrastructure. A {@link ReactiveSubscription} allows subscribing to
+ * Subscription for Valkey channels using reactive infrastructure. A {@link ReactiveSubscription} allows subscribing to
  * {@link #subscribe(ByteBuffer...) channels} and {@link #pSubscribe(ByteBuffer...) patterns}. It provides access to the
  * {@link ChannelMessage} {@link #receive() stream} that emits only messages for channels and patterns registered in
  * this {@link ReactiveSubscription}.
  * <p>
- * A reactive Redis connection can have multiple subscriptions. If two or more subscriptions subscribe to the same
+ * A reactive Valkey connection can have multiple subscriptions. If two or more subscriptions subscribe to the same
  * target (channel/pattern) and one unsubscribes, then the other one will no longer receive messages for the target due
- * to how Redis handled Pub/Sub subscription.
+ * to how Valkey handled Pub/Sub subscription.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -123,7 +123,7 @@ public interface ReactiveSubscription {
 	Mono<Void> cancel();
 
 	/**
-	 * {@link Message} represents a Redis channel message within Redis pub/sub.
+	 * {@link Message} represents a Valkey channel message within Valkey pub/sub.
 	 *
 	 * @param <C> channel representation type.
 	 * @param <M> message representation type.
@@ -148,7 +148,7 @@ public interface ReactiveSubscription {
 	}
 
 	/**
-	 * Value object for a Redis channel message.
+	 * Value object for a Valkey channel message.
 	 *
 	 * @param <C> type of how the channel name is represented.
 	 * @param <M> type of how the message is represented.
@@ -215,7 +215,7 @@ public interface ReactiveSubscription {
 	}
 
 	/**
-	 * Value object for a Redis channel message received from a pattern subscription.
+	 * Value object for a Valkey channel message received from a pattern subscription.
 	 *
 	 * @param <P> type of how the pattern is represented.
 	 * @param <C> type of how the channel name is represented.

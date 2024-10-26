@@ -26,7 +26,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PropertyHandler;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
 import org.springframework.data.redis.core.index.ConfigurableIndexDefinitionProvider;
 import org.springframework.data.redis.core.index.GeoIndexDefinition;
 import org.springframework.data.redis.core.index.GeoIndexed;
@@ -36,9 +36,9 @@ import org.springframework.data.redis.core.index.IndexDefinition.Condition;
 import org.springframework.data.redis.core.index.IndexDefinition.IndexingContext;
 import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.data.redis.core.index.SimpleIndexDefinition;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
-import org.springframework.data.redis.core.mapping.RedisPersistentProperty;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentProperty;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -58,14 +58,14 @@ public class PathIndexResolver implements IndexResolver {
 	private final Set<Class<?>> VALUE_TYPES = new HashSet<>(Arrays.<Class<?>> asList(Point.class, GeoLocation.class));
 
 	private final ConfigurableIndexDefinitionProvider indexConfiguration;
-	private final RedisMappingContext mappingContext;
+	private final ValkeyMappingContext mappingContext;
 	private final IndexedDataFactoryProvider indexedDataFactoryProvider;
 
 	/**
 	 * Creates new {@link PathIndexResolver} with empty {@link IndexConfiguration}.
 	 */
 	public PathIndexResolver() {
-		this(new RedisMappingContext());
+		this(new ValkeyMappingContext());
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class PathIndexResolver implements IndexResolver {
 	 *
 	 * @param mappingContext must not be {@literal null}.
 	 */
-	public PathIndexResolver(RedisMappingContext mappingContext) {
+	public PathIndexResolver(ValkeyMappingContext mappingContext) {
 
 		Assert.notNull(mappingContext, "MappingContext must not be null");
 
@@ -96,7 +96,7 @@ public class PathIndexResolver implements IndexResolver {
 	private Set<IndexedData> doResolveIndexesFor(final String keyspace, final String path,
 			TypeInformation<?> typeInformation, @Nullable PersistentProperty<?> fallback, @Nullable Object value) {
 
-		RedisPersistentEntity<?> entity = mappingContext.getPersistentEntity(typeInformation);
+		ValkeyPersistentEntity<?> entity = mappingContext.getPersistentEntity(typeInformation);
 
 		if (entity == null || (value != null && VALUE_TYPES.contains(value.getClass()))) {
 			return resolveIndex(keyspace, path, fallback, value);
@@ -112,10 +112,10 @@ public class PathIndexResolver implements IndexResolver {
 		final PersistentPropertyAccessor accessor = entity.getPropertyAccessor(value);
 		final Set<IndexedData> indexes = new LinkedHashSet<>();
 
-		entity.doWithProperties(new PropertyHandler<RedisPersistentProperty>() {
+		entity.doWithProperties(new PropertyHandler<ValkeyPersistentProperty>() {
 
 			@Override
-			public void doWithPersistentProperty(RedisPersistentProperty persistentProperty) {
+			public void doWithPersistentProperty(ValkeyPersistentProperty persistentProperty) {
 
 				String currentPath = !path.isEmpty() ? path + "." + persistentProperty.getName() : persistentProperty.getName();
 

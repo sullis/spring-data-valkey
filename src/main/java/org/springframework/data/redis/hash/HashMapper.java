@@ -18,19 +18,19 @@ package org.springframework.data.redis.hash;
 import java.util.Map;
 
 /**
- * Core mapping contract between Java types and Redis hashes/maps. It's up to the implementation to support nested
+ * Core mapping contract between Java types and Valkey hashes/maps. It's up to the implementation to support nested
  * objects.
  *
  * @param <T> Object type
- * @param <K> Redis Hash field type
- * @param <V> Redis Hash value type
+ * @param <K> Valkey Hash field type
+ * @param <V> Valkey Hash value type
  * @author Costin Leau
  * @author Mark Paluch
  */
 public interface HashMapper<T, K, V> {
 
 	/**
-	 * Convert an {@code object} to a map that can be used with Redis hashes.
+	 * Convert an {@code object} to a map that can be used with Valkey hashes.
 	 *
 	 * @param object
 	 * @return

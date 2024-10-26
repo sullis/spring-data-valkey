@@ -17,7 +17,7 @@ package org.springframework.data.redis.test.condition;
 
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.*;
 
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 
 import java.util.Optional;
 
@@ -28,15 +28,15 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.springframework.data.redis.test.extension.LettuceExtension;
 
 /**
- * {@link ExecutionCondition} for {@link EnabledOnRedisVersionCondition @EnabledOnVersion}.
+ * {@link ExecutionCondition} for {@link EnabledOnValkeyVersionCondition @EnabledOnVersion}.
  *
  * @author Mark Paluch return ENABLED_BY_DEFAULT;
- * @see EnabledOnRedisVersionCondition
+ * @see EnabledOnValkeyVersionCondition
  */
-class EnabledOnRedisVersionCondition implements ExecutionCondition {
+class EnabledOnValkeyVersionCondition implements ExecutionCondition {
 
 	private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = enabled("@EnabledOnVersion is not present");
-	private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(RedisConditions.class);
+	private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ValkeyConditions.class);
 
 	private final LettuceExtension lettuceExtension = new LettuceExtension();
 
@@ -44,8 +44,8 @@ class EnabledOnRedisVersionCondition implements ExecutionCondition {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
 
-		Optional<EnabledOnRedisVersion> optional = AnnotationUtils.findAnnotation(context.getElement(),
-				EnabledOnRedisVersion.class);
+		Optional<EnabledOnValkeyVersion> optional = AnnotationUtils.findAnnotation(context.getElement(),
+				EnabledOnValkeyVersion.class);
 
 		if (!optional.isPresent()) {
 			return ENABLED_BY_DEFAULT;
@@ -54,21 +54,21 @@ class EnabledOnRedisVersionCondition implements ExecutionCondition {
 		String requiredVersion = optional.get().value();
 
 		ExtensionContext.Store store = context.getRoot().getStore(NAMESPACE);
-		RedisConditions conditions = store.getOrComputeIfAbsent(RedisConditions.class, ignore -> {
+		ValkeyConditions conditions = store.getOrComputeIfAbsent(ValkeyConditions.class, ignore -> {
 
-			try (StatefulRedisConnection connection = lettuceExtension.resolve(context, StatefulRedisConnection.class)) {
-				return RedisConditions.of(connection);
+			try (StatefulValkeyConnection connection = lettuceExtension.resolve(context, StatefulValkeyConnection.class)) {
+				return ValkeyConditions.of(connection);
 			}
-		}, RedisConditions.class);
+		}, ValkeyConditions.class);
 
 		boolean requiredVersionMet = conditions.hasVersionGreaterOrEqualsTo(requiredVersion);
 
 		if (requiredVersionMet) {
 			return enabled("Enabled on version %s; actual version: %s".formatted(requiredVersion,
-					conditions.getRedisVersion()));
+					conditions.getValkeyVersion()));
 		}
 
-		return disabled("Disabled; version %s not available on Redis version %s".formatted(requiredVersion,
-				conditions.getRedisVersion()));
+		return disabled("Disabled; version %s not available on Valkey version %s".formatted(requiredVersion,
+				conditions.getValkeyVersion()));
 	}
 }

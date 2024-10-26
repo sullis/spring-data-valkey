@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
  * @author Christoph Strobl
  * @since 1.7
  */
-public interface PathBasedRedisIndexDefinition extends IndexDefinition {
+public interface PathBasedValkeyIndexDefinition extends IndexDefinition {
 
 	/**
 	 * @return can be {@literal null}.

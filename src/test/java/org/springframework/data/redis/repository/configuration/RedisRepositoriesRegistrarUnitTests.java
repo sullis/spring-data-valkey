@@ -31,13 +31,13 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.repository.CrudRepository;
 
 /**
  * @author Christoph Strobl
  */
-class RedisRepositoriesRegistrarUnitTests {
+class ValkeyRepositoriesRegistrarUnitTests {
 
 	private BeanDefinitionRegistry registry;
 
@@ -50,7 +50,7 @@ class RedisRepositoriesRegistrarUnitTests {
 	@MethodSource(value = { "args" })
 	void configuresRepositoriesCorrectly(AnnotationMetadata metadata, String[] beanNames) {
 
-		RedisRepositoriesRegistrar registrar = new RedisRepositoriesRegistrar();
+		ValkeyRepositoriesRegistrar registrar = new ValkeyRepositoriesRegistrar();
 		registrar.setResourceLoader(new DefaultResourceLoader());
 		registrar.setEnvironment(new StandardEnvironment());
 		registrar.registerBeanDefinitions(metadata, registry);
@@ -67,12 +67,12 @@ class RedisRepositoriesRegistrarUnitTests {
 						new String[] { "redisRepositoriesRegistrarUnitTests.PersonREPO" }));
 	}
 
-	@EnableRedisRepositories(basePackageClasses = PersonRepository.class, considerNestedRepositories = true)
+	@EnableValkeyRepositories(basePackageClasses = PersonRepository.class, considerNestedRepositories = true)
 	private class Config {
 
 	}
 
-	@EnableRedisRepositories(basePackageClasses = PersonRepository.class, nameGenerator = MyBeanNameGenerator.class,
+	@EnableValkeyRepositories(basePackageClasses = PersonRepository.class, nameGenerator = MyBeanNameGenerator.class,
 			considerNestedRepositories = true)
 	private class ConfigWithBeanNameGenerator {
 
@@ -90,6 +90,6 @@ class RedisRepositoriesRegistrarUnitTests {
 
 	}
 
-	@RedisHash
+	@ValkeyHash
 	static class Person {}
 }

@@ -19,21 +19,21 @@ import org.springframework.core.io.Resource
 
 
 /**
- * Inline fun variant with reified generics for [RedisScript].
+ * Inline fun variant with reified generics for [ValkeyScript].
  *
  * @author Mikhael Sokolov
  * @since 2.6.1
  */
 @Suppress("FunctionName")
-inline fun <reified T : Any> RedisScript(script: String): RedisScript<T> =
-    RedisScript.of(script, T::class.java)
+inline fun <reified T : Any> ValkeyScript(script: String): ValkeyScript<T> =
+    ValkeyScript.of(script, T::class.java)
 
 /**
- * Inline fun variant with reified generics for [RedisScript].
+ * Inline fun variant with reified generics for [ValkeyScript].
  *
  * @author Mikhael Sokolov
  * @since 2.6.1
  */
 @Suppress("FunctionName")
-inline fun <reified T : Any> RedisScript(script: Resource): RedisScript<T> =
-    RedisScript.of(script, T::class.java)
+inline fun <reified T : Any> ValkeyScript(script: Resource): ValkeyScript<T> =
+    ValkeyScript.of(script, T::class.java)

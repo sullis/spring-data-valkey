@@ -24,12 +24,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Java Serialization {@link RedisSerializer}.
+ * Java Serialization {@link ValkeySerializer}.
  * <p>
  * Delegates to the default (Java-based) {@link DefaultSerializer serializer}
  * and {@link DefaultDeserializer deserializer}.
  * <p>
- * This {@link RedisSerializer serializer} can be constructed with either a custom {@link ClassLoader}
+ * This {@link ValkeySerializer serializer} can be constructed with either a custom {@link ClassLoader}
  * or custom {@link Converter converters}.
  *
  * @author Mark Pollack
@@ -38,32 +38,32 @@ import org.springframework.util.Assert;
  * @author Christoph Strobl
  * @author John Blum
  */
-public class JdkSerializationRedisSerializer implements RedisSerializer<Object> {
+public class JdkSerializationValkeySerializer implements ValkeySerializer<Object> {
 
 	private final Converter<Object, byte[]> serializer;
 	private final Converter<byte[], Object> deserializer;
 
 	/**
-	 * Creates a new {@link JdkSerializationRedisSerializer} using the default {@link ClassLoader}.
+	 * Creates a new {@link JdkSerializationValkeySerializer} using the default {@link ClassLoader}.
 	 */
-	public JdkSerializationRedisSerializer() {
+	public JdkSerializationValkeySerializer() {
 		this(new SerializingConverter(), new DeserializingConverter());
 	}
 
 	/**
-	 * Creates a new {@link JdkSerializationRedisSerializer} with the given {@link ClassLoader} used to
+	 * Creates a new {@link JdkSerializationValkeySerializer} with the given {@link ClassLoader} used to
 	 * resolve {@link Class types} during deserialization.
 	 *
 	 * @param classLoader {@link ClassLoader} used to resolve {@link Class types} for deserialization;
 	 * can be {@literal null}.
 	 * @since 1.7
 	 */
-	public JdkSerializationRedisSerializer(@Nullable ClassLoader classLoader) {
+	public JdkSerializationValkeySerializer(@Nullable ClassLoader classLoader) {
 		this(new SerializingConverter(), new DeserializingConverter(classLoader));
 	}
 
 	/**
-	 * Creates a new {@link JdkSerializationRedisSerializer} using {@link Converter converters} to serialize and
+	 * Creates a new {@link JdkSerializationValkeySerializer} using {@link Converter converters} to serialize and
 	 * deserialize {@link Object objects}.
 	 *
 	 * @param serializer {@link Converter} used to serialize an {@link Object} to a byte array;
@@ -74,7 +74,7 @@ public class JdkSerializationRedisSerializer implements RedisSerializer<Object> 
 	 * are {@literal null}.
 	 * @since 1.7
 	 */
-	public JdkSerializationRedisSerializer(Converter<Object, byte[]> serializer,
+	public JdkSerializationValkeySerializer(Converter<Object, byte[]> serializer,
 			Converter<byte[], Object> deserializer) {
 
 		Assert.notNull(serializer, "Serializer must not be null");

@@ -37,59 +37,59 @@ import org.springframework.data.annotation.Reference;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.geo.Point;
 import org.springframework.data.keyvalue.annotation.KeySpace;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.ShadowCopy;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.EnableKeyspaceEvents;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter.ShadowCopy;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.MappingConfiguration;
 import org.springframework.data.redis.core.index.GeoIndexed;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.data.redis.test.condition.EnabledIfLongRunningTest;
 
 /**
- * Integration tests for {@link RedisKeyValueAdapter}.
+ * Integration tests for {@link ValkeyKeyValueAdapter}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author Andrey Muchnik
  */
 @ExtendWith(LettuceConnectionFactoryExtension.class)
-public class RedisKeyValueAdapterTests {
+public class ValkeyKeyValueAdapterTests {
 
-	private RedisKeyValueAdapter adapter;
-	private StringRedisTemplate template;
-	private RedisConnectionFactory connectionFactory;
-	private RedisMappingContext mappingContext;
+	private ValkeyKeyValueAdapter adapter;
+	private StringValkeyTemplate template;
+	private ValkeyConnectionFactory connectionFactory;
+	private ValkeyMappingContext mappingContext;
 
-	public RedisKeyValueAdapterTests(RedisConnectionFactory connectionFactory) throws Exception {
+	public ValkeyKeyValueAdapterTests(ValkeyConnectionFactory connectionFactory) throws Exception {
 		this.connectionFactory = connectionFactory;
 	}
 
 	@BeforeEach
 	void setUp() {
 
-		template = new StringRedisTemplate(connectionFactory);
+		template = new StringValkeyTemplate(connectionFactory);
 		template.afterPropertiesSet();
 
-		mappingContext = new RedisMappingContext(
+		mappingContext = new ValkeyMappingContext(
 				new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
 		mappingContext.afterPropertiesSet();
 
-		adapter = new RedisKeyValueAdapter(template, mappingContext);
+		adapter = new ValkeyKeyValueAdapter(template, mappingContext);
 		adapter.setEnableKeyspaceEvents(EnableKeyspaceEvents.ON_STARTUP);
 		adapter.afterPropertiesSet();
 		adapter.start();
 
-		template.execute((RedisCallback<Void>) connection -> {
+		template.execute((ValkeyCallback<Void>) connection -> {
 			connection.flushDb();
 			return null;
 		});
 
-		try (RedisConnection connection = template.getConnectionFactory()
+		try (ValkeyConnection connection = template.getConnectionFactory()
 				.getConnection()) {
 			connection.setConfig("notify-keyspace-events", "");
 			connection.setConfig("notify-keyspace-events", "KEA");
@@ -706,11 +706,11 @@ public class RedisKeyValueAdapterTests {
 	@Test // DATAREDIS-1091
 	void phantomKeyNotInsertedOnPutWhenShadowCopyIsTurnedOff() {
 
-		RedisMappingContext mappingContext = new RedisMappingContext(
+		ValkeyMappingContext mappingContext = new ValkeyMappingContext(
 				new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
 		mappingContext.afterPropertiesSet();
 
-		RedisKeyValueAdapter kvAdapter = new RedisKeyValueAdapter(template, mappingContext);
+		ValkeyKeyValueAdapter kvAdapter = new ValkeyKeyValueAdapter(template, mappingContext);
 		kvAdapter.setShadowCopy(ShadowCopy.OFF);
 
 		ExpiringPerson rand = new ExpiringPerson();
@@ -725,11 +725,11 @@ public class RedisKeyValueAdapterTests {
 	@Test // DATAREDIS-1091
 	void phantomKeyInsertedOnPutWhenShadowCopyIsTurnedOn() {
 
-		RedisMappingContext mappingContext = new RedisMappingContext(
+		ValkeyMappingContext mappingContext = new ValkeyMappingContext(
 				new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
 		mappingContext.afterPropertiesSet();
 
-		RedisKeyValueAdapter kvAdapter = new RedisKeyValueAdapter(template, mappingContext);
+		ValkeyKeyValueAdapter kvAdapter = new ValkeyKeyValueAdapter(template, mappingContext);
 		kvAdapter.setShadowCopy(ShadowCopy.ON);
 
 		ExpiringPerson rand = new ExpiringPerson();
@@ -789,20 +789,20 @@ public class RedisKeyValueAdapterTests {
 	}
 
 	/**
-	 * Wait up to 5 seconds until {@code key} is no longer available in Redis.
+	 * Wait up to 5 seconds until {@code key} is no longer available in Valkey.
 	 *
 	 * @param template must not be {@literal null}.
 	 * @param key must not be {@literal null}.
 	 * @throws TimeoutException
 	 * @throws InterruptedException
 	 */
-	private static void waitUntilKeyIsGone(RedisTemplate<String, ?> template, String key)
+	private static void waitUntilKeyIsGone(ValkeyTemplate<String, ?> template, String key)
 			throws TimeoutException, InterruptedException {
 		waitUntilKeyIsGone(template, key, 5, TimeUnit.SECONDS);
 	}
 
 	/**
-	 * Wait up to {@code timeout} until {@code key} is no longer available in Redis.
+	 * Wait up to {@code timeout} until {@code key} is no longer available in Valkey.
 	 *
 	 * @param template must not be {@literal null}.
 	 * @param key must not be {@literal null}.
@@ -811,7 +811,7 @@ public class RedisKeyValueAdapterTests {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	private static void waitUntilKeyIsGone(RedisTemplate<String, ?> template, String key, long timeout, TimeUnit timeUnit)
+	private static void waitUntilKeyIsGone(ValkeyTemplate<String, ?> template, String key, long timeout, TimeUnit timeUnit)
 			throws InterruptedException, TimeoutException {
 
 		long limitMs = TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
@@ -891,7 +891,7 @@ public class RedisKeyValueAdapterTests {
 	}
 
 	@KeySpace("withexpiration")
-	@RedisHash(timeToLive = 30)
+	@ValkeyHash(timeToLive = 30)
 	static class WithExpiration {
 
 		@Id String id;

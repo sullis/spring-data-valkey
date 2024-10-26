@@ -22,13 +22,13 @@ import org.springframework.data.redis.core.TimeToLiveAccessor;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis specific {@link PersistentEntity}.
+ * Valkey specific {@link PersistentEntity}.
  *
  * @author Christoph Strobl
  * @param <T>
  * @since 1.7
  */
-public interface RedisPersistentEntity<T> extends KeyValuePersistentEntity<T, RedisPersistentProperty> {
+public interface ValkeyPersistentEntity<T> extends KeyValuePersistentEntity<T, ValkeyPersistentProperty> {
 
 	/**
 	 * Get the {@link TimeToLiveAccessor} associated with the entity.
@@ -62,7 +62,7 @@ public interface RedisPersistentEntity<T> extends KeyValuePersistentEntity<T, Re
 	 * @since 1.8
 	 */
 	@Nullable
-	RedisPersistentProperty getExplicitTimeToLiveProperty();
+	ValkeyPersistentProperty getExplicitTimeToLiveProperty();
 
 	/**
 	 * @return {@literal true} if the entity could potentially expire.

@@ -1,5 +1,5 @@
 /**
- * Abstractions for Redis secondary indexes.
+ * Abstractions for Valkey secondary indexes.
  */
 @org.springframework.lang.NonNullApi
 @org.springframework.lang.NonNullFields

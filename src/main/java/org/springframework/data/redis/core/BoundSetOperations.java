@@ -35,7 +35,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param values
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sadd">Redis Documentation: SADD</a>
+	 * @see <a href="https://redis.io/commands/sadd">Valkey Documentation: SADD</a>
 	 */
 	@Nullable
 	Long add(V... values);
@@ -45,7 +45,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param values
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srem">Redis Documentation: SREM</a>
+	 * @see <a href="https://redis.io/commands/srem">Valkey Documentation: SREM</a>
 	 */
 	@Nullable
 	Long remove(Object... values);
@@ -54,7 +54,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * Remove and return a random member from set at the bound key.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/spop">Redis Documentation: SPOP</a>
+	 * @see <a href="https://redis.io/commands/spop">Valkey Documentation: SPOP</a>
 	 */
 	@Nullable
 	V pop();
@@ -65,7 +65,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param destKey must not be {@literal null}.
 	 * @param value
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/smove">Redis Documentation: SMOVE</a>
+	 * @see <a href="https://redis.io/commands/smove">Valkey Documentation: SMOVE</a>
 	 */
 	@Nullable
 	Boolean move(K destKey, V value);
@@ -74,7 +74,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * Get size of set at the bound key.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/scard">Redis Documentation: SCARD</a>
+	 * @see <a href="https://redis.io/commands/scard">Valkey Documentation: SCARD</a>
 	 */
 	@Nullable
 	Long size();
@@ -84,7 +84,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param o
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sismember">Redis Documentation: SISMEMBER</a>
+	 * @see <a href="https://redis.io/commands/sismember">Valkey Documentation: SISMEMBER</a>
 	 */
 	@Nullable
 	Boolean isMember(Object o);
@@ -95,7 +95,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param objects
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/smismember">Redis Documentation: SMISMEMBER</a>
+	 * @see <a href="https://redis.io/commands/smismember">Valkey Documentation: SMISMEMBER</a>
 	 */
 	@Nullable
 	Map<Object, Boolean> isMember(Object... objects);
@@ -105,7 +105,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sinter">Redis Documentation: SINTER</a>
+	 * @see <a href="https://redis.io/commands/sinter">Valkey Documentation: SINTER</a>
 	 */
 	@Nullable
 	Set<V> intersect(K key);
@@ -115,7 +115,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sinter">Redis Documentation: SINTER</a>
+	 * @see <a href="https://redis.io/commands/sinter">Valkey Documentation: SINTER</a>
 	 */
 	@Nullable
 	Set<V> intersect(Collection<K> keys);
@@ -125,7 +125,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sinterstore">Redis Documentation: SINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/sinterstore">Valkey Documentation: SINTERSTORE</a>
 	 */
 	void intersectAndStore(K key, K destKey);
 
@@ -134,7 +134,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sinterstore">Redis Documentation: SINTERSTORE</a>
+	 * @see <a href="https://redis.io/commands/sinterstore">Valkey Documentation: SINTERSTORE</a>
 	 */
 	void intersectAndStore(Collection<K> keys, K destKey);
 
@@ -143,7 +143,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sunion">Redis Documentation: SUNION</a>
+	 * @see <a href="https://redis.io/commands/sunion">Valkey Documentation: SUNION</a>
 	 */
 	@Nullable
 	Set<V> union(K key);
@@ -153,7 +153,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sunion">Redis Documentation: SUNION</a>
+	 * @see <a href="https://redis.io/commands/sunion">Valkey Documentation: SUNION</a>
 	 */
 	@Nullable
 	Set<V> union(Collection<K> keys);
@@ -163,7 +163,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sunionstore">Redis Documentation: SUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/sunionstore">Valkey Documentation: SUNIONSTORE</a>
 	 */
 	void unionAndStore(K key, K destKey);
 
@@ -172,7 +172,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sunionstore">Redis Documentation: SUNIONSTORE</a>
+	 * @see <a href="https://redis.io/commands/sunionstore">Valkey Documentation: SUNIONSTORE</a>
 	 */
 	void unionAndStore(Collection<K> keys, K destKey);
 
@@ -181,7 +181,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
 	 * @deprecated since 3.0, use {@link #difference(Object)} instead to follow a consistent method naming scheme.
 	 */
 	@Nullable
@@ -196,7 +196,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
 	 */
 	@Nullable
 	Set<V> difference(K key);
@@ -206,7 +206,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
 	 * @deprecated since 3.0, use {@link #difference(Collection)} instead to follow a consistent method naming scheme.
 	 */
 	@Nullable
@@ -221,7 +221,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param keys must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/sdiff">Redis Documentation: SDIFF</a>
+	 * @see <a href="https://redis.io/commands/sdiff">Valkey Documentation: SDIFF</a>
 	 */
 	@Nullable
 	Set<V> difference(Collection<K> keys);
@@ -231,7 +231,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
 	 * @deprecated since 3.0, use {@link #differenceAndStore(Object, Object)} instead to follow a consistent method naming
 	 *             scheme..
 	 */
@@ -246,7 +246,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
 	 */
 	void differenceAndStore(K keys, K destKey);
 
@@ -255,7 +255,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
 	 * @deprecated since 3.0, use {@link #differenceAndStore(Collection, Object)} instead to follow a consistent method
 	 *             naming scheme.
 	 */
@@ -270,7 +270,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * @param keys must not be {@literal null}.
 	 * @param destKey must not be {@literal null}.
 	 * @since 3.0
-	 * @see <a href="https://redis.io/commands/sdiffstore">Redis Documentation: SDIFFSTORE</a>
+	 * @see <a href="https://redis.io/commands/sdiffstore">Valkey Documentation: SDIFFSTORE</a>
 	 */
 	void differenceAndStore(Collection<K> keys, K destKey);
 
@@ -278,7 +278,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * Get all elements of set at the bound key.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/smembers">Redis Documentation: SMEMBERS</a>
+	 * @see <a href="https://redis.io/commands/smembers">Valkey Documentation: SMEMBERS</a>
 	 */
 	@Nullable
 	Set<V> members();
@@ -287,7 +287,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 * Get random element from set at the bound key.
 	 *
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
 	 */
 	@Nullable
 	V randomMember();
@@ -297,7 +297,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
 	 */
 	@Nullable
 	Set<V> distinctRandomMembers(long count);
@@ -307,7 +307,7 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	 *
 	 * @param count
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/srandmember">Redis Documentation: SRANDMEMBER</a>
+	 * @see <a href="https://redis.io/commands/srandmember">Valkey Documentation: SRANDMEMBER</a>
 	 */
 	@Nullable
 	List<V> randomMembers(long count);
@@ -327,6 +327,6 @@ public interface BoundSetOperations<K, V> extends BoundKeyOperations<K> {
 	/**
 	 * @return never {@literal null}.
 	 */
-	RedisOperations<K, V> getOperations();
+	ValkeyOperations<K, V> getOperations();
 
 }

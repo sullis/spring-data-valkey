@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 
 /**
  * @author Christoph Strobl
@@ -28,139 +28,139 @@ import org.springframework.data.redis.core.types.RedisClientInfo;
  * @since 2.0
  */
 @Deprecated
-public interface DefaultedRedisClusterConnection
-		extends DefaultedRedisConnection, RedisClusterCommands, RedisClusterServerCommands, RedisClusterCommandsProvider {
+public interface DefaultedValkeyClusterConnection
+		extends DefaultedValkeyConnection, ValkeyClusterCommands, ValkeyClusterServerCommands, ValkeyClusterCommandsProvider {
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void bgReWriteAof(RedisClusterNode node) {
+	default void bgReWriteAof(ValkeyClusterNode node) {
 		serverCommands().bgReWriteAof(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void bgSave(RedisClusterNode node) {
+	default void bgSave(ValkeyClusterNode node) {
 		serverCommands().bgSave(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Long lastSave(RedisClusterNode node) {
+	default Long lastSave(ValkeyClusterNode node) {
 		return serverCommands().lastSave(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void save(RedisClusterNode node) {
+	default void save(ValkeyClusterNode node) {
 		serverCommands().save(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Long dbSize(RedisClusterNode node) {
+	default Long dbSize(ValkeyClusterNode node) {
 		return serverCommands().dbSize(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void flushDb(RedisClusterNode node) {
+	default void flushDb(ValkeyClusterNode node) {
 		serverCommands().flushDb(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void flushDb(RedisClusterNode node, FlushOption option) {
+	default void flushDb(ValkeyClusterNode node, FlushOption option) {
 		serverCommands().flushDb(node, option);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void flushAll(RedisClusterNode node) {
+	default void flushAll(ValkeyClusterNode node) {
 		serverCommands().flushAll(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void flushAll(RedisClusterNode node, FlushOption option) {
+	default void flushAll(ValkeyClusterNode node, FlushOption option) {
 		serverCommands().flushAll(node, option);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Properties info(RedisClusterNode node) {
+	default Properties info(ValkeyClusterNode node) {
 		return serverCommands().info(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Properties info(RedisClusterNode node, String section) {
+	default Properties info(ValkeyClusterNode node, String section) {
 		return serverCommands().info(node, section);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void shutdown(RedisClusterNode node) {
+	default void shutdown(ValkeyClusterNode node) {
 		serverCommands().shutdown(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Properties getConfig(RedisClusterNode node, String pattern) {
+	default Properties getConfig(ValkeyClusterNode node, String pattern) {
 		return serverCommands().getConfig(node, pattern);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void setConfig(RedisClusterNode node, String param, String value) {
+	default void setConfig(ValkeyClusterNode node, String param, String value) {
 		serverCommands().setConfig(node, param, value);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void resetConfigStats(RedisClusterNode node) {
+	default void resetConfigStats(ValkeyClusterNode node) {
 		serverCommands().resetConfigStats(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default void rewriteConfig(RedisClusterNode node) {
+	default void rewriteConfig(ValkeyClusterNode node) {
 		serverCommands().rewriteConfig(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Long time(RedisClusterNode node) {
+	default Long time(ValkeyClusterNode node) {
 		return serverCommands().time(node);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default Long time(RedisClusterNode node, TimeUnit timeUnit) {
+	default Long time(ValkeyClusterNode node, TimeUnit timeUnit) {
 		return serverCommands().time(node, timeUnit);
 	}
 
-	/** @deprecated in favor of {@link RedisConnection#serverCommands()}. */
+	/** @deprecated in favor of {@link ValkeyConnection#serverCommands()}. */
 	@Override
 	@Deprecated
-	default List<RedisClientInfo> getClientList(RedisClusterNode node) {
+	default List<ValkeyClientInfo> getClientList(ValkeyClusterNode node) {
 		return serverCommands().getClientList(node);
 	}
 

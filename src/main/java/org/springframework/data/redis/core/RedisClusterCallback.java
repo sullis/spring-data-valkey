@@ -16,20 +16,20 @@
 package org.springframework.data.redis.core;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisClusterConnection;
+import org.springframework.data.redis.connection.ValkeyClusterConnection;
 import org.springframework.lang.Nullable;
 
 /**
- * Callback interface for low level operations executed against a clustered Redis environment.
+ * Callback interface for low level operations executed against a clustered Valkey environment.
  *
  * @author Christoph Strobl
  * @since 1.7
  * @param <T>
  */
-public interface RedisClusterCallback<T> {
+public interface ValkeyClusterCallback<T> {
 
 	/**
-	 * Gets called by {@link ClusterOperations} with an active Redis connection. Does not need to care about activating or
+	 * Gets called by {@link ClusterOperations} with an active Valkey connection. Does not need to care about activating or
 	 * closing the connection or handling exceptions.
 	 *
 	 * @param connection never {@literal null}.
@@ -37,5 +37,5 @@ public interface RedisClusterCallback<T> {
 	 * @throws DataAccessException
 	 */
 	@Nullable
-	T doInRedis(RedisClusterConnection connection) throws DataAccessException;
+	T doInValkey(ValkeyClusterConnection connection) throws DataAccessException;
 }

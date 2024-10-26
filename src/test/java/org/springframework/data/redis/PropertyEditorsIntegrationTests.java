@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 
 /**
  * @author Costin Leau
@@ -44,8 +44,8 @@ class PropertyEditorsIntegrationTests {
 
 	@Test
 	void testInjection() throws Exception {
-		RedisViewPE bean = ctx.getBean(RedisViewPE.class);
-		RedisOperations<?, ?> ops = ctx.getBean(RedisOperations.class);
+		ValkeyViewPE bean = ctx.getBean(ValkeyViewPE.class);
+		ValkeyOperations<?, ?> ops = ctx.getBean(ValkeyOperations.class);
 
 		assertThat(bean.getValueOps()).isSameAs(ops.opsForValue());
 		assertThat(bean.getListOps()).isSameAs(ops.opsForList());

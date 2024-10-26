@@ -23,9 +23,9 @@ import static org.springframework.data.redis.connection.BitFieldSubCommands.*;
 import static org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldIncrBy.Overflow.*;
 import static org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldType.*;
 import static org.springframework.data.redis.connection.ClusterTestVariables.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.*;
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoSearchStoreCommandArgs.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.GeoSearchStoreCommandArgs.*;
 import static org.springframework.data.redis.core.ScanOptions.*;
 
 import java.nio.charset.StandardCharsets;
@@ -57,17 +57,17 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.TestCondition;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.connection.RedisStreamCommands.XClaimOptions;
-import org.springframework.data.redis.connection.RedisStringCommands.BitOperation;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XClaimOptions;
+import org.springframework.data.redis.connection.ValkeyStringCommands.BitOperation;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs;
 import org.springframework.data.redis.connection.SortParameters.Order;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
-import org.springframework.data.redis.connection.ValueEncoding.RedisValueEncoding;
+import org.springframework.data.redis.connection.StringValkeyConnection.StringTuple;
+import org.springframework.data.redis.connection.ValueEncoding.ValkeyValueEncoding;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.PendingMessages;
@@ -85,17 +85,17 @@ import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.KeyScanOptions;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver;
-import org.springframework.data.redis.test.condition.EnabledOnRedisVersion;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyVersion;
 import org.springframework.data.redis.test.condition.LongRunningTest;
-import org.springframework.data.redis.test.condition.RedisDriver;
+import org.springframework.data.redis.test.condition.ValkeyDriver;
 import org.springframework.data.redis.test.util.HexStringUtils;
 import org.springframework.data.util.Streamable;
 
@@ -124,28 +124,28 @@ public abstract class AbstractConnectionIntegrationTests {
 	private static final GeoLocation<String> CATANIA = new GeoLocation<>("catania", POINT_CATANIA);
 	private static final GeoLocation<String> PALERMO = new GeoLocation<>("palermo", POINT_PALERMO);
 
-	protected StringRedisConnection connection;
-	protected RedisSerializer<Object> serializer = RedisSerializer.java();
-	private RedisSerializer<String> stringSerializer = RedisSerializer.string();
+	protected StringValkeyConnection connection;
+	protected ValkeySerializer<Object> serializer = ValkeySerializer.java();
+	private ValkeySerializer<String> stringSerializer = ValkeySerializer.string();
 
 	private static final byte[] EMPTY_ARRAY = new byte[0];
 
 	protected List<Object> actual = new ArrayList<>();
 
 	@Autowired
-	@EnabledOnRedisDriver.DriverQualifier protected RedisConnectionFactory connectionFactory;
+	@EnabledOnValkeyDriver.DriverQualifier protected ValkeyConnectionFactory connectionFactory;
 
-	protected RedisConnection byteConnection;
+	protected ValkeyConnection byteConnection;
 
-	private boolean isJedisOrLettuceConnection(RedisConnectionFactory connectionFactory) {
+	private boolean isJedisOrLettuceConnection(ValkeyConnectionFactory connectionFactory) {
 		return ConnectionUtils.isJedis(connectionFactory) || ConnectionUtils.isLettuce(connectionFactory);
 	}
 
-	private boolean isNotJedisOrLettuceConnection(RedisConnectionFactory connectionFactory) {
+	private boolean isNotJedisOrLettuceConnection(ValkeyConnectionFactory connectionFactory) {
 		return !isJedisOrLettuceConnection(connectionFactory);
 	}
 
-	private boolean isPipelinedOrQueueingConnection(RedisConnection connection) {
+	private boolean isPipelinedOrQueueingConnection(ValkeyConnection connection) {
 		return connection.isPipelined() || connection.isQueueing();
 	}
 
@@ -153,8 +153,8 @@ public abstract class AbstractConnectionIntegrationTests {
 	public void setUp() {
 
 		byteConnection = connectionFactory.getConnection();
-		connection = new DefaultStringRedisConnection(byteConnection);
-		((DefaultStringRedisConnection) connection).setDeserializePipelineAndTxResults(true);
+		connection = new DefaultStringValkeyConnection(byteConnection);
+		((DefaultStringValkeyConnection) connection).setDeserializePipelineAndTxResults(true);
 		initConnection();
 	}
 
@@ -285,7 +285,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testEvalShaArrayError() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.evalSha("notasha", ReturnType.MULTI, 1, "key1", "arg1");
 			getResults();
 		});
@@ -293,7 +293,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testEvalShaNotFound() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.evalSha("somefakesha", ReturnType.VALUE, 2, "key1", "key2");
 			getResults();
 		});
@@ -320,7 +320,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testEvalReturnSingleError() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.eval("return redis.call('expire','foo')", ReturnType.BOOLEAN, 0);
 			getResults();
 		});
@@ -355,7 +355,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testEvalArrayScriptError() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			// Syntax error
 			connection.eval("return {1,2", ReturnType.MULTI, 1, "foo", "bar");
 			getResults();
@@ -633,7 +633,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		String[] keys = new String[] { "~", "[" };
 		actual.add(connection.mGet(keys));
 		verifyResults(Arrays.asList(new Object[] { Arrays.asList(null, null) }));
-		StringRedisTemplate stringTemplate = new StringRedisTemplate(connectionFactory);
+		StringValkeyTemplate stringTemplate = new StringValkeyTemplate(connectionFactory);
 		List<String> multiGet = stringTemplate.opsForValue().multiGet(Arrays.asList(keys));
 		assertThat(multiGet).isEqualTo(Arrays.asList(null, null));
 	}
@@ -665,7 +665,7 @@ public abstract class AbstractConnectionIntegrationTests {
 			} catch (InterruptedException ignore) {}
 
 			// open a new connection
-			RedisConnection connection2 = connectionFactory.getConnection();
+			ValkeyConnection connection2 = connectionFactory.getConnection();
 			connection2.publish(expectedChannel.getBytes(), expectedMessage.getBytes());
 			connection2.close();
 			// In some clients, unsubscribe happens async of message
@@ -708,7 +708,7 @@ public abstract class AbstractConnectionIntegrationTests {
 			} catch (InterruptedException ignore) {}
 
 			// open a new connection
-			RedisConnection connection2 = connectionFactory.getConnection();
+			ValkeyConnection connection2 = connectionFactory.getConnection();
 			connection2.publish("channel1".getBytes(), expectedMessage.getBytes());
 			connection2.publish("channel2".getBytes(), expectedMessage.getBytes());
 			connection2.close();
@@ -782,14 +782,14 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testExecWithoutMulti() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.exec();
 		});
 	}
 
 	@Test
 	public void testErrorInTx() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.multi();
 			connection.set("foo", "bar");
 			// Try to do a list op on a value
@@ -801,7 +801,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testMultiDiscard() {
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.set("testitnow", "willdo");
 		connection.multi();
 		connection.set("testitnow2", "notok");
@@ -822,7 +822,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		connection.watch("testitnow".getBytes());
 		// Give some time for watch to be asynch executed in extending tests
 		Thread.sleep(200);
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.set("testitnow", "something");
 		conn2.close();
 		connection.multi();
@@ -844,7 +844,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 		// Give some time for unwatch to be asynch executed
 		Thread.sleep(200);
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.set("testitnow", "something");
 
 		connection.set("testitnow", "somethingelse");
@@ -1075,7 +1075,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testRestoreBadData() {
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			// Use something other than dump-specific serialization
 			connection.restore("testing".getBytes(), 0, "foo".getBytes());
 			getResults();
@@ -1089,7 +1089,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		actual.add(connection.dump("testing".getBytes()));
 		List<Object> results = getResults();
 		initConnection();
-		assertThatExceptionOfType(RedisSystemException.class).isThrownBy(() -> {
+		assertThatExceptionOfType(ValkeySystemException.class).isThrownBy(() -> {
 			connection.restore("testing".getBytes(), 0, (byte[]) results.get(1));
 			getResults();
 		});
@@ -1375,7 +1375,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testBLPop() {
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.lPush("poplist", "foo");
 		conn2.lPush("poplist", "bar");
 		actual.add(connection.bLPop(100, "poplist", "otherlist"));
@@ -1384,7 +1384,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testBRPop() {
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.rPush("rpoplist", "bar");
 		conn2.rPush("rpoplist", "foo");
 		actual.add(connection.bRPop(1, "rpoplist"));
@@ -1412,7 +1412,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	}
 
 	@Test // GH-1987
-	@EnabledOnRedisVersion("6.2")
+	@EnabledOnValkeyVersion("6.2")
 	void testLPopWithCount() {
 		actual.add(connection.rPush("PopList", "hello"));
 		actual.add(connection.rPush("PopList", "world"));
@@ -1450,7 +1450,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		actual.add(connection.rPush("From", "big"));
 		actual.add(connection.rPush("From", "world"));
 		actual.add(connection.rPush("To", "bar"));
-		actual.add(connection.lMove("From", "To", RedisListCommands.Direction.LEFT, RedisListCommands.Direction.RIGHT));
+		actual.add(connection.lMove("From", "To", ValkeyListCommands.Direction.LEFT, ValkeyListCommands.Direction.RIGHT));
 		actual.add(connection.lRange("From", 0, -1));
 		actual.add(connection.lRange("To", 0, -1));
 
@@ -1464,11 +1464,11 @@ public abstract class AbstractConnectionIntegrationTests {
 		actual.add(connection.rPush("From", "hello"));
 		actual.add(connection.rPush("From", "big"));
 		actual.add(
-				connection.bLMove("From", "To", RedisListCommands.Direction.LEFT, RedisListCommands.Direction.RIGHT, 0.01d));
+				connection.bLMove("From", "To", ValkeyListCommands.Direction.LEFT, ValkeyListCommands.Direction.RIGHT, 0.01d));
 		actual.add(
-				connection.bLMove("From", "To", RedisListCommands.Direction.LEFT, RedisListCommands.Direction.RIGHT, 0.01d));
+				connection.bLMove("From", "To", ValkeyListCommands.Direction.LEFT, ValkeyListCommands.Direction.RIGHT, 0.01d));
 		actual.add(
-				connection.bLMove("From", "To", RedisListCommands.Direction.LEFT, RedisListCommands.Direction.RIGHT, 0.01d));
+				connection.bLMove("From", "To", ValkeyListCommands.Direction.LEFT, ValkeyListCommands.Direction.RIGHT, 0.01d));
 		actual.add(connection.lRange("From", 0, -1));
 		actual.add(connection.lRange("To", 0, -1));
 
@@ -1504,7 +1504,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	}
 
 	@Test // GH-1987
-	@EnabledOnRedisVersion("6.2")
+	@EnabledOnValkeyVersion("6.2")
 	void testRPopWithCount() {
 		actual.add(connection.rPush("PopList", "hello"));
 		actual.add(connection.rPush("PopList", "world"));
@@ -1526,7 +1526,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 	@Test
 	public void testBRPopLPush() {
-		DefaultStringRedisConnection conn2 = new DefaultStringRedisConnection(connectionFactory.getConnection());
+		DefaultStringValkeyConnection conn2 = new DefaultStringValkeyConnection(connectionFactory.getConnection());
 		conn2.rPush("PopList", "hello");
 		conn2.rPush("PopList", "world");
 		conn2.rPush("pop2", "hey");
@@ -2595,9 +2595,9 @@ public abstract class AbstractConnectionIntegrationTests {
 
 		List<?> firstEntry = (List<?>) results.get(0);
 		assertThat(firstEntry.size()).isNotEqualTo(0);
-		assertThat(firstEntry.get(0)).isInstanceOf(RedisClientInfo.class);
+		assertThat(firstEntry.get(0)).isInstanceOf(ValkeyClientInfo.class);
 
-		RedisClientInfo info = (RedisClientInfo) firstEntry.get(0);
+		ValkeyClientInfo info = (ValkeyClientInfo) firstEntry.get(0);
 		assertThat(info.getDatabaseId()).isNotNull();
 	}
 
@@ -2632,7 +2632,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	}
 
 	@Test // GH-2089, GH-2153
-	@EnabledOnRedisVersion("6.0")
+	@EnabledOnValkeyVersion("6.0")
 	void scanWithType() {
 
 		assumeThat(isPipelinedOrQueueingConnection(connection))
@@ -3167,7 +3167,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	}
 
 	@Test // DATAREDIS-438
-	@EnabledOnRedisDriver({ RedisDriver.JEDIS })
+	@EnabledOnValkeyDriver({ ValkeyDriver.JEDIS })
 	void geoHash() {
 
 		String key = "geo-" + UUID.randomUUID();
@@ -3180,7 +3180,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	}
 
 	@Test // DATAREDIS-438
-	@EnabledOnRedisDriver({ RedisDriver.JEDIS })
+	@EnabledOnValkeyDriver({ ValkeyDriver.JEDIS })
 	void geoHashNonExisting() {
 
 		String key = "geo-" + UUID.randomUUID();
@@ -3475,7 +3475,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 		actual.add(connection.encodingOf("encode.this"));
 
-		verifyResults(Arrays.asList(new Object[] { true, RedisValueEncoding.INT }));
+		verifyResults(Arrays.asList(new Object[] { true, ValkeyValueEncoding.INT }));
 	}
 
 	@Test // DATAREDIS-716
@@ -3483,7 +3483,7 @@ public abstract class AbstractConnectionIntegrationTests {
 
 		actual.add(connection.encodingOf("encode.this"));
 
-		verifyResults(Arrays.asList(new Object[] { RedisValueEncoding.VACANT }));
+		verifyResults(Arrays.asList(new Object[] { ValkeyValueEncoding.VACANT }));
 	}
 
 	@Test // DATAREDIS-716
@@ -3629,7 +3629,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	@EnabledOnCommand("XADD")
 	void xAddShouldTrimStreamExactly() {
 
-		RedisStreamCommands.XAddOptions xAddOptions = RedisStreamCommands.XAddOptions.maxlen(1);
+		ValkeyStreamCommands.XAddOptions xAddOptions = ValkeyStreamCommands.XAddOptions.maxlen(1);
 		actual.add(
 				connection.xAdd(StringRecord.of(Collections.singletonMap(KEY_2, VALUE_2)).withStreamKey(KEY_1), xAddOptions));
 		actual.add(
@@ -3648,7 +3648,7 @@ public abstract class AbstractConnectionIntegrationTests {
 	@EnabledOnCommand("XADD")
 	void xAddShouldTrimStreamApprox() {
 
-		RedisStreamCommands.XAddOptions xAddOptions = RedisStreamCommands.XAddOptions.maxlen(1).approximateTrimming(true);
+		ValkeyStreamCommands.XAddOptions xAddOptions = ValkeyStreamCommands.XAddOptions.maxlen(1).approximateTrimming(true);
 		actual.add(
 				connection.xAdd(StringRecord.of(Collections.singletonMap(KEY_2, VALUE_2)).withStreamKey(KEY_1), xAddOptions));
 		actual.add(

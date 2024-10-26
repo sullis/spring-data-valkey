@@ -19,146 +19,146 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
 
 /**
- * Interface for the {@literal cluster} commands supported by Redis. A {@link RedisClusterNode} can be obtained from
- * {@link #clusterGetNodes()} or it can be constructed using either {@link RedisClusterNode#getHost() host} and
- * {@link RedisClusterNode#getPort()} or the {@link RedisClusterNode#getId() node Id}.
+ * Interface for the {@literal cluster} commands supported by Valkey. A {@link ValkeyClusterNode} can be obtained from
+ * {@link #clusterGetNodes()} or it can be constructed using either {@link ValkeyClusterNode#getHost() host} and
+ * {@link ValkeyClusterNode#getPort()} or the {@link ValkeyClusterNode#getId() node Id}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public interface RedisClusterCommands {
+public interface ValkeyClusterCommands {
 
 	/**
 	 * Retrieve cluster node information such as {@literal id}, {@literal host}, {@literal port} and {@literal slots}.
 	 *
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-nodes">Redis Documentation: CLUSTER NODES</a>
+	 * @see <a href="https://redis.io/commands/cluster-nodes">Valkey Documentation: CLUSTER NODES</a>
 	 */
-	Iterable<RedisClusterNode> clusterGetNodes();
+	Iterable<ValkeyClusterNode> clusterGetNodes();
 
 	/**
 	 * Retrieve information about connected replicas for given master node.
 	 *
 	 * @param master must not be {@literal null}.
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-replicas">Redis Documentation: CLUSTER REPLICAS</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicas">Valkey Documentation: CLUSTER REPLICAS</a>
 	 */
-	Collection<RedisClusterNode> clusterGetReplicas(RedisClusterNode master);
+	Collection<ValkeyClusterNode> clusterGetReplicas(ValkeyClusterNode master);
 
 	/**
 	 * Retrieve information about masters and their connected replicas.
 	 *
 	 * @return never {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-replicas">Redis Documentation: CLUSTER REPLICAS</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicas">Valkey Documentation: CLUSTER REPLICAS</a>
 	 */
-	Map<RedisClusterNode, Collection<RedisClusterNode>> clusterGetMasterReplicaMap();
+	Map<ValkeyClusterNode, Collection<ValkeyClusterNode>> clusterGetMasterReplicaMap();
 
 	/**
 	 * Find the slot for a given {@code key}.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/cluster-keyslot">Redis Documentation: CLUSTER KEYSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-keyslot">Valkey Documentation: CLUSTER KEYSLOT</a>
 	 */
 	Integer clusterGetSlotForKey(byte[] key);
 
 	/**
-	 * Find the {@link RedisClusterNode} serving given {@literal slot}.
+	 * Find the {@link ValkeyClusterNode} serving given {@literal slot}.
 	 *
 	 * @param slot
 	 * @return
 	 */
-	RedisClusterNode clusterGetNodeForSlot(int slot);
+	ValkeyClusterNode clusterGetNodeForSlot(int slot);
 
 	/**
-	 * Find the {@link RedisClusterNode} serving given {@literal key}.
+	 * Find the {@link ValkeyClusterNode} serving given {@literal key}.
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
 	 */
-	RedisClusterNode clusterGetNodeForKey(byte[] key);
+	ValkeyClusterNode clusterGetNodeForKey(byte[] key);
 
 	/**
 	 * Get cluster information.
 	 *
 	 * @return
-	 * @see <a href="https://redis.io/commands/cluster-info">Redis Documentation: CLUSTER INFO</a>
+	 * @see <a href="https://redis.io/commands/cluster-info">Valkey Documentation: CLUSTER INFO</a>
 	 */
 	ClusterInfo clusterGetClusterInfo();
 
 	/**
-	 * Assign slots to given {@link RedisClusterNode}.
+	 * Assign slots to given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param slots
-	 * @see <a href="https://redis.io/commands/cluster-addslots">Redis Documentation: CLUSTER ADDSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-addslots">Valkey Documentation: CLUSTER ADDSLOTS</a>
 	 */
-	void clusterAddSlots(RedisClusterNode node, int... slots);
+	void clusterAddSlots(ValkeyClusterNode node, int... slots);
 
 	/**
-	 * Assign {@link SlotRange#getSlotsArray()} to given {@link RedisClusterNode}.
+	 * Assign {@link SlotRange#getSlotsArray()} to given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-addslots">Redis Documentation: CLUSTER ADDSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-addslots">Valkey Documentation: CLUSTER ADDSLOTS</a>
 	 */
-	void clusterAddSlots(RedisClusterNode node, SlotRange range);
+	void clusterAddSlots(ValkeyClusterNode node, SlotRange range);
 
 	/**
 	 * Count the number of keys assigned to one {@literal slot}.
 	 *
 	 * @param slot
 	 * @return
-	 * @see <a href="https://redis.io/commands/cluster-countkeysinslot">Redis Documentation: CLUSTER COUNTKEYSINSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-countkeysinslot">Valkey Documentation: CLUSTER COUNTKEYSINSLOT</a>
 	 */
 	Long clusterCountKeysInSlot(int slot);
 
 	/**
-	 * Remove slots from {@link RedisClusterNode}.
+	 * Remove slots from {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param slots
-	 * @see <a href="https://redis.io/commands/cluster-delslots">Redis Documentation: CLUSTER DELSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-delslots">Valkey Documentation: CLUSTER DELSLOTS</a>
 	 */
-	void clusterDeleteSlots(RedisClusterNode node, int... slots);
+	void clusterDeleteSlots(ValkeyClusterNode node, int... slots);
 
 	/**
-	 * Removes {@link SlotRange#getSlotsArray()} from given {@link RedisClusterNode}.
+	 * Removes {@link SlotRange#getSlotsArray()} from given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param range must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-delslots">Redis Documentation: CLUSTER DELSLOTS</a>
+	 * @see <a href="https://redis.io/commands/cluster-delslots">Valkey Documentation: CLUSTER DELSLOTS</a>
 	 */
-	void clusterDeleteSlotsInRange(RedisClusterNode node, SlotRange range);
+	void clusterDeleteSlotsInRange(ValkeyClusterNode node, SlotRange range);
 
 	/**
 	 * Remove given {@literal node} from cluster.
 	 *
 	 * @param node must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-forget">Redis Documentation: CLUSTER FORGET</a>
+	 * @see <a href="https://redis.io/commands/cluster-forget">Valkey Documentation: CLUSTER FORGET</a>
 	 */
-	void clusterForget(RedisClusterNode node);
+	void clusterForget(ValkeyClusterNode node);
 
 	/**
 	 * Add given {@literal node} to cluster.
 	 *
-	 * @param node must contain {@link RedisClusterNode#getHost() host} and {@link RedisClusterNode#getPort()} and must
+	 * @param node must contain {@link ValkeyClusterNode#getHost() host} and {@link ValkeyClusterNode#getPort()} and must
 	 *          not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-meet">Redis Documentation: CLUSTER MEET</a>
+	 * @see <a href="https://redis.io/commands/cluster-meet">Valkey Documentation: CLUSTER MEET</a>
 	 */
-	void clusterMeet(RedisClusterNode node);
+	void clusterMeet(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param slot
 	 * @param mode must not be{@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-setslot">Redis Documentation: CLUSTER SETSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-setslot">Valkey Documentation: CLUSTER SETSLOT</a>
 	 */
-	void clusterSetSlot(RedisClusterNode node, int slot, AddSlots mode);
+	void clusterSetSlot(ValkeyClusterNode node, int slot, AddSlots mode);
 
 	/**
 	 * Get {@literal keys} served by slot.
@@ -166,7 +166,7 @@ public interface RedisClusterCommands {
 	 * @param slot
 	 * @param count must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/cluster-getkeysinslot">Redis Documentation: CLUSTER GETKEYSINSLOT</a>
+	 * @see <a href="https://redis.io/commands/cluster-getkeysinslot">Valkey Documentation: CLUSTER GETKEYSINSLOT</a>
 	 */
 	List<byte[]> clusterGetKeysInSlot(int slot, Integer count);
 
@@ -175,9 +175,9 @@ public interface RedisClusterCommands {
 	 *
 	 * @param master must not be {@literal null}.
 	 * @param replica must not be {@literal null}.
-	 * @see <a href="https://redis.io/commands/cluster-replicate">Redis Documentation: CLUSTER REPLICATE</a>
+	 * @see <a href="https://redis.io/commands/cluster-replicate">Valkey Documentation: CLUSTER REPLICATE</a>
 	 */
-	void clusterReplicate(RedisClusterNode master, RedisClusterNode replica);
+	void clusterReplicate(ValkeyClusterNode master, ValkeyClusterNode replica);
 
 	enum AddSlots {
 		MIGRATING, IMPORTING, STABLE, NODE

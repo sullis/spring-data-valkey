@@ -30,13 +30,13 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.ReactiveListCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.ByteBufferResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.RangeCommand;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.ByteBufferResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.RangeCommand;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
 import org.springframework.data.redis.core.TimeoutUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -50,14 +50,14 @@ import org.springframework.util.ObjectUtils;
  */
 class LettuceReactiveListCommands implements ReactiveListCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveListCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveListCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveListCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -334,7 +334,7 @@ class LettuceReactiveListCommands implements ReactiveListCommands {
 		}));
 	}
 
-	protected LettuceReactiveRedisConnection getConnection() {
+	protected LettuceReactiveValkeyConnection getConnection() {
 		return connection;
 	}
 }

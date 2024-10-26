@@ -30,7 +30,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
 import org.springframework.util.Assert;
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class JedisClusterGeoCommands implements RedisGeoCommands {
+class JedisClusterGeoCommands implements ValkeyGeoCommands {
 
 	private final JedisClusterConnection connection;
 

@@ -31,7 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class TransactionalLettuceIntegrationTests extends AbstractTransactionalTestBase {
 
 	@Configuration
-	public static class LettuceContextConfiguration extends RedisContextConfiguration {
+	public static class LettuceContextConfiguration extends ValkeyContextConfiguration {
 
 		@Override
 		@Bean

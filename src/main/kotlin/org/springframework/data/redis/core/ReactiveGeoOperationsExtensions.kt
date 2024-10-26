@@ -25,8 +25,8 @@ import org.springframework.data.geo.Distance
 import org.springframework.data.geo.GeoResult
 import org.springframework.data.geo.Metric
 import org.springframework.data.geo.Point
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs
 
 /**
  * Coroutines variant of [ReactiveGeoOperations.add].

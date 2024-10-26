@@ -39,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisServer;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyServer;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -58,58 +58,58 @@ class JedisConvertersUnitTests {
 	private static final String CLIENT_ALL_SINGLE_LINE_RESPONSE = "addr=127.0.0.1:60311 fd=6 name= age=4059 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=client";
 
 	@Test // DATAREDIS-268
-	void convertingEmptyStringToListOfRedisClientInfoShouldReturnEmptyList() {
-		assertThat(JedisConverters.toListOfRedisClientInformation("")).isEqualTo(Collections.<RedisClientInfo> emptyList());
+	void convertingEmptyStringToListOfValkeyClientInfoShouldReturnEmptyList() {
+		assertThat(JedisConverters.toListOfValkeyClientInformation("")).isEqualTo(Collections.<ValkeyClientInfo> emptyList());
 	}
 
 	@Test // DATAREDIS-268
-	void convertingNullToListOfRedisClientInfoShouldReturnEmptyList() {
-		assertThat(JedisConverters.toListOfRedisClientInformation(null))
-				.isEqualTo(Collections.<RedisClientInfo> emptyList());
+	void convertingNullToListOfValkeyClientInfoShouldReturnEmptyList() {
+		assertThat(JedisConverters.toListOfValkeyClientInformation(null))
+				.isEqualTo(Collections.<ValkeyClientInfo> emptyList());
 	}
 
 	@Test // DATAREDIS-268
-	void convertingMultipleLiesToListOfRedisClientInfoReturnsListCorrectly() {
+	void convertingMultipleLiesToListOfValkeyClientInfoReturnsListCorrectly() {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(CLIENT_ALL_SINGLE_LINE_RESPONSE);
 		sb.append("\r\n");
 		sb.append(CLIENT_ALL_SINGLE_LINE_RESPONSE);
 
-		assertThat(JedisConverters.toListOfRedisClientInformation(sb.toString()).size()).isEqualTo(2);
+		assertThat(JedisConverters.toListOfValkeyClientInformation(sb.toString()).size()).isEqualTo(2);
 	}
 
 	@Test // DATAREDIS-330
-	void convertsSingleMapToRedisServerReturnsCollectionCorrectly() {
+	void convertsSingleMapToValkeyServerReturnsCollectionCorrectly() {
 
-		Map<String, String> values = getRedisServerInfoMap("mymaster", 23697);
-		List<RedisServer> servers = JedisConverters.toListOfRedisServer(Collections.singletonList(values));
+		Map<String, String> values = getValkeyServerInfoMap("mymaster", 23697);
+		List<ValkeyServer> servers = JedisConverters.toListOfValkeyServer(Collections.singletonList(values));
 
 		assertThat(servers.size()).isEqualTo(1);
-		verifyRedisServerInfo(servers.get(0), values);
+		verifyValkeyServerInfo(servers.get(0), values);
 	}
 
 	@Test // DATAREDIS-330
-	void convertsMultipleMapsToRedisServerReturnsCollectionCorrectly() {
+	void convertsMultipleMapsToValkeyServerReturnsCollectionCorrectly() {
 
-		List<Map<String, String>> vals = Arrays.asList(getRedisServerInfoMap("mymaster", 23697),
-				getRedisServerInfoMap("yourmaster", 23680));
-		List<RedisServer> servers = JedisConverters.toListOfRedisServer(vals);
+		List<Map<String, String>> vals = Arrays.asList(getValkeyServerInfoMap("mymaster", 23697),
+				getValkeyServerInfoMap("yourmaster", 23680));
+		List<ValkeyServer> servers = JedisConverters.toListOfValkeyServer(vals);
 
 		assertThat(servers.size()).isEqualTo(vals.size());
 		for (int i = 0; i < vals.size(); i++) {
-			verifyRedisServerInfo(servers.get(i), vals.get(i));
+			verifyValkeyServerInfo(servers.get(i), vals.get(i));
 		}
 	}
 
 	@Test // DATAREDIS-330
-	void convertsRedisServersCorrectlyWhenGivenAnEmptyList() {
-		assertThat(JedisConverters.toListOfRedisServer(Collections.<Map<String, String>> emptyList())).isNotNull();
+	void convertsValkeyServersCorrectlyWhenGivenAnEmptyList() {
+		assertThat(JedisConverters.toListOfValkeyServer(Collections.<Map<String, String>> emptyList())).isNotNull();
 	}
 
 	@Test // DATAREDIS-330
-	void convertsRedisServersCorrectlyWhenGivenNull() {
-		assertThat(JedisConverters.toListOfRedisServer(null)).isNotNull();
+	void convertsValkeyServersCorrectlyWhenGivenNull() {
+		assertThat(JedisConverters.toListOfValkeyServer(null)).isNotNull();
 	}
 
 	/**
@@ -355,7 +355,7 @@ class JedisConvertersUnitTests {
 		verifyNoMoreInteractions(mockGetExParams);
 	}
 
-	private void verifyRedisServerInfo(RedisServer server, Map<String, String> values) {
+	private void verifyValkeyServerInfo(ValkeyServer server, Map<String, String> values) {
 
 		for (Map.Entry<String, String> entry : values.entrySet()) {
 			assertThat(server.get(entry.getKey())).isEqualTo(entry.getValue());
@@ -382,7 +382,7 @@ class JedisConvertersUnitTests {
 		return value != null ? value.name().toLowerCase() : "";
 	}
 
-	private Map<String, String> getRedisServerInfoMap(String name, int port) {
+	private Map<String, String> getValkeyServerInfoMap(String name, int port) {
 		Map<String, String> map = new HashMap<>();
 		map.put("name", name);
 		map.put("ip", "127.0.0.1");

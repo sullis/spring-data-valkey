@@ -23,7 +23,7 @@ import java.util.Set;
 import org.springframework.lang.Nullable;
 
 /**
- * Redis map specific operations working on a hash.
+ * Valkey map specific operations working on a hash.
  *
  * @author Costin Leau
  * @author Christoph Strobl
@@ -95,7 +95,7 @@ public interface HashOperations<H, HK, HV> {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	HK randomKey(H key);
@@ -106,7 +106,7 @@ public interface HashOperations<H, HK, HV> {
 	 * @param key must not be {@literal null}.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	Map.Entry<HK, HV> randomEntry(H key);
@@ -121,7 +121,7 @@ public interface HashOperations<H, HK, HV> {
 	 * @param count number of fields to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	List<HK> randomKeys(H key, long count);
@@ -133,7 +133,7 @@ public interface HashOperations<H, HK, HV> {
 	 * @param count number of fields to return. Must be positive.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	Map<HK, HV> randomEntries(H key, long count);
@@ -224,5 +224,5 @@ public interface HashOperations<H, HK, HV> {
 	/**
 	 * @return never {@literal null}.
 	 */
-	RedisOperations<H, ?> getOperations();
+	ValkeyOperations<H, ?> getOperations();
 }

@@ -29,7 +29,7 @@ class LettuceReactiveClusterHashCommands extends LettuceReactiveHashCommands imp
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterHashCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterHashCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 }

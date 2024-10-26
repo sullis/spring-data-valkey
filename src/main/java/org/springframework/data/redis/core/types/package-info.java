@@ -1,5 +1,5 @@
 /**
- * Redis domain specific types.
+ * Valkey domain specific types.
  */
 @org.springframework.lang.NonNullApi
 @org.springframework.lang.NonNullFields

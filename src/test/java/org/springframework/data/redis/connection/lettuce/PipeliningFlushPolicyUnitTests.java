@@ -18,7 +18,7 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.redis.connection.lettuce.LettuceConnection.*;
 
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulValkeyConnection;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PipeliningFlushPolicyUnitTests {
 
-	@Mock StatefulRedisConnection<?, ?> connection;
+	@Mock StatefulValkeyConnection<?, ?> connection;
 
 	@Test // DATAREDIS-1011
 	void shouldFlushEachCommand() {

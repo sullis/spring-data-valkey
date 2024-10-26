@@ -7,7 +7,7 @@
 	http://www.springframework.org/schema/redis https://www.springframework.org/schema/redis/spring-redis.xsd">
 
 	<bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"/>
-	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate" p:connectionFactory-ref="connectionFactory"/>
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringValkeyTemplate" p:connectionFactory-ref="connectionFactory"/>
 	
 	<redis:collection id="non-existing" />
 	<redis:collection id="props" key="prop-key" type="PROPERTIES"/>

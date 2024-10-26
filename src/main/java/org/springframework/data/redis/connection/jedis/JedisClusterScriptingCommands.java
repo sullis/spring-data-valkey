@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterCommandExecutor;
-import org.springframework.data.redis.connection.RedisScriptingCommands;
+import org.springframework.data.redis.connection.ValkeyScriptingCommands;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.util.Assert;
 
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * @author Pavel Khokhlov
  * @since 2.0
  */
-class JedisClusterScriptingCommands implements RedisScriptingCommands {
+class JedisClusterScriptingCommands implements ValkeyScriptingCommands {
 
 	private final JedisClusterConnection connection;
 

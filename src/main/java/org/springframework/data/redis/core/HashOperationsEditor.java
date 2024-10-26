@@ -18,17 +18,17 @@ package org.springframework.data.redis.core;
 import java.beans.PropertyEditorSupport;
 
 /**
- * PropertyEditor allowing for easy injection of {@link HashOperations} from {@link RedisOperations}.
+ * PropertyEditor allowing for easy injection of {@link HashOperations} from {@link ValkeyOperations}.
  *
  * @author Costin Leau
  */
 class HashOperationsEditor extends PropertyEditorSupport {
 
 	public void setValue(Object value) {
-		if (value instanceof RedisOperations<?, ?> redisOperations) {
+		if (value instanceof ValkeyOperations<?, ?> redisOperations) {
 			super.setValue(redisOperations.opsForHash());
 		} else {
-			throw new IllegalArgumentException("Editor supports only conversion of type " + RedisOperations.class);
+			throw new IllegalArgumentException("Editor supports only conversion of type " + ValkeyOperations.class);
 		}
 	}
 }

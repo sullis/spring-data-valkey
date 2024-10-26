@@ -17,15 +17,15 @@ package org.springframework.data.redis.connection.lettuce;
 
 import static org.assertj.core.api.Assertions.*;
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.SetArgs;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.sync.ValkeyCommands;
 import io.lettuce.core.cluster.SlotHash;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.pubsub.StatefulRedisClusterPubSubConnection;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.pubsub.StatefulValkeyClusterPubSubConnection;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -42,9 +42,9 @@ import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.ClusterCommandExecutor;
 import org.springframework.data.redis.connection.ClusterTopologyProvider;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisClusterConnection;
-import org.springframework.data.redis.connection.RedisConfiguration;
-import org.springframework.data.redis.test.condition.EnabledOnRedisClusterAvailable;
+import org.springframework.data.redis.connection.ValkeyClusterConnection;
+import org.springframework.data.redis.connection.ValkeyConfiguration;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyClusterAvailable;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 import org.springframework.lang.Nullable;
 
@@ -53,7 +53,7 @@ import org.springframework.lang.Nullable;
  *
  * @author Mark Paluch
  */
-@EnabledOnRedisClusterAvailable
+@EnabledOnValkeyClusterAvailable
 class LettuceClusterKeyspaceNotificationsTests {
 
 	private static CustomLettuceConnectionFactory factory;
@@ -103,7 +103,7 @@ class LettuceClusterKeyspaceNotificationsTests {
 
 		CompletableFuture<String> expiry = new CompletableFuture<>();
 
-		RedisClusterConnection connection = factory.getClusterConnection();
+		ValkeyClusterConnection connection = factory.getClusterConnection();
 
 		connection.pSubscribe((message, pattern) -> {
 			expiry.complete(new String(message.getBody()) + ":" + new String(message.getChannel()));
@@ -119,12 +119,12 @@ class LettuceClusterKeyspaceNotificationsTests {
 		connection.close();
 	}
 
-	private void withConnection(String hostname, int port, Consumer<RedisCommands<String, String>> commandsConsumer) {
+	private void withConnection(String hostname, int port, Consumer<ValkeyCommands<String, String>> commandsConsumer) {
 
-		RedisClient client = RedisClient.create(LettuceTestClientResources.getSharedClientResources(),
-				RedisURI.create(hostname, port));
+		ValkeyClient client = ValkeyClient.create(LettuceTestClientResources.getSharedClientResources(),
+				ValkeyURI.create(hostname, port));
 
-		StatefulRedisConnection<String, String> connection = client.connect();
+		StatefulValkeyConnection<String, String> connection = client.connect();
 		commandsConsumer.accept(connection.sync());
 
 		connection.close();
@@ -133,13 +133,13 @@ class LettuceClusterKeyspaceNotificationsTests {
 
 	static class CustomLettuceConnectionFactory extends LettuceConnectionFactory {
 
-		CustomLettuceConnectionFactory(RedisConfiguration redisConfiguration) {
+		CustomLettuceConnectionFactory(ValkeyConfiguration redisConfiguration) {
 			super(redisConfiguration);
 		}
 
 		@Override
 		protected LettuceClusterConnection doCreateLettuceClusterConnection(
-				StatefulRedisClusterConnection<byte[], byte[]> sharedConnection, LettuceConnectionProvider connectionProvider,
+				StatefulValkeyClusterConnection<byte[], byte[]> sharedConnection, LettuceConnectionProvider connectionProvider,
 				ClusterTopologyProvider topologyProvider, ClusterCommandExecutor clusterCommandExecutor,
 				Duration commandTimeout) {
 			return new CustomLettuceClusterConnection(sharedConnection, connectionProvider, topologyProvider,
@@ -149,7 +149,7 @@ class LettuceClusterKeyspaceNotificationsTests {
 
 	static class CustomLettuceClusterConnection extends LettuceClusterConnection {
 
-		CustomLettuceClusterConnection(@Nullable StatefulRedisClusterConnection<byte[], byte[]> sharedConnection,
+		CustomLettuceClusterConnection(@Nullable StatefulValkeyClusterConnection<byte[], byte[]> sharedConnection,
 				LettuceConnectionProvider connectionProvider, ClusterTopologyProvider clusterTopologyProvider,
 				ClusterCommandExecutor executor, Duration timeout) {
 			super(sharedConnection, connectionProvider, clusterTopologyProvider, executor, timeout);
@@ -157,22 +157,22 @@ class LettuceClusterKeyspaceNotificationsTests {
 
 		@Override
 		protected LettuceSubscription doCreateSubscription(MessageListener listener,
-				StatefulRedisPubSubConnection<byte[], byte[]> connection, LettuceConnectionProvider connectionProvider) {
-			return new CustomLettuceSubscription(listener, (StatefulRedisClusterPubSubConnection<byte[], byte[]>) connection,
+				StatefulValkeyPubSubConnection<byte[], byte[]> connection, LettuceConnectionProvider connectionProvider) {
+			return new CustomLettuceSubscription(listener, (StatefulValkeyClusterPubSubConnection<byte[], byte[]>) connection,
 					connectionProvider);
 		}
 	}
 
 	/**
 	 * Customized {@link LettuceSubscription}. Enables
-	 * {@link StatefulRedisClusterPubSubConnection#setNodeMessagePropagation(boolean)} and uses
+	 * {@link StatefulValkeyClusterPubSubConnection#setNodeMessagePropagation(boolean)} and uses
 	 * {@link io.lettuce.core.cluster.api.sync.NodeSelection} to subscribe to all master nodes.
 	 */
 	static class CustomLettuceSubscription extends LettuceSubscription {
 
-		private final StatefulRedisClusterPubSubConnection<byte[], byte[]> connection;
+		private final StatefulValkeyClusterPubSubConnection<byte[], byte[]> connection;
 
-		CustomLettuceSubscription(MessageListener listener, StatefulRedisClusterPubSubConnection<byte[], byte[]> connection,
+		CustomLettuceSubscription(MessageListener listener, StatefulValkeyClusterPubSubConnection<byte[], byte[]> connection,
 				LettuceConnectionProvider connectionProvider) {
 			super(listener, connection, connectionProvider);
 			this.connection = connection;

@@ -26,14 +26,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Data object holding {@link Bucket} representing the domain object to be stored in a Redis hash. Index information
+ * Data object holding {@link Bucket} representing the domain object to be stored in a Valkey hash. Index information
  * points to additional structures holding the objects is for searching.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisData {
+public class ValkeyData {
 
 	private final Bucket bucket;
 	private final Set<IndexedData> indexedData;
@@ -43,27 +43,27 @@ public class RedisData {
 	private @Nullable Long timeToLive;
 
 	/**
-	 * Creates new {@link RedisData} with empty {@link Bucket}.
+	 * Creates new {@link ValkeyData} with empty {@link Bucket}.
 	 */
-	public RedisData() {
+	public ValkeyData() {
 		this(Collections.emptyMap());
 	}
 
 	/**
-	 * Creates new {@link RedisData} with {@link Bucket} holding provided values.
+	 * Creates new {@link ValkeyData} with {@link Bucket} holding provided values.
 	 *
 	 * @param raw should not be {@literal null}.
 	 */
-	public RedisData(Map<byte[], byte[]> raw) {
+	public ValkeyData(Map<byte[], byte[]> raw) {
 		this(Bucket.newBucketFromRawMap(raw));
 	}
 
 	/**
-	 * Creates new {@link RedisData} with {@link Bucket}
+	 * Creates new {@link ValkeyData} with {@link Bucket}
 	 *
 	 * @param bucket must not be {@literal null}.
 	 */
-	public RedisData(Bucket bucket) {
+	public ValkeyData(Bucket bucket) {
 
 		Assert.notNull(bucket, "Bucket must not be null");
 
@@ -170,7 +170,7 @@ public class RedisData {
 
 	@Override
 	public String toString() {
-		return "RedisDataObject [key=" + keyspace + ":" + id + ", hash=" + bucket + "]";
+		return "ValkeyDataObject [key=" + keyspace + ":" + id + ", hash=" + bucket + "]";
 	}
 
 }

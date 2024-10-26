@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Redis client configuration for jedis. This configuration provides optional configuration elements such as
+ * Valkey client configuration for jedis. This configuration provides optional configuration elements such as
  * {@link SSLSocketFactory} and {@link JedisPoolConfig} specific to jedis client features.
  * <p>
  * Providing optional elements allows a more specific configuration of the client:
@@ -52,9 +52,9 @@ import org.springframework.util.Assert;
  * @author Chao Chang
  * @since 2.0
  * @see redis.clients.jedis.Jedis
- * @see org.springframework.data.redis.connection.RedisStandaloneConfiguration
- * @see org.springframework.data.redis.connection.RedisSentinelConfiguration
- * @see org.springframework.data.redis.connection.RedisClusterConfiguration
+ * @see org.springframework.data.redis.connection.ValkeyStandaloneConfiguration
+ * @see org.springframework.data.redis.connection.ValkeySentinelConfiguration
+ * @see org.springframework.data.redis.connection.ValkeyClusterConfiguration
  */
 public interface JedisClientConfiguration {
 
@@ -85,7 +85,7 @@ public interface JedisClientConfiguration {
 	Optional<HostnameVerifier> getHostnameVerifier();
 
 	/**
-	 * @return {@literal true} to use connection-pooling. Applies only to single node Redis. Sentinel and Cluster modes
+	 * @return {@literal true} to use connection-pooling. Applies only to single node Valkey. Sentinel and Cluster modes
 	 *         use always connection-pooling regardless of the pooling setting.
 	 */
 	boolean isUsePooling();
@@ -169,7 +169,7 @@ public interface JedisClientConfiguration {
 		/**
 		 * Enable connection-pooling.
 		 * <p>
-		 * Applies only to single node Redis. Sentinel and Cluster modes use always connection-pooling regardless of the
+		 * Applies only to single node Valkey. Sentinel and Cluster modes use always connection-pooling regardless of the
 		 * pooling setting.
 		 *
 		 * @return {@link JedisPoolingClientConfigurationBuilder}.

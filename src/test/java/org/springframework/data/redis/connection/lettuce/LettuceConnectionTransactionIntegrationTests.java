@@ -24,8 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.AbstractConnectionTransactionIntegrationTests;
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.StringValkeyConnection;
 import org.springframework.data.redis.test.extension.LettuceTestClientResources;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -57,7 +57,7 @@ public class LettuceConnectionTransactionIntegrationTests extends AbstractConnec
 		factory2.afterPropertiesSet();
 		factory2.start();
 
-		StringRedisConnection conn2 = new DefaultStringRedisConnection(factory2.getConnection());
+		StringValkeyConnection conn2 = new DefaultStringValkeyConnection(factory2.getConnection());
 		try {
 			assertThat(conn2.get("foo")).isEqualTo("bar");
 		} finally {

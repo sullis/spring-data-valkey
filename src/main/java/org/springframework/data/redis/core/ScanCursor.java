@@ -24,7 +24,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Redis client agnostic {@link Cursor} implementation continuously loading additional results from Redis server until
+ * Valkey client agnostic {@link Cursor} implementation continuously loading additional results from Valkey server until
  * reaching its starting point {@code zero}. <br />
  * <strong>Note:</strong> Please note that the {@link ScanCursor} has to be initialized ({@link #open()} prior to usage.
  * Any failures during scanning will {@link #close() close} the cursor and release any associated resources such as

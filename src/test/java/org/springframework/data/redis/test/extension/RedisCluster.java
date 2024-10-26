@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.data.redis.SettingsUtils;
 
 /**
- * {@code @RedisCluster} is used to qualify a connection resource to point to Redis Cluster.
+ * {@code @ValkeyCluster} is used to qualify a connection resource to point to Valkey Cluster.
  *
  * @author Mark Paluch
  * @see SettingsUtils#getClusterPort()
@@ -34,5 +34,5 @@ import org.springframework.data.redis.SettingsUtils;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface RedisCluster {
+public @interface ValkeyCluster {
 }

@@ -19,7 +19,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of {@link RedisSerializationContext}.
+ * Default implementation of {@link ValkeySerializationContext}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class DefaultRedisSerializationContext<K, V> implements RedisSerializationContext<K, V> {
+class DefaultValkeySerializationContext<K, V> implements ValkeySerializationContext<K, V> {
 
 	private final SerializationPair<K> keyTuple;
 	private final SerializationPair<V> valueTuple;
@@ -35,7 +35,7 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 	private final SerializationPair<?> hashValueTuple;
 	private final SerializationPair<String> stringTuple;
 
-	private DefaultRedisSerializationContext(SerializationPair<K> keyTuple, SerializationPair<V> valueTuple,
+	private DefaultValkeySerializationContext(SerializationPair<K> keyTuple, SerializationPair<V> valueTuple,
 			SerializationPair<?> hashKeyTuple, SerializationPair<?> hashValueTuple,
 			SerializationPair<String> stringTuple) {
 
@@ -74,24 +74,24 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 	}
 
 	/**
-	 * Default implementation of {@link RedisSerializationContextBuilder}.
+	 * Default implementation of {@link ValkeySerializationContextBuilder}.
 	 *
 	 * @author Mark Paluch
 	 * @author Christoph Strobl
 	 * @author Zhou KQ
 	 * @since 2.0
 	 */
-	static class DefaultRedisSerializationContextBuilder<K, V> implements RedisSerializationContextBuilder<K, V> {
+	static class DefaultValkeySerializationContextBuilder<K, V> implements ValkeySerializationContextBuilder<K, V> {
 
 		private @Nullable SerializationPair<K> keyTuple;
 		private @Nullable SerializationPair<V> valueTuple;
 		private @Nullable SerializationPair<?> hashKeyTuple;
 		private @Nullable SerializationPair<?> hashValueTuple;
 
-		private SerializationPair<String> stringTuple = SerializationPair.fromSerializer(RedisSerializer.string());
+		private SerializationPair<String> stringTuple = SerializationPair.fromSerializer(ValkeySerializer.string());
 
 		@Override
-		public RedisSerializationContextBuilder<K, V> key(SerializationPair<K> tuple) {
+		public ValkeySerializationContextBuilder<K, V> key(SerializationPair<K> tuple) {
 
 			Assert.notNull(tuple, "SerializationPair must not be null");
 
@@ -101,7 +101,7 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 		}
 
 		@Override
-		public RedisSerializationContextBuilder<K, V> value(SerializationPair<V> tuple) {
+		public ValkeySerializationContextBuilder<K, V> value(SerializationPair<V> tuple) {
 
 			Assert.notNull(tuple, "SerializationPair must not be null");
 
@@ -111,7 +111,7 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 		}
 
 		@Override
-		public RedisSerializationContextBuilder<K, V> hashKey(SerializationPair<?> tuple) {
+		public ValkeySerializationContextBuilder<K, V> hashKey(SerializationPair<?> tuple) {
 
 			Assert.notNull(tuple, "SerializationPair must not be null");
 
@@ -121,7 +121,7 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 		}
 
 		@Override
-		public RedisSerializationContextBuilder<K, V> hashValue(SerializationPair<?> tuple) {
+		public ValkeySerializationContextBuilder<K, V> hashValue(SerializationPair<?> tuple) {
 
 			Assert.notNull(tuple, "SerializationPair must not be null");
 
@@ -131,7 +131,7 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 		}
 
 		@Override
-		public RedisSerializationContextBuilder<K, V> string(SerializationPair<String> tuple) {
+		public ValkeySerializationContextBuilder<K, V> string(SerializationPair<String> tuple) {
 
 			Assert.notNull(tuple, "SerializationPair must not be null");
 
@@ -141,14 +141,14 @@ class DefaultRedisSerializationContext<K, V> implements RedisSerializationContex
 		}
 
 		@Override
-		public RedisSerializationContext<K, V> build() {
+		public ValkeySerializationContext<K, V> build() {
 
 			Assert.notNull(this.keyTuple, "Key SerializationPair must not be null");
 			Assert.notNull(this.valueTuple, "Value SerializationPair must not be null");
 			Assert.notNull(this.hashKeyTuple, "HashKey SerializationPair must not be null");
 			Assert.notNull(this.hashValueTuple, "HashValue SerializationPair must not be null");
 
-			return new DefaultRedisSerializationContext<>(this.keyTuple, this.valueTuple,
+			return new DefaultValkeySerializationContext<>(this.keyTuple, this.valueTuple,
 					this.hashKeyTuple, this.hashValueTuple, this.stringTuple);
 		}
 	}

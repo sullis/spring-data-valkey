@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
  * Simple {@link java.lang.String} to {@literal byte[]} (and back) serializer. Converts {@link java.lang.String Strings}
  * into bytes and vice-versa using the specified charset (by default {@literal UTF-8}).
  * <p>
- * Useful when the interaction with the Redis happens mainly through Strings.
+ * Useful when the interaction with the Valkey happens mainly through Strings.
  * <p>
  * Does not perform any {@literal null} conversion since empty strings are valid keys/values.
  *
@@ -33,48 +33,48 @@ import org.springframework.util.Assert;
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public class StringRedisSerializer implements RedisSerializer<String> {
+public class StringValkeySerializer implements ValkeySerializer<String> {
 
 	private final Charset charset;
 
 	/**
-	 * {@link StringRedisSerializer} to use 7 bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode
+	 * {@link StringValkeySerializer} to use 7 bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode
 	 * character set.
 	 *
 	 * @see StandardCharsets#US_ASCII
 	 * @since 2.1
 	 */
-	public static final StringRedisSerializer US_ASCII = new StringRedisSerializer(StandardCharsets.US_ASCII);
+	public static final StringValkeySerializer US_ASCII = new StringValkeySerializer(StandardCharsets.US_ASCII);
 
 	/**
-	 * {@link StringRedisSerializer} to use ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1.
+	 * {@link StringValkeySerializer} to use ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1.
 	 *
 	 * @see StandardCharsets#ISO_8859_1
 	 * @since 2.1
 	 */
-	public static final StringRedisSerializer ISO_8859_1 = new StringRedisSerializer(StandardCharsets.ISO_8859_1);
+	public static final StringValkeySerializer ISO_8859_1 = new StringValkeySerializer(StandardCharsets.ISO_8859_1);
 
 	/**
-	 * {@link StringRedisSerializer} to use 8 bit UCS Transformation Format.
+	 * {@link StringValkeySerializer} to use 8 bit UCS Transformation Format.
 	 *
 	 * @see StandardCharsets#UTF_8
 	 * @since 2.1
 	 */
-	public static final StringRedisSerializer UTF_8 = new StringRedisSerializer(StandardCharsets.UTF_8);
+	public static final StringValkeySerializer UTF_8 = new StringValkeySerializer(StandardCharsets.UTF_8);
 
 	/**
-	 * Creates a new {@link StringRedisSerializer} using {@link StandardCharsets#UTF_8 UTF-8}.
+	 * Creates a new {@link StringValkeySerializer} using {@link StandardCharsets#UTF_8 UTF-8}.
 	 */
-	public StringRedisSerializer() {
+	public StringValkeySerializer() {
 		this(StandardCharsets.UTF_8);
 	}
 
 	/**
-	 * Creates a new {@link StringRedisSerializer} using the given {@link Charset} to encode and decode strings.
+	 * Creates a new {@link StringValkeySerializer} using the given {@link Charset} to encode and decode strings.
 	 *
 	 * @param charset must not be {@literal null}.
 	 */
-	public StringRedisSerializer(Charset charset) {
+	public StringValkeySerializer(Charset charset) {
 
 		Assert.notNull(charset, "Charset must not be null");
 		this.charset = charset;

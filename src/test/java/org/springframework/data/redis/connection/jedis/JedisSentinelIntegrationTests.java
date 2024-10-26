@@ -29,12 +29,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.AbstractConnectionIntegrationTests;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.connection.RedisServer;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.connection.ValkeyServer;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
-import org.springframework.data.redis.test.extension.RedisSentinel;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
+import org.springframework.data.redis.test.extension.ValkeySentinel;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -43,13 +43,13 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Mark Paluch
  */
 @ExtendWith(JedisConnectionFactoryExtension.class)
-@EnabledOnRedisSentinelAvailable
+@EnabledOnValkeySentinelAvailable
 public class JedisSentinelIntegrationTests extends AbstractConnectionIntegrationTests {
 
-	private static final RedisServer REPLICA_0 = new RedisServer("127.0.0.1", 6380);
-	private static final RedisServer REPLICA_1 = new RedisServer("127.0.0.1", 6381);
+	private static final ValkeyServer REPLICA_0 = new ValkeyServer("127.0.0.1", 6380);
+	private static final ValkeyServer REPLICA_1 = new ValkeyServer("127.0.0.1", 6381);
 
-	public JedisSentinelIntegrationTests(@RedisSentinel JedisConnectionFactory connectionFactory) {
+	public JedisSentinelIntegrationTests(@ValkeySentinel JedisConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
@@ -64,7 +64,7 @@ public class JedisSentinelIntegrationTests extends AbstractConnectionIntegration
 	@Test // DATAREDIS-330
 	void shouldReadMastersCorrectly() {
 
-		List<RedisServer> servers = (List<RedisServer>) connectionFactory.getSentinelConnection().masters();
+		List<ValkeyServer> servers = (List<ValkeyServer>) connectionFactory.getSentinelConnection().masters();
 		assertThat(servers).hasSize(1);
 		assertThat(servers.get(0).getName()).isEqualTo(SettingsUtils.getSentinelMaster());
 	}
@@ -72,19 +72,19 @@ public class JedisSentinelIntegrationTests extends AbstractConnectionIntegration
 	@Test // DATAREDIS-330
 	void shouldReadReplicaOfMastersCorrectly() {
 
-		RedisSentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
+		ValkeySentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
 
-		List<RedisServer> servers = (List<RedisServer>) sentinelConnection.masters();
+		List<ValkeyServer> servers = (List<ValkeyServer>) sentinelConnection.masters();
 		assertThat(servers).hasSize(1);
 
-		Collection<RedisServer> replicas = sentinelConnection.replicas(servers.get(0));
+		Collection<ValkeyServer> replicas = sentinelConnection.replicas(servers.get(0));
 		assertThat(replicas).hasSize(2).contains(REPLICA_0, REPLICA_1);
 	}
 
 	@Test // DATAREDIS-552
 	void shouldSetClientName() {
 
-		RedisSentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
+		ValkeySentinelConnection sentinelConnection = connectionFactory.getSentinelConnection();
 		Jedis jedis = (Jedis) ReflectionTestUtils.getField(sentinelConnection, "jedis");
 
 		assertThat(jedis.clientGetname()).isEqualTo("jedis-client");

@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * Mark properties value to be included in a secondary index. <br />
- * Uses Redis {@literal SET} for storage. <br />
+ * Uses Valkey {@literal SET} for storage. <br />
  * The value will be part of the key built for the index.
  *
  * @author Christoph Strobl

@@ -29,7 +29,7 @@ class LettuceReactiveClusterScriptingCommands extends LettuceReactiveScriptingCo
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterScriptingCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterScriptingCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 }

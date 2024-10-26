@@ -88,8 +88,8 @@ class DefaultLettucePoolingClientConfiguration implements LettucePoolingClientCo
 	}
 
 	@Override
-	public Optional<RedisCredentialsProviderFactory> getRedisCredentialsProviderFactory() {
-		return clientConfiguration.getRedisCredentialsProviderFactory();
+	public Optional<ValkeyCredentialsProviderFactory> getValkeyCredentialsProviderFactory() {
+		return clientConfiguration.getValkeyCredentialsProviderFactory();
 	}
 
 	@Override

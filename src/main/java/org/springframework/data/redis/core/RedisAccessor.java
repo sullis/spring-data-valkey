@@ -18,22 +18,22 @@ package org.springframework.data.redis.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base class for {@link RedisTemplate} implementations defining common properties. Not intended to be used directly.
+ * Base class for {@link ValkeyTemplate} implementations defining common properties. Not intended to be used directly.
  *
  * @author Costin Leau
  * @author John Blum
  */
-public abstract class RedisAccessor implements InitializingBean {
+public abstract class ValkeyAccessor implements InitializingBean {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private @Nullable RedisConnectionFactory connectionFactory;
+	private @Nullable ValkeyConnectionFactory connectionFactory;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -41,39 +41,39 @@ public abstract class RedisAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Returns the factory configured to acquire connections and perform operations on the connected Redis instance.
+	 * Returns the factory configured to acquire connections and perform operations on the connected Valkey instance.
 	 *
-	 * @return the configured {@link RedisConnectionFactory}. Can be {@literal null}.
-	 * @see RedisConnectionFactory
+	 * @return the configured {@link ValkeyConnectionFactory}. Can be {@literal null}.
+	 * @see ValkeyConnectionFactory
 	 */
 	@Nullable
-	public RedisConnectionFactory getConnectionFactory() {
+	public ValkeyConnectionFactory getConnectionFactory() {
 		return this.connectionFactory;
 	}
 
 	/**
-	 * Returns the required {@link RedisConnectionFactory}, throwing an {@link IllegalStateException}
-	 * if the {@link RedisConnectionFactory} is not set.
+	 * Returns the required {@link ValkeyConnectionFactory}, throwing an {@link IllegalStateException}
+	 * if the {@link ValkeyConnectionFactory} is not set.
 	 *
-	 * @return the configured {@link RedisConnectionFactory}.
-	 * @throws IllegalStateException if the {@link RedisConnectionFactory} is not set.
+	 * @return the configured {@link ValkeyConnectionFactory}.
+	 * @throws IllegalStateException if the {@link ValkeyConnectionFactory} is not set.
 	 * @see #getConnectionFactory()
 	 * @since 2.0
 	 */
-	public RedisConnectionFactory getRequiredConnectionFactory() {
+	public ValkeyConnectionFactory getRequiredConnectionFactory() {
 
-		RedisConnectionFactory connectionFactory = getConnectionFactory();
-		Assert.state(connectionFactory != null, "RedisConnectionFactory is required");
+		ValkeyConnectionFactory connectionFactory = getConnectionFactory();
+		Assert.state(connectionFactory != null, "ValkeyConnectionFactory is required");
 		return connectionFactory;
 	}
 
 	/**
-	 * Sets the factory used to acquire connections and perform operations on the connected Redis instance.
+	 * Sets the factory used to acquire connections and perform operations on the connected Valkey instance.
 	 *
-	 * @param connectionFactory {@link RedisConnectionFactory} used to acquire connections.
-	 * @see RedisConnectionFactory
+	 * @param connectionFactory {@link ValkeyConnectionFactory} used to acquire connections.
+	 * @see ValkeyConnectionFactory
 	 */
-	public void setConnectionFactory(@Nullable RedisConnectionFactory connectionFactory) {
+	public void setConnectionFactory(@Nullable ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 }

@@ -16,13 +16,13 @@
 package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.api.StatefulConnection;
-import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.codec.ValkeyCodec;
 import io.lettuce.core.masterreplica.MasterReplica;
-import io.lettuce.core.masterreplica.StatefulRedisMasterReplicaConnection;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.masterreplica.StatefulValkeyMasterReplicaConnection;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 /**
  * {@link LettuceConnectionProvider} implementation for a static Master/Replica connection suitable for eg. AWS
  * ElastiCache with replicas setup.<br/>
- * Lettuce auto-discovers node roles from the static {@link RedisURI} collection.
+ * Lettuce auto-discovers node roles from the static {@link ValkeyURI} collection.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -42,10 +42,10 @@ import org.springframework.lang.Nullable;
  */
 class StaticMasterReplicaConnectionProvider implements LettuceConnectionProvider {
 
-	private final RedisClient client;
-	private final RedisCodec<?, ?> codec;
+	private final ValkeyClient client;
+	private final ValkeyCodec<?, ?> codec;
 	private final Optional<ReadFrom> readFrom;
-	private final Collection<RedisURI> nodes;
+	private final Collection<ValkeyURI> nodes;
 
 	/**
 	 * Create new {@link StaticMasterReplicaConnectionProvider}.
@@ -55,7 +55,7 @@ class StaticMasterReplicaConnectionProvider implements LettuceConnectionProvider
 	 * @param nodes must not be {@literal null}.
 	 * @param readFrom can be {@literal null}.
 	 */
-	StaticMasterReplicaConnectionProvider(RedisClient client, RedisCodec<?, ?> codec, Collection<RedisURI> nodes,
+	StaticMasterReplicaConnectionProvider(ValkeyClient client, ValkeyCodec<?, ?> codec, Collection<ValkeyURI> nodes,
 			@Nullable ReadFrom readFrom) {
 
 		this.client = client;
@@ -67,13 +67,13 @@ class StaticMasterReplicaConnectionProvider implements LettuceConnectionProvider
 	@Override
 	public <T extends StatefulConnection<?, ?>> T getConnection(Class<T> connectionType) {
 
-		if (connectionType.equals(StatefulRedisPubSubConnection.class)) {
+		if (connectionType.equals(StatefulValkeyPubSubConnection.class)) {
 			throw new UnsupportedOperationException("Pub/Sub connections not supported with Master/Replica configurations");
 		}
 
 		if (StatefulConnection.class.isAssignableFrom(connectionType)) {
 
-			StatefulRedisMasterReplicaConnection<?, ?> connection = MasterReplica.connect(client, codec, nodes);
+			StatefulValkeyMasterReplicaConnection<?, ?> connection = MasterReplica.connect(client, codec, nodes);
 			readFrom.ifPresent(connection::setReadFrom);
 
 			return connectionType.cast(connection);
@@ -87,7 +87,7 @@ class StaticMasterReplicaConnectionProvider implements LettuceConnectionProvider
 
 		if (StatefulConnection.class.isAssignableFrom(connectionType)) {
 
-			CompletableFuture<? extends StatefulRedisMasterReplicaConnection<?, ?>> connection = MasterReplica
+			CompletableFuture<? extends StatefulValkeyMasterReplicaConnection<?, ?>> connection = MasterReplica
 					.connectAsync(client, codec, nodes);
 
 			return connection.thenApply(it -> {

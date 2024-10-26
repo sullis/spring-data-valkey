@@ -18,16 +18,16 @@ package org.springframework.data.redis;
 import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
- * Fatal exception thrown when the Redis connection fails completely.
+ * Fatal exception thrown when the Valkey connection fails completely.
  *
  * @author Mark Pollack
  */
-public class RedisConnectionFailureException extends DataAccessResourceFailureException {
+public class ValkeyConnectionFailureException extends DataAccessResourceFailureException {
 
 	/**
 	 * @param msg the detail message.
 	 */
-	public RedisConnectionFailureException(String msg) {
+	public ValkeyConnectionFailureException(String msg) {
 		super(msg);
 	}
 
@@ -35,7 +35,7 @@ public class RedisConnectionFailureException extends DataAccessResourceFailureEx
 	 * @param msg the detail message.
 	 * @param cause the nested exception.
 	 */
-	public RedisConnectionFailureException(String msg, Throwable cause) {
+	public ValkeyConnectionFailureException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 

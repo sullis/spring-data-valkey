@@ -38,8 +38,8 @@ import org.springframework.util.Assert;
 class DefaultHashOperations<K, HK, HV> extends AbstractOperations<K, Object> implements HashOperations<K, HK, HV> {
 
 	@SuppressWarnings("unchecked")
-	DefaultHashOperations(RedisTemplate<K, ?> template) {
-		super((RedisTemplate<K, Object>) template);
+	DefaultHashOperations(ValkeyTemplate<K, ?> template) {
+		super((ValkeyTemplate<K, Object>) template);
 	}
 
 	@Override
@@ -242,7 +242,7 @@ class DefaultHashOperations<K, HK, HV> extends AbstractOperations<K, Object> imp
 
 		byte[] rawKey = rawKey(key);
 		return template.executeWithStickyConnection(
-				(RedisCallback<Cursor<Entry<HK, HV>>>) connection -> new ConvertingCursor<>(connection.hScan(rawKey, options),
+				(ValkeyCallback<Cursor<Entry<HK, HV>>>) connection -> new ConvertingCursor<>(connection.hScan(rawKey, options),
 						new Converter<Entry<byte[], byte[]>, Entry<HK, HV>>() {
 
 							@Override

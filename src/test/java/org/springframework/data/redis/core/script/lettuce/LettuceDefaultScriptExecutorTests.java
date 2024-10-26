@@ -15,11 +15,11 @@
  */
 package org.springframework.data.redis.core.script.lettuce;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.core.script.AbstractDefaultScriptExecutorTests;
 import org.springframework.data.redis.core.script.DefaultScriptExecutor;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 
 /**
  * Integration test of {@link DefaultScriptExecutor} with Lettuce.
@@ -30,7 +30,7 @@ import org.springframework.data.redis.test.extension.RedisStanalone;
 public class LettuceDefaultScriptExecutorTests extends AbstractDefaultScriptExecutorTests {
 
 	@Override
-	protected RedisConnectionFactory getConnectionFactory() {
-		return LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+	protected ValkeyConnectionFactory getConnectionFactory() {
+		return LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 	}
 }

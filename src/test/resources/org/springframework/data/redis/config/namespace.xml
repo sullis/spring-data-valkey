@@ -20,14 +20,14 @@
 		<redis:listener ref="testBean2" topic="exception"/>
 	</redis:listener-container>
 	
-	<bean id="testBean1" class="org.springframework.data.redis.listener.adapter.RedisMDP"/>
+	<bean id="testBean1" class="org.springframework.data.redis.listener.adapter.ValkeyMDP"/>
 	<bean id="testBean2" class="org.springframework.data.redis.listener.adapter.ThrowableMessageListener"/>
 	
-	<bean id="serializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	<bean id="serializer" class="org.springframework.data.redis.serializer.StringValkeySerializer"/>
 	
 	<bean id="handler" class="org.springframework.data.redis.config.StubErrorHandler"/>
 	
-	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringValkeyTemplate">
 		<property name="connectionFactory" ref="redisConnectionFactory"/>
 	</bean>
 	

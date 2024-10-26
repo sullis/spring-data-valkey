@@ -24,16 +24,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.data.mapping.MappingException;
-import org.springframework.data.redis.core.mapping.RedisPersistentEntity;
+import org.springframework.data.redis.core.mapping.ValkeyPersistentEntity;
 
 /**
  * @author Christoph Strobl
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
-class MappingRedisEntityInformationUnitTests<T, ID> {
+class MappingValkeyEntityInformationUnitTests<T, ID> {
 
-	@Mock RedisPersistentEntity<T> entity;
+	@Mock ValkeyPersistentEntity<T> entity;
 
 	@Test // DATAREDIS-425
 	void throwsMappingExceptionWhenNoIdPropertyPresent() {
@@ -41,6 +41,6 @@ class MappingRedisEntityInformationUnitTests<T, ID> {
 		when(entity.hasIdProperty()).thenReturn(false);
 
 		assertThatExceptionOfType(MappingException.class)
-				.isThrownBy(() -> new MappingRedisEntityInformation<T, ID>(entity));
+				.isThrownBy(() -> new MappingValkeyEntityInformation<T, ID>(entity));
 	}
 }

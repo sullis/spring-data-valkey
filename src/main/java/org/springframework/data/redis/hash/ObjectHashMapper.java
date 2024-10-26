@@ -22,18 +22,18 @@ import java.util.Set;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.redis.core.convert.IndexResolver;
 import org.springframework.data.redis.core.convert.IndexedData;
-import org.springframework.data.redis.core.convert.MappingRedisConverter;
-import org.springframework.data.redis.core.convert.RedisConverter;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
-import org.springframework.data.redis.core.convert.RedisData;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyConverter;
+import org.springframework.data.redis.core.convert.ValkeyCustomConversions;
+import org.springframework.data.redis.core.convert.ValkeyData;
 import org.springframework.data.redis.core.convert.ReferenceResolver;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link HashMapper} based on {@link MappingRedisConverter}. Supports nested properties and simple types like
+ * {@link HashMapper} based on {@link MappingValkeyConverter}. Supports nested properties and simple types like
  * {@link String}.
  *
  * <pre>
@@ -73,23 +73,23 @@ public class ObjectHashMapper implements HashMapper<Object, byte[], byte[]> {
 
 	@Nullable private volatile static ObjectHashMapper sharedInstance;
 
-	private final RedisConverter converter;
+	private final ValkeyConverter converter;
 
 	/**
 	 * Creates new {@link ObjectHashMapper}.
 	 */
 	public ObjectHashMapper() {
-		this(new RedisCustomConversions());
+		this(new ValkeyCustomConversions());
 	}
 
 	/**
-	 * Creates a new {@link ObjectHashMapper} using the given {@link RedisConverter} for conversion.
+	 * Creates a new {@link ObjectHashMapper} using the given {@link ValkeyConverter} for conversion.
 	 *
 	 * @param converter must not be {@literal null}.
 	 * @throws IllegalArgumentException if the given {@literal converter} is {@literal null}.
 	 * @since 2.4
 	 */
-	public ObjectHashMapper(RedisConverter converter) {
+	public ObjectHashMapper(ValkeyConverter converter) {
 
 		Assert.notNull(converter, "Converter must not be null");
 		this.converter = converter;
@@ -103,9 +103,9 @@ public class ObjectHashMapper implements HashMapper<Object, byte[], byte[]> {
 	 */
 	public ObjectHashMapper(@Nullable CustomConversions customConversions) {
 
-		MappingRedisConverter mappingConverter = new MappingRedisConverter(new RedisMappingContext(),
+		MappingValkeyConverter mappingConverter = new MappingValkeyConverter(new ValkeyMappingContext(),
 				new NoOpIndexResolver(), new NoOpReferenceResolver());
-		mappingConverter.setCustomConversions(customConversions == null ? new RedisCustomConversions() : customConversions);
+		mappingConverter.setCustomConversions(customConversions == null ? new ValkeyCustomConversions() : customConversions);
 		mappingConverter.afterPropertiesSet();
 
 		converter = mappingConverter;
@@ -143,7 +143,7 @@ public class ObjectHashMapper implements HashMapper<Object, byte[], byte[]> {
 			return Collections.emptyMap();
 		}
 
-		RedisData sink = new RedisData();
+		ValkeyData sink = new ValkeyData();
 		converter.write(source, sink);
 		return sink.getBucket().rawMap();
 	}
@@ -155,7 +155,7 @@ public class ObjectHashMapper implements HashMapper<Object, byte[], byte[]> {
 			return null;
 		}
 
-		return converter.read(Object.class, new RedisData(hash));
+		return converter.read(Object.class, new ValkeyData(hash));
 	}
 
 	/**

@@ -22,21 +22,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.redis.SettingsUtils;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializer;
+import org.springframework.data.redis.serializer.JdkSerializationValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.lang.Nullable;
 
 /**
@@ -45,35 +45,35 @@ import org.springframework.lang.Nullable;
  */
 class CacheTestParams {
 
-	private static Collection<RedisConnectionFactory> connectionFactories() {
+	private static Collection<ValkeyConnectionFactory> connectionFactories() {
 
-		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration config = new ValkeyStandaloneConfiguration();
 		config.setHostName(SettingsUtils.getHost());
 		config.setPort(SettingsUtils.getPort());
 
-		List<RedisConnectionFactory> factoryList = new ArrayList<>(3);
+		List<ValkeyConnectionFactory> factoryList = new ArrayList<>(3);
 
 		// Jedis Standalone
 		JedisConnectionFactory jedisConnectionFactory = JedisConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 		factoryList.add(jedisConnectionFactory);
 
 		// Lettuce Standalone
 		LettuceConnectionFactory lettuceConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 		factoryList.add(lettuceConnectionFactory);
 
 		if (clusterAvailable()) {
 
 			// Jedis Cluster
 			JedisConnectionFactory jedisClusterConnectionFactory = JedisConnectionFactoryExtension
-					.getConnectionFactory(RedisCluster.class);
+					.getConnectionFactory(ValkeyCluster.class);
 			factoryList
 					.add(jedisClusterConnectionFactory);
 
 			// Lettuce Cluster
 			LettuceConnectionFactory lettuceClusterConnectionFactory = LettuceConnectionFactoryExtension
-					.getConnectionFactory(RedisCluster.class);
+					.getConnectionFactory(ValkeyCluster.class);
 			factoryList
 					.add(lettuceClusterConnectionFactory);
 		}
@@ -88,21 +88,21 @@ class CacheTestParams {
 	static Collection<Object[]> connectionFactoriesAndSerializers() {
 
 		OxmSerializer oxmSerializer = XstreamOxmSerializerSingleton.getInstance();
-		GenericJackson2JsonRedisSerializer jackson2Serializer = new GenericJackson2JsonRedisSerializer();
-		JdkSerializationRedisSerializer jdkSerializer = new JdkSerializationRedisSerializer();
+		GenericJackson2JsonValkeySerializer jackson2Serializer = new GenericJackson2JsonValkeySerializer();
+		JdkSerializationValkeySerializer jdkSerializer = new JdkSerializationValkeySerializer();
 
 		return connectionFactories().stream().flatMap(factory -> Arrays.asList( //
-				new Object[] { factory, new FixDamnedJunitParameterizedNameForRedisSerializer(jdkSerializer) }, //
-				new Object[] { factory, new FixDamnedJunitParameterizedNameForRedisSerializer(jackson2Serializer) }, //
-				new Object[] { factory, new FixDamnedJunitParameterizedNameForRedisSerializer(oxmSerializer) }).stream())
+				new Object[] { factory, new FixDamnedJunitParameterizedNameForValkeySerializer(jdkSerializer) }, //
+				new Object[] { factory, new FixDamnedJunitParameterizedNameForValkeySerializer(jackson2Serializer) }, //
+				new Object[] { factory, new FixDamnedJunitParameterizedNameForValkeySerializer(oxmSerializer) }).stream())
 				.collect(Collectors.toList());
 	}
 
-	static class FixDamnedJunitParameterizedNameForRedisSerializer/* ¯\_(ツ)_/¯ */ implements RedisSerializer {
+	static class FixDamnedJunitParameterizedNameForValkeySerializer/* ¯\_(ツ)_/¯ */ implements ValkeySerializer {
 
-		final RedisSerializer serializer;
+		final ValkeySerializer serializer;
 
-		FixDamnedJunitParameterizedNameForRedisSerializer(RedisSerializer serializer) {
+		FixDamnedJunitParameterizedNameForValkeySerializer(ValkeySerializer serializer) {
 			this.serializer = serializer;
 		}
 
@@ -118,24 +118,24 @@ class CacheTestParams {
 			return serializer.deserialize(bytes);
 		}
 
-		public static RedisSerializer<Object> java() {
-			return RedisSerializer.java();
+		public static ValkeySerializer<Object> java() {
+			return ValkeySerializer.java();
 		}
 
-		public static RedisSerializer<Object> java(@Nullable ClassLoader classLoader) {
-			return RedisSerializer.java(classLoader);
+		public static ValkeySerializer<Object> java(@Nullable ClassLoader classLoader) {
+			return ValkeySerializer.java(classLoader);
 		}
 
-		public static RedisSerializer<Object> json() {
-			return RedisSerializer.json();
+		public static ValkeySerializer<Object> json() {
+			return ValkeySerializer.json();
 		}
 
-		public static RedisSerializer<String> string() {
-			return RedisSerializer.string();
+		public static ValkeySerializer<String> string() {
+			return ValkeySerializer.string();
 		}
 
-		public static RedisSerializer<byte[]> byteArray() {
-			return RedisSerializer.byteArray();
+		public static ValkeySerializer<byte[]> byteArray() {
+			return ValkeySerializer.byteArray();
 		}
 
 		@Override
@@ -155,6 +155,6 @@ class CacheTestParams {
 	}
 
 	private static boolean clusterAvailable() {
-		return RedisDetector.isClusterAvailable();
+		return ValkeyDetector.isClusterAvailable();
 	}
 }

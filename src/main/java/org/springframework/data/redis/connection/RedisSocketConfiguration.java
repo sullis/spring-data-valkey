@@ -15,39 +15,39 @@
  */
 package org.springframework.data.redis.connection;
 
-import org.springframework.data.redis.connection.RedisConfiguration.DomainSocketConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.DomainSocketConfiguration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Configuration class used for setting up {@link RedisConnection} via {@link RedisConnectionFactory} connecting to
- * single <a href="https://redis.io/">Redis</a> using a local unix domain socket.
+ * Configuration class used for setting up {@link ValkeyConnection} via {@link ValkeyConnectionFactory} connecting to
+ * single <a href="https://redis.io/">Valkey</a> using a local unix domain socket.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.1
  */
-public class RedisSocketConfiguration implements RedisConfiguration, DomainSocketConfiguration {
+public class ValkeySocketConfiguration implements ValkeyConfiguration, DomainSocketConfiguration {
 
 	private static final String DEFAULT_SOCKET = "/tmp/redis.sock";
 
 	private String socket = DEFAULT_SOCKET;
 	private int database;
 	private @Nullable String username = null;
-	private RedisPassword password = RedisPassword.none();
+	private ValkeyPassword password = ValkeyPassword.none();
 
 	/**
-	 * Create a new default {@link RedisSocketConfiguration}.
+	 * Create a new default {@link ValkeySocketConfiguration}.
 	 */
-	public RedisSocketConfiguration() {}
+	public ValkeySocketConfiguration() {}
 
 	/**
-	 * Create a new {@link RedisSocketConfiguration} given {@code socket}.
+	 * Create a new {@link ValkeySocketConfiguration} given {@code socket}.
 	 *
 	 * @param socket must not be {@literal null} or empty.
 	 */
-	public RedisSocketConfiguration(String socket) {
+	public ValkeySocketConfiguration(String socket) {
 
 		Assert.hasText(socket, "Socket path must not be null nor empty");
 
@@ -91,14 +91,14 @@ public class RedisSocketConfiguration implements RedisConfiguration, DomainSocke
 	}
 
 	@Override
-	public RedisPassword getPassword() {
+	public ValkeyPassword getPassword() {
 		return password;
 	}
 
 	@Override
-	public void setPassword(RedisPassword password) {
+	public void setPassword(ValkeyPassword password) {
 
-		Assert.notNull(password, "RedisPassword must not be null");
+		Assert.notNull(password, "ValkeyPassword must not be null");
 
 		this.password = password;
 	}
@@ -108,7 +108,7 @@ public class RedisSocketConfiguration implements RedisConfiguration, DomainSocke
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RedisSocketConfiguration that)) {
+		if (!(o instanceof ValkeySocketConfiguration that)) {
 			return false;
 		}
 		if (database != that.database) {

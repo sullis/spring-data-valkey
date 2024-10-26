@@ -30,42 +30,42 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.extension.JedisConnectionFactoryExtension;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
- * Integration tests for {@link RedisKeyValueTemplate}.
+ * Integration tests for {@link ValkeyKeyValueTemplate}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @author John Blum
  */
 @MethodSource("params")
-public class RedisKeyValueTemplateTests {
+public class ValkeyKeyValueTemplateTests {
 
-	private RedisConnectionFactory connectionFactory;
-	private RedisKeyValueTemplate template;
-	private RedisTemplate<Object, Object> nativeTemplate;
-	private RedisMappingContext context;
-	private RedisKeyValueAdapter adapter;
+	private ValkeyConnectionFactory connectionFactory;
+	private ValkeyKeyValueTemplate template;
+	private ValkeyTemplate<Object, Object> nativeTemplate;
+	private ValkeyMappingContext context;
+	private ValkeyKeyValueAdapter adapter;
 
-	public RedisKeyValueTemplateTests(RedisConnectionFactory connectionFactory) {
+	public ValkeyKeyValueTemplateTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
-	public static List<RedisConnectionFactory> params() {
+	public static List<ValkeyConnectionFactory> params() {
 
-		JedisConnectionFactory jedis = JedisConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
-		LettuceConnectionFactory lettuce = LettuceConnectionFactoryExtension.getConnectionFactory(RedisStanalone.class);
+		JedisConnectionFactory jedis = JedisConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
+		LettuceConnectionFactory lettuce = LettuceConnectionFactoryExtension.getConnectionFactory(ValkeyStanalone.class);
 
 		return Arrays.asList(jedis, lettuce);
 	}
@@ -73,15 +73,15 @@ public class RedisKeyValueTemplateTests {
 	@BeforeEach
 	void setUp() {
 
-		nativeTemplate = new RedisTemplate<>();
+		nativeTemplate = new ValkeyTemplate<>();
 		nativeTemplate.setConnectionFactory(connectionFactory);
 		nativeTemplate.afterPropertiesSet();
 
-		context = new RedisMappingContext();
-		adapter = new RedisKeyValueAdapter(nativeTemplate, context);
-		template = new RedisKeyValueTemplate(adapter, context);
+		context = new ValkeyMappingContext();
+		adapter = new ValkeyKeyValueAdapter(nativeTemplate, context);
+		template = new ValkeyKeyValueTemplate(adapter, context);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			connection.flushDb();
 			return null;
@@ -95,7 +95,7 @@ public class RedisKeyValueTemplateTests {
 		adapter.destroy();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-425
+	@ParameterizedValkeyTest // DATAREDIS-425
 	void savesObjectCorrectly() {
 
 		final Person rand = new Person();
@@ -103,14 +103,14 @@ public class RedisKeyValueTemplateTests {
 
 		template.insert(rand);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.exists(("template-test-person:" + rand.id).getBytes())).isTrue();
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-425
+	@ParameterizedValkeyTest // DATAREDIS-425
 	void findProcessesCallbackReturningSingleIdCorrectly() {
 
 		Person rand = new Person();
@@ -128,7 +128,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(result).contains(mat);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-425
+	@ParameterizedValkeyTest // DATAREDIS-425
 	void findProcessesCallbackReturningMultipleIdsCorrectly() {
 
 		final Person rand = new Person();
@@ -147,7 +147,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(result).contains(rand, mat);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-425
+	@ParameterizedValkeyTest // DATAREDIS-425
 	void findProcessesCallbackReturningNullCorrectly() {
 
 		Person rand = new Person();
@@ -164,7 +164,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(result.size()).isEqualTo(0);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdate() {
 
 		final Person rand = new Person();
@@ -181,7 +181,7 @@ public class RedisKeyValueTemplateTests {
 		template.insert(update);
 
 		assertThat(template.findById(rand.id, Person.class)).isEqualTo(Optional.of(new Person(rand.id, "rand", "al-thor")));
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-person:" + rand.id).getBytes(), "firstname".getBytes()))
 					.isEqualTo("rand".getBytes());
@@ -199,7 +199,7 @@ public class RedisKeyValueTemplateTests {
 
 		assertThat(template.findById(rand.id, Person.class))
 				.isEqualTo(Optional.of(new Person(rand.id, "frodo", "al-thor")));
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.exists("template-test-person:lastname:al-thor".getBytes())).isTrue();
 			assertThat(connection.sIsMember("template-test-person:lastname:al-thor".getBytes(), rand.id.getBytes())).isTrue();
@@ -215,7 +215,7 @@ public class RedisKeyValueTemplateTests {
 		template.doPartialUpdate(update);
 
 		assertThat(template.findById(rand.id, Person.class)).isEqualTo(Optional.of(new Person(rand.id, null, "baggins")));
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.exists("template-test-person:lastname:al-thor".getBytes())).isFalse();
 			assertThat(connection.exists("template-test-person:lastname:baggins".getBytes())).isTrue();
@@ -232,14 +232,14 @@ public class RedisKeyValueTemplateTests {
 		template.doPartialUpdate(update);
 
 		assertThat(template.findById(rand.id, Person.class)).isEqualTo(Optional.of(new Person(rand.id, null, null)));
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.keys("template-test-person:lastname:*".getBytes()).size()).isEqualTo(0);
 			return null;
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateSimpleType() {
 
 		final VariousTypes source = new VariousTypes();
@@ -252,7 +252,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "stringValue".getBytes()))
 					.isEqualTo("hooya".getBytes());
@@ -262,7 +262,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateComplexType() {
 
 		Item callandor = new Item();
@@ -286,7 +286,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(
 					connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "complexValue.name".getBytes()))
@@ -302,7 +302,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateObjectType() {
 
 		Item callandor = new Item();
@@ -326,7 +326,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(
 					connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "objectValue._class".getBytes()))
@@ -344,7 +344,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateSimpleTypedMap() {
 
 		final VariousTypes source = new VariousTypes();
@@ -360,7 +360,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(
 					connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "simpleTypedMap.[spring]".getBytes()))
@@ -375,7 +375,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateComplexTypedMap() {
 
 		final VariousTypes source = new VariousTypes();
@@ -408,7 +408,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-type-mapping:" + source.id).getBytes(),
 					"complexTypedMap.[horn-of-valere].name".getBytes())).isEqualTo("Horn of Valere".getBytes());
@@ -434,7 +434,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateObjectTypedMap() {
 
 		final VariousTypes source = new VariousTypes();
@@ -473,7 +473,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-type-mapping:" + source.id).getBytes(),
 					"untypedMap.[horn-of-valere].name".getBytes())).isEqualTo("Horn of Valere".getBytes());
@@ -510,7 +510,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateSimpleTypedList() {
 
 		final VariousTypes source = new VariousTypes();
@@ -526,7 +526,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(
 					connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "simpleTypedList.[0]".getBytes()))
@@ -544,7 +544,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateComplexTypedList() {
 
 		final VariousTypes source = new VariousTypes();
@@ -577,7 +577,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-type-mapping:" + source.id).getBytes(),
 					"complexTypedList.[0].name".getBytes())).isEqualTo("Horn of Valere".getBytes());
@@ -596,7 +596,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-471
+	@ParameterizedValkeyTest // DATAREDIS-471
 	void partialUpdateObjectTypedList() {
 
 		final VariousTypes source = new VariousTypes();
@@ -635,7 +635,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(
 					connection.hGet(("template-test-type-mapping:" + source.id).getBytes(), "untypedList.[0]._class".getBytes()))
@@ -661,7 +661,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-530
+	@ParameterizedValkeyTest // DATAREDIS-530
 	void partialUpdateShouldLeaveIndexesNotInvolvedInUpdateUntouched() {
 
 		final Person rand = new Person();
@@ -678,7 +678,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.doPartialUpdate(update);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.hGet(("template-test-person:" + rand.id).getBytes(), "lastname".getBytes()))
 					.isEqualTo("doe".getBytes());
@@ -689,7 +689,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-530
+	@ParameterizedValkeyTest // DATAREDIS-530
 	void updateShouldAlterIndexesCorrectlyWhenValuesGetRemovedFromHash() {
 
 		final Person rand = new Person();
@@ -699,7 +699,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.insert(rand);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.exists("template-test-person:email:rand@twof.com".getBytes())).isTrue();
 			assertThat(connection.exists("template-test-person:lastname:al-thor".getBytes())).isTrue();
@@ -710,7 +710,7 @@ public class RedisKeyValueTemplateTests {
 
 		template.update(rand);
 
-		nativeTemplate.execute((RedisCallback<Void>) connection -> {
+		nativeTemplate.execute((ValkeyCallback<Void>) connection -> {
 
 			assertThat(connection.exists("template-test-person:email:rand@twof.com".getBytes())).isTrue();
 			assertThat(connection.exists("template-test-person:lastname:al-thor".getBytes())).isFalse();
@@ -718,7 +718,7 @@ public class RedisKeyValueTemplateTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-523
+	@ParameterizedValkeyTest // DATAREDIS-523
 	void shouldReadBackExplicitTimeToLive() throws InterruptedException {
 
 		WithTtl source = new WithTtl();
@@ -732,7 +732,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(target.get().ttl).isGreaterThan(0L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-523
+	@ParameterizedValkeyTest // DATAREDIS-523
 	void shouldReadBackExplicitTimeToLiveToPrimitiveField() throws InterruptedException {
 
 		WithPrimitiveTtl source = new WithPrimitiveTtl();
@@ -746,7 +746,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(target.get().ttl).isGreaterThan(0);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-523
+	@ParameterizedValkeyTest // DATAREDIS-523
 	void shouldReadBackExplicitTimeToLiveWhenFetchingList() throws InterruptedException {
 
 		WithTtl source = new WithTtl();
@@ -762,7 +762,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(target.ttl).isGreaterThan(0);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-523
+	@ParameterizedValkeyTest // DATAREDIS-523
 	void shouldReadBackExplicitTimeToLiveAndSetItToMinusOnelIfPersisted() throws InterruptedException {
 
 		WithTtl source = new WithTtl();
@@ -773,13 +773,13 @@ public class RedisKeyValueTemplateTests {
 		template.insert(source);
 
 		nativeTemplate.execute(
-				(RedisCallback<Boolean>) connection -> connection.persist((WithTtl.class.getName() + ":ttl-1").getBytes()));
+				(ValkeyCallback<Boolean>) connection -> connection.persist((WithTtl.class.getName() + ":ttl-1").getBytes()));
 
 		Optional<WithTtl> target = template.findById(source.id, WithTtl.class);
 		assertThat(target.get().ttl).isEqualTo(-1L);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-849
+	@ParameterizedValkeyTest // DATAREDIS-849
 	void shouldWriteImmutableType() {
 
 		ImmutableObject source = new ImmutableObject().withValue("foo").withTtl(1234L);
@@ -790,7 +790,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(inserted.id).isNotNull();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-849
+	@ParameterizedValkeyTest // DATAREDIS-849
 	void shouldReadImmutableType() {
 
 		ImmutableObject source = new ImmutableObject().withValue("foo").withTtl(1234L);
@@ -806,7 +806,7 @@ public class RedisKeyValueTemplateTests {
 		assertThat(immutableObject.value).isEqualTo(inserted.value);
 	}
 
-	@RedisHash("template-test-type-mapping")
+	@ValkeyHash("template-test-type-mapping")
 	static class VariousTypes {
 
 		@Id String id;
@@ -869,7 +869,7 @@ public class RedisKeyValueTemplateTests {
 		Integer length;
 	}
 
-	@RedisHash("template-test-person")
+	@ValkeyHash("template-test-person")
 	static class Person {
 
 		@Id String id;
@@ -1086,7 +1086,7 @@ public class RedisKeyValueTemplateTests {
 		@Override
 		public String toString() {
 
-			return "RedisKeyValueTemplateTests.ImmutableObject(id=" + this.getId()
+			return "ValkeyKeyValueTemplateTests.ImmutableObject(id=" + this.getId()
 				+ ", value=" + this.getValue()
 				+ ", ttl=" + this.getTtl() + ")";
 		}

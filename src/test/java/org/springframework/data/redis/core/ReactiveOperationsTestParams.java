@@ -31,22 +31,22 @@ import org.springframework.data.redis.PrefixStringObjectFactory;
 import org.springframework.data.redis.StringObjectFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.extension.LettuceConnectionFactoryExtension;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer;
+import org.springframework.data.redis.serializer.JdkSerializationValkeySerializer;
 import org.springframework.data.redis.serializer.OxmSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.data.redis.test.XstreamOxmSerializerSingleton;
-import org.springframework.data.redis.test.condition.RedisDetector;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.condition.ValkeyDetector;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.lang.Nullable;
 
 /**
- * Parameters for testing implementations of {@link ReactiveRedisTemplate}
+ * Parameters for testing implementations of {@link ReactiveValkeyTemplate}
  *
  * @author Mark Paluch
  * @author Christoph Strobl
@@ -63,54 +63,54 @@ abstract public class ReactiveOperationsTestParams {
 		ObjectFactory<Person> personFactory = new PersonObjectFactory();
 
 		LettuceConnectionFactory lettuceConnectionFactory = LettuceConnectionFactoryExtension
-				.getConnectionFactory(RedisStanalone.class);
+				.getConnectionFactory(ValkeyStanalone.class);
 
-		ReactiveRedisTemplate<Object, Object> objectTemplate = new ReactiveRedisTemplate<>(lettuceConnectionFactory,
-				RedisSerializationContext.java(ReactiveOperationsTestParams.class.getClassLoader()));
+		ReactiveValkeyTemplate<Object, Object> objectTemplate = new ReactiveValkeyTemplate<>(lettuceConnectionFactory,
+				ValkeySerializationContext.java(ReactiveOperationsTestParams.class.getClassLoader()));
 
-		StringRedisSerializer stringRedisSerializer = StringRedisSerializer.UTF_8;
-		ReactiveRedisTemplate<String, String> stringTemplate = new ReactiveRedisTemplate<>(lettuceConnectionFactory,
-				RedisSerializationContext.fromSerializer(stringRedisSerializer));
+		StringValkeySerializer stringValkeySerializer = StringValkeySerializer.UTF_8;
+		ReactiveValkeyTemplate<String, String> stringTemplate = new ReactiveValkeyTemplate<>(lettuceConnectionFactory,
+				ValkeySerializationContext.fromSerializer(stringValkeySerializer));
 
-		JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
+		JdkSerializationValkeySerializer jdkSerializationValkeySerializer = new JdkSerializationValkeySerializer();
 		GenericToStringSerializer<Long> longToStringSerializer = new GenericToStringSerializer(Long.class);
-		ReactiveRedisTemplate<String, Long> longTemplate = new ReactiveRedisTemplate<>(lettuceConnectionFactory,
-				RedisSerializationContext.<String, Long> newSerializationContext(jdkSerializationRedisSerializer)
-						.key(stringRedisSerializer).value(longToStringSerializer).build());
+		ReactiveValkeyTemplate<String, Long> longTemplate = new ReactiveValkeyTemplate<>(lettuceConnectionFactory,
+				ValkeySerializationContext.<String, Long> newSerializationContext(jdkSerializationValkeySerializer)
+						.key(stringValkeySerializer).value(longToStringSerializer).build());
 
 		GenericToStringSerializer<Double> doubleToStringSerializer = new GenericToStringSerializer(Double.class);
-		ReactiveRedisTemplate<String, Double> doubleTemplate = new ReactiveRedisTemplate<>(lettuceConnectionFactory,
-				RedisSerializationContext.<String, Double> newSerializationContext(jdkSerializationRedisSerializer)
-						.key(stringRedisSerializer).value(doubleToStringSerializer).build());
+		ReactiveValkeyTemplate<String, Double> doubleTemplate = new ReactiveValkeyTemplate<>(lettuceConnectionFactory,
+				ValkeySerializationContext.<String, Double> newSerializationContext(jdkSerializationValkeySerializer)
+						.key(stringValkeySerializer).value(doubleToStringSerializer).build());
 
-		ReactiveRedisTemplate<ByteBuffer, ByteBuffer> rawTemplate = new ReactiveRedisTemplate<>(lettuceConnectionFactory,
-				RedisSerializationContext.byteBuffer());
+		ReactiveValkeyTemplate<ByteBuffer, ByteBuffer> rawTemplate = new ReactiveValkeyTemplate<>(lettuceConnectionFactory,
+				ValkeySerializationContext.byteBuffer());
 
-		ReactiveRedisTemplate<String, Person> personTemplate = new ReactiveRedisTemplate(lettuceConnectionFactory,
-				RedisSerializationContext.fromSerializer(jdkSerializationRedisSerializer));
+		ReactiveValkeyTemplate<String, Person> personTemplate = new ReactiveValkeyTemplate(lettuceConnectionFactory,
+				ValkeySerializationContext.fromSerializer(jdkSerializationValkeySerializer));
 
 		OxmSerializer oxmSerializer = XstreamOxmSerializerSingleton.getInstance();
-		ReactiveRedisTemplate<String, String> xstreamStringTemplate = new ReactiveRedisTemplate(lettuceConnectionFactory,
-				RedisSerializationContext.fromSerializer(oxmSerializer));
+		ReactiveValkeyTemplate<String, String> xstreamStringTemplate = new ReactiveValkeyTemplate(lettuceConnectionFactory,
+				ValkeySerializationContext.fromSerializer(oxmSerializer));
 
-		ReactiveRedisTemplate<String, Person> xstreamPersonTemplate = new ReactiveRedisTemplate(lettuceConnectionFactory,
-				RedisSerializationContext.fromSerializer(oxmSerializer));
+		ReactiveValkeyTemplate<String, Person> xstreamPersonTemplate = new ReactiveValkeyTemplate(lettuceConnectionFactory,
+				ValkeySerializationContext.fromSerializer(oxmSerializer));
 
-		Jackson2JsonRedisSerializer<Person> jackson2JsonSerializer = new Jackson2JsonRedisSerializer<>(Person.class);
-		ReactiveRedisTemplate<String, Person> jackson2JsonPersonTemplate = new ReactiveRedisTemplate(
-				lettuceConnectionFactory, RedisSerializationContext.fromSerializer(jackson2JsonSerializer));
+		Jackson2JsonValkeySerializer<Person> jackson2JsonSerializer = new Jackson2JsonValkeySerializer<>(Person.class);
+		ReactiveValkeyTemplate<String, Person> jackson2JsonPersonTemplate = new ReactiveValkeyTemplate(
+				lettuceConnectionFactory, ValkeySerializationContext.fromSerializer(jackson2JsonSerializer));
 
-		GenericJackson2JsonRedisSerializer genericJackson2JsonSerializer = new GenericJackson2JsonRedisSerializer();
-		ReactiveRedisTemplate<String, Person> genericJackson2JsonPersonTemplate = new ReactiveRedisTemplate(
-				lettuceConnectionFactory, RedisSerializationContext.fromSerializer(genericJackson2JsonSerializer));
+		GenericJackson2JsonValkeySerializer genericJackson2JsonSerializer = new GenericJackson2JsonValkeySerializer();
+		ReactiveValkeyTemplate<String, Person> genericJackson2JsonPersonTemplate = new ReactiveValkeyTemplate(
+				lettuceConnectionFactory, ValkeySerializationContext.fromSerializer(genericJackson2JsonSerializer));
 
 		List<Fixture<?, ?>> list = Arrays.asList( //
-				new Fixture<>(stringTemplate, stringFactory, stringFactory, stringRedisSerializer, "String"), //
-				new Fixture<>(objectTemplate, personFactory, personFactory, jdkSerializationRedisSerializer, "Person/JDK"), //
+				new Fixture<>(stringTemplate, stringFactory, stringFactory, stringValkeySerializer, "String"), //
+				new Fixture<>(objectTemplate, personFactory, personFactory, jdkSerializationValkeySerializer, "Person/JDK"), //
 				new Fixture<>(longTemplate, stringFactory, longFactory, longToStringSerializer, "Long"), //
 				new Fixture<>(doubleTemplate, stringFactory, doubleFactory, doubleToStringSerializer, "Double"), //
 				new Fixture<>(rawTemplate, rawFactory, rawFactory, null, "raw"), //
-				new Fixture<>(personTemplate, stringFactory, personFactory, jdkSerializationRedisSerializer,
+				new Fixture<>(personTemplate, stringFactory, personFactory, jdkSerializationValkeySerializer,
 						"String/Person/JDK"), //
 				new Fixture<>(xstreamStringTemplate, stringFactory, stringFactory, oxmSerializer, "String/OXM"), //
 				new Fixture<>(xstreamPersonTemplate, stringFactory, personFactory, oxmSerializer, "String/Person/OXM"), //
@@ -120,16 +120,16 @@ abstract public class ReactiveOperationsTestParams {
 
 		if (clusterAvailable()) {
 
-			ReactiveRedisTemplate<String, String> clusterStringTemplate;
+			ReactiveValkeyTemplate<String, String> clusterStringTemplate;
 
 			LettuceConnectionFactory lettuceClusterConnectionFactory = LettuceConnectionFactoryExtension
-					.getConnectionFactory(RedisCluster.class);
+					.getConnectionFactory(ValkeyCluster.class);
 
-			clusterStringTemplate = new ReactiveRedisTemplate<>(lettuceClusterConnectionFactory,
-					RedisSerializationContext.string());
+			clusterStringTemplate = new ReactiveValkeyTemplate<>(lettuceClusterConnectionFactory,
+					ValkeySerializationContext.string());
 
 			list = new ArrayList<>(list);
-			list.add(new Fixture<>(clusterStringTemplate, clusterKeyStringFactory, stringFactory, stringRedisSerializer,
+			list.add(new Fixture<>(clusterStringTemplate, clusterKeyStringFactory, stringFactory, stringValkeySerializer,
 					"Cluster String"));
 		}
 
@@ -137,28 +137,28 @@ abstract public class ReactiveOperationsTestParams {
 	}
 
 	private static boolean clusterAvailable() {
-		return RedisDetector.isClusterAvailable();
+		return ValkeyDetector.isClusterAvailable();
 	}
 
 	static class Fixture<K, V> {
 
-		private final ReactiveRedisTemplate<K, V> template;
+		private final ReactiveValkeyTemplate<K, V> template;
 		private final ObjectFactory<K> keyFactory;
 		private final ObjectFactory<V> valueFactory;
-		private final @Nullable RedisSerializer<K> serializer;
+		private final @Nullable ValkeySerializer<K> serializer;
 		private final String label;
 
-		public Fixture(ReactiveRedisTemplate<?, ?> template, ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory,
-				@Nullable RedisSerializer<?> serializer, String label) {
+		public Fixture(ReactiveValkeyTemplate<?, ?> template, ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory,
+				@Nullable ValkeySerializer<?> serializer, String label) {
 
-			this.template = (ReactiveRedisTemplate) template;
+			this.template = (ReactiveValkeyTemplate) template;
 			this.keyFactory = keyFactory;
 			this.valueFactory = valueFactory;
-			this.serializer = (RedisSerializer) serializer;
+			this.serializer = (ValkeySerializer) serializer;
 			this.label = label;
 		}
 
-		public ReactiveRedisTemplate<K, V> getTemplate() {
+		public ReactiveValkeyTemplate<K, V> getTemplate() {
 			return template;
 		}
 
@@ -171,7 +171,7 @@ abstract public class ReactiveOperationsTestParams {
 		}
 
 		@Nullable
-		public RedisSerializer getSerializer() {
+		public ValkeySerializer getSerializer() {
 			return serializer;
 		}
 

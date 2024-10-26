@@ -53,18 +53,18 @@ import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldIncrBy;
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldSet;
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldSubCommand;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.Flag;
-import org.springframework.data.redis.connection.RedisListCommands.Position;
-import org.springframework.data.redis.connection.RedisServer;
-import org.springframework.data.redis.connection.RedisServerCommands;
-import org.springframework.data.redis.connection.RedisStringCommands.BitOperation;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyGeoCommands;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.Flag;
+import org.springframework.data.redis.connection.ValkeyListCommands.Position;
+import org.springframework.data.redis.connection.ValkeyServer;
+import org.springframework.data.redis.connection.ValkeyServerCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands.BitOperation;
+import org.springframework.data.redis.connection.ValkeyStringCommands.SetOption;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.SortParameters.Order;
 import org.springframework.data.redis.connection.SortParameters.Range;
@@ -72,13 +72,13 @@ import org.springframework.data.redis.connection.ValueEncoding;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.convert.ListConverter;
 import org.springframework.data.redis.connection.convert.SetConverter;
-import org.springframework.data.redis.connection.convert.StringToRedisClientInfoConverter;
+import org.springframework.data.redis.connection.convert.StringToValkeyClientInfoConverter;
 import org.springframework.data.redis.connection.zset.DefaultTuple;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.domain.geo.BoundingBox;
 import org.springframework.data.redis.domain.geo.BoxShape;
 import org.springframework.data.redis.domain.geo.GeoReference;
@@ -212,36 +212,36 @@ abstract class JedisConverters extends Converters {
 	 * @since 1.7
 	 */
 	@SuppressWarnings("unchecked")
-	public static RedisClusterNode toNode(Object source) {
+	public static ValkeyClusterNode toNode(Object source) {
 
 		List<Object> values = (List<Object>) source;
 
-		RedisClusterNode.SlotRange range = new RedisClusterNode.SlotRange(((Number) values.get(0)).intValue(),
+		ValkeyClusterNode.SlotRange range = new ValkeyClusterNode.SlotRange(((Number) values.get(0)).intValue(),
 				((Number) values.get(1)).intValue());
 
 		List<Object> nodeInfo = (List<Object>) values.get(2);
 
-		return new RedisClusterNode(toString((byte[]) nodeInfo.get(0)), ((Number) nodeInfo.get(1)).intValue(), range);
+		return new ValkeyClusterNode(toString((byte[]) nodeInfo.get(0)), ((Number) nodeInfo.get(1)).intValue(), range);
 
 	}
 
 	/**
 	 * @since 1.3
 	 */
-	public static List<RedisClientInfo> toListOfRedisClientInformation(String source) {
+	public static List<ValkeyClientInfo> toListOfValkeyClientInformation(String source) {
 
 		if (!StringUtils.hasText(source)) {
 			return Collections.emptyList();
 		}
 
-		return StringToRedisClientInfoConverter.INSTANCE.convert(source.split("\\r?\\n"));
+		return StringToValkeyClientInfoConverter.INSTANCE.convert(source.split("\\r?\\n"));
 	}
 
 	/**
 	 * @since 1.4
 	 */
-	public static List<RedisServer> toListOfRedisServer(List<Map<String, String>> source) {
-		return toList(it -> RedisServer.newServerFrom(Converters.toProperties(it)), source);
+	public static List<ValkeyServer> toListOfValkeyServer(List<Map<String, String>> source) {
+		return toList(it -> ValkeyServer.newServerFrom(Converters.toProperties(it)), source);
 	}
 
 	public static ListPosition toListPosition(Position source) {
@@ -700,7 +700,7 @@ abstract class JedisConverters extends Converters {
 		return args.toArray(new byte[0][0]);
 	}
 
-	static FlushMode toFlushMode(@Nullable RedisServerCommands.FlushOption option) {
+	static FlushMode toFlushMode(@Nullable ValkeyServerCommands.FlushOption option) {
 
 		if (option == null) {
 			return FlushMode.SYNC;
@@ -713,7 +713,7 @@ abstract class JedisConverters extends Converters {
 	}
 
 	static GeoSearchParam toGeoSearchParams(GeoReference<byte[]> reference, GeoShape predicate,
-			RedisGeoCommands.GeoCommandArgs args) {
+			ValkeyGeoCommands.GeoCommandArgs args) {
 
 		Assert.notNull(reference, "GeoReference must not be null");
 		Assert.notNull(predicate, "GeoShape must not be null");

@@ -29,13 +29,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Simple set of operations required to run queries against Redis.
+ * Simple set of operations required to run queries against Valkey.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisOperationChain {
+public class ValkeyOperationChain {
 
 	private final Set<PathAndValue> sismember = new LinkedHashSet<>();
 	private final Set<PathAndValue> orSismember = new LinkedHashSet<>();

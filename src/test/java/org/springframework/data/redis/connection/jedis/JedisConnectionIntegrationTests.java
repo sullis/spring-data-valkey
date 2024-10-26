@@ -33,18 +33,18 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.SettingsUtils;
 import org.springframework.data.redis.connection.AbstractConnectionIntegrationTests;
 import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.data.redis.connection.DefaultStringTuple;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
 import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
-import org.springframework.data.redis.test.condition.EnabledOnRedisSentinelAvailable;
+import org.springframework.data.redis.connection.StringValkeyConnection.StringTuple;
+import org.springframework.data.redis.test.condition.EnabledOnValkeySentinelAvailable;
 import org.springframework.data.redis.util.ConnectionVerifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -70,7 +70,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 			connection.flushAll();
 		} catch (Exception ignore) {
 			// Jedis leaves some incomplete data in OutputStream on NPE caused by null key/value tests
-			// Attempting to flush the DB or close the connection will result in error on sending QUIT to Redis
+			// Attempting to flush the DB or close the connection will result in error on sending QUIT to Valkey
 		}
 
 		try {
@@ -101,7 +101,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 		factory2.setDatabase(1);
 
 		ConnectionVerifier.create(factory2) //
-				.execute(RedisConnection::ping) //
+				.execute(ValkeyConnection::ping) //
 				.verifyAndClose();
 	}
 
@@ -114,7 +114,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 		factory2.start();
 
 		try {
-			assertThatExceptionOfType(RedisConnectionFailureException.class).isThrownBy(factory2::getConnection);
+			assertThatExceptionOfType(ValkeyConnectionFailureException.class).isThrownBy(factory2::getConnection);
 		} finally {
 			factory2.destroy();
 		}
@@ -135,7 +135,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 
 		try {
 
-			RedisConnection conn2 = factory2.getConnection();
+			ValkeyConnection conn2 = factory2.getConnection();
 			conn2.close();
 			factory2.getConnection();
 		} finally {
@@ -225,7 +225,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 
 			public void run() {
 
-				RedisConnection con = connectionFactory.getConnection();
+				ValkeyConnection con = connectionFactory.getConnection();
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException ex) {
@@ -283,7 +283,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 			public void run() {
 
 				// open a new connection
-				RedisConnection con = connectionFactory.getConnection();
+				ValkeyConnection con = connectionFactory.getConnection();
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException ex) {
@@ -336,7 +336,7 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 		factory2.afterPropertiesSet();
 		factory2.start();
 
-		try (RedisConnection conn = factory2.getConnection()) {
+		try (ValkeyConnection conn = factory2.getConnection()) {
 			conn.get(null);
 		} catch (Exception ignore) {
 		} finally {
@@ -410,11 +410,11 @@ public class JedisConnectionIntegrationTests extends AbstractConnectionIntegrati
 	}
 
 	@Test // DATAREDIS-330
-	@EnabledOnRedisSentinelAvailable
+	@EnabledOnValkeySentinelAvailable
 	void shouldReturnSentinelCommandsWhenWhenActiveSentinelFound() {
 
 		((JedisConnection) byteConnection).setSentinelConfiguration(
-				new RedisSentinelConfiguration().master("mymaster").sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380));
+				new ValkeySentinelConfiguration().master("mymaster").sentinel("127.0.0.1", 26379).sentinel("127.0.0.1", 26380));
 		assertThat(connection.getSentinelConnection()).isNotNull();
 	}
 

@@ -19,13 +19,13 @@ import org.springframework.data.convert.TypeMapper;
 import org.springframework.data.redis.core.convert.Bucket.BucketPropertyPath;
 
 /**
- * Redis-specific {@link TypeMapper} exposing that {@link BucketPropertyPath}s might contain a type key.
+ * Valkey-specific {@link TypeMapper} exposing that {@link BucketPropertyPath}s might contain a type key.
  *
  * @author Mark Paluch
  * @since 2.1
  * @see Bucket.BucketPropertyPath
  */
-public interface RedisTypeMapper extends TypeMapper<BucketPropertyPath> {
+public interface ValkeyTypeMapper extends TypeMapper<BucketPropertyPath> {
 
 	/**
 	 * Returns whether the given {@code key} is the type key.

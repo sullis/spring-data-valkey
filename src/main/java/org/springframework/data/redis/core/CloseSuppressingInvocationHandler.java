@@ -19,13 +19,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.lang.Nullable;
 
 /**
- * Invocation handler that suppresses close calls on {@link RedisConnection}.
+ * Invocation handler that suppresses close calls on {@link ValkeyConnection}.
  *
- * @see RedisConnection#close()
+ * @see ValkeyConnection#close()
  * @author Costin Leau
  * @author Christoph Strobl
  */
@@ -56,7 +56,7 @@ class CloseSuppressingInvocationHandler implements InvocationHandler {
 			return null;
 		}
 
-		// Invoke method on target RedisConnection.
+		// Invoke method on target ValkeyConnection.
 		try {
 			Object returnValue = method.invoke(this.target, args);
 			return returnValue;

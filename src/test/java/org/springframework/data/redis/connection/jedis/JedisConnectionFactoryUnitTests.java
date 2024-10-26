@@ -22,7 +22,7 @@ import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.JedisClientConfig;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.RedisProtocol;
+import redis.clients.jedis.ValkeyProtocol;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -38,10 +38,10 @@ import javax.net.ssl.SSLSocketFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyPassword;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory.State;
 import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -57,10 +57,10 @@ class JedisConnectionFactoryUnitTests {
 
 	private JedisConnectionFactory connectionFactory;
 
-	private static final RedisSentinelConfiguration SINGLE_SENTINEL_CONFIG = new RedisSentinelConfiguration()
+	private static final ValkeySentinelConfiguration SINGLE_SENTINEL_CONFIG = new ValkeySentinelConfiguration()
 			.master("mymaster").sentinel("127.0.0.1", 26379);
 
-	private static final RedisClusterConfiguration CLUSTER_CONFIG = new RedisClusterConfiguration()
+	private static final ValkeyClusterConfiguration CLUSTER_CONFIG = new ValkeyClusterConfiguration()
 			.clusterNode("127.0.0.1", 6379).clusterNode("127.0.0.1", 6380);
 
 	@Test // DATAREDIS-324
@@ -70,25 +70,25 @@ class JedisConnectionFactoryUnitTests {
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		verify(connectionFactory, times(1)).createRedisSentinelPool(eq(SINGLE_SENTINEL_CONFIG));
-		verify(connectionFactory, never()).createRedisPool();
+		verify(connectionFactory, times(1)).createValkeySentinelPool(eq(SINGLE_SENTINEL_CONFIG));
+		verify(connectionFactory, never()).createValkeyPool();
 	}
 
 	@Test // DATAREDIS-324
 	void shouldInitJedisPoolWhenNoSentinelConfigPresent() {
 
-		connectionFactory = initSpyedConnectionFactory((RedisSentinelConfiguration) null, new JedisPoolConfig());
+		connectionFactory = initSpyedConnectionFactory((ValkeySentinelConfiguration) null, new JedisPoolConfig());
 		connectionFactory.afterPropertiesSet();
 		connectionFactory.start();
 
-		verify(connectionFactory, times(1)).createRedisPool();
-		verify(connectionFactory, never()).createRedisSentinelPool(any(RedisSentinelConfiguration.class));
+		verify(connectionFactory, times(1)).createValkeyPool();
+		verify(connectionFactory, never()).createValkeySentinelPool(any(ValkeySentinelConfiguration.class));
 	}
 
 	@Test // DATAREDIS-765
 	void shouldRejectPoolDisablingWhenSentinelConfigPresent() {
 
-		connectionFactory = new JedisConnectionFactory(new RedisSentinelConfiguration());
+		connectionFactory = new JedisConnectionFactory(new ValkeySentinelConfiguration());
 
 		assertThatIllegalStateException().isThrownBy(() -> connectionFactory.setUsePool(false));
 	}
@@ -101,7 +101,7 @@ class JedisConnectionFactoryUnitTests {
 		connectionFactory.start();
 
 		verify(connectionFactory, times(1)).createCluster(eq(CLUSTER_CONFIG), any(GenericObjectPoolConfig.class));
-		verify(connectionFactory, never()).createRedisPool();
+		verify(connectionFactory, never()).createValkeyPool();
 	}
 
 	@Test // DATAREDIS-315
@@ -120,8 +120,8 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReadStandalonePassword() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 
@@ -131,21 +131,21 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteStandalonePassword() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadSentinelPassword() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 
@@ -155,21 +155,21 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteSentinelPassword() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadClusterPassword() {
 
-		RedisClusterConfiguration envConfig = new RedisClusterConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyClusterConfiguration envConfig = new ValkeyClusterConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 
@@ -179,20 +179,20 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteClusterPassword() {
 
-		RedisClusterConfiguration envConfig = new RedisClusterConfiguration();
-		envConfig.setPassword(RedisPassword.of("foo"));
+		ValkeyClusterConfiguration envConfig = new ValkeyClusterConfiguration();
+		envConfig.setPassword(ValkeyPassword.of("foo"));
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
 		connectionFactory.setPassword("bar");
 
 		assertThat(connectionFactory.getPassword()).isEqualTo("bar");
-		assertThat(envConfig.getPassword()).isEqualTo(RedisPassword.of("bar"));
+		assertThat(envConfig.getPassword()).isEqualTo(ValkeyPassword.of("bar"));
 	}
 
 	@Test // DATAREDIS-574
 	void shouldReadStandaloneDatabaseIndex() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
 		envConfig.setDatabase(2);
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
@@ -203,7 +203,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteStandaloneDatabaseIndex() {
 
-		RedisStandaloneConfiguration envConfig = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration envConfig = new ValkeyStandaloneConfiguration();
 		envConfig.setDatabase(2);
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
@@ -216,7 +216,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReadSentinelDatabaseIndex() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
 		envConfig.setDatabase(2);
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
@@ -227,7 +227,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldWriteSentinelDatabaseIndex() {
 
-		RedisSentinelConfiguration envConfig = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration envConfig = new ValkeySentinelConfiguration();
 		envConfig.setDatabase(2);
 
 		connectionFactory = new JedisConnectionFactory(envConfig, JedisClientConfiguration.defaultConfiguration());
@@ -255,7 +255,7 @@ class JedisConnectionFactoryUnitTests {
 				.usePooling().poolConfig(poolConfig) //
 				.build();
 
-		connectionFactory = new JedisConnectionFactory(new RedisStandaloneConfiguration(), configuration);
+		connectionFactory = new JedisConnectionFactory(new ValkeyStandaloneConfiguration(), configuration);
 
 		assertThat(connectionFactory.getClientConfiguration()).isSameAs(configuration);
 		assertThat(connectionFactory.isUseSsl()).isTrue();
@@ -268,7 +268,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnStandaloneConfiguration() {
 
-		RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+		ValkeyStandaloneConfiguration configuration = new ValkeyStandaloneConfiguration();
 		connectionFactory = new JedisConnectionFactory(configuration, JedisClientConfiguration.defaultConfiguration());
 
 		assertThat(connectionFactory.getStandaloneConfiguration()).isSameAs(configuration);
@@ -279,7 +279,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnSentinelConfiguration() {
 
-		RedisSentinelConfiguration configuration = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration configuration = new ValkeySentinelConfiguration();
 		connectionFactory = new JedisConnectionFactory(configuration, JedisClientConfiguration.defaultConfiguration());
 
 		assertThat(connectionFactory.getStandaloneConfiguration()).isNotNull();
@@ -290,7 +290,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // GH-2218
 	void shouldConsiderSentinelAuthentication() {
 
-		RedisSentinelConfiguration configuration = new RedisSentinelConfiguration();
+		ValkeySentinelConfiguration configuration = new ValkeySentinelConfiguration();
 		configuration.setSentinelUsername("sentinel");
 		configuration.setSentinelPassword("the-password");
 		connectionFactory = new JedisConnectionFactory(configuration, JedisClientConfiguration.defaultConfiguration());
@@ -304,7 +304,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldReturnClusterConfiguration() {
 
-		RedisClusterConfiguration configuration = new RedisClusterConfiguration();
+		ValkeyClusterConfiguration configuration = new ValkeyClusterConfiguration();
 		connectionFactory = new JedisConnectionFactory(configuration, JedisClientConfiguration.defaultConfiguration());
 
 		assertThat(connectionFactory.getStandaloneConfiguration()).isNotNull();
@@ -315,7 +315,7 @@ class JedisConnectionFactoryUnitTests {
 	@Test // DATAREDIS-574
 	void shouldDenyChangesToImmutableClientConfiguration() throws NoSuchAlgorithmException {
 
-		connectionFactory = new JedisConnectionFactory(new RedisStandaloneConfiguration(),
+		connectionFactory = new JedisConnectionFactory(new ValkeyStandaloneConfiguration(),
 				JedisClientConfiguration.defaultConfiguration());
 
 		assertThatIllegalStateException().isThrownBy(() -> connectionFactory.setClientName("foo"));
@@ -346,17 +346,17 @@ class JedisConnectionFactoryUnitTests {
 		JedisClientConfig resp3Config = apply(
 				JedisClientConfiguration.builder().customize(DefaultJedisClientConfig.Builder::resp3).build());
 
-		assertThat(resp3Config.getRedisProtocol()).isEqualTo(RedisProtocol.RESP3);
+		assertThat(resp3Config.getValkeyProtocol()).isEqualTo(ValkeyProtocol.RESP3);
 
 		JedisClientConfig resp2Config = apply(
-				JedisClientConfiguration.builder().customize(it -> it.protocol(RedisProtocol.RESP2)).build());
+				JedisClientConfiguration.builder().customize(it -> it.protocol(ValkeyProtocol.RESP2)).build());
 
-		assertThat(resp2Config.getRedisProtocol()).isEqualTo(RedisProtocol.RESP2);
+		assertThat(resp2Config.getValkeyProtocol()).isEqualTo(ValkeyProtocol.RESP2);
 	}
 
 	private static JedisClientConfig apply(JedisClientConfiguration configuration) {
 
-		JedisConnectionFactory connectionFactory = new JedisConnectionFactory(new RedisStandaloneConfiguration(),
+		JedisConnectionFactory connectionFactory = new JedisConnectionFactory(new ValkeyStandaloneConfiguration(),
 				configuration);
 		connectionFactory.setEarlyStartup(false);
 		connectionFactory.afterPropertiesSet();
@@ -379,30 +379,30 @@ class JedisConnectionFactoryUnitTests {
 		assertThat(ReflectionTestUtils.getField(connectionFactory, "pool")).isNull();
 	}
 
-	private JedisConnectionFactory initSpyedConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
+	private JedisConnectionFactory initSpyedConnectionFactory(ValkeySentinelConfiguration sentinelConfiguration,
 			@Nullable JedisPoolConfig poolConfig) {
 
 		// we have to use a spy here as jedis would start connecting to redis sentinels when the pool is created.
 		JedisConnectionFactory connectionFactorySpy = spy(new JedisConnectionFactory(sentinelConfiguration, poolConfig));
 
-		doReturn(null).when(connectionFactorySpy).createRedisSentinelPool(any(RedisSentinelConfiguration.class));
+		doReturn(null).when(connectionFactorySpy).createValkeySentinelPool(any(ValkeySentinelConfiguration.class));
 
-		doReturn(null).when(connectionFactorySpy).createRedisPool();
+		doReturn(null).when(connectionFactorySpy).createValkeyPool();
 
 		return connectionFactorySpy;
 	}
 
-	private JedisConnectionFactory initSpyedConnectionFactory(RedisClusterConfiguration clusterConfiguration,
+	private JedisConnectionFactory initSpyedConnectionFactory(ValkeyClusterConfiguration clusterConfiguration,
 			@Nullable JedisPoolConfig poolConfig) {
 
 		JedisCluster clusterMock = mock(JedisCluster.class);
 
 		JedisConnectionFactory connectionFactorySpy = spy(new JedisConnectionFactory(clusterConfiguration, poolConfig));
 
-		doReturn(clusterMock).when(connectionFactorySpy).createCluster(any(RedisClusterConfiguration.class),
+		doReturn(clusterMock).when(connectionFactorySpy).createCluster(any(ValkeyClusterConfiguration.class),
 				any(GenericObjectPoolConfig.class));
 
-		doReturn(null).when(connectionFactorySpy).createRedisPool();
+		doReturn(null).when(connectionFactorySpy).createValkeyPool();
 
 		return connectionFactorySpy;
 	}

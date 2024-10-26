@@ -40,21 +40,21 @@ import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.cache.support.NullValue;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.serializer.ValkeySerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 import org.springframework.data.redis.test.condition.EnabledOnCommand;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver;
-import org.springframework.data.redis.test.condition.EnabledOnRedisDriver.DriverQualifier;
-import org.springframework.data.redis.test.condition.RedisDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver;
+import org.springframework.data.redis.test.condition.EnabledOnValkeyDriver.DriverQualifier;
+import org.springframework.data.redis.test.condition.ValkeyDriver;
 import org.springframework.data.redis.test.extension.parametrized.MethodSource;
-import org.springframework.data.redis.test.extension.parametrized.ParameterizedRedisTest;
+import org.springframework.data.redis.test.extension.parametrized.ParameterizedValkeyTest;
 import org.springframework.lang.Nullable;
 
 /**
- * Tests for {@link RedisCache} with {@link DefaultRedisCacheWriter} using different {@link RedisSerializer} and
- * {@link RedisConnectionFactory} pairs.
+ * Tests for {@link ValkeyCache} with {@link DefaultValkeyCacheWriter} using different {@link ValkeySerializer} and
+ * {@link ValkeyConnectionFactory} pairs.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -63,7 +63,7 @@ import org.springframework.lang.Nullable;
  * @author John Blum
  */
 @MethodSource("testParams")
-public class RedisCacheTests {
+public class ValkeyCacheTests {
 
 	private String key = "key-1";
 	private String cacheKey = "cache::" + key;
@@ -72,13 +72,13 @@ public class RedisCacheTests {
 	private Person sample = new Person("calmity", new Date());
 	private byte[] binarySample;
 
-	private byte[] binaryNullValue = RedisSerializer.java().serialize(NullValue.INSTANCE);
+	private byte[] binaryNullValue = ValkeySerializer.java().serialize(NullValue.INSTANCE);
 
-	private final @DriverQualifier RedisConnectionFactory connectionFactory;
-	private RedisSerializer serializer;
-	private RedisCache cache;
+	private final @DriverQualifier ValkeyConnectionFactory connectionFactory;
+	private ValkeySerializer serializer;
+	private ValkeyCache cache;
 
-	public RedisCacheTests(RedisConnectionFactory connectionFactory, RedisSerializer serializer) {
+	public ValkeyCacheTests(ValkeyConnectionFactory connectionFactory, ValkeySerializer serializer) {
 
 		this.connectionFactory = connectionFactory;
 		this.serializer = serializer;
@@ -92,12 +92,12 @@ public class RedisCacheTests {
 	@BeforeEach
 	void setUp() {
 
-		doWithConnection(RedisConnection::flushAll);
+		doWithConnection(ValkeyConnection::flushAll);
 
-		this.cache = new RedisCache("cache", usingRedisCacheWriter(), usingRedisCacheConfiguration());
+		this.cache = new ValkeyCache("cache", usingValkeyCacheWriter(), usingValkeyCacheConfiguration());
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putShouldAddEntry() {
 
 		cache.put("key-1", sample);
@@ -105,7 +105,7 @@ public class RedisCacheTests {
 		doWithConnection(connection -> assertThat(connection.exists(binaryCacheKey)).isTrue());
 	}
 
-	@ParameterizedRedisTest // GH-2379
+	@ParameterizedValkeyTest // GH-2379
 	void cacheShouldBeClearedByPattern() {
 
 		cache.put(key, sample);
@@ -116,7 +116,7 @@ public class RedisCacheTests {
 		doWithConnection(connection -> assertThat(connection.exists(binaryCacheKey)).isFalse());
 	}
 
-	@ParameterizedRedisTest // GH-2379
+	@ParameterizedValkeyTest // GH-2379
 	void cacheShouldNotBeClearedIfNoPatternMatch() {
 
 		cache.put(key, sample);
@@ -127,7 +127,7 @@ public class RedisCacheTests {
 		doWithConnection(connection -> assertThat(connection.exists(binaryCacheKey)).isTrue());
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putNullShouldAddEntryForNullValue() {
 
 		cache.put("key-1", null);
@@ -138,7 +138,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putIfAbsentShouldAddEntryIfNotExists() {
 
 		cache.putIfAbsent("key-1", sample);
@@ -149,7 +149,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putIfAbsentWithNullShouldAddNullValueEntryIfNotExists() {
 
 		assertThat(cache.putIfAbsent("key-1", null)).isNull();
@@ -160,7 +160,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putIfAbsentShouldReturnExistingIfExists() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binarySample));
@@ -173,7 +173,7 @@ public class RedisCacheTests {
 		doWithConnection(connection -> assertThat(connection.get(binaryCacheKey)).isEqualTo(binarySample));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void putIfAbsentShouldReturnExistingNullValueIfExists() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryNullValue));
@@ -186,7 +186,7 @@ public class RedisCacheTests {
 		doWithConnection(connection -> assertThat(connection.get(binaryCacheKey)).isEqualTo(binaryNullValue));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getShouldRetrieveEntry() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binarySample));
@@ -196,7 +196,7 @@ public class RedisCacheTests {
 		assertThat(result.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void shouldReadAndWriteSimpleCacheKey() {
 
 		SimpleKey key = new SimpleKey("param-1", "param-2");
@@ -208,7 +208,7 @@ public class RedisCacheTests {
 		assertThat(result.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void shouldRejectNonInvalidKey() {
 
 		InvalidKey key = new InvalidKey(sample.getFirstname(), sample.getBirthdate());
@@ -216,7 +216,7 @@ public class RedisCacheTests {
 		assertThatIllegalStateException().isThrownBy(() -> cache.put(key, sample));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void shouldAllowComplexKeyWithToStringMethod() {
 
 		ComplexKey key = new ComplexKey(sample.getFirstname(), sample.getBirthdate());
@@ -229,12 +229,12 @@ public class RedisCacheTests {
 		assertThat(result.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getShouldReturnNullWhenKeyDoesNotExist() {
 		assertThat(cache.get(key)).isNull();
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getShouldReturnValueWrapperHoldingNullIfNullValueStored() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryNullValue));
@@ -245,7 +245,7 @@ public class RedisCacheTests {
 		assertThat(result.get()).isEqualTo(null);
 	}
 
-	@ParameterizedRedisTest // GH-2890
+	@ParameterizedValkeyTest // GH-2890
 	void getWithValueLoaderShouldStoreNull() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryNullValue));
@@ -257,7 +257,7 @@ public class RedisCacheTests {
 		assertThat(result).isNull();
 	}
 
-	@ParameterizedRedisTest // GH-2890
+	@ParameterizedValkeyTest // GH-2890
 	void getWithValueLoaderShouldRetrieveValue() {
 
 		AtomicLong counter = new AtomicLong();
@@ -276,7 +276,7 @@ public class RedisCacheTests {
 		assertThat(counter).hasValue(1);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void evictShouldRemoveKey() {
 
 		doWithConnection(connection -> {
@@ -292,7 +292,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-2028
+	@ParameterizedValkeyTest // GH-2028
 	void clearShouldClearCache() {
 
 		doWithConnection(connection -> {
@@ -308,13 +308,13 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-1721
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE) // SCAN not supported via Jedis Cluster.
+	@ParameterizedValkeyTest // GH-1721
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE) // SCAN not supported via Jedis Cluster.
 	void clearWithScanShouldClearCache() {
 
-		RedisCache cache = new RedisCache("cache",
-				RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory, BatchStrategies.scan(25)),
-				RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer)));
+		ValkeyCache cache = new ValkeyCache("cache",
+				ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory, BatchStrategies.scan(25)),
+				ValkeyCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer)));
 
 		doWithConnection(connection -> {
 			connection.set(binaryCacheKey, binaryNullValue);
@@ -331,7 +331,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getWithCallableShouldResolveValueIfNotPresent() {
 
 		assertThat(cache.get(key, () -> sample)).isEqualTo(sample);
@@ -342,7 +342,7 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-481
+	@ParameterizedValkeyTest // DATAREDIS-481
 	void getWithCallableShouldNotResolveValueIfPresent() {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryNullValue));
@@ -357,12 +357,12 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-715
+	@ParameterizedValkeyTest // DATAREDIS-715
 	void computePrefixCreatesCacheKeyCorrectly() {
 
-		RedisCache cacheWithCustomPrefix = new RedisCache("cache",
-				RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory),
-				RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer))
+		ValkeyCache cacheWithCustomPrefix = new ValkeyCache("cache",
+				ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory),
+				ValkeyCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer))
 						.computePrefixWith(cacheName -> "_" + cacheName + "_"));
 
 		cacheWithCustomPrefix.put("key-1", sample);
@@ -372,11 +372,11 @@ public class RedisCacheTests {
 						.isEqualTo(binarySample));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1041
+	@ParameterizedValkeyTest // DATAREDIS-1041
 	void prefixCacheNameCreatesCacheKeyCorrectly() {
 
-		RedisCache cacheWithCustomPrefix = new RedisCache("cache",
-				RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory), RedisCacheConfiguration.defaultCacheConfig()
+		ValkeyCache cacheWithCustomPrefix = new ValkeyCache("cache",
+				ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory), ValkeyCacheConfiguration.defaultCacheConfig()
 						.serializeValuesWith(SerializationPair.fromSerializer(serializer)).prefixCacheNameWith("redis::"));
 
 		cacheWithCustomPrefix.put("key-1", sample);
@@ -386,14 +386,14 @@ public class RedisCacheTests {
 				.isEqualTo(binarySample));
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-715
+	@ParameterizedValkeyTest // DATAREDIS-715
 	void fetchKeyWithComputedPrefixReturnsExpectedResult() {
 
 		doWithConnection(connection -> connection.set("_cache_key-1".getBytes(StandardCharsets.UTF_8), binarySample));
 
-		RedisCache cacheWithCustomPrefix = new RedisCache("cache",
-				RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory),
-				RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer))
+		ValkeyCache cacheWithCustomPrefix = new ValkeyCache("cache",
+				ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory),
+				ValkeyCacheConfiguration.defaultCacheConfig().serializeValuesWith(SerializationPair.fromSerializer(serializer))
 						.computePrefixWith(cacheName -> "_" + cacheName + "_"));
 
 		ValueWrapper result = cacheWithCustomPrefix.get(key);
@@ -402,7 +402,7 @@ public class RedisCacheTests {
 		assertThat(result.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1032
+	@ParameterizedValkeyTest // DATAREDIS-1032
 	void cacheShouldAllowListKeyCacheKeysOfSimpleTypes() {
 
 		Object key = SimpleKeyGenerator.generateKey(Collections.singletonList("my-cache-key-in-a-list"));
@@ -414,7 +414,7 @@ public class RedisCacheTests {
 		assertThat(target.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1032
+	@ParameterizedValkeyTest // DATAREDIS-1032
 	void cacheShouldAllowArrayKeyCacheKeysOfSimpleTypes() {
 
 		Object key = SimpleKeyGenerator.generateKey("my-cache-key-in-an-array");
@@ -425,7 +425,7 @@ public class RedisCacheTests {
 		assertThat(target.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1032
+	@ParameterizedValkeyTest // DATAREDIS-1032
 	void cacheShouldAllowListCacheKeysOfComplexTypes() {
 
 		Object key = SimpleKeyGenerator
@@ -438,7 +438,7 @@ public class RedisCacheTests {
 		assertThat(target.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1032
+	@ParameterizedValkeyTest // DATAREDIS-1032
 	void cacheShouldAllowMapCacheKeys() {
 
 		Object key = SimpleKeyGenerator
@@ -451,7 +451,7 @@ public class RedisCacheTests {
 		assertThat(target.get()).isEqualTo(sample);
 	}
 
-	@ParameterizedRedisTest // DATAREDIS-1032
+	@ParameterizedValkeyTest // DATAREDIS-1032
 	void cacheShouldFailOnNonConvertibleCacheKey() {
 
 		Object key = SimpleKeyGenerator
@@ -461,13 +461,13 @@ public class RedisCacheTests {
 	}
 
 	@EnabledOnCommand("GETEX")
-	@ParameterizedRedisTest // GH-2351
+	@ParameterizedValkeyTest // GH-2351
 	void cacheGetWithTimeToIdleExpirationWhenEntryNotExpiredShouldReturnValue() {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binarySample));
 
-		RedisCache cache = new RedisCache("cache", usingRedisCacheWriter(),
-				usingRedisCacheConfiguration(withTtiExpiration()));
+		ValkeyCache cache = new ValkeyCache("cache", usingValkeyCacheWriter(),
+				usingValkeyCacheConfiguration(withTtiExpiration()));
 
 		assertThat(unwrap(cache.get(this.key))).isEqualTo(this.sample);
 
@@ -478,13 +478,13 @@ public class RedisCacheTests {
 	}
 
 	@EnabledOnCommand("GETEX")
-	@ParameterizedRedisTest // GH-2351
+	@ParameterizedValkeyTest // GH-2351
 	void cacheGetWithTimeToIdleExpirationAfterEntryExpiresShouldReturnNull() {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binarySample));
 
-		RedisCache cache = new RedisCache("cache", usingRedisCacheWriter(),
-				usingRedisCacheConfiguration(withTtiExpiration()));
+		ValkeyCache cache = new ValkeyCache("cache", usingValkeyCacheWriter(),
+				usingValkeyCacheConfiguration(withTtiExpiration()));
 
 		assertThat(unwrap(cache.get(this.key))).isEqualTo(this.sample);
 
@@ -493,31 +493,31 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.JEDIS)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.JEDIS)
 	void retrieveCacheValueUsingJedis() {
 
 		assertThatExceptionOfType(UnsupportedOperationException.class)
-				.isThrownBy(() -> this.cache.retrieve(this.binaryCacheKey)).withMessageContaining("RedisCache");
+				.isThrownBy(() -> this.cache.retrieve(this.binaryCacheKey)).withMessageContaining("ValkeyCache");
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.JEDIS)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.JEDIS)
 	void retrieveLoadedValueUsingJedis() {
 
 		assertThatExceptionOfType(UnsupportedOperationException.class)
 				.isThrownBy(() -> this.cache.retrieve(this.binaryCacheKey, () -> usingCompletedFuture("TEST")))
-				.withMessageContaining("RedisCache");
+				.withMessageContaining("ValkeyCache");
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsCachedValue() throws Exception {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binarySample));
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(),
-				usingRedisCacheConfiguration().disableCachingNullValues());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(),
+				usingValkeyCacheConfiguration().disableCachingNullValues());
 
 		CompletableFuture<ValueWrapper> value = cache.retrieve(this.key);
 
@@ -531,14 +531,14 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-2890
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2890
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveAppliesTimeToIdle() throws ExecutionException, InterruptedException {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binarySample));
 
-		RedisCache cache = new RedisCache("cache", usingRedisCacheWriter(),
-				usingRedisCacheConfiguration(withTtiExpiration()));
+		ValkeyCache cache = new ValkeyCache("cache", usingValkeyCacheWriter(),
+				usingValkeyCacheConfiguration(withTtiExpiration()));
 
 		CompletableFuture<ValueWrapper> value = cache.retrieve(this.key);
 
@@ -551,13 +551,13 @@ public class RedisCacheTests {
 		});
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsCachedNullableValue() throws Exception {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binarySample));
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(), usingRedisCacheConfiguration());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(), usingValkeyCacheConfiguration());
 
 		CompletableFuture<ValueWrapper> value = cache.retrieve(this.key);
 
@@ -566,8 +566,8 @@ public class RedisCacheTests {
 		assertThat(value).isDone();
 	}
 
-	@ParameterizedRedisTest // GH-2783
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2783
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsCachedNullValue() throws Exception {
 
 		doWithConnection(connection -> connection.set(binaryCacheKey, binaryNullValue));
@@ -579,8 +579,8 @@ public class RedisCacheTests {
 		assertThat(wrapper.get()).isNull();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsCachedValueWhenLockIsReleased() throws Exception {
 
 		String testValue = "TestValue";
@@ -589,10 +589,10 @@ public class RedisCacheTests {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, binaryCacheValue));
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(Duration.ofMillis(5L)),
-				usingRedisCacheConfiguration());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(Duration.ofMillis(5L)),
+				usingValkeyCacheConfiguration());
 
-		DefaultRedisCacheWriter cacheWriter = (DefaultRedisCacheWriter) cache.getCacheWriter();
+		DefaultValkeyCacheWriter cacheWriter = (DefaultValkeyCacheWriter) cache.getCacheWriter();
 
 		cacheWriter.lock("cache");
 
@@ -605,15 +605,15 @@ public class RedisCacheTests {
 		assertThat(value).isDone();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsLoadedValue() throws Exception {
 
 		AtomicBoolean loaded = new AtomicBoolean(false);
 		Person jon = new Person("Jon", Date.from(Instant.now()));
 		CompletableFuture<Person> valueLoader = CompletableFuture.completedFuture(jon);
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(), usingRedisCacheConfiguration());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(), usingValkeyCacheConfiguration());
 
 		Supplier<CompletableFuture<Person>> valueLoaderSupplier = () -> {
 			loaded.set(true);
@@ -627,14 +627,14 @@ public class RedisCacheTests {
 		assertThat(value).isDone();
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveStoresLoadedValue() throws Exception {
 
 		Person jon = new Person("Jon", Date.from(Instant.now()));
 		Supplier<CompletableFuture<Person>> valueLoaderSupplier = () -> CompletableFuture.completedFuture(jon);
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(), usingRedisCacheConfiguration());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(), usingValkeyCacheConfiguration());
 
 		cache.retrieve(this.key, valueLoaderSupplier).get();
 
@@ -643,13 +643,13 @@ public class RedisCacheTests {
 						.isTrue());
 	}
 
-	@ParameterizedRedisTest // GH-2650
-	@EnabledOnRedisDriver(RedisDriver.LETTUCE)
+	@ParameterizedValkeyTest // GH-2650
+	@EnabledOnValkeyDriver(ValkeyDriver.LETTUCE)
 	void retrieveReturnsNull() throws Exception {
 
 		doWithConnection(connection -> connection.stringCommands().set(this.binaryCacheKey, this.binaryNullValue));
 
-		RedisCache cache = new RedisCache("cache", usingLockingRedisCacheWriter(), usingRedisCacheConfiguration());
+		ValkeyCache cache = new ValkeyCache("cache", usingLockingValkeyCacheWriter(), usingValkeyCacheConfiguration());
 
 		CompletableFuture<ValueWrapper> value = cache.retrieve(this.key);
 
@@ -669,32 +669,32 @@ public class RedisCacheTests {
 		return CompletableFuture.completedFuture(value);
 	}
 
-	private RedisCacheConfiguration usingRedisCacheConfiguration() {
-		return usingRedisCacheConfiguration(Function.identity());
+	private ValkeyCacheConfiguration usingValkeyCacheConfiguration() {
+		return usingValkeyCacheConfiguration(Function.identity());
 	}
 
-	private RedisCacheConfiguration usingRedisCacheConfiguration(
-			Function<RedisCacheConfiguration, RedisCacheConfiguration> customizer) {
+	private ValkeyCacheConfiguration usingValkeyCacheConfiguration(
+			Function<ValkeyCacheConfiguration, ValkeyCacheConfiguration> customizer) {
 
-		return customizer.apply(RedisCacheConfiguration.defaultCacheConfig()
+		return customizer.apply(ValkeyCacheConfiguration.defaultCacheConfig()
 				.serializeValuesWith(SerializationPair.fromSerializer(this.serializer)));
 	}
 
-	private RedisCacheWriter usingRedisCacheWriter() {
-		return usingNonLockingRedisCacheWriter();
+	private ValkeyCacheWriter usingValkeyCacheWriter() {
+		return usingNonLockingValkeyCacheWriter();
 	}
 
-	private RedisCacheWriter usingLockingRedisCacheWriter() {
-		return RedisCacheWriter.lockingRedisCacheWriter(this.connectionFactory);
+	private ValkeyCacheWriter usingLockingValkeyCacheWriter() {
+		return ValkeyCacheWriter.lockingValkeyCacheWriter(this.connectionFactory);
 	}
 
-	private RedisCacheWriter usingLockingRedisCacheWriter(Duration sleepTime) {
-		return RedisCacheWriter.lockingRedisCacheWriter(this.connectionFactory, sleepTime,
-				RedisCacheWriter.TtlFunction.persistent(), BatchStrategies.keys());
+	private ValkeyCacheWriter usingLockingValkeyCacheWriter(Duration sleepTime) {
+		return ValkeyCacheWriter.lockingValkeyCacheWriter(this.connectionFactory, sleepTime,
+				ValkeyCacheWriter.TtlFunction.persistent(), BatchStrategies.keys());
 	}
 
-	private RedisCacheWriter usingNonLockingRedisCacheWriter() {
-		return RedisCacheWriter.nonLockingRedisCacheWriter(this.connectionFactory);
+	private ValkeyCacheWriter usingNonLockingValkeyCacheWriter() {
+		return ValkeyCacheWriter.nonLockingValkeyCacheWriter(this.connectionFactory);
 	}
 
 	@Nullable
@@ -702,16 +702,16 @@ public class RedisCacheTests {
 		return value instanceof ValueWrapper wrapper ? wrapper.get() : value;
 	}
 
-	private Function<RedisCacheConfiguration, RedisCacheConfiguration> withTtiExpiration() {
+	private Function<ValkeyCacheConfiguration, ValkeyCacheConfiguration> withTtiExpiration() {
 
-		Function<RedisCacheConfiguration, RedisCacheConfiguration> entryTtlFunction = cacheConfiguration -> cacheConfiguration
+		Function<ValkeyCacheConfiguration, ValkeyCacheConfiguration> entryTtlFunction = cacheConfiguration -> cacheConfiguration
 				.entryTtl(Duration.ofSeconds(10));
 
-		return entryTtlFunction.andThen(RedisCacheConfiguration::enableTimeToIdle);
+		return entryTtlFunction.andThen(ValkeyCacheConfiguration::enableTimeToIdle);
 	}
 
-	void doWithConnection(Consumer<RedisConnection> callback) {
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+	void doWithConnection(Consumer<ValkeyConnection> callback) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			callback.accept(connection);
 		}
 	}
@@ -766,7 +766,7 @@ public class RedisCacheTests {
 
 		@Override
 		public String toString() {
-			return "RedisCacheTests.Person(firstname=" + this.getFirstname() + ", birthdate=" + this.getBirthdate() + ")";
+			return "ValkeyCacheTests.Person(firstname=" + this.getFirstname() + ", birthdate=" + this.getBirthdate() + ")";
 		}
 	}
 
@@ -822,7 +822,7 @@ public class RedisCacheTests {
 
 		@Override
 		public String toString() {
-			return "RedisCacheTests.ComplexKey(firstame=" + this.getFirstname() + ", birthdate=" + this.getBirthdate() + ")";
+			return "ValkeyCacheTests.ComplexKey(firstame=" + this.getFirstname() + ", birthdate=" + this.getBirthdate() + ")";
 		}
 	}
 }

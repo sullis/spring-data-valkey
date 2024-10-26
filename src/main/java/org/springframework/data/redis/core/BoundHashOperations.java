@@ -94,7 +94,7 @@ public interface BoundHashOperations<H, HK, HV> extends BoundKeyOperations<H> {
 	 *
 	 * @return {@literal null} if the hash does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	HK randomKey();
@@ -104,7 +104,7 @@ public interface BoundHashOperations<H, HK, HV> extends BoundKeyOperations<H> {
 	 *
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	Map.Entry<HK, HV> randomEntry();
@@ -118,7 +118,7 @@ public interface BoundHashOperations<H, HK, HV> extends BoundKeyOperations<H> {
 	 * @param count number of keys to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	List<HK> randomKeys(long count);
@@ -129,7 +129,7 @@ public interface BoundHashOperations<H, HK, HV> extends BoundKeyOperations<H> {
 	 * @param count number of entries to return. Must be positive.
 	 * @return {@literal null} if the hash does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	@Nullable
 	Map<HK, HV> randomEntries(long count);
@@ -216,5 +216,5 @@ public interface BoundHashOperations<H, HK, HV> extends BoundKeyOperations<H> {
 	/**
 	 * @return never {@literal null}.
 	 */
-	RedisOperations<H, ?> getOperations();
+	ValkeyOperations<H, ?> getOperations();
 }

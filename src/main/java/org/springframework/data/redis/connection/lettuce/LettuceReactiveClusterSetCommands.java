@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.ReactiveClusterSetCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.util.Assert;
 
 /**
@@ -43,7 +43,7 @@ class LettuceReactiveClusterSetCommands extends LettuceReactiveSetCommands imple
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveClusterSetCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveClusterSetCommands(LettuceReactiveValkeyConnection connection) {
 		super(connection);
 	}
 

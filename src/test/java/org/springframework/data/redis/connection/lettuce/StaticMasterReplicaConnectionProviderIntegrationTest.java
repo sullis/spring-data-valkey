@@ -18,10 +18,10 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 
 import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
 import io.lettuce.core.codec.ByteArrayCodec;
-import io.lettuce.core.masterreplica.StatefulRedisMasterReplicaConnection;
+import io.lettuce.core.masterreplica.StatefulValkeyMasterReplicaConnection;
 
 import java.util.Collections;
 import java.util.concurrent.CompletionStage;
@@ -43,16 +43,16 @@ import org.springframework.data.redis.test.extension.LettuceExtension;
 @ExtendWith(LettuceExtension.class)
 class StaticMasterReplicaConnectionProviderIntegrationTest {
 
-	RedisURI uri = RedisURI.create(SettingsUtils.getHost(), SettingsUtils.getPort());
+	ValkeyURI uri = ValkeyURI.create(SettingsUtils.getHost(), SettingsUtils.getPort());
 
 	@Test
-	void shouldConnectToMasterReplicaSynchronously(RedisClient redisClient) {
+	void shouldConnectToMasterReplicaSynchronously(ValkeyClient redisClient) {
 
 		StaticMasterReplicaConnectionProvider connectionProvider = new StaticMasterReplicaConnectionProvider(redisClient,
 				ByteArrayCodec.INSTANCE, Collections.singletonList(uri), ReadFrom.REPLICA);
 
-		StatefulRedisMasterReplicaConnection<?, ?> connection = connectionProvider
-				.getConnection(StatefulRedisMasterReplicaConnection.class);
+		StatefulValkeyMasterReplicaConnection<?, ?> connection = connectionProvider
+				.getConnection(StatefulValkeyMasterReplicaConnection.class);
 
 		assertThat(connection.getReadFrom()).isEqualTo(ReadFrom.REPLICA);
 
@@ -61,16 +61,16 @@ class StaticMasterReplicaConnectionProviderIntegrationTest {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	void shouldConnectToMasterReplicaAsync(RedisClient redisClient)
+	void shouldConnectToMasterReplicaAsync(ValkeyClient redisClient)
 			throws ExecutionException, InterruptedException, TimeoutException {
 
 		StaticMasterReplicaConnectionProvider connectionProvider = new StaticMasterReplicaConnectionProvider(redisClient,
 				ByteArrayCodec.INSTANCE, Collections.singletonList(uri), ReadFrom.REPLICA);
 
-		CompletionStage<StatefulRedisMasterReplicaConnection> future = connectionProvider
-				.getConnectionAsync(StatefulRedisMasterReplicaConnection.class);
+		CompletionStage<StatefulValkeyMasterReplicaConnection> future = connectionProvider
+				.getConnectionAsync(StatefulValkeyMasterReplicaConnection.class);
 
-		StatefulRedisMasterReplicaConnection<?, ?> connection = future.toCompletableFuture().get(5, TimeUnit.SECONDS);
+		StatefulValkeyMasterReplicaConnection<?, ?> connection = future.toCompletableFuture().get(5, TimeUnit.SECONDS);
 		assertThat(connection.getReadFrom()).isEqualTo(ReadFrom.REPLICA);
 
 		connectionProvider.release(connection);

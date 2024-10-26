@@ -27,13 +27,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.core.ValkeyHash;
+import org.springframework.data.redis.core.ValkeyKeyValueAdapter;
+import org.springframework.data.redis.core.ValkeyTemplate;
 import org.springframework.data.redis.core.convert.ReferenceResolver;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
 import org.springframework.data.repository.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,18 +41,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * Unit tests for Redis Repository configuration.
+ * Unit tests for Valkey Repository configuration.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public class RedisRepositoryConfigurationUnitTests {
+public class ValkeyRepositoryConfigurationUnitTests {
 
-	static RedisTemplate<?, ?> createTemplateMock() {
+	static ValkeyTemplate<?, ?> createTemplateMock() {
 
-		RedisTemplate<?, ?> template = mock(RedisTemplate.class);
-		RedisConnectionFactory connectionFactory = mock(RedisConnectionFactory.class);
-		RedisConnection connection = mock(RedisConnection.class);
+		ValkeyTemplate<?, ?> template = mock(ValkeyTemplate.class);
+		ValkeyConnectionFactory connectionFactory = mock(ValkeyConnectionFactory.class);
+		ValkeyConnection connection = mock(ValkeyConnection.class);
 
 		when(template.getConnectionFactory()).thenReturn(connectionFactory);
 		when(connectionFactory.getConnection()).thenReturn(connection);
@@ -65,12 +65,12 @@ public class RedisRepositoryConfigurationUnitTests {
 	@ContextConfiguration(classes = { ContextWithCustomReferenceResolverUnitTests.Config.class })
 	public static class ContextWithCustomReferenceResolverUnitTests {
 
-		@EnableRedisRepositories(considerNestedRepositories = true,
+		@EnableValkeyRepositories(considerNestedRepositories = true,
 				includeFilters = { @ComponentScan.Filter(type = FilterType.REGEX, pattern = { ".*ContextSampleRepository" }) })
 		static class Config {
 
 			@Bean
-			RedisTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> redisTemplate() {
 				return createTemplateMock();
 			}
 
@@ -86,7 +86,7 @@ public class RedisRepositoryConfigurationUnitTests {
 		@Test // DATAREDIS-425
 		public void shouldPickUpReferenceResolver() {
 
-			RedisKeyValueAdapter adapter = (RedisKeyValueAdapter) ctx.getBean("redisKeyValueAdapter");
+			ValkeyKeyValueAdapter adapter = (ValkeyKeyValueAdapter) ctx.getBean("redisKeyValueAdapter");
 
 			Object referenceResolver = ReflectionTestUtils.getField(adapter.getConverter(), "referenceResolver");
 
@@ -100,12 +100,12 @@ public class RedisRepositoryConfigurationUnitTests {
 	@ContextConfiguration(classes = { ContextWithoutCustomizationUnitTests.Config.class })
 	public static class ContextWithoutCustomizationUnitTests {
 
-		@EnableRedisRepositories(considerNestedRepositories = true,
+		@EnableValkeyRepositories(considerNestedRepositories = true,
 				includeFilters = { @ComponentScan.Filter(type = FilterType.REGEX, pattern = { ".*ContextSampleRepository" }) })
 		static class Config {
 
 			@Bean
-			RedisTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> redisTemplate() {
 				return createTemplateMock();
 			}
 		}
@@ -133,18 +133,18 @@ public class RedisRepositoryConfigurationUnitTests {
 	@ContextConfiguration(classes = { WithMessageListenerConfigurationUnitTests.Config.class })
 	public static class WithMessageListenerConfigurationUnitTests {
 
-		@EnableRedisRepositories(considerNestedRepositories = true,
+		@EnableValkeyRepositories(considerNestedRepositories = true,
 				includeFilters = { @ComponentScan.Filter(type = FilterType.REGEX, pattern = { ".*ContextSampleRepository" }) },
 				keyspaceNotificationsConfigParameter = "", messageListenerContainerRef = "myContainer")
 		static class Config {
 
 			@Bean
-			RedisMessageListenerContainer myContainer() {
-				return mock(RedisMessageListenerContainer.class);
+			ValkeyMessageListenerContainer myContainer() {
+				return mock(ValkeyMessageListenerContainer.class);
 			}
 
 			@Bean
-			RedisTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> redisTemplate() {
 				return createTemplateMock();
 			}
 		}
@@ -154,14 +154,14 @@ public class RedisRepositoryConfigurationUnitTests {
 		@Test // DATAREDIS-425
 		public void shouldConfigureMessageListenerContainer() {
 
-			RedisKeyValueAdapter adapter = ctx.getBean("redisKeyValueAdapter", RedisKeyValueAdapter.class);
+			ValkeyKeyValueAdapter adapter = ctx.getBean("redisKeyValueAdapter", ValkeyKeyValueAdapter.class);
 			Object messageListenerContainer = ReflectionTestUtils.getField(adapter, "messageListenerContainer");
 
 			assertThat(Mockito.mockingDetails(messageListenerContainer).isMock()).isTrue();
 		}
 	}
 
-	@RedisHash
+	@ValkeyHash
 	static class Sample {
 		String id;
 	}

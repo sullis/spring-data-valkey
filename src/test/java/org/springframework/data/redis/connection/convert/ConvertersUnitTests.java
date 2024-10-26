@@ -25,10 +25,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisClusterNode.Flag;
-import org.springframework.data.redis.connection.RedisClusterNode.LinkState;
-import org.springframework.data.redis.connection.RedisNode.NodeType;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode.Flag;
+import org.springframework.data.redis.connection.ValkeyClusterNode.LinkState;
+import org.springframework.data.redis.connection.ValkeyNode.NodeType;
 import org.springframework.data.redis.connection.convert.Converters.ClusterNodesConverter.AddressPortHostname;
 
 /**
@@ -78,11 +78,11 @@ class ConvertersUnitTests {
 	private static final String CLUSTER_NODE_WITH_SINGLE_IPV4_HOSTNAME = "3765733728631672640db35fd2f04743c03119c6 10.180.0.33:11003@16379,hostname1 master - 0 1708041426947 2 connected 0-5460";
 
 	@Test // DATAREDIS-315
-	void toSetOfRedis30ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
+	void toSetOfValkey30ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
 
-		Iterator<RedisClusterNode> nodes = Converters.toSetOfRedisClusterNodes(REDIS_3_0_CLUSTER_NODES_RESPONSE).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(REDIS_3_0_CLUSTER_NODES_RESPONSE).iterator();
 
-		RedisClusterNode node = nodes.next(); // 127.0.0.1:6379
+		ValkeyClusterNode node = nodes.next(); // 127.0.0.1:6379
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
 		assertThat(node.getHost()).isEqualTo("127.0.0.1");
 		assertThat(node.getPort()).isEqualTo(6379);
@@ -128,11 +128,11 @@ class ConvertersUnitTests {
 	}
 
 	@Test // DATAREDIS-315
-	void toSetOfRedis32ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
+	void toSetOfValkey32ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
 
-		Iterator<RedisClusterNode> nodes = Converters.toSetOfRedisClusterNodes(REDIS_3_2_CLUSTER_NODES_RESPONSE).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(REDIS_3_2_CLUSTER_NODES_RESPONSE).iterator();
 
-		RedisClusterNode node = nodes.next(); // 127.0.0.1:6379
+		ValkeyClusterNode node = nodes.next(); // 127.0.0.1:6379
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
 		assertThat(node.getHost()).isEqualTo("127.0.0.1");
 		assertThat(node.getPort()).isEqualTo(6379);
@@ -178,12 +178,12 @@ class ConvertersUnitTests {
 	}
 
 	@Test // DATAREDIS-315
-	void toSetOfRedisClusterNodesShouldConvertNodesWithSingleSlotCorrectly() {
+	void toSetOfValkeyClusterNodesShouldConvertNodesWithSingleSlotCorrectly() {
 
-		Iterator<RedisClusterNode> nodes = Converters.toSetOfRedisClusterNodes(CLUSTER_NODE_WITH_SINGLE_SLOT_RESPONSE)
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(CLUSTER_NODE_WITH_SINGLE_SLOT_RESPONSE)
 				.iterator();
 
-		RedisClusterNode node = nodes.next(); // 127.0.0.1:6379
+		ValkeyClusterNode node = nodes.next(); // 127.0.0.1:6379
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
 		assertThat(node.getHost()).isEqualTo("127.0.0.1");
 		assertThat(node.getPort()).isEqualTo(6379);
@@ -192,12 +192,12 @@ class ConvertersUnitTests {
 	}
 
 	@Test // DATAREDIS-315
-	void toSetOfRedisClusterNodesShouldParseLinkStateAndDisconnectedCorrectly() {
+	void toSetOfValkeyClusterNodesShouldParseLinkStateAndDisconnectedCorrectly() {
 
-		Iterator<RedisClusterNode> nodes = Converters
-				.toSetOfRedisClusterNodes(CLUSTER_NODE_WITH_FAIL_FLAG_AND_DISCONNECTED_LINK_STATE).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters
+				.toSetOfValkeyClusterNodes(CLUSTER_NODE_WITH_FAIL_FLAG_AND_DISCONNECTED_LINK_STATE).iterator();
 
-		RedisClusterNode node = nodes.next();
+		ValkeyClusterNode node = nodes.next();
 		assertThat(node.getId()).isEqualTo("b8b5ee73b1d1997abff694b3fe8b2397d2138b6d");
 		assertThat(node.getHost()).isEqualTo("127.0.0.1");
 		assertThat(node.getPort()).isEqualTo(7382);
@@ -208,11 +208,11 @@ class ConvertersUnitTests {
 	}
 
 	@Test // DATAREDIS-315
-	void toSetOfRedisClusterNodesShouldIgnoreImportingSlot() {
+	void toSetOfValkeyClusterNodesShouldIgnoreImportingSlot() {
 
-		Iterator<RedisClusterNode> nodes = Converters.toSetOfRedisClusterNodes(CLUSTER_NODE_IMPORTING_SLOT).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(CLUSTER_NODE_IMPORTING_SLOT).iterator();
 
-		RedisClusterNode node = nodes.next();
+		ValkeyClusterNode node = nodes.next();
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
 		assertThat(node.getHost()).isEqualTo("127.0.0.1");
 		assertThat(node.hasValidHost()).isTrue();
@@ -224,11 +224,11 @@ class ConvertersUnitTests {
 	}
 
 	@Test // GH-1985
-	void toSetOfRedisClusterNodesShouldAllowEmptyHostname() {
+	void toSetOfValkeyClusterNodesShouldAllowEmptyHostname() {
 
-		Iterator<RedisClusterNode> nodes = Converters.toSetOfRedisClusterNodes(CLUSTER_NODE_WITHOUT_HOST).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(CLUSTER_NODE_WITHOUT_HOST).iterator();
 
-		RedisClusterNode node = nodes.next();
+		ValkeyClusterNode node = nodes.next();
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
 		assertThat(node.getHost()).isEmpty();
 		assertThat(node.hasValidHost()).isFalse();
@@ -241,7 +241,7 @@ class ConvertersUnitTests {
 
 	@Test // https://github.com/spring-projects/spring-data-valkey/issues/2678
 	void toClusterNodeWithIPv6Hostname() {
-		RedisClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV6_HOST);
+		ValkeyClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV6_HOST);
 
 		assertThat(node.getId()).isEqualTo("67adfe3df1058896e3cb49d2863e0f70e7e159fa");
 		assertThat(node.getHost()).isEqualTo("2a02:6b8:c67:9c:0:6d8b:33da:5a2c");
@@ -256,7 +256,7 @@ class ConvertersUnitTests {
 	@Test // GH-2862
 	void toClusterNodeWithIPv4EmptyHostname() {
 
-		RedisClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV4_EMPTY_HOSTNAME);
+		ValkeyClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV4_EMPTY_HOSTNAME);
 
 		assertThat(node.getId()).isEqualTo("3765733728631672640db35fd2f04743c03119c6");
 		assertThat(node.getHost()).isEqualTo("10.180.0.33");
@@ -271,7 +271,7 @@ class ConvertersUnitTests {
 	@Test // GH-2862
 	void toClusterNodeWithIPv4Hostname() {
 
-		RedisClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV4_HOSTNAME);
+		ValkeyClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV4_HOSTNAME);
 
 		assertThat(node.getId()).isEqualTo("3765733728631672640db35fd2f04743c03119c6");
 		assertThat(node.getHost()).isEqualTo("10.180.0.33");
@@ -287,7 +287,7 @@ class ConvertersUnitTests {
 	@Test // GH-2678
 	void toClusterNodeWithIPv6HostnameSquareBrackets() {
 
-		RedisClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV6_HOST_SQUARE_BRACKETS);
+		ValkeyClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV6_HOST_SQUARE_BRACKETS);
 
 		assertThat(node.getId()).isEqualTo("67adfe3df1058896e3cb49d2863e0f70e7e159fa");
 		assertThat(node.getHost()).isEqualTo("2a02:6b8:c67:9c:0:6d8b:33da:5a2c");
@@ -317,25 +317,25 @@ class ConvertersUnitTests {
 	static Stream<Arguments> clusterNodesEndpoints() {
 
 		Stream<Arguments> regular = Stream.of(
-				// IPv4 with Host, Redis 3
+				// IPv4 with Host, Valkey 3
 				Arguments.of("1.2.4.4:7379", new AddressPortHostname("1.2.4.4", "7379", null)),
-				// IPv6 with Host, Redis 3
+				// IPv6 with Host, Valkey 3
 				Arguments.of("6b8:c67:9c:0:6d8b:33da:5a2c:6380",
 						new AddressPortHostname("6b8:c67:9c:0:6d8b:33da:5a2c", "6380", null)),
-				// Assuming IPv6 in brackets with Host, Redis 3
+				// Assuming IPv6 in brackets with Host, Valkey 3
 				Arguments.of("[6b8:c67:9c:0:6d8b:33da:5a2c]:6380",
 						new AddressPortHostname("6b8:c67:9c:0:6d8b:33da:5a2c", "6380", null)),
 
-				// IPv4 with Host and Bus Port, Redis 4
+				// IPv4 with Host and Bus Port, Valkey 4
 				Arguments.of("127.0.0.1:7382@17382", new AddressPortHostname("127.0.0.1", "7382", null)),
-				// IPv6 with Host and Bus Port, Redis 4
+				// IPv6 with Host and Bus Port, Valkey 4
 				Arguments.of("6b8:c67:9c:0:6d8b:33da:5a2c:6380",
 						new AddressPortHostname("6b8:c67:9c:0:6d8b:33da:5a2c", "6380", null)),
 
-				// Hostname with Port and Bus Port, Redis 7
+				// Hostname with Port and Bus Port, Valkey 7
 				Arguments.of("my.host-name.com:7379@17379", new AddressPortHostname("my.host-name.com", "7379", null)),
 
-				// With hostname, Redis 7
+				// With hostname, Valkey 7
 				Arguments.of("1.2.4.4:7379@17379,my.host-name.com",
 						new AddressPortHostname("1.2.4.4", "7379", "my.host-name.com")));
 

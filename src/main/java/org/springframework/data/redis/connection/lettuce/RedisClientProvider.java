@@ -15,20 +15,20 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.AbstractValkeyClient;
 
 /**
- * Extension to {@link LettuceConnectionProvider} for providers exposing {@link io.lettuce.core.RedisClient}.
+ * Extension to {@link LettuceConnectionProvider} for providers exposing {@link io.lettuce.core.ValkeyClient}.
  *
  * @author Mark Paluch
  * @since 2.0.5
  */
-interface RedisClientProvider {
+interface ValkeyClientProvider {
 
 	/**
-	 * Returns the underlying Redis Client.
+	 * Returns the underlying Valkey Client.
 	 *
-	 * @return the {@link AbstractRedisClient}. Never {@literal null}.
+	 * @return the {@link AbstractValkeyClient}. Never {@literal null}.
 	 */
-	AbstractRedisClient getRedisClient();
+	AbstractValkeyClient getValkeyClient();
 }

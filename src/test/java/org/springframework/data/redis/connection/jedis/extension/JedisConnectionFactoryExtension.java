@@ -28,27 +28,27 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.springframework.data.redis.ConnectionFactoryTracker;
 import org.springframework.data.redis.SettingsUtils;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.ValkeyClusterConfiguration;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.test.extension.RedisCluster;
-import org.springframework.data.redis.test.extension.RedisSentinel;
-import org.springframework.data.redis.test.extension.RedisStanalone;
+import org.springframework.data.redis.test.extension.ValkeyCluster;
+import org.springframework.data.redis.test.extension.ValkeySentinel;
+import org.springframework.data.redis.test.extension.ValkeyStanalone;
 import org.springframework.data.redis.test.extension.ShutdownQueue;
 import org.springframework.data.util.Lazy;
 
 /**
  * JUnit {@link ParameterResolver} providing pre-cached {@link JedisConnectionFactory} instances. Connection factories
- * can be qualified with {@code @RedisStanalone} (default), {@code @RedisSentinel} or {@code @RedisCluster} to obtain a
+ * can be qualified with {@code @ValkeyStanalone} (default), {@code @ValkeySentinel} or {@code @ValkeyCluster} to obtain a
  * specific factory instance. Instances are managed by this extension and will be shut down on JVM shutdown.
  *
  * @author Mark Paluch
- * @see RedisStanalone
- * @see RedisSentinel
- * @see RedisCluster
+ * @see ValkeyStanalone
+ * @see ValkeySentinel
+ * @see ValkeyCluster
  */
 public class JedisConnectionFactoryExtension implements ParameterResolver {
 
@@ -99,16 +99,16 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 	static {
 
 		factories = new HashMap<>();
-		factories.put(RedisStanalone.class, STANDALONE);
-		factories.put(RedisSentinel.class, SENTINEL);
-		factories.put(RedisCluster.class, CLUSTER);
+		factories.put(ValkeyStanalone.class, STANDALONE);
+		factories.put(ValkeySentinel.class, SENTINEL);
+		factories.put(ValkeyCluster.class, CLUSTER);
 	}
 
 	/**
 	 * Obtain a cached {@link JedisConnectionFactory} described by {@code qualifier}. Instances are managed by this
 	 * extension and will be shut down on JVM shutdown.
 	 *
-	 * @param qualifier an be any of {@link RedisStanalone}, {@link RedisSentinel}, {@link RedisCluster}.
+	 * @param qualifier an be any of {@link ValkeyStanalone}, {@link ValkeySentinel}, {@link ValkeyCluster}.
 	 * @return the managed {@link JedisConnectionFactory}.
 	 */
 	public static JedisConnectionFactory getConnectionFactory(Class<? extends Annotation> qualifier) {
@@ -119,7 +119,7 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 	 * Obtain a new {@link JedisConnectionFactory} described by {@code qualifier}. Instances are managed by this extension
 	 * and will be shut down on JVM shutdown.
 	 *
-	 * @param qualifier an be any of {@link RedisStanalone}, {@link RedisSentinel}, {@link RedisCluster}.
+	 * @param qualifier an be any of {@link ValkeyStanalone}, {@link ValkeySentinel}, {@link ValkeyCluster}.
 	 * @return the managed {@link JedisConnectionFactory}.
 	 */
 	public static JedisConnectionFactory getNewConnectionFactory(Class<? extends Annotation> qualifier) {
@@ -129,7 +129,7 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
 			throws ParameterResolutionException {
-		return RedisConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType());
+		return ValkeyConnectionFactory.class.isAssignableFrom(parameterContext.getParameter().getType());
 	}
 
 	@Override
@@ -145,15 +145,15 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 
 	private static Class<? extends Annotation> getQualifier(ParameterContext parameterContext) {
 
-		if (parameterContext.isAnnotated(RedisSentinel.class)) {
-			return RedisSentinel.class;
+		if (parameterContext.isAnnotated(ValkeySentinel.class)) {
+			return ValkeySentinel.class;
 		}
 
-		if (parameterContext.isAnnotated(RedisCluster.class)) {
-			return RedisCluster.class;
+		if (parameterContext.isAnnotated(ValkeyCluster.class)) {
+			return ValkeyCluster.class;
 		}
 
-		return RedisStanalone.class;
+		return ValkeyStanalone.class;
 	}
 
 	static class NewableLazy<T> {
@@ -178,16 +178,16 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 
 		private volatile boolean mayClose;
 
-		ManagedJedisConnectionFactory(RedisStandaloneConfiguration standaloneConfig,
+		ManagedJedisConnectionFactory(ValkeyStandaloneConfiguration standaloneConfig,
 				JedisClientConfiguration clientConfig) {
 			super(standaloneConfig, clientConfig);
 		}
 
-		ManagedJedisConnectionFactory(RedisSentinelConfiguration sentinelConfig, JedisClientConfiguration clientConfig) {
+		ManagedJedisConnectionFactory(ValkeySentinelConfiguration sentinelConfig, JedisClientConfiguration clientConfig) {
 			super(sentinelConfig, clientConfig);
 		}
 
-		ManagedJedisConnectionFactory(RedisClusterConfiguration clusterConfig, JedisClientConfiguration clientConfig) {
+		ManagedJedisConnectionFactory(ValkeyClusterConfiguration clusterConfig, JedisClientConfiguration clientConfig) {
 			super(clusterConfig, clientConfig);
 		}
 
@@ -207,11 +207,11 @@ public class JedisConnectionFactoryExtension implements ParameterResolver {
 
 			StringBuilder builder = new StringBuilder("Jedis");
 
-			if (isRedisClusterAware()) {
+			if (isValkeyClusterAware()) {
 				builder.append(" Cluster");
 			}
 
-			if (isRedisSentinelAware()) {
+			if (isValkeySentinelAware()) {
 				builder.append(" Sentinel");
 			}
 

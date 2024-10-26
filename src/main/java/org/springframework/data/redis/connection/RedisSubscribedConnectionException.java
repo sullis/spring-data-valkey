@@ -23,26 +23,26 @@ import org.springframework.lang.Nullable;
  *
  * @author Costin Leau
  * @author Christoph Strobl
- * @see org.springframework.data.redis.connection.RedisPubSubCommands
+ * @see org.springframework.data.redis.connection.ValkeyPubSubCommands
  */
-public class RedisSubscribedConnectionException extends InvalidDataAccessApiUsageException {
+public class ValkeySubscribedConnectionException extends InvalidDataAccessApiUsageException {
 
 	/**
-	 * Constructs a new <code>RedisSubscribedConnectionException</code> instance.
+	 * Constructs a new <code>ValkeySubscribedConnectionException</code> instance.
 	 *
 	 * @param msg
 	 * @param cause
 	 */
-	public RedisSubscribedConnectionException(@Nullable String msg, @Nullable Throwable cause) {
+	public ValkeySubscribedConnectionException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
 	}
 
 	/**
-	 * Constructs a new <code>RedisSubscribedConnectionException</code> instance.
+	 * Constructs a new <code>ValkeySubscribedConnectionException</code> instance.
 	 *
 	 * @param msg
 	 */
-	public RedisSubscribedConnectionException(String msg) {
+	public ValkeySubscribedConnectionException(String msg) {
 		super(msg);
 	}
 }

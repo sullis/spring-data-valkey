@@ -22,6 +22,6 @@ import org.springframework.data.repository.core.EntityInformation;
  * @param <T>
  * @param <ID>
  */
-public interface RedisEntityInformation<T, ID> extends EntityInformation<T, ID> {
+public interface ValkeyEntityInformation<T, ID> extends EntityInformation<T, ID> {
 
 }

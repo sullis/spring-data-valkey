@@ -21,11 +21,11 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.springframework.data.redis.connection.ClusterTestVariables.*;
 
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.reactive.RedisReactiveCommands;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.reactive.RedisAdvancedClusterReactiveCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.reactive.ValkeyReactiveCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.reactive.ValkeyAdvancedClusterReactiveCommands;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -40,26 +40,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionProvider.TargetAware;
 
 /**
- * Unit tests for {@link LettuceReactiveRedisClusterConnection}.
+ * Unit tests for {@link LettuceReactiveValkeyClusterConnection}.
  *
  * @author Mark Paluch
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class LettuceReactiveRedisClusterConnectionUnitTests {
+public class LettuceReactiveValkeyClusterConnectionUnitTests {
 
-	static final RedisClusterNode NODE1 = new RedisClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT);
+	static final ValkeyClusterNode NODE1 = new ValkeyClusterNode(CLUSTER_HOST, MASTER_NODE_1_PORT);
 
-	@Mock StatefulRedisClusterConnection<ByteBuffer, ByteBuffer> sharedConnection;
-	@Mock StatefulRedisConnection<ByteBuffer, ByteBuffer> nodeConnection;
+	@Mock StatefulValkeyClusterConnection<ByteBuffer, ByteBuffer> sharedConnection;
+	@Mock StatefulValkeyConnection<ByteBuffer, ByteBuffer> nodeConnection;
 
-	@Mock RedisClusterClient clusterClient;
-	@Mock RedisAdvancedClusterReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
-	@Mock RedisReactiveCommands<ByteBuffer, ByteBuffer> reactiveNodeCommands;
+	@Mock ValkeyClusterClient clusterClient;
+	@Mock ValkeyAdvancedClusterReactiveCommands<ByteBuffer, ByteBuffer> reactiveCommands;
+	@Mock ValkeyReactiveCommands<ByteBuffer, ByteBuffer> reactiveNodeCommands;
 	@Mock(extraInterfaces = TargetAware.class) LettuceConnectionProvider connectionProvider;
 
 	@BeforeEach
@@ -73,7 +73,7 @@ public class LettuceReactiveRedisClusterConnectionUnitTests {
 	@Test // DATAREDIS-659, DATAREDIS-708
 	public void bgReWriteAofShouldRespondCorrectly() {
 
-		LettuceReactiveRedisClusterConnection connection = new LettuceReactiveRedisClusterConnection(connectionProvider,
+		LettuceReactiveValkeyClusterConnection connection = new LettuceReactiveValkeyClusterConnection(connectionProvider,
 				clusterClient);
 
 		when(reactiveNodeCommands.bgrewriteaof()).thenReturn(Mono.just("OK"));
@@ -84,7 +84,7 @@ public class LettuceReactiveRedisClusterConnectionUnitTests {
 	@Test // DATAREDIS-659, DATAREDIS-708
 	public void bgSaveShouldRespondCorrectly() {
 
-		LettuceReactiveRedisClusterConnection connection = new LettuceReactiveRedisClusterConnection(connectionProvider,
+		LettuceReactiveValkeyClusterConnection connection = new LettuceReactiveValkeyClusterConnection(connectionProvider,
 				clusterClient);
 
 		when(reactiveNodeCommands.bgsave()).thenReturn(Mono.just("OK"));

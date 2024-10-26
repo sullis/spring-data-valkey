@@ -29,9 +29,9 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisConnectionUtils.ConnectionSplittingInterceptor;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.core.ValkeyConnectionUtils.ConnectionSplittingInterceptor;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -45,16 +45,16 @@ class ConnectionSplittingInterceptorUnitTests {
 
 	private ConnectionSplittingInterceptor interceptor;
 
-	private @Mock RedisConnectionFactory connectionFactoryMock;
+	private @Mock ValkeyConnectionFactory connectionFactoryMock;
 
-	private @Mock RedisConnection freshConnectionMock;
+	private @Mock ValkeyConnection freshConnectionMock;
 
-	private @Mock RedisConnection boundConnectionMock;
+	private @Mock ValkeyConnection boundConnectionMock;
 
 	static {
 		try {
-			WRITE_METHOD = ClassUtils.getMethod(RedisConnection.class, "expire", byte[].class, long.class);
-			READONLY_METHOD = ClassUtils.getMethod(RedisConnection.class, "keys", byte[].class);
+			WRITE_METHOD = ClassUtils.getMethod(ValkeyConnection.class, "expire", byte[].class, long.class);
+			READONLY_METHOD = ClassUtils.getMethod(ValkeyConnection.class, "keys", byte[].class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

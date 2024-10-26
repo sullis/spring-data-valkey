@@ -17,25 +17,25 @@ package org.springframework.data.redis.core;
 
 import org.reactivestreams.Publisher;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection;
 
 /**
- * Generic callback interface for code that wants to use the same {@link ReactiveRedisConnection} avoiding connection
+ * Generic callback interface for code that wants to use the same {@link ReactiveValkeyConnection} avoiding connection
  * allocation overhead upon each Template API method call. Allows to execute any number of operations on a single
- * {@link ReactiveRedisConnection}, using any type and number of commands.
+ * {@link ReactiveValkeyConnection}, using any type and number of commands.
  * <p>
  * This is particularly useful for issuing multiple calls on the same connection.
  *
  * @param <T>
  * @author Mark Paluch
  * @since 2.6
- * @see ReactiveRedisOperations#executeInSession(ReactiveRedisSessionCallback)
+ * @see ReactiveValkeyOperations#executeInSession(ReactiveValkeySessionCallback)
  */
-public interface ReactiveRedisSessionCallback<K, V, T> {
+public interface ReactiveValkeySessionCallback<K, V, T> {
 
 	/**
-	 * Gets called by {@link ReactiveRedisOperations#executeInSession(ReactiveRedisSessionCallback)} with an active Redis
-	 * connection. Does not need to care about activating or closing the {@link ReactiveRedisConnection}.
+	 * Gets called by {@link ReactiveValkeyOperations#executeInSession(ReactiveValkeySessionCallback)} with an active Valkey
+	 * connection. Does not need to care about activating or closing the {@link ReactiveValkeyConnection}.
 	 * <p>
 	 * Allows for returning a result object created within the callback, i.e. a domain object or a collection of domain
 	 * objects.
@@ -44,5 +44,5 @@ public interface ReactiveRedisSessionCallback<K, V, T> {
 	 * @return a result object {@link Publisher}.
 	 * @throws DataAccessException in case of custom exceptions.
 	 */
-	Publisher<T> doWithOperations(ReactiveRedisOperations<K, V> operations) throws DataAccessException;
+	Publisher<T> doWithOperations(ReactiveValkeyOperations<K, V> operations) throws DataAccessException;
 }

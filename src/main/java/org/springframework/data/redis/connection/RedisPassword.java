@@ -26,7 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Value object which may or may not contain a Redis password.
+ * Value object which may or may not contain a Valkey password.
  * <p>
  * If a password is present, {@code isPresent()} will return {@code true} and {@code get()} will return the value.
  * <p>
@@ -36,50 +36,50 @@ import org.springframework.util.StringUtils;
  * @author Christoph Strobl
  * @since 2.0
  */
-public class RedisPassword {
+public class ValkeyPassword {
 
-	private static final RedisPassword NONE = new RedisPassword(new char[] {});
+	private static final ValkeyPassword NONE = new ValkeyPassword(new char[] {});
 
 	private final char[] thePassword;
 
-	private RedisPassword(char[] thePassword) {
+	private ValkeyPassword(char[] thePassword) {
 		this.thePassword = thePassword;
 	}
 
 	/**
-	 * Create a {@link RedisPassword} from a {@link String}.
+	 * Create a {@link ValkeyPassword} from a {@link String}.
 	 *
 	 * @param passwordAsString the password as string.
-	 * @return the {@link RedisPassword} for {@code passwordAsString}.
+	 * @return the {@link ValkeyPassword} for {@code passwordAsString}.
 	 */
-	public static RedisPassword of(@Nullable String passwordAsString) {
+	public static ValkeyPassword of(@Nullable String passwordAsString) {
 
 		return Optional.ofNullable(passwordAsString) //
 				.filter(StringUtils::hasText) //
-				.map(it -> new RedisPassword(it.toCharArray())) //
-				.orElseGet(RedisPassword::none);
+				.map(it -> new ValkeyPassword(it.toCharArray())) //
+				.orElseGet(ValkeyPassword::none);
 	}
 
 	/**
-	 * Create a {@link RedisPassword} from a {@code char} array.
+	 * Create a {@link ValkeyPassword} from a {@code char} array.
 	 *
 	 * @param passwordAsChars the password as char array.
-	 * @return the {@link RedisPassword} for {@code passwordAsChars}.
+	 * @return the {@link ValkeyPassword} for {@code passwordAsChars}.
 	 */
-	public static RedisPassword of(@Nullable char[] passwordAsChars) {
+	public static ValkeyPassword of(@Nullable char[] passwordAsChars) {
 
 		return Optional.ofNullable(passwordAsChars) //
 				.filter(it -> !ObjectUtils.isEmpty(passwordAsChars)) //
-				.map(it -> new RedisPassword(Arrays.copyOf(it, it.length))) //
-				.orElseGet(RedisPassword::none);
+				.map(it -> new ValkeyPassword(Arrays.copyOf(it, it.length))) //
+				.orElseGet(ValkeyPassword::none);
 	}
 
 	/**
-	 * Create an absent {@link RedisPassword}.
+	 * Create an absent {@link ValkeyPassword}.
 	 *
-	 * @return the absent {@link RedisPassword}.
+	 * @return the absent {@link ValkeyPassword}.
 	 */
-	public static RedisPassword none() {
+	public static ValkeyPassword none() {
 		return NONE;
 	}
 
@@ -151,7 +151,7 @@ public class RedisPassword {
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		RedisPassword password = (RedisPassword) o;
+		ValkeyPassword password = (ValkeyPassword) o;
 
 		return ObjectUtils.nullSafeEquals(thePassword, password.thePassword);
 	}

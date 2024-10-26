@@ -18,10 +18,10 @@ package org.springframework.data.redis.connection.lettuce;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.sentinel.api.StatefulRedisSentinelConnection;
-import io.lettuce.core.sentinel.api.sync.RedisSentinelCommands;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyFuture;
+import io.lettuce.core.sentinel.api.StatefulValkeySentinelConnection;
+import io.lettuce.core.sentinel.api.sync.ValkeySentinelCommands;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,9 +35,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisNode.RedisNodeBuilder;
-import org.springframework.data.redis.connection.RedisServer;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeyNode.ValkeyNodeBuilder;
+import org.springframework.data.redis.connection.ValkeyServer;
 
 /**
  * @author Christoph Strobl
@@ -49,12 +49,12 @@ class LettuceSentinelConnectionUnitTests {
 
 	private static final String MASTER_ID = "mymaster";
 
-	private @Mock RedisClient redisClientMock;
+	private @Mock ValkeyClient redisClientMock;
 
-	private @Mock StatefulRedisSentinelConnection<String, String> connectionMock;
-	private @Mock RedisSentinelCommands<String, String> sentinelCommandsMock;
+	private @Mock StatefulValkeySentinelConnection<String, String> connectionMock;
+	private @Mock ValkeySentinelCommands<String, String> sentinelCommandsMock;
 
-	private @Mock RedisFuture<List<Map<String, String>>> redisFutureMock;
+	private @Mock ValkeyFuture<List<Map<String, String>>> redisFutureMock;
 
 	private LettuceSentinelConnection connection;
 
@@ -74,7 +74,7 @@ class LettuceSentinelConnectionUnitTests {
 	@Test // DATAREDIS-348
 	void failoverShouldBeSentCorrectly() {
 
-		connection.failover(new RedisNodeBuilder().withName(MASTER_ID).build());
+		connection.failover(new ValkeyNodeBuilder().withName(MASTER_ID).build());
 		verify(sentinelCommandsMock, times(1)).failover(eq(MASTER_ID));
 	}
 
@@ -85,7 +85,7 @@ class LettuceSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-348
 	void failoverShouldThrowExceptionIfMasterNodeNameIsEmpty() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.failover(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.failover(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-348
@@ -108,7 +108,7 @@ class LettuceSentinelConnectionUnitTests {
 	void shouldReadReplicasCorrectlyWhenGivenNamedNode() {
 
 		when(sentinelCommandsMock.slaves(MASTER_ID)).thenReturn(Collections.<Map<String, String>> emptyList());
-		connection.replicas(new RedisNodeBuilder().withName(MASTER_ID).build());
+		connection.replicas(new ValkeyNodeBuilder().withName(MASTER_ID).build());
 		verify(sentinelCommandsMock, times(1)).slaves(eq(MASTER_ID));
 	}
 
@@ -119,18 +119,18 @@ class LettuceSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-348
 	void readReplicasShouldThrowExceptionWhenGivenNull() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas((RedisNode) null));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas((ValkeyNode) null));
 	}
 
 	@Test // DATAREDIS-348
 	void readReplicasShouldThrowExceptionWhenNodeWithoutName() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.replicas(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-348
 	void shouldRemoveMasterCorrectlyWhenGivenNamedNode() {
 
-		connection.remove(new RedisNodeBuilder().withName(MASTER_ID).build());
+		connection.remove(new ValkeyNodeBuilder().withName(MASTER_ID).build());
 		verify(sentinelCommandsMock, times(1)).remove(eq(MASTER_ID));
 	}
 
@@ -141,18 +141,18 @@ class LettuceSentinelConnectionUnitTests {
 
 	@Test // DATAREDIS-348
 	void removeShouldThrowExceptionWhenGivenNull() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove((RedisNode) null));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove((ValkeyNode) null));
 	}
 
 	@Test // DATAREDIS-348
 	void removeShouldThrowExceptionWhenNodeWithoutName() {
-		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove(new RedisNodeBuilder().build()));
+		assertThatIllegalArgumentException().isThrownBy(() -> connection.remove(new ValkeyNodeBuilder().build()));
 	}
 
 	@Test // DATAREDIS-348
 	void monitorShouldBeSentCorrectly() {
 
-		RedisServer server = new RedisServer("127.0.0.1", 6382);
+		ValkeyServer server = new ValkeyServer("127.0.0.1", 6382);
 		server.setName("anothermaster");
 		server.setQuorum(3L);
 

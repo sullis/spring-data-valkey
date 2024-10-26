@@ -21,11 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.redis.core.PartialUpdate;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration.KeyspaceSettings;
-import org.springframework.data.redis.core.mapping.RedisMappingContext.ConfigAwareTimeToLiveAccessor;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext.ConfigAwareTimeToLiveAccessor;
 
 /**
  * Unit tests for {@link ConfigAwareTimeToLiveAccessor}.
@@ -42,7 +42,7 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 	void setUp() {
 
 		config = new KeyspaceConfiguration();
-		accessor = new ConfigAwareTimeToLiveAccessor(config, new RedisMappingContext());
+		accessor = new ConfigAwareTimeToLiveAccessor(config, new ValkeyMappingContext());
 	}
 
 	@Test // DATAREDIS-425
@@ -67,27 +67,27 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 
 	@Test // DATAREDIS-425
 	void getTimeToLiveShouldReturnValueWhenTypeIsAnnotated() {
-		assertThat(accessor.getTimeToLive(new TypeWithRedisHashAnnotation())).isEqualTo(5L);
+		assertThat(accessor.getTimeToLive(new TypeWithValkeyHashAnnotation())).isEqualTo(5L);
 	}
 
 	@Test // DATAREDIS-425
 	void getTimeToLiveConsidersAnnotationOverConfig() {
 
-		KeyspaceSettings setting = new KeyspaceSettings(TypeWithRedisHashAnnotation.class, null);
+		KeyspaceSettings setting = new KeyspaceSettings(TypeWithValkeyHashAnnotation.class, null);
 		setting.setTimeToLive(10L);
 		config.addKeyspaceSettings(setting);
 
-		assertThat(accessor.getTimeToLive(new TypeWithRedisHashAnnotation())).isEqualTo(5L);
+		assertThat(accessor.getTimeToLive(new TypeWithValkeyHashAnnotation())).isEqualTo(5L);
 	}
 
 	@Test // DATAREDIS-425
 	void getTimeToLiveShouldReturnValueWhenPropertyIsAnnotatedAndHasValue() {
-		assertThat(accessor.getTimeToLive(new TypeWithRedisHashAnnotationAndTTLProperty(20L))).isEqualTo(20L);
+		assertThat(accessor.getTimeToLive(new TypeWithValkeyHashAnnotationAndTTLProperty(20L))).isEqualTo(20L);
 	}
 
 	@Test // DATAREDIS-425
 	void getTimeToLiveShouldReturnValueFromTypeAnnotationWhenPropertyIsAnnotatedAndHasNullValue() {
-		assertThat(accessor.getTimeToLive(new TypeWithRedisHashAnnotationAndTTLProperty())).isEqualTo(10L);
+		assertThat(accessor.getTimeToLive(new TypeWithValkeyHashAnnotationAndTTLProperty())).isEqualTo(10L);
 	}
 
 	@Test // DATAREDIS-425
@@ -149,7 +149,7 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 	void getTimeToLiveShouldReturnDefaultValue() {
 
 		Long ttl = accessor
-				.getTimeToLive(new PartialUpdate<>("123", new TypeWithRedisHashAnnotation()));
+				.getTimeToLive(new PartialUpdate<>("123", new TypeWithValkeyHashAnnotation()));
 
 		assertThat(ttl).isEqualTo(5L);
 	}
@@ -169,7 +169,7 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 
 		Long ttl = accessor.getTimeToLive(
 				new PartialUpdate<>("123",
-				new TypeWithRedisHashAnnotationAndTTLProperty()).set("ttl", 100).refreshTtl(true));
+				new TypeWithValkeyHashAnnotationAndTTLProperty()).set("ttl", 100).refreshTtl(true));
 
 		assertThat(ttl).isEqualTo(100L);
 	}
@@ -179,7 +179,7 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 
 		Long ttl = accessor
 				.getTimeToLive(new PartialUpdate<>("123",
-				new TypeWithRedisHashAnnotationAndTTLProperty()).refreshTtl(true));
+				new TypeWithValkeyHashAnnotationAndTTLProperty()).refreshTtl(true));
 
 		assertThat(ttl).isEqualTo(10L);
 	}
@@ -197,17 +197,17 @@ class ConfigAwareTimeToLiveAccessorUnitTests {
 		}
 	}
 
-	@RedisHash(timeToLive = 5)
-	private static class TypeWithRedisHashAnnotation {}
+	@ValkeyHash(timeToLive = 5)
+	private static class TypeWithValkeyHashAnnotation {}
 
-	@RedisHash(timeToLive = 10)
-	static class TypeWithRedisHashAnnotationAndTTLProperty {
+	@ValkeyHash(timeToLive = 10)
+	static class TypeWithValkeyHashAnnotationAndTTLProperty {
 
 		@TimeToLive Long ttl;
 
-		TypeWithRedisHashAnnotationAndTTLProperty() {}
+		TypeWithValkeyHashAnnotationAndTTLProperty() {}
 
-		TypeWithRedisHashAnnotationAndTTLProperty(Long ttl) {
+		TypeWithValkeyHashAnnotationAndTTLProperty(Long ttl) {
 			this.ttl = ttl;
 		}
 	}

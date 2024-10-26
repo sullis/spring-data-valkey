@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -35,11 +35,11 @@ import org.springframework.lang.Nullable;
  */
 public abstract class CollectionUtils {
 
-	static Collection<String> extractKeys(Collection<? extends RedisStore> stores) {
+	static Collection<String> extractKeys(Collection<? extends ValkeyStore> stores) {
 
 		Collection<String> keys = new ArrayList<>(stores.size());
 
-		for (RedisStore store : stores) {
+		for (ValkeyStore store : stores) {
 			keys.add(store.getKey());
 		}
 
@@ -60,12 +60,12 @@ public abstract class CollectionUtils {
 		return list != null ? list : Collections.emptyList();
 	}
 
-	static <K> void rename(final K key, final K newKey, RedisOperations<K, ?> operations) {
+	static <K> void rename(final K key, final K newKey, ValkeyOperations<K, ?> operations) {
 
 		operations.execute(new SessionCallback<Object>() {
 
 			@SuppressWarnings("unchecked")
-			public Object execute(RedisOperations operations) throws DataAccessException {
+			public Object execute(ValkeyOperations operations) throws DataAccessException {
 
 				do {
 					operations.watch(key);

@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 
 import io.lettuce.core.KeyScanCursor;
 import io.lettuce.core.MapScanCursor;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisFuture;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyFuture;
 import io.lettuce.core.ScanArgs;
 import io.lettuce.core.ScanCursor;
 import io.lettuce.core.ScoredValue;
@@ -39,11 +39,11 @@ import io.lettuce.core.ScoredValueScanCursor;
 import io.lettuce.core.ValueScanCursor;
 import io.lettuce.core.XAddArgs;
 import io.lettuce.core.XClaimArgs;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
-import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.api.StatefulValkeyConnection;
+import io.lettuce.core.api.async.ValkeyAsyncCommands;
+import io.lettuce.core.api.sync.ValkeyCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
-import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.codec.ValkeyCodec;
 import io.lettuce.core.codec.StringCodec;
 import io.lettuce.core.output.ScanOutput;
 import io.lettuce.core.output.StatusOutput;
@@ -68,9 +68,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.redis.connection.AbstractConnectionUnitTestBase;
-import org.springframework.data.redis.connection.RedisServerCommands.ShutdownOption;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
-import org.springframework.data.redis.connection.RedisStreamCommands.XClaimOptions;
+import org.springframework.data.redis.connection.ValkeyServerCommands.ShutdownOption;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XAddOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XClaimOptions;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.core.Cursor;
@@ -84,22 +84,22 @@ import org.springframework.test.util.ReflectionTestUtils;
 class LettuceConnectionUnitTests {
 
 	protected LettuceConnection connection;
-	private RedisClient clientMock;
-	StatefulRedisConnection<byte[], byte[]> statefulConnectionMock;
-	RedisAsyncCommands<byte[], byte[]> asyncCommandsMock;
-	RedisCommands<byte[], byte[]> commandsMock;
+	private ValkeyClient clientMock;
+	StatefulValkeyConnection<byte[], byte[]> statefulConnectionMock;
+	ValkeyAsyncCommands<byte[], byte[]> asyncCommandsMock;
+	ValkeyCommands<byte[], byte[]> commandsMock;
 
 	@BeforeEach
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setUp() throws InvocationTargetException, IllegalAccessException {
 
-		clientMock = mock(RedisClient.class);
-		statefulConnectionMock = mock(StatefulRedisConnection.class);
-		when(clientMock.connect((RedisCodec) any())).thenReturn(statefulConnectionMock);
+		clientMock = mock(ValkeyClient.class);
+		statefulConnectionMock = mock(StatefulValkeyConnection.class);
+		when(clientMock.connect((ValkeyCodec) any())).thenReturn(statefulConnectionMock);
 
-		asyncCommandsMock = Mockito.mock(RedisAsyncCommands.class, invocation -> {
+		asyncCommandsMock = Mockito.mock(ValkeyAsyncCommands.class, invocation -> {
 
-			if (invocation.getMethod().getReturnType().equals(RedisFuture.class)) {
+			if (invocation.getMethod().getReturnType().equals(ValkeyFuture.class)) {
 
 				Command<?, ?, ?> cmd = new Command<>(CommandType.PING, new StatusOutput<>(StringCodec.UTF8));
 				AsyncCommand<?, ?, ?> async = new AsyncCommand<>(cmd);
@@ -109,7 +109,7 @@ class LettuceConnectionUnitTests {
 			}
 			return null;
 		});
-		commandsMock = Mockito.mock(RedisCommands.class);
+		commandsMock = Mockito.mock(ValkeyCommands.class);
 
 		when(statefulConnectionMock.async()).thenReturn(asyncCommandsMock);
 		when(statefulConnectionMock.sync()).thenReturn(commandsMock);
@@ -118,7 +118,7 @@ class LettuceConnectionUnitTests {
 
 	@Nested
 	@SuppressWarnings({ "rawtypes", "deprecation" })
-	class BasicUnitTests extends AbstractConnectionUnitTestBase<RedisAsyncCommands> {
+	class BasicUnitTests extends AbstractConnectionUnitTestBase<ValkeyAsyncCommands> {
 
 		@Test // DATAREDIS-184
 		public void shutdownWithNullOptionsIsCalledCorrectly() {
@@ -176,7 +176,7 @@ class LettuceConnectionUnitTests {
 		}
 
 		@Test // DATAREDIS-348
-		void shouldThrowExceptionWhenAccessingRedisSentinelsCommandsWhenNoSentinelsConfigured() {
+		void shouldThrowExceptionWhenAccessingValkeySentinelsCommandsWhenNoSentinelsConfigured() {
 			assertThatExceptionOfType(InvalidDataAccessResourceUsageException.class)
 					.isThrownBy(() -> connection.getSentinelConnection());
 		}
@@ -259,7 +259,7 @@ class LettuceConnectionUnitTests {
 			AsyncCommand<byte[], byte[], String> future = new AsyncCommand<>(command);
 			future.complete();
 
-			when(asyncCommandsMock.dispatch(any(), any(), any())).thenReturn((RedisFuture) future);
+			when(asyncCommandsMock.dispatch(any(), any(), any())).thenReturn((ValkeyFuture) future);
 
 			connection.execute("foo.bar", command.getOutput());
 

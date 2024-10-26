@@ -17,19 +17,19 @@ package org.springframework.data.redis.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
-import org.springframework.data.redis.support.collections.RedisCollectionFactoryBean;
+import org.springframework.data.redis.support.collections.ValkeyCollectionFactoryBean;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the Redis <code>&lt;collection&gt;</code> element.
+ * Parser for the Valkey <code>&lt;collection&gt;</code> element.
  *
  * @author Costin Leau
  */
-class RedisCollectionParser extends AbstractSimpleBeanDefinitionParser {
+class ValkeyCollectionParser extends AbstractSimpleBeanDefinitionParser {
 
 	protected Class<?> getBeanClass(Element element) {
-		return RedisCollectionFactoryBean.class;
+		return ValkeyCollectionFactoryBean.class;
 	}
 
 	protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element) {

@@ -32,13 +32,13 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.PartialUpdate.PropertyUpdate;
 import org.springframework.data.redis.core.PartialUpdate.UpdateCommand;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.TimeToLiveAccessor;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration.KeyspaceSettings;
 import org.springframework.data.redis.core.convert.MappingConfiguration;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
+import org.springframework.data.redis.core.convert.ValkeyCustomConversions;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
@@ -49,33 +49,33 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Redis specific {@link MappingContext}.
+ * Valkey specific {@link MappingContext}.
  *
  * @author Christoph Strobl
  * @author Oliver Gierke
  * @author Mark Paluch
  * @since 1.7
  */
-public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentEntity<?>, RedisPersistentProperty> {
+public class ValkeyMappingContext extends KeyValueMappingContext<ValkeyPersistentEntity<?>, ValkeyPersistentProperty> {
 
-	private static final SimpleTypeHolder SIMPLE_TYPE_HOLDER = new RedisCustomConversions().getSimpleTypeHolder();
+	private static final SimpleTypeHolder SIMPLE_TYPE_HOLDER = new ValkeyCustomConversions().getSimpleTypeHolder();
 
 	private final MappingConfiguration mappingConfiguration;
 	private final TimeToLiveAccessor timeToLiveAccessor;
 
 	/**
-	 * Creates new {@link RedisMappingContext} with empty {@link MappingConfiguration}.
+	 * Creates new {@link ValkeyMappingContext} with empty {@link MappingConfiguration}.
 	 */
-	public RedisMappingContext() {
+	public ValkeyMappingContext() {
 		this(new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration()));
 	}
 
 	/**
-	 * Creates new {@link RedisMappingContext}.
+	 * Creates new {@link ValkeyMappingContext}.
 	 *
 	 * @param mappingConfiguration can be {@literal null}.
 	 */
-	public RedisMappingContext(@Nullable MappingConfiguration mappingConfiguration) {
+	public ValkeyMappingContext(@Nullable MappingConfiguration mappingConfiguration) {
 
 		this.mappingConfiguration = mappingConfiguration != null ? mappingConfiguration
 				: new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration());
@@ -87,14 +87,14 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 	}
 
 	@Override
-	protected <T> RedisPersistentEntity<T> createPersistentEntity(TypeInformation<T> typeInformation) {
-		return new BasicRedisPersistentEntity<>(typeInformation, getKeySpaceResolver(), timeToLiveAccessor);
+	protected <T> ValkeyPersistentEntity<T> createPersistentEntity(TypeInformation<T> typeInformation) {
+		return new BasicValkeyPersistentEntity<>(typeInformation, getKeySpaceResolver(), timeToLiveAccessor);
 	}
 
 	@Override
-	protected RedisPersistentProperty createPersistentProperty(Property property, RedisPersistentEntity<?> owner,
+	protected ValkeyPersistentProperty createPersistentProperty(Property property, ValkeyPersistentEntity<?> owner,
 			SimpleTypeHolder simpleTypeHolder) {
-		return new RedisPersistentProperty(property, owner, simpleTypeHolder);
+		return new ValkeyPersistentProperty(property, owner, simpleTypeHolder);
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 		private final Map<Class<?>, PersistentProperty<?>> timeoutProperties;
 		private final Map<Class<?>, Method> timeoutMethods;
 		private final KeyspaceConfiguration keyspaceConfig;
-		private final RedisMappingContext mappingContext;
+		private final ValkeyMappingContext mappingContext;
 
 		/**
 		 * Creates new {@link ConfigAwareTimeToLiveAccessor}
@@ -175,7 +175,7 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 		 * @param keyspaceConfig must not be {@literal null}.
 		 * @param mappingContext must not be {@literal null}.
 		 */
-		ConfigAwareTimeToLiveAccessor(KeyspaceConfiguration keyspaceConfig, RedisMappingContext mappingContext) {
+		ConfigAwareTimeToLiveAccessor(KeyspaceConfiguration keyspaceConfig, ValkeyMappingContext mappingContext) {
 
 			Assert.notNull(keyspaceConfig, "KeyspaceConfiguration must not be null");
 			Assert.notNull(mappingContext, "MappingContext must not be null");
@@ -219,7 +219,7 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 
 			} else if (ttlProperty != null) {
 
-				RedisPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(type);
+				ValkeyPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(type);
 
 				Object ttlPropertyValue = entity.getPropertyAccessor(source).getProperty(ttlProperty);
 				if (ttlPropertyValue != null) {
@@ -286,7 +286,7 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 				defaultTimeout = keyspaceConfig.getKeyspaceSettings(type).getTimeToLive();
 			}
 
-			RedisHash hash = mappingContext.getRequiredPersistentEntity(type).findAnnotation(RedisHash.class);
+			ValkeyHash hash = mappingContext.getRequiredPersistentEntity(type).findAnnotation(ValkeyHash.class);
 			if (hash != null && hash.timeToLive() > 0) {
 				defaultTimeout = hash.timeToLive();
 			}
@@ -302,7 +302,7 @@ public class RedisMappingContext extends KeyValueMappingContext<RedisPersistentE
 				return timeoutProperties.get(type);
 			}
 
-			RedisPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(type);
+			ValkeyPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(type);
 			PersistentProperty<?> ttlProperty = entity.getPersistentProperty(TimeToLive.class);
 
 			if (ttlProperty != null) {

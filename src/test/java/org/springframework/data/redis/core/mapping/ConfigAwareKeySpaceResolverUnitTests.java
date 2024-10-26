@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.KeyspaceConfiguration.KeyspaceSettings;
-import org.springframework.data.redis.core.mapping.RedisMappingContext.ConfigAwareKeySpaceResolver;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext.ConfigAwareKeySpaceResolver;
 
 /**
  * Unit tests for {@link ConfigAwareKeySpaceResolver}.

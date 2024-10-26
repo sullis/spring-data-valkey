@@ -25,24 +25,24 @@ import org.mockito.Mockito;
  */
 public abstract class AbstractConnectionUnitTestBase<T> {
 
-	private T nativeRedisConnectionMock;
+	private T nativeValkeyConnectionMock;
 
-	protected T getNativeRedisConnectionMock() {
+	protected T getNativeValkeyConnectionMock() {
 
-		if (this.nativeRedisConnectionMock == null) {
+		if (this.nativeValkeyConnectionMock == null) {
 			Class<T> type = resolveReturnedClassFromGernericType();
-			this.nativeRedisConnectionMock = Mockito.mock(type);
+			this.nativeValkeyConnectionMock = Mockito.mock(type);
 		}
 
-		return this.nativeRedisConnectionMock;
+		return this.nativeValkeyConnectionMock;
 	}
 
 	protected T verifyNativeConnectionInvocation() {
-		return Mockito.verify(getNativeRedisConnectionMock(), Mockito.times(1));
+		return Mockito.verify(getNativeValkeyConnectionMock(), Mockito.times(1));
 	}
 
-	protected void setNativeRedisConnectionMock(T nativeRedisConnectionMock) {
-		this.nativeRedisConnectionMock = nativeRedisConnectionMock;
+	protected void setNativeValkeyConnectionMock(T nativeValkeyConnectionMock) {
+		this.nativeValkeyConnectionMock = nativeValkeyConnectionMock;
 	}
 
 	@SuppressWarnings("unchecked")

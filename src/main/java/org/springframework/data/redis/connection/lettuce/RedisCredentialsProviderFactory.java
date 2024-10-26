@@ -15,74 +15,74 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisCredentials;
-import io.lettuce.core.RedisCredentialsProvider;
+import io.lettuce.core.ValkeyCredentials;
+import io.lettuce.core.ValkeyCredentialsProvider;
 import reactor.core.publisher.Mono;
 
-import org.springframework.data.redis.connection.RedisConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration;
+import org.springframework.data.redis.connection.ValkeySentinelConfiguration;
 import org.springframework.lang.Nullable;
 
 /**
- * Factory interface to create {@link RedisCredentialsProvider} from a {@link RedisConfiguration}. Credentials can be
- * associated with {@link RedisCredentials#hasUsername() username} and/or {@link RedisCredentials#hasPassword()
+ * Factory interface to create {@link ValkeyCredentialsProvider} from a {@link ValkeyConfiguration}. Credentials can be
+ * associated with {@link ValkeyCredentials#hasUsername() username} and/or {@link ValkeyCredentials#hasPassword()
  * password}.
  * <p>
- * Credentials are based off the given {@link RedisConfiguration} objects. Changing the credentials in the actual object
- * affects the constructed {@link RedisCredentials} object. Credentials are requested by the Lettuce client after
+ * Credentials are based off the given {@link ValkeyConfiguration} objects. Changing the credentials in the actual object
+ * affects the constructed {@link ValkeyCredentials} object. Credentials are requested by the Lettuce client after
  * connecting to the host. Therefore, credential retrieval is subject to complete within the configured connection
  * creation timeout to avoid connection failures.
  *
  * @author Mark Paluch
  * @since 3.0
  */
-public interface RedisCredentialsProviderFactory {
+public interface ValkeyCredentialsProviderFactory {
 
 	/**
-	 * Create a {@link RedisCredentialsProvider} for data node authentication given {@link RedisConfiguration}.
+	 * Create a {@link ValkeyCredentialsProvider} for data node authentication given {@link ValkeyConfiguration}.
 	 *
-	 * @param redisConfiguration the {@link RedisConfiguration} object.
-	 * @return a {@link RedisCredentialsProvider} that emits {@link RedisCredentials} for data node authentication.
+	 * @param redisConfiguration the {@link ValkeyConfiguration} object.
+	 * @return a {@link ValkeyCredentialsProvider} that emits {@link ValkeyCredentials} for data node authentication.
 	 */
 	@Nullable
-	default RedisCredentialsProvider createCredentialsProvider(RedisConfiguration redisConfiguration) {
+	default ValkeyCredentialsProvider createCredentialsProvider(ValkeyConfiguration redisConfiguration) {
 
-		if (redisConfiguration instanceof RedisConfiguration.WithAuthentication
-				&& ((RedisConfiguration.WithAuthentication) redisConfiguration).getPassword().isPresent()) {
+		if (redisConfiguration instanceof ValkeyConfiguration.WithAuthentication
+				&& ((ValkeyConfiguration.WithAuthentication) redisConfiguration).getPassword().isPresent()) {
 
-			return RedisCredentialsProvider.from(() -> {
+			return ValkeyCredentialsProvider.from(() -> {
 
-				RedisConfiguration.WithAuthentication withAuthentication = (RedisConfiguration.WithAuthentication) redisConfiguration;
+				ValkeyConfiguration.WithAuthentication withAuthentication = (ValkeyConfiguration.WithAuthentication) redisConfiguration;
 
-				return RedisCredentials.just(withAuthentication.getUsername(), withAuthentication.getPassword().get());
+				return ValkeyCredentials.just(withAuthentication.getUsername(), withAuthentication.getPassword().get());
 			});
 		}
 
-		return () -> Mono.just(AbsentRedisCredentials.ANONYMOUS);
+		return () -> Mono.just(AbsentValkeyCredentials.ANONYMOUS);
 	}
 
 	/**
-	 * Create a {@link RedisCredentialsProvider} for Sentinel node authentication given
-	 * {@link RedisSentinelConfiguration}.
+	 * Create a {@link ValkeyCredentialsProvider} for Sentinel node authentication given
+	 * {@link ValkeySentinelConfiguration}.
 	 *
-	 * @param redisConfiguration the {@link RedisSentinelConfiguration} object.
-	 * @return a {@link RedisCredentialsProvider} that emits {@link RedisCredentials} for sentinel authentication.
+	 * @param redisConfiguration the {@link ValkeySentinelConfiguration} object.
+	 * @return a {@link ValkeyCredentialsProvider} that emits {@link ValkeyCredentials} for sentinel authentication.
 	 */
-	default RedisCredentialsProvider createSentinelCredentialsProvider(RedisSentinelConfiguration redisConfiguration) {
+	default ValkeyCredentialsProvider createSentinelCredentialsProvider(ValkeySentinelConfiguration redisConfiguration) {
 
 		if (redisConfiguration.getSentinelPassword().isPresent()) {
 
-			return RedisCredentialsProvider.from(() -> RedisCredentials.just(redisConfiguration.getSentinelUsername(),
+			return ValkeyCredentialsProvider.from(() -> ValkeyCredentials.just(redisConfiguration.getSentinelUsername(),
 					redisConfiguration.getSentinelPassword().get()));
 		}
 
-		return () -> Mono.just(AbsentRedisCredentials.ANONYMOUS);
+		return () -> Mono.just(AbsentValkeyCredentials.ANONYMOUS);
 	}
 
 	/**
-	 * Default anonymous {@link RedisCredentials} without username/password.
+	 * Default anonymous {@link ValkeyCredentials} without username/password.
 	 */
-	enum AbsentRedisCredentials implements RedisCredentials {
+	enum AbsentValkeyCredentials implements ValkeyCredentials {
 
 		ANONYMOUS;
 

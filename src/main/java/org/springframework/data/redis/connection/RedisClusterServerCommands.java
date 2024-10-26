@@ -19,131 +19,131 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 
 /**
  * @author Mark Paluch
  * @author Dennis Neufeld
  * @since 2.0
  */
-public interface RedisClusterServerCommands extends RedisServerCommands {
+public interface ValkeyClusterServerCommands extends ValkeyServerCommands {
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#bgReWriteAof()
+	 * @see ValkeyServerCommands#bgReWriteAof()
 	 */
-	void bgReWriteAof(RedisClusterNode node);
+	void bgReWriteAof(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#bgSave()
+	 * @see ValkeyServerCommands#bgSave()
 	 */
-	void bgSave(RedisClusterNode node);
-
-	/**
-	 * @param node must not be {@literal null}.
-	 * @return
-	 * @see RedisServerCommands#lastSave()
-	 */
-	Long lastSave(RedisClusterNode node);
-
-	/**
-	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#save()
-	 */
-	void save(RedisClusterNode node);
+	void bgSave(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisServerCommands#dbSize()
+	 * @see ValkeyServerCommands#lastSave()
 	 */
-	Long dbSize(RedisClusterNode node);
+	Long lastSave(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#flushDb()
+	 * @see ValkeyServerCommands#save()
 	 */
-	void flushDb(RedisClusterNode node);
+	void save(ValkeyClusterNode node);
+
+	/**
+	 * @param node must not be {@literal null}.
+	 * @return
+	 * @see ValkeyServerCommands#dbSize()
+	 */
+	Long dbSize(ValkeyClusterNode node);
+
+	/**
+	 * @param node must not be {@literal null}.
+	 * @see ValkeyServerCommands#flushDb()
+	 */
+	void flushDb(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param option
-	 * @see RedisServerCommands#flushDb(FlushOption)
+	 * @see ValkeyServerCommands#flushDb(FlushOption)
 	 * @since 2.7
 	 */
-	void flushDb(RedisClusterNode node, FlushOption option);
+	void flushDb(ValkeyClusterNode node, FlushOption option);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#flushAll()
+	 * @see ValkeyServerCommands#flushAll()
 	 */
-	void flushAll(RedisClusterNode node);
+	void flushAll(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param option
-	 * @see RedisServerCommands#flushAll(FlushOption)
+	 * @see ValkeyServerCommands#flushAll(FlushOption)
 	 * @since 2.7
 	 */
-	void flushAll(RedisClusterNode node, FlushOption option);
+	void flushAll(ValkeyClusterNode node, FlushOption option);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisServerCommands#info()
+	 * @see ValkeyServerCommands#info()
 	 */
-	Properties info(RedisClusterNode node);
+	Properties info(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param section
 	 * @return
-	 * @see RedisServerCommands#info(String)
+	 * @see ValkeyServerCommands#info(String)
 	 */
-	Properties info(RedisClusterNode node, String section);
+	Properties info(ValkeyClusterNode node, String section);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#shutdown()
+	 * @see ValkeyServerCommands#shutdown()
 	 */
-	void shutdown(RedisClusterNode node);
+	void shutdown(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param pattern
 	 * @return
-	 * @see RedisServerCommands#getConfig(String)
+	 * @see ValkeyServerCommands#getConfig(String)
 	 */
-	Properties getConfig(RedisClusterNode node, String pattern);
+	Properties getConfig(ValkeyClusterNode node, String pattern);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param param
 	 * @param value
-	 * @see RedisServerCommands#setConfig(String, String)
+	 * @see ValkeyServerCommands#setConfig(String, String)
 	 */
-	void setConfig(RedisClusterNode node, String param, String value);
+	void setConfig(ValkeyClusterNode node, String param, String value);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#resetConfigStats()
+	 * @see ValkeyServerCommands#resetConfigStats()
 	 */
-	void resetConfigStats(RedisClusterNode node);
+	void resetConfigStats(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
-	 * @see RedisServerCommands#rewriteConfig()
+	 * @see ValkeyServerCommands#rewriteConfig()
 	 * @since 2.5
 	 */
-	void rewriteConfig(RedisClusterNode node);
+	void rewriteConfig(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisServerCommands#time()
+	 * @see ValkeyServerCommands#time()
 	 */
-	default Long time(RedisClusterNode node) {
+	default Long time(ValkeyClusterNode node) {
 		return time(node, TimeUnit.MILLISECONDS);
 	}
 
@@ -152,14 +152,14 @@ public interface RedisClusterServerCommands extends RedisServerCommands {
 	 * @param timeUnit must not be {@literal null}.
 	 * @return
 	 * @since 2.5
-	 * @see RedisServerCommands#time(TimeUnit)
+	 * @see ValkeyServerCommands#time(TimeUnit)
 	 */
-	Long time(RedisClusterNode node, TimeUnit timeUnit);
+	Long time(ValkeyClusterNode node, TimeUnit timeUnit);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return
-	 * @see RedisServerCommands#getClientList()
+	 * @see ValkeyServerCommands#getClientList()
 	 */
-	List<RedisClientInfo> getClientList(RedisClusterNode node);
+	List<ValkeyClientInfo> getClientList(ValkeyClusterNode node);
 }

@@ -21,25 +21,25 @@ import static org.assertj.core.api.Assertions.*;
 
 
 /**
- * Unit tests for {@link RedisKeyExpiredEvent}.
+ * Unit tests for {@link ValkeyKeyExpiredEvent}.
  *
  * @author Mark Paluch
  */
-class RedisKeyExpiredEventUnitTests {
+class ValkeyKeyExpiredEventUnitTests {
 
 	@Test // DATAREDIS-744
 	void shouldReturnKeyspace() {
 
-		assertThat(new RedisKeyExpiredEvent<>("foo".getBytes(), "").getKeyspace()).isNull();
-		assertThat(new RedisKeyExpiredEvent<>("foo:bar".getBytes(), "").getKeyspace()).isEqualTo("foo");
-		assertThat(new RedisKeyExpiredEvent<>("foo:bar:baz".getBytes(), "").getKeyspace()).isEqualTo("foo");
+		assertThat(new ValkeyKeyExpiredEvent<>("foo".getBytes(), "").getKeyspace()).isNull();
+		assertThat(new ValkeyKeyExpiredEvent<>("foo:bar".getBytes(), "").getKeyspace()).isEqualTo("foo");
+		assertThat(new ValkeyKeyExpiredEvent<>("foo:bar:baz".getBytes(), "").getKeyspace()).isEqualTo("foo");
 	}
 
 	@Test // DATAREDIS-744
 	void shouldReturnId() {
 
-		assertThat(new RedisKeyExpiredEvent<>("foo".getBytes(), "").getId()).isEqualTo("foo".getBytes());
-		assertThat(new RedisKeyExpiredEvent<>("foo:bar".getBytes(), "").getId()).isEqualTo("bar".getBytes());
-		assertThat(new RedisKeyExpiredEvent<>("foo:bar:baz".getBytes(), "").getId()).isEqualTo("bar:baz".getBytes());
+		assertThat(new ValkeyKeyExpiredEvent<>("foo".getBytes(), "").getId()).isEqualTo("foo".getBytes());
+		assertThat(new ValkeyKeyExpiredEvent<>("foo:bar".getBytes(), "").getId()).isEqualTo("bar".getBytes());
+		assertThat(new ValkeyKeyExpiredEvent<>("foo:bar:baz".getBytes(), "").getId()).isEqualTo("bar:baz".getBytes());
 	}
 }

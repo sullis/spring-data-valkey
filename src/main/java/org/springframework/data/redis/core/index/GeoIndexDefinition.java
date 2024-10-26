@@ -16,14 +16,14 @@
 package org.springframework.data.redis.core.index;
 
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.ValkeyGeoCommands.GeoLocation;
 import org.springframework.lang.Nullable;
 
 /**
  * @author Christoph Strobl
  * @since 1.8
  */
-public class GeoIndexDefinition extends RedisIndexDefinition implements PathBasedRedisIndexDefinition {
+public class GeoIndexDefinition extends ValkeyIndexDefinition implements PathBasedValkeyIndexDefinition {
 
 	/**
 	 * Creates new {@link GeoIndexDefinition}.

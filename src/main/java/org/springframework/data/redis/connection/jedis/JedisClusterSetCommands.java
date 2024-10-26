@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
-import org.springframework.data.redis.connection.RedisSetCommands;
+import org.springframework.data.redis.connection.ValkeySetCommands;
 import org.springframework.data.redis.connection.jedis.JedisClusterConnection.JedisMultiKeyClusterCommandCallback;
 import org.springframework.data.redis.connection.util.ByteArraySet;
 import org.springframework.data.redis.core.Cursor;
@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 2.0
  */
-class JedisClusterSetCommands implements RedisSetCommands {
+class JedisClusterSetCommands implements ValkeySetCommands {
 
 	private final JedisClusterConnection connection;
 

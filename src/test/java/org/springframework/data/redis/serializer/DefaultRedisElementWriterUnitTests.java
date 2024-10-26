@@ -23,11 +23,11 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link DefaultRedisElementWriter}.
+ * Unit tests for {@link DefaultValkeyElementWriter}.
  *
  * @author Mark Paluch
  */
-class DefaultRedisElementWriterUnitTests {
+class DefaultValkeyElementWriterUnitTests {
 
 	@Test // DATAREDIS-602
 	void shouldSerializeInputCorrectly() {
@@ -35,8 +35,8 @@ class DefaultRedisElementWriterUnitTests {
 		String input = "123ü?™";
 		byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
 
-		DefaultRedisElementWriter<String> writer = new DefaultRedisElementWriter<>(
-				new StringRedisSerializer(StandardCharsets.UTF_8));
+		DefaultValkeyElementWriter<String> writer = new DefaultValkeyElementWriter<>(
+				new StringValkeySerializer(StandardCharsets.UTF_8));
 
 		ByteBuffer result = writer.write(input);
 
@@ -46,7 +46,7 @@ class DefaultRedisElementWriterUnitTests {
 	@Test // DATAREDIS-602
 	void shouldWrapByteArrayForAbsentSerializer() {
 
-		DefaultRedisElementWriter<Object> writer = new DefaultRedisElementWriter<>(null);
+		DefaultValkeyElementWriter<Object> writer = new DefaultValkeyElementWriter<>(null);
 
 		byte[] input = { 1, 2, 3 };
 		ByteBuffer result = writer.write(input);
@@ -57,7 +57,7 @@ class DefaultRedisElementWriterUnitTests {
 	@Test // DATAREDIS-602
 	void shouldPassThroughByteBufferForAbsentSerializer() {
 
-		DefaultRedisElementWriter<Object> writer = new DefaultRedisElementWriter<>(null);
+		DefaultValkeyElementWriter<Object> writer = new DefaultValkeyElementWriter<>(null);
 
 		byte[] input = { 1, 2, 3 };
 		ByteBuffer result = writer.write(ByteBuffer.wrap(input));
@@ -68,7 +68,7 @@ class DefaultRedisElementWriterUnitTests {
 	@Test // DATAREDIS-602
 	void shouldFailForUnsupportedTypeWithAbsentSerializer() {
 
-		DefaultRedisElementWriter<Object> writer = new DefaultRedisElementWriter<>(null);
+		DefaultValkeyElementWriter<Object> writer = new DefaultValkeyElementWriter<>(null);
 
 		assertThatIllegalStateException().isThrownBy(() -> writer.write(new Object()));
 	}

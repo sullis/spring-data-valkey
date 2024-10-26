@@ -28,19 +28,19 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.Command;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyScanCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.Command;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyScanCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Redis Hash commands executed using reactive infrastructure.
+ * Valkey Hash commands executed using reactive infrastructure.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -52,7 +52,7 @@ public interface ReactiveHashCommands {
 	 * {@literal HSET} {@link Command}.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/hset">Redis Documentation: HSET</a>
+	 * @see <a href="https://redis.io/commands/hset">Valkey Documentation: HSET</a>
 	 */
 	class HSetCommand extends KeyCommand {
 
@@ -155,7 +155,7 @@ public interface ReactiveHashCommands {
 	 * @param field must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hset">Redis Documentation: HSET</a>
+	 * @see <a href="https://redis.io/commands/hset">Valkey Documentation: HSET</a>
 	 */
 	default Mono<Boolean> hSet(ByteBuffer key, ByteBuffer field, ByteBuffer value) {
 
@@ -173,7 +173,7 @@ public interface ReactiveHashCommands {
 	 * @param field must not be {@literal null}.
 	 * @param value must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hsetnx">Redis Documentation: HSETNX</a>
+	 * @see <a href="https://redis.io/commands/hsetnx">Valkey Documentation: HSETNX</a>
 	 */
 	default Mono<Boolean> hSetNX(ByteBuffer key, ByteBuffer field, ByteBuffer value) {
 
@@ -191,7 +191,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param fieldValueMap must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hmset">Redis Documentation: HMSET</a>
+	 * @see <a href="https://redis.io/commands/hmset">Valkey Documentation: HMSET</a>
 	 */
 	default Mono<Boolean> hMSet(ByteBuffer key, Map<ByteBuffer, ByteBuffer> fieldValueMap) {
 
@@ -206,7 +206,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hset">Redis Documentation: HSET</a>
+	 * @see <a href="https://redis.io/commands/hset">Valkey Documentation: HSET</a>
 	 */
 	Flux<BooleanResponse<HSetCommand>> hSet(Publisher<HSetCommand> commands);
 
@@ -214,7 +214,7 @@ public interface ReactiveHashCommands {
 	 * {@literal HGET} {@link Command}.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/hget">Redis Documentation: HGET</a>
+	 * @see <a href="https://redis.io/commands/hget">Valkey Documentation: HGET</a>
 	 */
 	class HGetCommand extends KeyCommand {
 
@@ -280,7 +280,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param field must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hget">Redis Documentation: HGET</a>
+	 * @see <a href="https://redis.io/commands/hget">Valkey Documentation: HGET</a>
 	 */
 	default Mono<ByteBuffer> hGet(ByteBuffer key, ByteBuffer field) {
 		return hMGet(key, Collections.singletonList(field)).filter(it -> !it.contains(null))
@@ -294,7 +294,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param fields must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hmget">Redis Documentation: HMGET</a>
+	 * @see <a href="https://redis.io/commands/hmget">Valkey Documentation: HMGET</a>
 	 */
 	default Mono<List<ByteBuffer>> hMGet(ByteBuffer key, Collection<ByteBuffer> fields) {
 
@@ -310,7 +310,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hmget">Redis Documentation: HMGET</a>
+	 * @see <a href="https://redis.io/commands/hmget">Valkey Documentation: HMGET</a>
 	 */
 	Flux<MultiValueResponse<HGetCommand, ByteBuffer>> hMGet(Publisher<HGetCommand> commands);
 
@@ -318,7 +318,7 @@ public interface ReactiveHashCommands {
 	 * {@literal HEXISTS} {@link Command}.
 	 *
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/hexists">Redis Documentation: HEXISTS</a>
+	 * @see <a href="https://redis.io/commands/hexists">Valkey Documentation: HEXISTS</a>
 	 */
 	class HExistsCommand extends KeyCommand {
 
@@ -371,7 +371,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param field must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hexists">Redis Documentation: HEXISTS</a>
+	 * @see <a href="https://redis.io/commands/hexists">Valkey Documentation: HEXISTS</a>
 	 */
 	default Mono<Boolean> hExists(ByteBuffer key, ByteBuffer field) {
 
@@ -386,13 +386,13 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands
 	 * @return
-	 * @see <a href="https://redis.io/commands/hexists">Redis Documentation: HEXISTS</a>
+	 * @see <a href="https://redis.io/commands/hexists">Valkey Documentation: HEXISTS</a>
 	 */
 	Flux<BooleanResponse<HExistsCommand>> hExists(Publisher<HExistsCommand> commands);
 
 	/**
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/hdel">Redis Documentation: HDEL</a>
+	 * @see <a href="https://redis.io/commands/hdel">Valkey Documentation: HDEL</a>
 	 */
 	class HDelCommand extends KeyCommand {
 
@@ -458,7 +458,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param field must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hdel">Redis Documentation: HDEL</a>
+	 * @see <a href="https://redis.io/commands/hdel">Valkey Documentation: HDEL</a>
 	 */
 	default Mono<Boolean> hDel(ByteBuffer key, ByteBuffer field) {
 
@@ -473,7 +473,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @param fields must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hdel">Redis Documentation: HDEL</a>
+	 * @see <a href="https://redis.io/commands/hdel">Valkey Documentation: HDEL</a>
 	 */
 	default Mono<Long> hDel(ByteBuffer key, Collection<ByteBuffer> fields) {
 
@@ -488,7 +488,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hdel">Redis Documentation: HDEL</a>
+	 * @see <a href="https://redis.io/commands/hdel">Valkey Documentation: HDEL</a>
 	 */
 	Flux<NumericResponse<HDelCommand, Long>> hDel(Publisher<HDelCommand> commands);
 
@@ -497,7 +497,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hlen">Redis Documentation: HLEN</a>
+	 * @see <a href="https://redis.io/commands/hlen">Valkey Documentation: HLEN</a>
 	 */
 	default Mono<Long> hLen(ByteBuffer key) {
 
@@ -511,7 +511,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hlen">Redis Documentation: HLEN</a>
+	 * @see <a href="https://redis.io/commands/hlen">Valkey Documentation: HLEN</a>
 	 */
 	Flux<NumericResponse<KeyCommand, Long>> hLen(Publisher<KeyCommand> commands);
 
@@ -520,7 +520,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	class HRandFieldCommand extends KeyCommand {
 
@@ -570,7 +570,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	default Mono<ByteBuffer> hRandField(ByteBuffer key) {
 
@@ -585,7 +585,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	default Mono<Map.Entry<ByteBuffer, ByteBuffer>> hRandFieldWithValues(ByteBuffer key) {
 
@@ -605,7 +605,7 @@ public interface ReactiveHashCommands {
 	 * @param count number of fields to return.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	default Flux<ByteBuffer> hRandField(ByteBuffer key, long count) {
 
@@ -624,7 +624,7 @@ public interface ReactiveHashCommands {
 	 * @param count number of fields to return.
 	 * @return {@literal null} if key does not exist or when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	default Flux<Map.Entry<ByteBuffer, ByteBuffer>> hRandFieldWithValues(ByteBuffer key, long count) {
 
@@ -639,7 +639,7 @@ public interface ReactiveHashCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Flux<CommandResponse<HRandFieldCommand, Flux<ByteBuffer>>> hRandField(Publisher<HRandFieldCommand> commands);
 
@@ -649,7 +649,7 @@ public interface ReactiveHashCommands {
 	 * @param commands must not be {@literal null}.
 	 * @return
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/hrandfield">Redis Documentation: HRANDFIELD</a>
+	 * @see <a href="https://redis.io/commands/hrandfield">Valkey Documentation: HRANDFIELD</a>
 	 */
 	Flux<CommandResponse<HRandFieldCommand, Flux<Map.Entry<ByteBuffer, ByteBuffer>>>> hRandFieldWithValues(
 			Publisher<HRandFieldCommand> commands);
@@ -659,7 +659,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hkeys">Redis Documentation: HKEYS</a>
+	 * @see <a href="https://redis.io/commands/hkeys">Valkey Documentation: HKEYS</a>
 	 */
 	default Flux<ByteBuffer> hKeys(ByteBuffer key) {
 
@@ -673,7 +673,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hkeys">Redis Documentation: HKEYS</a>
+	 * @see <a href="https://redis.io/commands/hkeys">Valkey Documentation: HKEYS</a>
 	 */
 	Flux<CommandResponse<KeyCommand, Flux<ByteBuffer>>> hKeys(Publisher<KeyCommand> commands);
 
@@ -682,7 +682,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hvals">Redis Documentation: HVALS</a>
+	 * @see <a href="https://redis.io/commands/hvals">Valkey Documentation: HVALS</a>
 	 */
 	default Flux<ByteBuffer> hVals(ByteBuffer key) {
 
@@ -696,7 +696,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hvals">Redis Documentation: HVALS</a>
+	 * @see <a href="https://redis.io/commands/hvals">Valkey Documentation: HVALS</a>
 	 */
 	Flux<CommandResponse<KeyCommand, Flux<ByteBuffer>>> hVals(Publisher<KeyCommand> commands);
 
@@ -705,7 +705,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param key must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hgetall">Redis Documentation: HGETALL</a>
+	 * @see <a href="https://redis.io/commands/hgetall">Valkey Documentation: HGETALL</a>
 	 */
 	default Flux<Map.Entry<ByteBuffer, ByteBuffer>> hGetAll(ByteBuffer key) {
 
@@ -719,7 +719,7 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return
-	 * @see <a href="https://redis.io/commands/hgetall">Redis Documentation: HGETALL</a>
+	 * @see <a href="https://redis.io/commands/hgetall">Valkey Documentation: HGETALL</a>
 	 */
 	Flux<CommandResponse<KeyCommand, Flux<Map.Entry<ByteBuffer, ByteBuffer>>>> hGetAll(Publisher<KeyCommand> commands);
 
@@ -730,7 +730,7 @@ public interface ReactiveHashCommands {
 	 * @param key must not be {@literal null}.
 	 * @return the {@link Flux} emitting {@link java.util.Map.Entry entries} one by one.
 	 * @throws IllegalArgumentException in case the given key is {@literal null}.
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<Map.Entry<ByteBuffer, ByteBuffer>> hScan(ByteBuffer key) {
@@ -745,7 +745,7 @@ public interface ReactiveHashCommands {
 	 * @param options must not be {@literal null}. Use {@link ScanOptions#NONE} instead.
 	 * @return the {@link Flux} emitting the raw {@link java.util.Map.Entry entries} one by one.
 	 * @throws IllegalArgumentException in case one of the required arguments is {@literal null}.
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
 	 * @since 2.1
 	 */
 	default Flux<Map.Entry<ByteBuffer, ByteBuffer>> hScan(ByteBuffer key, ScanOptions options) {
@@ -760,14 +760,14 @@ public interface ReactiveHashCommands {
 	 *
 	 * @param commands must not be {@literal null}.
 	 * @return the {@link Flux} emitting {@link CommandResponse} one by one.
-	 * @see <a href="https://redis.io/commands/hscan">Redis Documentation: HSCAN</a>
+	 * @see <a href="https://redis.io/commands/hscan">Valkey Documentation: HSCAN</a>
 	 * @since 2.1
 	 */
 	Flux<CommandResponse<KeyCommand, Flux<Map.Entry<ByteBuffer, ByteBuffer>>>> hScan(Publisher<KeyScanCommand> commands);
 
 	/**
 	 * @author Christoph Strobl
-	 * @see <a href="https://redis.io/commands/hstrlen">Redis Documentation: HSTRLEN</a>
+	 * @see <a href="https://redis.io/commands/hstrlen">Valkey Documentation: HSTRLEN</a>
 	 * @since 2.1
 	 */
 	class HStrLenCommand extends KeyCommand {

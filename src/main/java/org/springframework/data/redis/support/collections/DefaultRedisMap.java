@@ -25,41 +25,41 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ValkeyOperations;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.Nullable;
 
 /**
- * Default implementation for {@link RedisMap}. Note that the current implementation doesn't provide the same locking
+ * Default implementation for {@link ValkeyMap}. Note that the current implementation doesn't provide the same locking
  * semantics across all methods. In highly concurrent environments, race conditions might appear.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  * @author Christian Bühler
  */
-public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
+public class DefaultValkeyMap<K, V> implements ValkeyMap<K, V> {
 
 	private final BoundHashOperations<String, K, V> hashOps;
 
 	/**
-	 * Constructs a new {@link DefaultRedisMap} instance.
+	 * Constructs a new {@link DefaultValkeyMap} instance.
 	 *
-	 * @param key Redis key of this map.
-	 * @param operations {@link RedisOperations} for this map.
-	 * @see RedisOperations#getHashKeySerializer()
-	 * @see RedisOperations#getValueSerializer()
+	 * @param key Valkey key of this map.
+	 * @param operations {@link ValkeyOperations} for this map.
+	 * @see ValkeyOperations#getHashKeySerializer()
+	 * @see ValkeyOperations#getValueSerializer()
 	 */
-	public DefaultRedisMap(String key, RedisOperations<String, ?> operations) {
+	public DefaultValkeyMap(String key, ValkeyOperations<String, ?> operations) {
 		this.hashOps = operations.boundHashOps(key);
 	}
 
 	/**
-	 * Constructs a new {@link DefaultRedisMap} instance.
+	 * Constructs a new {@link DefaultValkeyMap} instance.
 	 *
 	 * @param boundOps {@link BoundHashOperations} for this map.
 	 */
-	public DefaultRedisMap(BoundHashOperations<String, K, V> boundOps) {
+	public DefaultValkeyMap(BoundHashOperations<String, K, V> boundOps) {
 		this.hashOps = boundOps;
 	}
 
@@ -84,7 +84,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 	}
 
 	@Override
-	public RedisOperations<String, ?> getOperations() {
+	public ValkeyOperations<String, ?> getOperations() {
 		return hashOps.getOperations();
 	}
 
@@ -171,7 +171,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 		if (o == this)
 			return true;
 
-		if (o instanceof RedisMap) {
+		if (o instanceof ValkeyMap) {
 			return o.hashCode() == hashCode();
 		}
 		return false;
@@ -187,7 +187,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 
 	@Override
 	public String toString() {
-		return "RedisStore for key:" + getKey();
+		return "ValkeyStore for key:" + getKey();
 	}
 
 	@Override
@@ -206,7 +206,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 		return hashOps.getOperations().execute(new SessionCallback<Boolean>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public Boolean execute(RedisOperations ops) {
+			public Boolean execute(ValkeyOperations ops) {
 				for (;;) {
 					ops.watch(Collections.singleton(getKey()));
 					V v = get(key);
@@ -234,7 +234,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 		return hashOps.getOperations().execute(new SessionCallback<Boolean>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public Boolean execute(RedisOperations ops) {
+			public Boolean execute(ValkeyOperations ops) {
 				for (;;) {
 					ops.watch(Collections.singleton(getKey()));
 					V v = get(key);
@@ -263,7 +263,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 		return hashOps.getOperations().execute(new SessionCallback<V>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public V execute(RedisOperations ops) {
+			public V execute(ValkeyOperations ops) {
 				for (;;) {
 					ops.watch(Collections.singleton(getKey()));
 					V v = get(key);
@@ -323,7 +323,7 @@ public class DefaultRedisMap<K, V> implements RedisMap<K, V> {
 
 	private void checkResult(@Nullable Object obj) {
 		if (obj == null) {
-			throw new IllegalStateException("Cannot read collection with Redis connection in pipeline/multi-exec mode");
+			throw new IllegalStateException("Cannot read collection with Valkey connection in pipeline/multi-exec mode");
 		}
 	}
 

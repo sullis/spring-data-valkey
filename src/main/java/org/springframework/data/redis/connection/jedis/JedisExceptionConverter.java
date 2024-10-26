@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.ClusterRedirectException;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.TooManyClusterRedirectionsException;
 
 /**
@@ -60,7 +60,7 @@ public class JedisExceptionConverter implements Converter<Exception, DataAccessE
 		}
 
 		if (ex instanceof JedisConnectionException) {
-			return new RedisConnectionFailureException(ex.getMessage(), ex);
+			return new ValkeyConnectionFailureException(ex.getMessage(), ex);
 		}
 
 		if (ex instanceof JedisException || ex instanceof UnsupportedOperationException) {
@@ -68,11 +68,11 @@ public class JedisExceptionConverter implements Converter<Exception, DataAccessE
 		}
 
 		if (ex instanceof UnknownHostException) {
-			return new RedisConnectionFailureException("Unknown host " + ex.getMessage(), ex);
+			return new ValkeyConnectionFailureException("Unknown host " + ex.getMessage(), ex);
 		}
 
 		if (ex instanceof IOException) {
-			return new RedisConnectionFailureException("Could not connect to Redis server", ex);
+			return new ValkeyConnectionFailureException("Could not connect to Valkey server", ex);
 		}
 
 		return null;

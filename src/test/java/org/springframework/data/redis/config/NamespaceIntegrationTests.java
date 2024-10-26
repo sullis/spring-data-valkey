@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StreamOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringValkeyTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.ValkeyMessageListenerContainer;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -37,9 +37,9 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 @SpringJUnitConfig(locations = "namespace.xml")
 class NamespaceIntegrationTests {
 
-	@Autowired private RedisMessageListenerContainer container;
+	@Autowired private ValkeyMessageListenerContainer container;
 
-	@Autowired private StringRedisTemplate template;
+	@Autowired private StringValkeyTemplate template;
 
 	@Autowired private StubErrorHandler handler;
 

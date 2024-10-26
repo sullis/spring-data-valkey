@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Options for reading messages from a Redis Stream.
+ * Options for reading messages from a Valkey Stream.
  *
  * @author Mark Paluch
  * @author Christoph Strobl

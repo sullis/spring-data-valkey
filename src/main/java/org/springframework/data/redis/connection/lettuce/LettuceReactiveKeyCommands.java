@@ -17,7 +17,7 @@ package org.springframework.data.redis.connection.lettuce;
 
 import io.lettuce.core.CopyArgs;
 import io.lettuce.core.ScanStream;
-import io.lettuce.core.api.reactive.RedisKeyReactiveCommands;
+import io.lettuce.core.api.reactive.ValkeyKeyReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,13 +29,13 @@ import java.util.List;
 import org.reactivestreams.Publisher;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.ReactiveKeyCommands;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.BooleanResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.CommandResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.KeyCommand;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.MultiValueResponse;
-import org.springframework.data.redis.connection.ReactiveRedisConnection.NumericResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.BooleanResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.CommandResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.KeyCommand;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.MultiValueResponse;
+import org.springframework.data.redis.connection.ReactiveValkeyConnection.NumericResponse;
 import org.springframework.data.redis.connection.ValueEncoding;
-import org.springframework.data.redis.connection.ValueEncoding.RedisValueEncoding;
+import org.springframework.data.redis.connection.ValueEncoding.ValkeyValueEncoding;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.util.Assert;
 
@@ -46,14 +46,14 @@ import org.springframework.util.Assert;
  */
 class LettuceReactiveKeyCommands implements ReactiveKeyCommands {
 
-	private final LettuceReactiveRedisConnection connection;
+	private final LettuceReactiveValkeyConnection connection;
 
 	/**
 	 * Create new {@link LettuceReactiveKeyCommands}.
 	 *
 	 * @param connection must not be {@literal null}.
 	 */
-	LettuceReactiveKeyCommands(LettuceReactiveRedisConnection connection) {
+	LettuceReactiveKeyCommands(LettuceReactiveValkeyConnection connection) {
 
 		Assert.notNull(connection, "Connection must not be null");
 
@@ -133,7 +133,7 @@ class LettuceReactiveKeyCommands implements ReactiveKeyCommands {
 
 	@Override
 	public Mono<ByteBuffer> randomKey() {
-		return connection.execute(RedisKeyReactiveCommands::randomkey).next();
+		return connection.execute(ValkeyKeyReactiveCommands::randomkey).next();
 	}
 
 	@Override
@@ -306,7 +306,7 @@ class LettuceReactiveKeyCommands implements ReactiveKeyCommands {
 	public Mono<ValueEncoding> encodingOf(ByteBuffer key) {
 
 		return connection
-				.execute(cmd -> cmd.objectEncoding(key).map(ValueEncoding::of).defaultIfEmpty(RedisValueEncoding.VACANT))
+				.execute(cmd -> cmd.objectEncoding(key).map(ValueEncoding::of).defaultIfEmpty(ValkeyValueEncoding.VACANT))
 				.next();
 	}
 

@@ -34,19 +34,19 @@ import org.springframework.instrument.classloading.ShadowingClassLoader;
 import org.springframework.lang.Nullable;
 
 /**
- * Unit tests for {@link RedisCacheConfiguration}.
+ * Unit tests for {@link ValkeyCacheConfiguration}.
  *
  * @author Mark Paluch
  * @author John Blum
  */
-class RedisCacheConfigurationUnitTests {
+class ValkeyCacheConfigurationUnitTests {
 
 	@Test // DATAREDIS-763
 	void shouldSetClassLoader() {
 
 		ShadowingClassLoader classLoader = new ShadowingClassLoader(getClass().getClassLoader());
 
-		RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig(classLoader);
+		ValkeyCacheConfiguration config = ValkeyCacheConfiguration.defaultCacheConfig(classLoader);
 
 		Object adapter = new DirectFieldAccessor(config.getValueSerializationPair().getReader())
 				.getPropertyValue("serializer");
@@ -60,7 +60,7 @@ class RedisCacheConfigurationUnitTests {
 	@Test // DATAREDIS-1032
 	void shouldAllowConverterRegistration() {
 
-		RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
+		ValkeyCacheConfiguration config = ValkeyCacheConfiguration.defaultCacheConfig();
 		config.configureKeyConverters(registry -> registry.addConverter(new DomainTypeConverter()));
 
 		assertThat(config.getConversionService().canConvert(DomainType.class, String.class)).isTrue();
@@ -72,7 +72,7 @@ class RedisCacheConfigurationUnitTests {
 
 		Duration sixtySeconds = Duration.ofSeconds(60);
 
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+		ValkeyCacheConfiguration cacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig()
 			.entryTtl(sixtySeconds);
 
 		assertThat(cacheConfiguration).isNotNull();
@@ -87,11 +87,11 @@ class RedisCacheConfigurationUnitTests {
 		Duration thirtyMinutes = Duration.ofMinutes(30);
 		Duration twoHours = Duration.ofHours(2);
 
-		RedisCacheWriter.TtlFunction mockTtlFunction = mock(RedisCacheWriter.TtlFunction.class);
+		ValkeyCacheWriter.TtlFunction mockTtlFunction = mock(ValkeyCacheWriter.TtlFunction.class);
 
 		doReturn(thirtyMinutes).doReturn(twoHours).when(mockTtlFunction).getTimeToLive(any(), any());
 
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+		ValkeyCacheConfiguration cacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig()
 				.entryTtl(mockTtlFunction);
 
 		assertThat(cacheConfiguration.getTtl()).isEqualTo(thirtyMinutes);
@@ -104,12 +104,12 @@ class RedisCacheConfigurationUnitTests {
 	@Test // GH-2351
 	public void enableTtiExpirationShouldConfigureTti() {
 
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+		ValkeyCacheConfiguration cacheConfiguration = ValkeyCacheConfiguration.defaultCacheConfig();
 
 		assertThat(cacheConfiguration).isNotNull();
 		assertThat(cacheConfiguration.isTimeToIdleEnabled()).isFalse();
 
-		RedisCacheConfiguration ttiEnabledCacheConfiguration = cacheConfiguration.enableTimeToIdle();
+		ValkeyCacheConfiguration ttiEnabledCacheConfiguration = cacheConfiguration.enableTimeToIdle();
 
 		assertThat(ttiEnabledCacheConfiguration).isNotNull();
 		assertThat(ttiEnabledCacheConfiguration).isNotSameAs(cacheConfiguration);

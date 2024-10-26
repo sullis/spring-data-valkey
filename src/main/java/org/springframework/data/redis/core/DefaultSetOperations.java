@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.util.Assert;
 
 /**
@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  */
 class DefaultSetOperations<K, V> extends AbstractOperations<K, V> implements SetOperations<K, V> {
 
-	DefaultSetOperations(RedisTemplate<K, V> template) {
+	DefaultSetOperations(ValkeyTemplate<K, V> template) {
 		super(template);
 	}
 
@@ -195,10 +195,10 @@ class DefaultSetOperations<K, V> extends AbstractOperations<K, V> implements Set
 	@Override
 	public V randomMember(K key) {
 
-		return execute(new ValueDeserializingRedisCallback(key) {
+		return execute(new ValueDeserializingValkeyCallback(key) {
 
 			@Override
-			protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
+			protected byte[] inValkey(byte[] rawKey, ValkeyConnection connection) {
 				return connection.sRandMember(rawKey);
 			}
 		});
@@ -211,7 +211,7 @@ class DefaultSetOperations<K, V> extends AbstractOperations<K, V> implements Set
 
 		byte[] rawKey = rawKey(key);
 		Set<byte[]> rawValues = execute(
-				(RedisCallback<Set<byte[]>>) connection -> new HashSet<>(connection.sRandMember(rawKey, count)));
+				(ValkeyCallback<Set<byte[]>>) connection -> new HashSet<>(connection.sRandMember(rawKey, count)));
 
 		return deserializeValues(rawValues);
 	}
@@ -239,10 +239,10 @@ class DefaultSetOperations<K, V> extends AbstractOperations<K, V> implements Set
 	@Override
 	public V pop(K key) {
 
-		return execute(new ValueDeserializingRedisCallback(key) {
+		return execute(new ValueDeserializingValkeyCallback(key) {
 
 			@Override
-			protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
+			protected byte[] inValkey(byte[] rawKey, ValkeyConnection connection) {
 				return connection.sPop(rawKey);
 			}
 		});
@@ -315,7 +315,7 @@ class DefaultSetOperations<K, V> extends AbstractOperations<K, V> implements Set
 
 		byte[] rawKey = rawKey(key);
 		return template.executeWithStickyConnection(
-				(RedisCallback<Cursor<V>>) connection -> new ConvertingCursor<>(connection.sScan(rawKey, options),
+				(ValkeyCallback<Cursor<V>>) connection -> new ConvertingCursor<>(connection.sScan(rawKey, options),
 						this::deserializeValue));
 	}
 }

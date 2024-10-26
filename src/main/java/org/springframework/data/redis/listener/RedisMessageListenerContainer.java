@@ -47,18 +47,18 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.ValkeyConnectionFailureException;
 import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 import org.springframework.data.redis.connection.Subscription;
 import org.springframework.data.redis.connection.SubscriptionListener;
 import org.springframework.data.redis.connection.util.ByteArrayWrapper;
-import org.springframework.data.redis.listener.adapter.RedisListenerExecutionFailedException;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.listener.adapter.ValkeyListenerExecutionFailedException;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -70,16 +70,16 @@ import org.springframework.util.backoff.BackOffExecution;
 import org.springframework.util.backoff.FixedBackOff;
 
 /**
- * Container providing asynchronous behaviour for Redis message listeners. Handles the low level details of listening,
+ * Container providing asynchronous behaviour for Valkey message listeners. Handles the low level details of listening,
  * converting and message dispatching.
  * <p>
- * As opposed to the low level Redis (one connection per subscription), the container uses only one connection that is
+ * As opposed to the low level Valkey (one connection per subscription), the container uses only one connection that is
  * 'multiplexed' for all registered listeners, the message dispatch being done through the
  * {@link #setTaskExecutor(Executor) task executor}. It is recommended to configure the task executor (and subscription
- * executor when using a blocking Redis connector) instead of using the default {@link SimpleAsyncTaskExecutor} for
+ * executor when using a blocking Valkey connector) instead of using the default {@link SimpleAsyncTaskExecutor} for
  * reuse of thread pools.
  * <p>
- * The container uses a single Redis connection in a lazy fashion (the connection is used only if at least one listener
+ * The container uses a single Valkey connection in a lazy fashion (the connection is used only if at least one listener
  * is configured). Listeners can be registered eagerly before {@link #start() starting} the container to subscribe to
  * all registered topics upon startup. Listeners are guaranteed to be subscribed after the {@link #start()} method
  * returns.
@@ -105,7 +105,7 @@ import org.springframework.util.backoff.FixedBackOff;
  * @see MessageListener
  * @see SubscriptionListener
  */
-public class RedisMessageListenerContainer implements InitializingBean, DisposableBean, BeanNameAware, SmartLifecycle {
+public class ValkeyMessageListenerContainer implements InitializingBean, DisposableBean, BeanNameAware, SmartLifecycle {
 
 	/**
 	 * The default recovery interval: 5000 ms = 5 seconds.
@@ -118,9 +118,9 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	public static final long DEFAULT_SUBSCRIPTION_REGISTRATION_WAIT_TIME = 2000L;
 
 	/**
-	 * Default thread name prefix: "RedisMessageListenerContainer-".
+	 * Default thread name prefix: "ValkeyMessageListenerContainer-".
 	 */
-	public static final String DEFAULT_THREAD_NAME_PREFIX = ClassUtils.getShortName(RedisMessageListenerContainer.class)
+	public static final String DEFAULT_THREAD_NAME_PREFIX = ClassUtils.getShortName(ValkeyMessageListenerContainer.class)
 			+ "-";
 
 	/** Logger available to subclasses */
@@ -159,9 +159,9 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	// lookup map between listeners and channels
 	private final Map<MessageListener, Set<Topic>> listenerTopics = new ConcurrentHashMap<>();
 
-	private @Nullable RedisConnectionFactory connectionFactory;
+	private @Nullable ValkeyConnectionFactory connectionFactory;
 
-	private RedisSerializer<String> serializer = RedisSerializer.string();
+	private ValkeySerializer<String> serializer = ValkeySerializer.string();
 
 	private @Nullable String beanName;
 
@@ -176,7 +176,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	}
 
 	/**
-	 * Sets the task execution used for subscribing to Redis channels. By default, if no executor is set, the
+	 * Sets the task execution used for subscribing to Valkey channels. By default, if no executor is set, the
 	 * {@link #setTaskExecutor(Executor)} will be used. In some cases, this might be undesired as the listening to the
 	 * connection is a long-running task.
 	 * <p>
@@ -206,14 +206,14 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	 * @return Returns the connectionFactory
 	 */
 	@Nullable
-	public RedisConnectionFactory getConnectionFactory() {
+	public ValkeyConnectionFactory getConnectionFactory() {
 		return this.connectionFactory;
 	}
 
 	/**
 	 * @param connectionFactory The connectionFactory to set.
 	 */
-	public void setConnectionFactory(RedisConnectionFactory connectionFactory) {
+	public void setConnectionFactory(ValkeyConnectionFactory connectionFactory) {
 
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 
@@ -222,11 +222,11 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 	/**
 	 * Sets the serializer for converting the {@link Topic}s into low-level channels and patterns. By default,
-	 * {@link StringRedisSerializer} is used.
+	 * {@link StringValkeySerializer} is used.
 	 *
 	 * @param serializer The serializer to set.
 	 */
-	public void setTopicSerializer(RedisSerializer<String> serializer) {
+	public void setTopicSerializer(ValkeySerializer<String> serializer) {
 		this.serializer = serializer;
 	}
 
@@ -293,7 +293,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	public void afterPropertiesSet() {
 
 		Assert.state(!this.afterPropertiesSet, "Container already initialized");
-		Assert.notNull(this.connectionFactory, "RedisConnectionFactory is not set");
+		Assert.notNull(this.connectionFactory, "ValkeyConnectionFactory is not set");
 
 		if (this.taskExecutor == null) {
 			this.manageExecutor = true;
@@ -357,7 +357,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	public void start() {
 
 		if (started.compareAndSet(false, true)) {
-			logDebug(() -> "Starting RedisMessageListenerContainer...");
+			logDebug(() -> "Starting ValkeyMessageListenerContainer...");
 			lazyListen();
 		}
 	}
@@ -380,7 +380,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		} catch (ExecutionException ex) {
 
 			if (ex.getCause() instanceof DataAccessException) {
-				throw new RedisListenerExecutionFailedException(ex.getMessage(), ex.getCause());
+				throw new ValkeyListenerExecutionFailedException(ex.getMessage(), ex.getCause());
 			}
 
 			throw new CompletionException(ex.getCause());
@@ -395,7 +395,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	private CompletableFuture<Void> lazyListen(BackOffExecution backOffExecution) {
 
 		if (!hasTopics()) {
-			logDebug(() -> "Postpone listening for Redis messages until actual listeners are added");
+			logDebug(() -> "Postpone listening for Valkey messages until actual listeners are added");
 			return CompletableFuture.completedFuture(null);
 		}
 
@@ -432,10 +432,10 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		listenFuture.whenComplete((unused, throwable) -> {
 
 			if (throwable == null) {
-				logDebug(() -> "RedisMessageListenerContainer listeners registered successfully");
+				logDebug(() -> "ValkeyMessageListenerContainer listeners registered successfully");
 				this.state.set(State.listening());
 			} else {
-				logDebug(() -> "Failed to start RedisMessageListenerContainer listeners", throwable);
+				logDebug(() -> "Failed to start ValkeyMessageListenerContainer listeners", throwable);
 				this.state.set(State.notListening());
 			}
 
@@ -447,7 +447,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 			}
 		});
 
-		logDebug(() -> "Subscribing to topics for RedisMessageListenerContainer");
+		logDebug(() -> "Subscribing to topics for ValkeyMessageListenerContainer");
 
 		return true;
 	}
@@ -484,7 +484,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 		if (this.started.compareAndSet(true, false)) {
 			stopListening();
-			logDebug(() -> "Stopped RedisMessageListenerContainer");
+			logDebug(() -> "Stopped ValkeyMessageListenerContainer");
 			callback.run();
 		}
 	}
@@ -577,7 +577,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	 * Removes a message listener from the given topics. If the container is running, the listener stops receiving
 	 * (matching) messages as soon as possible.
 	 * <p>
-	 * Note that this method obeys the Redis (p)unsubscribe semantics - meaning an empty/null collection will remove
+	 * Note that this method obeys the Valkey (p)unsubscribe semantics - meaning an empty/null collection will remove
 	 * listener from all channels.
 	 *
 	 * @param listener message listener.
@@ -591,7 +591,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	 * Removes a message listener from the given topic. If the container is running, the listener stops receiving
 	 * (matching) messages as soon as possible.
 	 * <p>
-	 * Note that this method obeys the Redis (p)unsubscribe semantics - meaning an empty/null collection will remove
+	 * Note that this method obeys the Valkey (p)unsubscribe semantics - meaning an empty/null collection will remove
 	 * listener from all channels.
 	 *
 	 * @param listener message listener.
@@ -689,7 +689,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 				} catch (CompletionException ex) {
 
 					if (ex.getCause() instanceof DataAccessException) {
-						throw new RedisListenerExecutionFailedException(ex.getMessage(), ex.getCause());
+						throw new ValkeyListenerExecutionFailedException(ex.getMessage(), ex.getCause());
 					}
 
 					throw ex;
@@ -802,7 +802,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		}
 	}
 
-	private Subscriber createSubscriber(RedisConnectionFactory connectionFactory, Executor executor) {
+	private Subscriber createSubscriber(ValkeyConnectionFactory connectionFactory, Executor executor) {
 		return ConnectionUtils.isAsync(connectionFactory) ? new Subscriber(connectionFactory)
 				: new BlockingSubscriber(connectionFactory, executor);
 	}
@@ -861,7 +861,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 	/**
 	 * Handle subscription task exception. Will attempt to restart the subscription if the Exception is a connection
-	 * failure (for example, Redis was restarted).
+	 * failure (for example, Valkey was restarted).
 	 *
 	 * @param cause Throwable exception
 	 */
@@ -870,7 +870,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 		getRequiredSubscriber().closeConnection();
 
-		if (cause instanceof RedisConnectionFailureException && isRunning()) {
+		if (cause instanceof ValkeyConnectionFailureException && isRunning()) {
 
 			BackOffExecution loggingBackOffExecution = () -> {
 
@@ -986,7 +986,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	private Subscriber getRequiredSubscriber() {
 
 		Assert.state(this.subscriber != null,
-				"Subscriber not created; Configure RedisConnectionFactory to create a Subscriber. Make sure that afterPropertiesSet() has been called");
+				"Subscriber not created; Configure ValkeyConnectionFactory to create a Subscriber. Make sure that afterPropertiesSet() has been called");
 
 		return this.subscriber;
 	}
@@ -1194,8 +1194,8 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 	}
 
 	/**
-	 * Topic subscriber controller. Keeps track of the actual Redis connection and provides entry points to initially
-	 * subscribe to Redis topics and update subscriptions (add/remove).
+	 * Topic subscriber controller. Keeps track of the actual Valkey connection and provides entry points to initially
+	 * subscribe to Valkey topics and update subscriptions (add/remove).
 	 * <p>
 	 * Actual subscription notifications are routed through {@link DispatchMessageListener} to multicast events to the
 	 * actual listeners without blocking the event loop.
@@ -1209,14 +1209,14 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 		private final Lock lock = new ReentrantLock();
 
-		private volatile @Nullable RedisConnection connection;
+		private volatile @Nullable ValkeyConnection connection;
 
-		private final RedisConnectionFactory connectionFactory;
+		private final ValkeyConnectionFactory connectionFactory;
 
 		private final SynchronizingMessageListener synchronizingMessageListener = new SynchronizingMessageListener(
 				delegateListener, delegateListener);
 
-		Subscriber(RedisConnectionFactory connectionFactory) {
+		Subscriber(ValkeyConnectionFactory connectionFactory) {
 			this.connectionFactory = connectionFactory;
 		}
 
@@ -1238,7 +1238,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 				try {
 
-					RedisConnection connection = this.connectionFactory.getConnection();
+					ValkeyConnection connection = this.connectionFactory.getConnection();
 
 					this.connection = connection;
 
@@ -1271,7 +1271,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		/**
 		 * Performs a potentially asynchronous registration of a subscription.
 		 */
-		void eventuallyPerformSubscription(RedisConnection connection, BackOffExecution backOffExecution,
+		void eventuallyPerformSubscription(ValkeyConnection connection, BackOffExecution backOffExecution,
 				CompletableFuture<Void> subscriptionDone, Collection<byte[]> patterns, Collection<byte[]> channels) {
 
 			addSynchronization(new SynchronizingMessageListener.SubscriptionSynchronization(patterns, channels, () -> {
@@ -1288,7 +1288,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		 * @param patterns patterns to subscribe to.
 		 * @param channels channels to subscribe to.
 		 */
-		void doSubscribe(RedisConnection connection, Collection<byte[]> patterns, Collection<byte[]> channels) {
+		void doSubscribe(ValkeyConnection connection, Collection<byte[]> patterns, Collection<byte[]> channels) {
 
 			if (!patterns.isEmpty()) {
 				connection.pSubscribe(synchronizingMessageListener, patterns.toArray(new byte[0][]));
@@ -1311,7 +1311,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 			doInLock(() -> {
 
-				RedisConnection connection = this.connection;
+				ValkeyConnection connection = this.connection;
 
 				if (connection != null) {
 					doUnsubscribe(connection);
@@ -1319,7 +1319,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 			});
 		}
 
-		void doUnsubscribe(RedisConnection connection) {
+		void doUnsubscribe(ValkeyConnection connection) {
 
 			closeSubscription(connection);
 			closeConnection();
@@ -1334,7 +1334,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 			doInLock(() -> {
 
-				RedisConnection connection = this.connection;
+				ValkeyConnection connection = this.connection;
 
 				if (connection != null) {
 					doCancel(connection);
@@ -1342,14 +1342,14 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 			});
 		}
 
-		void doCancel(RedisConnection connection) {
+		void doCancel(ValkeyConnection connection) {
 			closeSubscription(connection);
 			closeConnection();
 		}
 
-		void closeSubscription(RedisConnection connection) {
+		void closeSubscription(ValkeyConnection connection) {
 
-			logTrace(() -> "Cancelling Redis subscription...");
+			logTrace(() -> "Cancelling Valkey subscription...");
 
 			Subscription subscription = connection.getSubscription();
 
@@ -1366,13 +1366,13 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 		}
 
 		/**
-		 * Close the current Redis connection.
+		 * Close the current Valkey connection.
 		 */
 		public void closeConnection() {
 
 			doInLock(() -> {
 
-				RedisConnection connection = this.connection;
+				ValkeyConnection connection = this.connection;
 
 				this.connection = null;
 
@@ -1430,7 +1430,7 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 			}
 
 			doInLock(() -> {
-				RedisConnection connection = this.connection;
+				ValkeyConnection connection = this.connection;
 				if (connection != null) {
 					Subscription subscription = connection.getSubscription();
 					if (subscription != null) {
@@ -1469,18 +1469,18 @@ public class RedisMessageListenerContainer implements InitializingBean, Disposab
 
 		private final Executor executor;
 
-		BlockingSubscriber(RedisConnectionFactory connectionFactory, Executor executor) {
+		BlockingSubscriber(ValkeyConnectionFactory connectionFactory, Executor executor) {
 			super(connectionFactory);
 			this.executor = executor;
 		}
 
 		@Override
-		void doUnsubscribe(RedisConnection connection) {
+		void doUnsubscribe(ValkeyConnection connection) {
 			closeSubscription(connection); // connection will be closed after exiting the doSubscribe method
 		}
 
 		@Override
-		protected void eventuallyPerformSubscription(RedisConnection connection, BackOffExecution backOffExecution,
+		protected void eventuallyPerformSubscription(ValkeyConnection connection, BackOffExecution backOffExecution,
 				CompletableFuture<Void> subscriptionDone, Collection<byte[]> patterns, Collection<byte[]> channels) {
 
 			Collection<byte[]> initiallySubscribeToChannels;

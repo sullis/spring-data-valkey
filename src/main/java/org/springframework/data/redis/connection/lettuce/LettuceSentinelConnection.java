@@ -15,14 +15,14 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
-import io.lettuce.core.RedisURI.Builder;
+import io.lettuce.core.ValkeyClient;
+import io.lettuce.core.ValkeyURI;
+import io.lettuce.core.ValkeyURI.Builder;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.codec.StringCodec;
 import io.lettuce.core.resource.ClientResources;
-import io.lettuce.core.sentinel.api.StatefulRedisSentinelConnection;
-import io.lettuce.core.sentinel.api.sync.RedisSentinelCommands;
+import io.lettuce.core.sentinel.api.StatefulValkeySentinelConnection;
+import io.lettuce.core.sentinel.api.sync.ValkeySentinelCommands;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,9 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.data.redis.ExceptionTranslationStrategy;
 import org.springframework.data.redis.FallbackExceptionTranslationStrategy;
 import org.springframework.data.redis.connection.NamedNode;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisSentinelConnection;
-import org.springframework.data.redis.connection.RedisServer;
+import org.springframework.data.redis.connection.ValkeyNode;
+import org.springframework.data.redis.connection.ValkeySentinelConnection;
+import org.springframework.data.redis.connection.ValkeyServer;
 import org.springframework.util.Assert;
 
 /**
@@ -41,20 +41,20 @@ import org.springframework.util.Assert;
  * @author Mark Paluch
  * @since 1.5
  */
-public class LettuceSentinelConnection implements RedisSentinelConnection {
+public class LettuceSentinelConnection implements ValkeySentinelConnection {
 
 	private static final ExceptionTranslationStrategy EXCEPTION_TRANSLATION = new FallbackExceptionTranslationStrategy(
 			LettuceExceptionConverter.INSTANCE);
 
 	private final LettuceConnectionProvider provider;
-	private StatefulRedisSentinelConnection<String, String> connection; // no that should not be null
+	private StatefulValkeySentinelConnection<String, String> connection; // no that should not be null
 
 	/**
-	 * Creates a {@link LettuceSentinelConnection} with a dedicated client for a supplied {@link RedisNode}.
+	 * Creates a {@link LettuceSentinelConnection} with a dedicated client for a supplied {@link ValkeyNode}.
 	 *
 	 * @param sentinel The sentinel to connect to.
 	 */
-	public LettuceSentinelConnection(RedisNode sentinel) {
+	public LettuceSentinelConnection(ValkeyNode sentinel) {
 		this(sentinel.getHost(), sentinel.getPort());
 	}
 
@@ -90,11 +90,11 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	}
 
 	/**
-	 * Creates a {@link LettuceSentinelConnection} using a supplied {@link RedisClient}.
+	 * Creates a {@link LettuceSentinelConnection} using a supplied {@link ValkeyClient}.
 	 *
 	 * @param redisClient must not be {@literal null}.
 	 */
-	public LettuceSentinelConnection(RedisClient redisClient) {
+	public LettuceSentinelConnection(ValkeyClient redisClient) {
 
 		Assert.notNull(redisClient, "Cannot create LettuceSentinelConnection using 'null' as client.");
 		this.provider = new LettuceConnectionProvider() {
@@ -116,7 +116,7 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	 *
 	 * @param connection native Lettuce connection, must not be {@literal null}
 	 */
-	protected LettuceSentinelConnection(StatefulRedisSentinelConnection<String, String> connection) {
+	protected LettuceSentinelConnection(StatefulValkeySentinelConnection<String, String> connection) {
 
 		Assert.notNull(connection, "Cannot create LettuceSentinelConnection using 'null' as connection.");
 		this.provider = new LettuceConnectionProvider() {
@@ -149,22 +149,22 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	@Override
 	public void failover(NamedNode master) {
 
-		Assert.notNull(master, "Redis node master must not be 'null' for failover.");
-		Assert.hasText(master.getName(), "Redis master name must not be 'null' or empty for failover.");
+		Assert.notNull(master, "Valkey node master must not be 'null' for failover.");
+		Assert.hasText(master.getName(), "Valkey master name must not be 'null' or empty for failover.");
 		getSentinelCommands().failover(master.getName());
 	}
 
 	@Override
-	public List<RedisServer> masters() {
+	public List<ValkeyServer> masters() {
 		try {
-			return LettuceConverters.toListOfRedisServer(getSentinelCommands().masters());
+			return LettuceConverters.toListOfValkeyServer(getSentinelCommands().masters());
 		} catch (Exception ex) {
 			throw EXCEPTION_TRANSLATION.translate(ex);
 		}
 	}
 
 	@Override
-	public List<RedisServer> replicas(NamedNode master) {
+	public List<ValkeyServer> replicas(NamedNode master) {
 
 		Assert.notNull(master, "Master node cannot be 'null' when loading replicas.");
 		return slaves(master.getName());
@@ -172,14 +172,14 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 
 	/**
 	 * @param masterName
-	 * @see org.springframework.data.redis.connection.RedisSentinelCommands#replicas(org.springframework.data.redis.connection.NamedNode)
+	 * @see org.springframework.data.redis.connection.ValkeySentinelCommands#replicas(org.springframework.data.redis.connection.NamedNode)
 	 * @return
 	 */
-	public List<RedisServer> slaves(String masterName) {
+	public List<ValkeyServer> slaves(String masterName) {
 
 		Assert.hasText(masterName, "Name of redis master cannot be 'null' or empty when loading replicas.");
 		try {
-			return LettuceConverters.toListOfRedisServer(getSentinelCommands().slaves(masterName));
+			return LettuceConverters.toListOfValkeyServer(getSentinelCommands().slaves(masterName));
 		} catch (Exception ex) {
 			throw EXCEPTION_TRANSLATION.translate(ex);
 		}
@@ -194,7 +194,7 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 
 	/**
 	 * @param masterName
-	 * @see org.springframework.data.redis.connection.RedisSentinelCommands#remove(org.springframework.data.redis.connection.NamedNode)
+	 * @see org.springframework.data.redis.connection.ValkeySentinelCommands#remove(org.springframework.data.redis.connection.NamedNode)
 	 */
 	public void remove(String masterName) {
 
@@ -203,7 +203,7 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	}
 
 	@Override
-	public void monitor(RedisServer server) {
+	public void monitor(ValkeyServer server) {
 
 		Assert.notNull(server, "Cannot monitor 'null' server.");
 		Assert.hasText(server.getName(), "Name of server to monitor must not be 'null' or empty");
@@ -223,11 +223,11 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	private void init() {
 
 		if (connection == null) {
-			connection = provider.getConnection(StatefulRedisSentinelConnection.class);
+			connection = provider.getConnection(StatefulValkeySentinelConnection.class);
 		}
 	}
 
-	private RedisSentinelCommands<String, String> getSentinelCommands() {
+	private ValkeySentinelCommands<String, String> getSentinelCommands() {
 		return connection.sync();
 	}
 
@@ -241,15 +241,15 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 	 */
 	private static class DedicatedClientConnectionProvider implements LettuceConnectionProvider {
 
-		private final RedisClient redisClient;
-		private final RedisURI uri;
+		private final ValkeyClient redisClient;
+		private final ValkeyURI uri;
 
 		DedicatedClientConnectionProvider(String host, int port) {
 
 			Assert.notNull(host, "Cannot create LettuceSentinelConnection using 'null' as host.");
 
 			uri = Builder.redis(host, port).build();
-			redisClient = RedisClient.create(uri);
+			redisClient = ValkeyClient.create(uri);
 		}
 
 		DedicatedClientConnectionProvider(String host, int port, ClientResources clientResources) {
@@ -258,7 +258,7 @@ public class LettuceSentinelConnection implements RedisSentinelConnection {
 			Assert.notNull(host, "Cannot create LettuceSentinelConnection using 'null' as host.");
 
 			this.uri = Builder.redis(host, port).build();
-			redisClient = RedisClient.create(clientResources, uri);
+			redisClient = ValkeyClient.create(clientResources, uri);
 		}
 
 		@Override

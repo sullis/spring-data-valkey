@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * @author Christoph Strobl
  * @author Mark Paluch
  */
-public class GenericToStringSerializer<T> implements RedisSerializer<T>, BeanFactoryAware {
+public class GenericToStringSerializer<T> implements ValkeySerializer<T>, BeanFactoryAware {
 
 	private final Class<T> type;
 	private final Charset charset;

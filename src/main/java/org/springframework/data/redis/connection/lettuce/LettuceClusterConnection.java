@@ -15,12 +15,12 @@
  */
 package org.springframework.data.redis.connection.lettuce;
 
-import io.lettuce.core.RedisURI;
-import io.lettuce.core.api.sync.BaseRedisCommands;
-import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.ValkeyURI;
+import io.lettuce.core.api.sync.BaseValkeyCommands;
+import io.lettuce.core.cluster.ValkeyClusterClient;
 import io.lettuce.core.cluster.SlotHash;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.cluster.api.StatefulValkeyClusterConnection;
+import io.lettuce.core.cluster.api.sync.ValkeyClusterCommands;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.ClusterCommandCallback;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.MultiKeyClusterCommandCallback;
 import org.springframework.data.redis.connection.ClusterCommandExecutor.NodeResult;
-import org.springframework.data.redis.connection.RedisClusterNode.SlotRange;
+import org.springframework.data.redis.connection.ValkeyClusterNode.SlotRange;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
@@ -52,12 +52,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@code RedisClusterConnection} implementation on top of <a href="https://github.com/mp911de/lettuce">Lettuce</a>
- * Redis client.
+ * {@code ValkeyClusterConnection} implementation on top of <a href="https://github.com/mp911de/lettuce">Lettuce</a>
+ * Valkey client.
  * <p>
- * While the underlying Lettuce {@literal RedisClient} and {@literal StatefulRedisConnection} instances used by
+ * While the underlying Lettuce {@literal ValkeyClient} and {@literal StatefulValkeyConnection} instances used by
  * {@link LettuceClusterConnection} are Thread-safe, this class itself is not Thread-safe. Therefore, instances of
- * {@link LettuceClusterConnection} should not be shared across multiple Threads when executing Redis commands and other
+ * {@link LettuceClusterConnection} should not be shared across multiple Threads when executing Valkey commands and other
  * operations. If optimal performance is required by your application(s), then we recommend direct access to the
  * low-level, API provided by the underlying Lettuce client library (driver), where such Thread-safety guarantees can be
  * made. Simply call {@link #getNativeConnection()} and use the native resource as required.
@@ -68,7 +68,7 @@ import org.springframework.util.ObjectUtils;
  * @since 1.7
  */
 public class LettuceClusterConnection extends LettuceConnection
-		implements RedisClusterConnection, DefaultedRedisClusterConnection {
+		implements ValkeyClusterConnection, DefaultedValkeyClusterConnection {
 
 	static final ExceptionTranslationStrategy exceptionConverter = new PassThroughExceptionTranslationStrategy(
 			LettuceExceptionConverter.INSTANCE);
@@ -92,29 +92,29 @@ public class LettuceClusterConnection extends LettuceConnection
 	private final LettuceClusterServerCommands serverCommands = new LettuceClusterServerCommands(this);
 
 	/**
-	 * Creates new {@link LettuceClusterConnection} using {@link RedisClusterClient} with default
-	 * {@link RedisURI#DEFAULT_TIMEOUT_DURATION timeout} and a fresh {@link ClusterCommandExecutor} that gets destroyed on
+	 * Creates new {@link LettuceClusterConnection} using {@link ValkeyClusterClient} with default
+	 * {@link ValkeyURI#DEFAULT_TIMEOUT_DURATION timeout} and a fresh {@link ClusterCommandExecutor} that gets destroyed on
 	 * close.
 	 *
 	 * @param clusterClient must not be {@literal null}.
 	 */
-	public LettuceClusterConnection(RedisClusterClient clusterClient) {
+	public LettuceClusterConnection(ValkeyClusterClient clusterClient) {
 		this(new ClusterConnectionProvider(clusterClient, CODEC));
 	}
 
 	/**
-	 * Creates new {@link LettuceClusterConnection} with default {@link RedisURI#DEFAULT_TIMEOUT_DURATION timeout} using
-	 * {@link RedisClusterClient} running commands across the cluster via given {@link ClusterCommandExecutor}.
+	 * Creates new {@link LettuceClusterConnection} with default {@link ValkeyURI#DEFAULT_TIMEOUT_DURATION timeout} using
+	 * {@link ValkeyClusterClient} running commands across the cluster via given {@link ClusterCommandExecutor}.
 	 *
 	 * @param clusterClient must not be {@literal null}.
 	 * @param executor must not be {@literal null}.
 	 */
-	public LettuceClusterConnection(RedisClusterClient clusterClient, ClusterCommandExecutor executor) {
-		this(clusterClient, executor, RedisURI.DEFAULT_TIMEOUT_DURATION);
+	public LettuceClusterConnection(ValkeyClusterClient clusterClient, ClusterCommandExecutor executor) {
+		this(clusterClient, executor, ValkeyURI.DEFAULT_TIMEOUT_DURATION);
 	}
 
 	/**
-	 * Creates new {@link LettuceClusterConnection} with given command {@code timeout} using {@link RedisClusterClient}
+	 * Creates new {@link LettuceClusterConnection} with given command {@code timeout} using {@link ValkeyClusterClient}
 	 * running commands across the cluster via given {@link ClusterCommandExecutor}.
 	 *
 	 * @param clusterClient must not be {@literal null}.
@@ -122,7 +122,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 * @param executor must not be {@literal null}.
 	 * @since 2.0
 	 */
-	public LettuceClusterConnection(RedisClusterClient clusterClient, ClusterCommandExecutor executor, Duration timeout) {
+	public LettuceClusterConnection(ValkeyClusterClient clusterClient, ClusterCommandExecutor executor, Duration timeout) {
 		this(new ClusterConnectionProvider(clusterClient, CODEC), executor, timeout);
 	}
 
@@ -135,7 +135,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 */
 	public LettuceClusterConnection(LettuceConnectionProvider connectionProvider) {
 
-		super(null, connectionProvider, RedisURI.DEFAULT_TIMEOUT_DURATION.toMillis(), 0);
+		super(null, connectionProvider, ValkeyURI.DEFAULT_TIMEOUT_DURATION.toMillis(), 0);
 
 		Assert.isTrue(connectionProvider instanceof ClusterConnectionProvider,
 				"LettuceConnectionProvider must be a ClusterConnectionProvider");
@@ -155,7 +155,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 * @since 2.0
 	 */
 	public LettuceClusterConnection(LettuceConnectionProvider connectionProvider, ClusterCommandExecutor executor) {
-		this(connectionProvider, executor, RedisURI.DEFAULT_TIMEOUT_DURATION);
+		this(connectionProvider, executor, ValkeyURI.DEFAULT_TIMEOUT_DURATION);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	/**
-	 * Creates new {@link LettuceClusterConnection} given a shared {@link StatefulRedisClusterConnection} and
+	 * Creates new {@link LettuceClusterConnection} given a shared {@link StatefulValkeyClusterConnection} and
 	 * {@link LettuceConnectionProvider} running commands across the cluster via given {@link ClusterCommandExecutor}.
 	 *
 	 * @param sharedConnection may be {@literal null} if no shared connection used.
@@ -192,7 +192,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 * @param timeout must not be {@literal null}.
 	 * @since 2.1
 	 */
-	protected LettuceClusterConnection(@Nullable StatefulRedisClusterConnection<byte[], byte[]> sharedConnection,
+	protected LettuceClusterConnection(@Nullable StatefulValkeyClusterConnection<byte[], byte[]> sharedConnection,
 			LettuceConnectionProvider connectionProvider, ClusterTopologyProvider clusterTopologyProvider,
 			ClusterCommandExecutor executor, Duration timeout) {
 
@@ -206,67 +206,67 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	/**
-	 * @return access to {@link RedisClusterClient} for non-connection access.
+	 * @return access to {@link ValkeyClusterClient} for non-connection access.
 	 */
-	private RedisClusterClient getClient() {
+	private ValkeyClusterClient getClient() {
 
 		LettuceConnectionProvider connectionProvider = getConnectionProvider();
 
-		if (connectionProvider instanceof RedisClientProvider redisClientProvider) {
-			return (RedisClusterClient) redisClientProvider.getRedisClient();
+		if (connectionProvider instanceof ValkeyClientProvider redisClientProvider) {
+			return (ValkeyClusterClient) redisClientProvider.getValkeyClient();
 		}
 
-		throw new IllegalStateException("Connection provider %s does not implement RedisClientProvider"
+		throw new IllegalStateException("Connection provider %s does not implement ValkeyClientProvider"
 				.formatted(connectionProvider.getClass().getName()));
 	}
 
 	@Override
-	public org.springframework.data.redis.connection.RedisClusterCommands clusterCommands() {
+	public org.springframework.data.redis.connection.ValkeyClusterCommands clusterCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisGeoCommands geoCommands() {
+	public ValkeyGeoCommands geoCommands() {
 		return geoCommands;
 	}
 
 	@Override
-	public RedisHashCommands hashCommands() {
+	public ValkeyHashCommands hashCommands() {
 		return hashCommands;
 	}
 
 	@Override
-	public RedisHyperLogLogCommands hyperLogLogCommands() {
+	public ValkeyHyperLogLogCommands hyperLogLogCommands() {
 		return hllCommands;
 	}
 
 	@Override
-	public RedisKeyCommands keyCommands() {
+	public ValkeyKeyCommands keyCommands() {
 		return keyCommands;
 	}
 
 	@Override
-	public RedisListCommands listCommands() {
+	public ValkeyListCommands listCommands() {
 		return listCommands;
 	}
 
 	@Override
-	public RedisSetCommands setCommands() {
+	public ValkeySetCommands setCommands() {
 		return setCommands;
 	}
 
 	@Override
-	public RedisClusterServerCommands serverCommands() {
+	public ValkeyClusterServerCommands serverCommands() {
 		return serverCommands;
 	}
 
 	@Override
-	public RedisStringCommands stringCommands() {
+	public ValkeyStringCommands stringCommands() {
 		return stringCommands;
 	}
 
 	@Override
-	public RedisZSetCommands zSetCommands() {
+	public ValkeyZSetCommands zSetCommands() {
 		return zSetCommands;
 	}
 
@@ -285,46 +285,46 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public String ping(RedisClusterNode node) {
+	public String ping(ValkeyClusterNode node) {
 		return this.clusterCommandExecutor.executeCommandOnSingleNode(pingCommand(), node).getValue();
 	}
 
 	private LettuceClusterCommandCallback<String> pingCommand() {
-		return BaseRedisCommands::ping;
+		return BaseValkeyCommands::ping;
 	}
 
 	@Override
-	public List<RedisClusterNode> clusterGetNodes() {
+	public List<ValkeyClusterNode> clusterGetNodes() {
 		return new ArrayList<>(this.topologyProvider.getTopology().getNodes());
 	}
 
 	@Override
-	public Set<RedisClusterNode> clusterGetReplicas(RedisClusterNode master) {
+	public Set<ValkeyClusterNode> clusterGetReplicas(ValkeyClusterNode master) {
 
 		Assert.notNull(master, "Master must not be null");
 
-		RedisClusterNode nodeToUse = this.topologyProvider.getTopology().lookup(master);
+		ValkeyClusterNode nodeToUse = this.topologyProvider.getTopology().lookup(master);
 
-		LettuceClusterCommandCallback<Set<RedisClusterNode>> command = client ->
-			LettuceConverters.toSetOfRedisClusterNodes(client.clusterSlaves(nodeToUse.getId()));
+		LettuceClusterCommandCallback<Set<ValkeyClusterNode>> command = client ->
+			LettuceConverters.toSetOfValkeyClusterNodes(client.clusterSlaves(nodeToUse.getId()));
 
 		return this.clusterCommandExecutor.executeCommandOnSingleNode(command, master).getValue();
 	}
 
 	@Override
-	public Map<RedisClusterNode, Collection<RedisClusterNode>> clusterGetMasterReplicaMap() {
+	public Map<ValkeyClusterNode, Collection<ValkeyClusterNode>> clusterGetMasterReplicaMap() {
 
-		Set<RedisClusterNode> activeMasterNodes = this.topologyProvider.getTopology().getActiveMasterNodes();
+		Set<ValkeyClusterNode> activeMasterNodes = this.topologyProvider.getTopology().getActiveMasterNodes();
 
-		LettuceClusterCommandCallback<Collection<RedisClusterNode>> command = client ->
-			Converters.toSetOfRedisClusterNodes(client.clusterSlaves(client.clusterMyId()));
+		LettuceClusterCommandCallback<Collection<ValkeyClusterNode>> command = client ->
+			Converters.toSetOfValkeyClusterNodes(client.clusterSlaves(client.clusterMyId()));
 
-		List<NodeResult<Collection<RedisClusterNode>>> nodeResults =
+		List<NodeResult<Collection<ValkeyClusterNode>>> nodeResults =
 			this.clusterCommandExecutor.executeCommandAsyncOnNodes(command,activeMasterNodes).getResults();
 
-		Map<RedisClusterNode, Collection<RedisClusterNode>> result = new LinkedHashMap<>();
+		Map<ValkeyClusterNode, Collection<ValkeyClusterNode>> result = new LinkedHashMap<>();
 
-		for (NodeResult<Collection<RedisClusterNode>> nodeResult : nodeResults) {
+		for (NodeResult<Collection<ValkeyClusterNode>> nodeResult : nodeResults) {
 			result.put(nodeResult.getNode(), nodeResult.getValue());
 		}
 
@@ -338,15 +338,15 @@ public class LettuceClusterConnection extends LettuceConnection
 
 	@Nullable
 	@Override
-	public RedisClusterNode clusterGetNodeForSlot(int slot) {
+	public ValkeyClusterNode clusterGetNodeForSlot(int slot) {
 
-		Set<RedisClusterNode> nodes = topologyProvider.getTopology().getSlotServingNodes(slot);
+		Set<ValkeyClusterNode> nodes = topologyProvider.getTopology().getSlotServingNodes(slot);
 
 		return !nodes.isEmpty() ? nodes.iterator().next() : null;
 	}
 
 	@Override
-	public RedisClusterNode clusterGetNodeForKey(byte[] key) {
+	public ValkeyClusterNode clusterGetNodeForKey(byte[] key) {
 		return clusterGetNodeForSlot(clusterGetSlotForKey(key));
 	}
 
@@ -360,7 +360,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterAddSlots(RedisClusterNode node, int... slots) {
+	public void clusterAddSlots(ValkeyClusterNode node, int... slots) {
 
 		LettuceClusterCommandCallback<String> command = client -> client.clusterAddSlots(slots);
 
@@ -368,7 +368,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterAddSlots(RedisClusterNode node, SlotRange range) {
+	public void clusterAddSlots(ValkeyClusterNode node, SlotRange range) {
 
 		Assert.notNull(range, "Range must not be null");
 
@@ -386,7 +386,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterDeleteSlots(RedisClusterNode node, int... slots) {
+	public void clusterDeleteSlots(ValkeyClusterNode node, int... slots) {
 
 		LettuceClusterCommandCallback<String> command = client -> client.clusterDelSlots(slots);
 
@@ -394,7 +394,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterDeleteSlotsInRange(RedisClusterNode node, SlotRange range) {
+	public void clusterDeleteSlotsInRange(ValkeyClusterNode node, SlotRange range) {
 
 		Assert.notNull(range, "Range must not be null");
 
@@ -402,10 +402,10 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterForget(RedisClusterNode node) {
+	public void clusterForget(ValkeyClusterNode node) {
 
-		List<RedisClusterNode> nodes = new ArrayList<>(clusterGetNodes());
-		RedisClusterNode nodeToRemove = topologyProvider.getTopology().lookup(node);
+		List<ValkeyClusterNode> nodes = new ArrayList<>(clusterGetNodes());
+		ValkeyClusterNode nodeToRemove = topologyProvider.getTopology().lookup(node);
 
 		nodes.remove(nodeToRemove);
 
@@ -416,7 +416,7 @@ public class LettuceClusterConnection extends LettuceConnection
 
 	@Override
 	@SuppressWarnings("all")
-	public void clusterMeet(RedisClusterNode node) {
+	public void clusterMeet(ValkeyClusterNode node) {
 
 		Assert.notNull(node, "Cluster node must not be null for CLUSTER MEET command");
 		Assert.hasText(node.getHost(), "Node to meet cluster must have a host");
@@ -428,12 +428,12 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterSetSlot(RedisClusterNode node, int slot, AddSlots mode) {
+	public void clusterSetSlot(ValkeyClusterNode node, int slot, AddSlots mode) {
 
 		Assert.notNull(node, "Node must not be null");
 		Assert.notNull(mode, "AddSlots mode must not be null");
 
-		RedisClusterNode nodeToUse = topologyProvider.getTopology().lookup(node);
+		ValkeyClusterNode nodeToUse = topologyProvider.getTopology().lookup(node);
 		String nodeId = nodeToUse.getId();
 
 		LettuceClusterCommandCallback<String> command = client -> switch (mode) {
@@ -457,9 +457,9 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public void clusterReplicate(RedisClusterNode master, RedisClusterNode replica) {
+	public void clusterReplicate(ValkeyClusterNode master, ValkeyClusterNode replica) {
 
-		RedisClusterNode masterNode = this.topologyProvider.getTopology().lookup(master);
+		ValkeyClusterNode masterNode = this.topologyProvider.getTopology().lookup(master);
 
 		LettuceClusterCommandCallback<String> command = client -> client.clusterReplicate(masterNode.getId());
 
@@ -467,16 +467,16 @@ public class LettuceClusterConnection extends LettuceConnection
 	}
 
 	@Override
-	public Set<byte[]> keys(RedisClusterNode node, byte[] pattern) {
+	public Set<byte[]> keys(ValkeyClusterNode node, byte[] pattern) {
 		return new LettuceClusterKeyCommands(this).keys(node, pattern);
 	}
 
 	@Override
-	public Cursor<byte[]> scan(RedisClusterNode node, ScanOptions options) {
+	public Cursor<byte[]> scan(ValkeyClusterNode node, ScanOptions options) {
 		return new LettuceClusterKeyCommands(this).scan(node, options);
 	}
 
-	public byte[] randomKey(RedisClusterNode node) {
+	public byte[] randomKey(ValkeyClusterNode node) {
 		return new LettuceClusterKeyCommands(this).randomKey(node);
 	}
 
@@ -531,7 +531,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 * @since 1.7
 	 */
 	protected interface LettuceClusterCommandCallback<T>
-			extends ClusterCommandCallback<RedisClusterCommands<byte[], byte[]>, T> {}
+			extends ClusterCommandCallback<ValkeyClusterCommands<byte[], byte[]>, T> {}
 
 	/**
 	 * Lettuce specific implementation of {@link MultiKeyClusterCommandCallback}.
@@ -541,7 +541,7 @@ public class LettuceClusterConnection extends LettuceConnection
 	 * @since 1.7
 	 */
 	protected interface LettuceMultiKeyClusterCommandCallback<T>
-			extends MultiKeyClusterCommandCallback<RedisClusterCommands<byte[], byte[]>, T> {}
+			extends MultiKeyClusterCommandCallback<ValkeyClusterCommands<byte[], byte[]>, T> {}
 
 	/**
 	 * Lettuce specific implementation of {@link ClusterNodeResourceProvider}.
@@ -555,7 +555,7 @@ public class LettuceClusterConnection extends LettuceConnection
 
 		private final LettuceConnectionProvider connectionProvider;
 
-		private volatile @Nullable StatefulRedisClusterConnection<byte[], byte[]> connection;
+		private volatile @Nullable StatefulValkeyClusterConnection<byte[], byte[]> connection;
 
 		LettuceClusterNodeResourceProvider(LettuceConnectionProvider connectionProvider) {
 			this.connectionProvider = connectionProvider;
@@ -563,7 +563,7 @@ public class LettuceClusterConnection extends LettuceConnection
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public RedisClusterCommands<byte[], byte[]> getResourceForSpecificNode(RedisClusterNode node) {
+		public ValkeyClusterCommands<byte[], byte[]> getResourceForSpecificNode(ValkeyClusterNode node) {
 
 			Assert.notNull(node, "Node must not be null");
 
@@ -573,7 +573,7 @@ public class LettuceClusterConnection extends LettuceConnection
 
 				try {
 					if (this.connection == null) {
-						this.connection = this.connectionProvider.getConnection(StatefulRedisClusterConnection.class);
+						this.connection = this.connectionProvider.getConnection(StatefulValkeyClusterConnection.class);
 					}
 				} finally {
 					this.lock.unlock();
@@ -584,7 +584,7 @@ public class LettuceClusterConnection extends LettuceConnection
 		}
 
 		@Override
-		public void returnResourceForSpecificNode(RedisClusterNode node, Object resource) {}
+		public void returnResourceForSpecificNode(ValkeyClusterNode node, Object resource) {}
 
 		@Override
 		public void destroy() throws Exception {

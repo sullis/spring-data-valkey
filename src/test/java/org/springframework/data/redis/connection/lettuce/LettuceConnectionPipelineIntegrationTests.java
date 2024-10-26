@@ -23,9 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.AbstractConnectionPipelineIntegrationTests;
-import org.springframework.data.redis.connection.DefaultStringRedisConnection;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.DefaultStringValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyStandaloneConfiguration;
+import org.springframework.data.redis.connection.StringValkeyConnection;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -53,12 +53,12 @@ public class LettuceConnectionPipelineIntegrationTests extends AbstractConnectio
 		actual.add(connection.move("foo", 1));
 		verifyResults(Arrays.asList(new Object[] { true, true }));
 		// Lettuce does not support select when using shared conn, use a new conn factory
-		LettuceConnectionFactory factory2 = new LettuceConnectionFactory(new RedisStandaloneConfiguration(),
+		LettuceConnectionFactory factory2 = new LettuceConnectionFactory(new ValkeyStandaloneConfiguration(),
 				LettuceTestClientConfiguration.builder().build());
 		factory2.setDatabase(1);
 		factory2.afterPropertiesSet();
 		factory2.start();
-		StringRedisConnection conn2 = new DefaultStringRedisConnection(factory2.getConnection());
+		StringValkeyConnection conn2 = new DefaultStringValkeyConnection(factory2.getConnection());
 		try {
 			assertThat(conn2.get("foo")).isEqualTo("bar");
 		} finally {

@@ -34,14 +34,14 @@ import org.mockito.quality.Strictness;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ValkeyConnection;
 import org.springframework.data.redis.core.convert.GeoIndexedPropertyValue;
 import org.springframework.data.redis.core.convert.IndexedData;
-import org.springframework.data.redis.core.convert.MappingRedisConverter;
+import org.springframework.data.redis.core.convert.MappingValkeyConverter;
 import org.springframework.data.redis.core.convert.PathIndexResolver;
 import org.springframework.data.redis.core.convert.ReferenceResolver;
 import org.springframework.data.redis.core.convert.SimpleIndexedPropertyValue;
-import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.core.mapping.ValkeyMappingContext;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -57,15 +57,15 @@ class IndexWriterUnitTests {
 	private static final String KEY = "key-1";
 	private static final byte[] KEY_BIN = KEY.getBytes(CHARSET);
 	private IndexWriter writer;
-	private MappingRedisConverter converter;
+	private MappingValkeyConverter converter;
 
-	@Mock RedisConnection connectionMock;
+	@Mock ValkeyConnection connectionMock;
 	@Mock ReferenceResolver referenceResolverMock;
 
 	@BeforeEach
 	void setUp() {
 
-		converter = new MappingRedisConverter(new RedisMappingContext(), new PathIndexResolver(), referenceResolverMock);
+		converter = new MappingValkeyConverter(new ValkeyMappingContext(), new PathIndexResolver(), referenceResolverMock);
 		converter.afterPropertiesSet();
 
 		writer = new IndexWriter(connectionMock, converter);

@@ -20,14 +20,14 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisStreamCommands.XPendingOptions;
+import org.springframework.data.redis.connection.ValkeyStreamCommands.XPendingOptions;
 
 /**
- * Unit tests for {@link RedisStreamCommands}.
+ * Unit tests for {@link ValkeyStreamCommands}.
  *
  * @author jinkshower
  */
-class RedisStreamCommandsUnitTests {
+class ValkeyStreamCommandsUnitTests {
 
 	@Test // GH-2982
 	void xPendingOptionsUnboundedShouldThrowExceptionWhenCountIsNegative() {

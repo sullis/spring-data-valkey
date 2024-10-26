@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ValkeyStringCommands;
 
 /**
  * @author Christoph Strobl
@@ -68,7 +68,7 @@ class LettuceReactiveClusterStringCommandsIntegrationTests extends LettuceReacti
 		nativeCommands.set(SAME_SLOT_KEY_2, VALUE_2);
 
 		assertThat(connection.stringCommands().bitOp(Arrays.asList(SAME_SLOT_KEY_1_BBUFFER, SAME_SLOT_KEY_2_BBUFFER),
-				RedisStringCommands.BitOperation.AND, SAME_SLOT_KEY_3_BBUFFER).block()).isEqualTo(7L);
+				ValkeyStringCommands.BitOperation.AND, SAME_SLOT_KEY_3_BBUFFER).block()).isEqualTo(7L);
 		assertThat(nativeCommands.get(SAME_SLOT_KEY_3)).isEqualTo("value-0");
 	}
 
@@ -79,7 +79,7 @@ class LettuceReactiveClusterStringCommandsIntegrationTests extends LettuceReacti
 		nativeCommands.set(SAME_SLOT_KEY_2, VALUE_2);
 
 		assertThat(connection.stringCommands().bitOp(Arrays.asList(SAME_SLOT_KEY_1_BBUFFER, SAME_SLOT_KEY_2_BBUFFER),
-				RedisStringCommands.BitOperation.OR, SAME_SLOT_KEY_3_BBUFFER).block()).isEqualTo(7L);
+				ValkeyStringCommands.BitOperation.OR, SAME_SLOT_KEY_3_BBUFFER).block()).isEqualTo(7L);
 		assertThat(nativeCommands.get(SAME_SLOT_KEY_3)).isEqualTo(VALUE_3);
 	}
 
@@ -87,7 +87,7 @@ class LettuceReactiveClusterStringCommandsIntegrationTests extends LettuceReacti
 	void bitNotShouldThrowExceptionWhenMoreThanOnSourceKeyAndKeysMapToSameSlot() {
 		assertThatIllegalArgumentException().isThrownBy(
 				() -> connection.stringCommands().bitOp(Arrays.asList(SAME_SLOT_KEY_1_BBUFFER, SAME_SLOT_KEY_2_BBUFFER),
-						RedisStringCommands.BitOperation.NOT, SAME_SLOT_KEY_3_BBUFFER).block());
+						ValkeyStringCommands.BitOperation.NOT, SAME_SLOT_KEY_3_BBUFFER).block());
 	}
 
 }

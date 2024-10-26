@@ -29,7 +29,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.convert.ListConverter;
 import org.springframework.data.redis.connection.convert.MapConverter;
@@ -46,18 +46,18 @@ import org.springframework.data.redis.core.ConvertingCursor;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.data.redis.domain.geo.GeoReference.GeoMemberReference;
 import org.springframework.data.redis.domain.geo.GeoShape;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Default implementation of {@link StringRedisConnection}.
+ * Default implementation of {@link StringValkeyConnection}.
  *
  * @author Costin Leau
  * @author Jennifer Hickey
@@ -73,13 +73,13 @@ import org.springframework.util.ObjectUtils;
  * @author Shyngys Sapraliyev
  */
 @SuppressWarnings({ "ConstantConditions", "deprecation" })
-public class DefaultStringRedisConnection implements StringRedisConnection, DecoratedRedisConnection {
+public class DefaultStringValkeyConnection implements StringValkeyConnection, DecoratedValkeyConnection {
 
 	private static final byte[][] EMPTY_2D_BYTE_ARRAY = new byte[0][];
 
-	private final Log log = LogFactory.getLog(DefaultStringRedisConnection.class);
-	private final RedisConnection delegate;
-	private final RedisSerializer<String> serializer;
+	private final Log log = LogFactory.getLog(DefaultStringValkeyConnection.class);
+	private final ValkeyConnection delegate;
+	private final ValkeySerializer<String> serializer;
 	private Converter<byte[], String> bytesToString = new DeserializingConverter();
 	private Converter<String, byte[]> stringToBytes = new SerializingConverter();
 	private final TupleConverter tupleConverter = new TupleConverter();
@@ -152,22 +152,22 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	/**
-	 * Constructs a new <code>DefaultStringRedisConnection</code> instance. Uses {@link StringRedisSerializer} as
+	 * Constructs a new <code>DefaultStringValkeyConnection</code> instance. Uses {@link StringValkeySerializer} as
 	 * underlying serializer.
 	 *
-	 * @param connection Redis connection
+	 * @param connection Valkey connection
 	 */
-	public DefaultStringRedisConnection(RedisConnection connection) {
-		this(connection, RedisSerializer.string());
+	public DefaultStringValkeyConnection(ValkeyConnection connection) {
+		this(connection, ValkeySerializer.string());
 	}
 
 	/**
-	 * Constructs a new <code>DefaultStringRedisConnection</code> instance.
+	 * Constructs a new <code>DefaultStringValkeyConnection</code> instance.
 	 *
-	 * @param connection Redis connection
+	 * @param connection Valkey connection
 	 * @param serializer String serializer
 	 */
-	public DefaultStringRedisConnection(RedisConnection connection, RedisSerializer<String> serializer) {
+	public DefaultStringValkeyConnection(ValkeyConnection connection, ValkeySerializer<String> serializer) {
 
 		Assert.notNull(connection, "connection is required");
 		Assert.notNull(serializer, "serializer is required");
@@ -178,62 +178,62 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public RedisCommands commands() {
+	public ValkeyCommands commands() {
 		return this;
 	}
 
 	@Override
-	public RedisGeoCommands geoCommands() {
+	public ValkeyGeoCommands geoCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisHashCommands hashCommands() {
+	public ValkeyHashCommands hashCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisHyperLogLogCommands hyperLogLogCommands() {
+	public ValkeyHyperLogLogCommands hyperLogLogCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisKeyCommands keyCommands() {
+	public ValkeyKeyCommands keyCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisListCommands listCommands() {
+	public ValkeyListCommands listCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisSetCommands setCommands() {
+	public ValkeySetCommands setCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisScriptingCommands scriptingCommands() {
+	public ValkeyScriptingCommands scriptingCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisServerCommands serverCommands() {
+	public ValkeyServerCommands serverCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisStreamCommands streamCommands() {
+	public ValkeyStreamCommands streamCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisStringCommands stringCommands() {
+	public ValkeyStringCommands stringCommands() {
 		return this;
 	}
 
 	@Override
-	public RedisZSetCommands zSetCommands() {
+	public ValkeyZSetCommands zSetCommands() {
 		return this;
 	}
 
@@ -268,7 +268,7 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public void close() throws RedisSystemException {
+	public void close() throws ValkeySystemException {
 		delegate.close();
 	}
 
@@ -2526,7 +2526,7 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public List<RedisClientInfo> getClientList() {
+	public List<ValkeyClientInfo> getClientList() {
 		return convertAndReturn(this.delegate.getClientList(), Converters.identityConverter());
 	}
 
@@ -2582,7 +2582,7 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	/*
-	 * @see org.springframework.data.redis.connection.RedisServerCommands#getClientName()
+	 * @see org.springframework.data.redis.connection.ValkeyServerCommands#getClientName()
 	 */
 	@Override
 	public String getClientName() {
@@ -2611,7 +2611,7 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public RedisSentinelConnection getSentinelConnection() {
+	public ValkeySentinelConnection getSentinelConnection() {
 		return delegate.getSentinelConnection();
 	}
 
@@ -2770,12 +2770,12 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option) {
 		delegate.migrate(key, target, dbIndex, option);
 	}
 
 	@Override
-	public void migrate(byte[] key, RedisNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
+	public void migrate(byte[] key, ValkeyNode target, int dbIndex, @Nullable MigrateOption option, long timeout) {
 		delegate.migrate(key, target, dbIndex, option, timeout);
 	}
 
@@ -3092,7 +3092,7 @@ public class DefaultStringRedisConnection implements StringRedisConnection, Deco
 	}
 
 	@Override
-	public RedisConnection getDelegate() {
+	public ValkeyConnection getDelegate() {
 		return delegate;
 	}
 }

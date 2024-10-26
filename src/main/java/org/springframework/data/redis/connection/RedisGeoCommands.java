@@ -15,7 +15,7 @@
  */
 package org.springframework.data.redis.connection;
 
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs.*;
+import static org.springframework.data.redis.connection.ValkeyGeoCommands.GeoRadiusCommandArgs.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,14 +35,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Geo-specific Redis commands.
+ * Geo-specific Valkey commands.
  *
  * @author Ninad Divadkar
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.8
  */
-public interface RedisGeoCommands {
+public interface ValkeyGeoCommands {
 
 	/**
 	 * Add {@link Point} with given member {@literal name} to {@literal key}.
@@ -51,7 +51,7 @@ public interface RedisGeoCommands {
 	 * @param point must not be {@literal null}.
 	 * @param member must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long geoAdd(byte[] key, Point point, byte[] member);
@@ -62,7 +62,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param location must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	default Long geoAdd(byte[] key, GeoLocation<byte[]> location) {
@@ -79,7 +79,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param memberCoordinateMap must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long geoAdd(byte[] key, Map<byte[], Point> memberCoordinateMap);
@@ -90,7 +90,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param locations must not be {@literal null}.
 	 * @return Number of elements added. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geoadd">Redis Documentation: GEOADD</a>
+	 * @see <a href="https://redis.io/commands/geoadd">Valkey Documentation: GEOADD</a>
 	 */
 	@Nullable
 	Long geoAdd(byte[] key, Iterable<GeoLocation<byte[]>> locations);
@@ -102,7 +102,7 @@ public interface RedisGeoCommands {
 	 * @param member1 must not be {@literal null}.
 	 * @param member2 must not be {@literal null}.
 	 * @return can be {@literal null}. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	@Nullable
 	Distance geoDist(byte[] key, byte[] member1, byte[] member2);
@@ -115,7 +115,7 @@ public interface RedisGeoCommands {
 	 * @param member2 must not be {@literal null}.
 	 * @param metric must not be {@literal null}.
 	 * @return can be {@literal null}. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geodist">Redis Documentation: GEODIST</a>
+	 * @see <a href="https://redis.io/commands/geodist">Valkey Documentation: GEODIST</a>
 	 */
 	@Nullable
 	Distance geoDist(byte[] key, byte[] member1, byte[] member2, Metric metric);
@@ -126,7 +126,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return empty list when key or members do not exists. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geohash">Redis Documentation: GEOHASH</a>
+	 * @see <a href="https://redis.io/commands/geohash">Valkey Documentation: GEOHASH</a>
 	 */
 	@Nullable
 	List<String> geoHash(byte[] key, byte[]... members);
@@ -137,7 +137,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return empty {@link List} when key of members do not exist. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/geopos">Redis Documentation: GEOPOS</a>
+	 * @see <a href="https://redis.io/commands/geopos">Valkey Documentation: GEOPOS</a>
 	 */
 	@Nullable
 	List<Point> geoPos(byte[] key, byte[]... members);
@@ -148,7 +148,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param within must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<byte[]>> geoRadius(byte[] key, Circle within);
@@ -160,7 +160,7 @@ public interface RedisGeoCommands {
 	 * @param within must not be {@literal null}.
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/georadius">Redis Documentation: GEORADIUS</a>
+	 * @see <a href="https://redis.io/commands/georadius">Valkey Documentation: GEORADIUS</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<byte[]>> geoRadius(byte[] key, Circle within, GeoRadiusCommandArgs args);
@@ -173,7 +173,7 @@ public interface RedisGeoCommands {
 	 * @param member must not be {@literal null}.
 	 * @param radius
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	default GeoResults<GeoLocation<byte[]>> geoRadiusByMember(byte[] key, byte[] member, double radius) {
@@ -188,7 +188,7 @@ public interface RedisGeoCommands {
 	 * @param member must not be {@literal null}.
 	 * @param radius must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction..
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<byte[]>> geoRadiusByMember(byte[] key, byte[] member, Distance radius);
@@ -202,7 +202,7 @@ public interface RedisGeoCommands {
 	 * @param radius must not be {@literal null}.
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/georadiusbymember">Redis Documentation: GEORADIUSBYMEMBER</a>
+	 * @see <a href="https://redis.io/commands/georadiusbymember">Valkey Documentation: GEORADIUSBYMEMBER</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<byte[]>> geoRadiusByMember(byte[] key, byte[] member, Distance radius,
@@ -214,7 +214,7 @@ public interface RedisGeoCommands {
 	 * @param key must not be {@literal null}.
 	 * @param members must not be {@literal null}.
 	 * @return Number of elements removed. {@literal null} when used in pipeline / transaction.
-	 * @see <a href="https://redis.io/commands/zrem">Redis Documentation: ZREM</a>
+	 * @see <a href="https://redis.io/commands/zrem">Valkey Documentation: ZREM</a>
 	 */
 	@Nullable
 	Long geoRemove(byte[] key, byte[]... members);
@@ -229,7 +229,7 @@ public interface RedisGeoCommands {
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	GeoResults<GeoLocation<byte[]>> geoSearch(byte[] key, GeoReference<byte[]> reference, GeoShape predicate,
@@ -245,14 +245,14 @@ public interface RedisGeoCommands {
 	 * @param args must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
 	 * @since 2.6
-	 * @see <a href="https://redis.io/commands/geosearch">Redis Documentation: GEOSEARCH</a>
+	 * @see <a href="https://redis.io/commands/geosearch">Valkey Documentation: GEOSEARCH</a>
 	 */
 	@Nullable
 	Long geoSearchStore(byte[] destKey, byte[] key, GeoReference<byte[]> reference, GeoShape predicate,
 			GeoSearchStoreCommandArgs args);
 
 	/**
-	 * Arguments to be used with {@link RedisGeoCommands}.
+	 * Arguments to be used with {@link ValkeyGeoCommands}.
 	 *
 	 * @author Christoph Strobl
 	 * @since 2.6
@@ -321,7 +321,7 @@ public interface RedisGeoCommands {
 	}
 
 	/**
-	 * Additional arguments (like count/sort/...) to be used with {@link RedisGeoCommands}.
+	 * Additional arguments (like count/sort/...) to be used with {@link ValkeyGeoCommands}.
 	 *
 	 * @author Mark Paluch
 	 * @author Christoph Strobl
@@ -465,7 +465,7 @@ public interface RedisGeoCommands {
 	}
 
 	/**
-	 * Additional arguments (like count/sort/...) to be used with {@link RedisGeoCommands}.
+	 * Additional arguments (like count/sort/...) to be used with {@link ValkeyGeoCommands}.
 	 *
 	 * @author Mark Paluch
 	 * @since 2.6
@@ -601,7 +601,7 @@ public interface RedisGeoCommands {
 	}
 
 	/**
-	 * Additional arguments (like count/sort/...) to be used with {@link RedisGeoCommands}.
+	 * Additional arguments (like count/sort/...) to be used with {@link ValkeyGeoCommands}.
 	 *
 	 * @author Ninad Divadkar
 	 * @author Christoph Strobl
@@ -715,12 +715,12 @@ public interface RedisGeoCommands {
 		}
 
 		public String toString() {
-			return "RedisGeoCommands.GeoLocation(name=" + this.getName() + ", point=" + this.getPoint() + ")";
+			return "ValkeyGeoCommands.GeoLocation(name=" + this.getName() + ", point=" + this.getPoint() + ")";
 		}
 	}
 
 	/**
-	 * {@link Metric}s supported by Redis.
+	 * {@link Metric}s supported by Valkey.
 	 *
 	 * @author Christoph Strobl
 	 * @since 1.8

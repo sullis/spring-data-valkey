@@ -34,14 +34,14 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metric;
 import org.springframework.data.geo.Point;
-import org.springframework.data.redis.connection.RedisNode.RedisNodeBuilder;
+import org.springframework.data.redis.connection.ValkeyNode.ValkeyNodeBuilder;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.data.redis.connection.zset.Weights;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.types.RedisClientInfo;
+import org.springframework.data.redis.core.types.ValkeyClientInfo;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -52,23 +52,23 @@ import org.springframework.util.ObjectUtils;
  * @author Mark Paluch
  * @author Dennis Neufeld
  */
-class RedisConnectionUnitTests {
+class ValkeyConnectionUnitTests {
 
-	private final RedisNode SENTINEL_1 = new RedisNodeBuilder().listeningAt("localhost", 23679).build();
-	private AbstractDelegatingRedisConnectionStub connection;
-	private RedisSentinelConnection sentinelConnectionMock;
+	private final ValkeyNode SENTINEL_1 = new ValkeyNodeBuilder().listeningAt("localhost", 23679).build();
+	private AbstractDelegatingValkeyConnectionStub connection;
+	private ValkeySentinelConnection sentinelConnectionMock;
 
 	@BeforeEach
 	void setUp() {
-		sentinelConnectionMock = mock(RedisSentinelConnection.class);
+		sentinelConnectionMock = mock(ValkeySentinelConnection.class);
 
-		connection = new AbstractDelegatingRedisConnectionStub(mock(AbstractRedisConnection.class, CALLS_REAL_METHODS));
-		connection.setSentinelConfiguration(new RedisSentinelConfiguration().master("mymaster").sentinel(SENTINEL_1));
+		connection = new AbstractDelegatingValkeyConnectionStub(mock(AbstractValkeyConnection.class, CALLS_REAL_METHODS));
+		connection.setSentinelConfiguration(new ValkeySentinelConfiguration().master("mymaster").sentinel(SENTINEL_1));
 		connection.setSentinelConnection(sentinelConnectionMock);
 	}
 
 	@Test // DATAREDIS-330
-	void shouldCloseSentinelConnectionAlongWithRedisConnection() throws IOException {
+	void shouldCloseSentinelConnectionAlongWithValkeyConnection() throws IOException {
 
 		when(sentinelConnectionMock.isOpen()).thenReturn(true).thenReturn(false);
 
@@ -92,86 +92,86 @@ class RedisConnectionUnitTests {
 		verify(sentinelConnectionMock, never()).close();
 	}
 
-	static class AbstractDelegatingRedisConnectionStub extends AbstractRedisConnection {
+	static class AbstractDelegatingValkeyConnectionStub extends AbstractValkeyConnection {
 
-		RedisConnection delegate;
-		RedisNode activeNode;
-		RedisSentinelConnection sentinelConnection;
+		ValkeyConnection delegate;
+		ValkeyNode activeNode;
+		ValkeySentinelConnection sentinelConnection;
 
-		AbstractDelegatingRedisConnectionStub(RedisConnection delegate) {
+		AbstractDelegatingValkeyConnectionStub(ValkeyConnection delegate) {
 			this.delegate = delegate;
 		}
 
 		@Override
-		public RedisCommands commands() {
+		public ValkeyCommands commands() {
 			return null;
 		}
 
 		@Override
-		public RedisGeoCommands geoCommands() {
+		public ValkeyGeoCommands geoCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisHashCommands hashCommands() {
+		public ValkeyHashCommands hashCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisHyperLogLogCommands hyperLogLogCommands() {
+		public ValkeyHyperLogLogCommands hyperLogLogCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisKeyCommands keyCommands() {
+		public ValkeyKeyCommands keyCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisListCommands listCommands() {
+		public ValkeyListCommands listCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisSetCommands setCommands() {
+		public ValkeySetCommands setCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisScriptingCommands scriptingCommands() {
+		public ValkeyScriptingCommands scriptingCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisServerCommands serverCommands() {
+		public ValkeyServerCommands serverCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisStreamCommands streamCommands() {
+		public ValkeyStreamCommands streamCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisStringCommands stringCommands() {
+		public ValkeyStringCommands stringCommands() {
 			return null;
 		}
 
 		@Override
-		public RedisZSetCommands zSetCommands() {
+		public ValkeyZSetCommands zSetCommands() {
 			return null;
 		}
 
 		@Override
-		protected boolean isActive(RedisNode node) {
+		protected boolean isActive(ValkeyNode node) {
 			return ObjectUtils.nullSafeEquals(activeNode, node);
 		}
 
-		void setActiveNode(RedisNode activeNode) {
+		void setActiveNode(ValkeyNode activeNode) {
 			this.activeNode = activeNode;
 		}
 
-		void setSentinelConnection(RedisSentinelConnection sentinelConnection) {
+		void setSentinelConnection(ValkeySentinelConnection sentinelConnection) {
 			this.sentinelConnection = sentinelConnection;
 		}
 
@@ -653,7 +653,7 @@ class RedisConnectionUnitTests {
 			return delegate.hLen(key);
 		}
 
-		public List<Object> closePipeline() throws RedisPipelineException {
+		public List<Object> closePipeline() throws ValkeyPipelineException {
 			return delegate.closePipeline();
 		}
 
@@ -825,7 +825,7 @@ class RedisConnectionUnitTests {
 			return delegate.zRangeByScoreWithScores(key, min, max, offset, count);
 		}
 
-		public List<RedisClientInfo> getClientList() {
+		public List<ValkeyClientInfo> getClientList() {
 			return delegate.getClientList();
 		}
 
@@ -953,12 +953,12 @@ class RedisConnectionUnitTests {
 			return delegate.zScan(key, options);
 		}
 
-		public RedisConnection getDelegate() {
+		public ValkeyConnection getDelegate() {
 			return delegate;
 		}
 
 		@Override
-		protected RedisSentinelConnection getSentinelConnection(RedisNode sentinel) {
+		protected ValkeySentinelConnection getSentinelConnection(ValkeyNode sentinel) {
 			if (ObjectUtils.nullSafeEquals(this.activeNode, sentinel)) {
 				return this.sentinelConnection;
 			}
@@ -1074,12 +1074,12 @@ class RedisConnectionUnitTests {
 		}
 
 		@Override
-		public void migrate(byte[] key, RedisNode target, int dbIndex, MigrateOption option) {
+		public void migrate(byte[] key, ValkeyNode target, int dbIndex, MigrateOption option) {
 			delegate.migrate(key, target, dbIndex, option);
 		}
 
 		@Override
-		public void migrate(byte[] key, RedisNode target, int dbIndex, MigrateOption option, long timeout) {
+		public void migrate(byte[] key, ValkeyNode target, int dbIndex, MigrateOption option, long timeout) {
 			delegate.migrate(key, target, dbIndex, option, timeout);
 		}
 

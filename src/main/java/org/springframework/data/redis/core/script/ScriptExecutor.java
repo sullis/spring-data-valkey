@@ -17,10 +17,10 @@ package org.springframework.data.redis.core.script;
 
 import java.util.List;
 
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.ValkeySerializer;
 
 /**
- * Executes {@link RedisScript}s
+ * Executes {@link ValkeyScript}s
  *
  * @author Jennifer Hickey
  * @param <K> The type of keys that may be passed during script execution
@@ -28,29 +28,29 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public interface ScriptExecutor<K> {
 
 	/**
-	 * Executes the given {@link RedisScript}
+	 * Executes the given {@link ValkeyScript}
 	 *
 	 * @param script the script to execute.
 	 * @param keys any keys that need to be passed to the script.
 	 * @param args any args that need to be passed to the script.
-	 * @return The return value of the script or {@literal null} if {@link RedisScript#getResultType()} is
+	 * @return The return value of the script or {@literal null} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	<T> T execute(RedisScript<T> script, List<K> keys, Object... args);
+	<T> T execute(ValkeyScript<T> script, List<K> keys, Object... args);
 
 	/**
-	 * Executes the given {@link RedisScript}, using the provided {@link RedisSerializer}s to serialize the script
+	 * Executes the given {@link ValkeyScript}, using the provided {@link ValkeySerializer}s to serialize the script
 	 * arguments and result.
 	 *
 	 * @param script the script to execute.
-	 * @param argsSerializer The {@link RedisSerializer} to use for serializing args.
-	 * @param resultSerializer The {@link RedisSerializer} to use for serializing the script return value.
+	 * @param argsSerializer The {@link ValkeySerializer} to use for serializing args.
+	 * @param resultSerializer The {@link ValkeySerializer} to use for serializing the script return value.
 	 * @param keys any keys that need to be passed to the script.
 	 * @param args any args that need to be passed to the script.
-	 * @return The return value of the script or {@literal null} if {@link RedisScript#getResultType()} is
+	 * @return The return value of the script or {@literal null} if {@link ValkeyScript#getResultType()} is
 	 *         {@literal null}, likely indicating a throw-away status reply (i.e. "OK")
 	 */
-	<T> T execute(RedisScript<T> script, RedisSerializer<?> argsSerializer, RedisSerializer<T> resultSerializer,
+	<T> T execute(ValkeyScript<T> script, ValkeySerializer<?> argsSerializer, ValkeySerializer<T> resultSerializer,
 			List<K> keys, Object... args);
 
 }

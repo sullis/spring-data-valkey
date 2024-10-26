@@ -27,10 +27,10 @@ import org.mockito.quality.Strictness;
 
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.connection.BitFieldSubCommands.BitFieldType;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
+import org.springframework.data.redis.serializer.ValkeySerializer;
+import org.springframework.data.redis.serializer.StringValkeySerializer;
 
 /**
  * @author Christoph Strobl
@@ -39,10 +39,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class DefaultValueOperationsUnitTests<K, V> {
 
-	@Mock RedisConnectionFactory connectionFactoryMock;
-	@Mock RedisConnection connectionMock;
-	private RedisSerializer<String> serializer;
-	private RedisTemplate<String, V> template;
+	@Mock ValkeyConnectionFactory connectionFactoryMock;
+	@Mock ValkeyConnection connectionMock;
+	private ValkeySerializer<String> serializer;
+	private ValkeyTemplate<String, V> template;
 	private ValueOperations<String, V> valueOps;
 
 	@BeforeEach
@@ -50,9 +50,9 @@ class DefaultValueOperationsUnitTests<K, V> {
 
 		when(connectionFactoryMock.getConnection()).thenReturn(connectionMock);
 
-		serializer = new StringRedisSerializer();
+		serializer = new StringValkeySerializer();
 
-		template = new RedisTemplate<String, V>();
+		template = new ValkeyTemplate<String, V>();
 		template.setKeySerializer(serializer);
 		template.setConnectionFactory(connectionFactoryMock);
 		template.afterPropertiesSet();

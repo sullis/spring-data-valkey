@@ -29,7 +29,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ReactiveHashCommands;
 import org.springframework.data.redis.connection.convert.Converters;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.ValkeySerializationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -43,11 +43,11 @@ import org.springframework.util.Assert;
  */
 class DefaultReactiveHashOperations<H, HK, HV> implements ReactiveHashOperations<H, HK, HV> {
 
-	private final ReactiveRedisTemplate<?, ?> template;
-	private final RedisSerializationContext<H, ?> serializationContext;
+	private final ReactiveValkeyTemplate<?, ?> template;
+	private final ValkeySerializationContext<H, ?> serializationContext;
 
-	DefaultReactiveHashOperations(ReactiveRedisTemplate<?, ?> template,
-			RedisSerializationContext<H, ?> serializationContext) {
+	DefaultReactiveHashOperations(ReactiveValkeyTemplate<?, ?> template,
+			ValkeySerializationContext<H, ?> serializationContext) {
 
 		this.template = template;
 		this.serializationContext = serializationContext;

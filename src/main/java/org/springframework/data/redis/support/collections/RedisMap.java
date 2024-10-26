@@ -22,12 +22,12 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.lang.Nullable;
 
 /**
- * Map view of a Redis hash.
+ * Map view of a Valkey hash.
  *
  * @author Costin Leau
  * @author Christoph Strobl
  */
-public interface RedisMap<K, V> extends RedisStore, ConcurrentMap<K, V> {
+public interface ValkeyMap<K, V> extends ValkeyStore, ConcurrentMap<K, V> {
 
 	/**
 	 * Increment {@code value} of the hash {@code key} by the given {@code delta}.

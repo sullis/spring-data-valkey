@@ -25,16 +25,16 @@ import java.util.Set;
 
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.data.redis.connection.RedisConfiguration.SentinelConfiguration;
+import org.springframework.data.redis.connection.ValkeyConfiguration.SentinelConfiguration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link RedisConfiguration Configuration} class used to set up a {@link RedisConnection} with
- * {@link RedisConnectionFactory} for connecting to <a href="https://redis.io/topics/sentinel">Redis Sentinel(s)</a>.
- * Useful when setting up a highly available Redis environment.
+ * {@link ValkeyConfiguration Configuration} class used to set up a {@link ValkeyConnection} with
+ * {@link ValkeyConnectionFactory} for connecting to <a href="https://redis.io/topics/sentinel">Valkey Sentinel(s)</a>.
+ * Useful when setting up a highly available Valkey environment.
  *
  * @author Christoph Strobl
  * @author Thomas Darimont
@@ -45,7 +45,7 @@ import org.springframework.util.StringUtils;
  * @author Mustapha Zorgati
  * @since 1.4
  */
-public class RedisSentinelConfiguration implements RedisConfiguration, SentinelConfiguration {
+public class ValkeySentinelConfiguration implements ValkeyConfiguration, SentinelConfiguration {
 
 	private static final String REDIS_SENTINEL_MASTER_CONFIG_PROPERTY = "spring.redis.sentinel.master";
 	private static final String REDIS_SENTINEL_NODES_CONFIG_PROPERTY = "spring.redis.sentinel.nodes";
@@ -59,23 +59,23 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 
 	private @Nullable NamedNode master;
 
-	private RedisPassword dataNodePassword = RedisPassword.none();
-	private RedisPassword sentinelPassword = RedisPassword.none();
+	private ValkeyPassword dataNodePassword = ValkeyPassword.none();
+	private ValkeyPassword sentinelPassword = ValkeyPassword.none();
 
-	private final Set<RedisNode> sentinels;
+	private final Set<ValkeyNode> sentinels;
 
 	private @Nullable String dataNodeUsername = null;
 	private @Nullable String sentinelUsername = null;
 
 	/**
-	 * Creates a new, default {@link RedisSentinelConfiguration}.
+	 * Creates a new, default {@link ValkeySentinelConfiguration}.
 	 */
-	public RedisSentinelConfiguration() {
-		this(new MapPropertySource("RedisSentinelConfiguration", Collections.emptyMap()));
+	public ValkeySentinelConfiguration() {
+		this(new MapPropertySource("ValkeySentinelConfiguration", Collections.emptyMap()));
 	}
 
 	/**
-	 * Creates a new {@link RedisSentinelConfiguration} for given {@link String hostPort} combinations.
+	 * Creates a new {@link ValkeySentinelConfiguration} for given {@link String hostPort} combinations.
 	 *
 	 * <pre class="code">
 	 * sentinelHostAndPorts[0] = 127.0.0.1:23679
@@ -85,12 +85,12 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 * @param sentinelHostAndPorts must not be {@literal null}.
 	 * @since 1.5
 	 */
-	public RedisSentinelConfiguration(String master, Set<String> sentinelHostAndPorts) {
-		this(new MapPropertySource("RedisSentinelConfiguration", asMap(master, sentinelHostAndPorts)));
+	public ValkeySentinelConfiguration(String master, Set<String> sentinelHostAndPorts) {
+		this(new MapPropertySource("ValkeySentinelConfiguration", asMap(master, sentinelHostAndPorts)));
 	}
 
 	/**
-	 * Creates a new {@link RedisSentinelConfiguration} looking up configuration values from the given
+	 * Creates a new {@link ValkeySentinelConfiguration} looking up configuration values from the given
 	 * {@link PropertySource}.
 	 *
 	 * <pre class="code">
@@ -100,11 +100,11 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 *
 	 * @param propertySource must not be {@literal null}.
 	 * @since 1.5
-	 * @deprecated since 3.3, use {@link RedisSentinelConfiguration#of(PropertySource)} instead. This constructor will be
+	 * @deprecated since 3.3, use {@link ValkeySentinelConfiguration#of(PropertySource)} instead. This constructor will be
 	 *             made private in the next major release.
 	 */
 	@Deprecated(since = "3.3")
-	public RedisSentinelConfiguration(PropertySource<?> propertySource) {
+	public ValkeySentinelConfiguration(PropertySource<?> propertySource) {
 
 		Assert.notNull(propertySource, "PropertySource must not be null");
 
@@ -156,14 +156,14 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	}
 
 	/**
-	 * Construct a new {@link RedisSentinelConfiguration} from the given {@link PropertySource}.
+	 * Construct a new {@link ValkeySentinelConfiguration} from the given {@link PropertySource}.
 	 *
 	 * @param propertySource must not be {@literal null}.
-	 * @return a new {@link RedisSentinelConfiguration} configured from the given {@link PropertySource}.
+	 * @return a new {@link ValkeySentinelConfiguration} configured from the given {@link PropertySource}.
 	 * @since 3.3
 	 */
-	public static RedisSentinelConfiguration of(PropertySource<?> propertySource) {
-		return new RedisSentinelConfiguration(propertySource);
+	public static ValkeySentinelConfiguration of(PropertySource<?> propertySource) {
+		return new ValkeySentinelConfiguration(propertySource);
 	}
 
 	/**
@@ -171,18 +171,18 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 *
 	 * @param sentinels must not be {@literal null}.
 	 */
-	public void setSentinels(Iterable<RedisNode> sentinels) {
+	public void setSentinels(Iterable<ValkeyNode> sentinels) {
 
 		Assert.notNull(sentinels, "Cannot set sentinels to null");
 
 		this.sentinels.clear();
 
-		for (RedisNode sentinel : sentinels) {
+		for (ValkeyNode sentinel : sentinels) {
 			addSentinel(sentinel);
 		}
 	}
 
-	public Set<RedisNode> getSentinels() {
+	public Set<ValkeyNode> getSentinels() {
 		return Collections.unmodifiableSet(sentinels);
 	}
 
@@ -191,7 +191,7 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 *
 	 * @param sentinel must not be {@literal null}.
 	 */
-	public void addSentinel(RedisNode sentinel) {
+	public void addSentinel(ValkeyNode sentinel) {
 
 		Assert.notNull(sentinel, "Sentinel must not be null");
 
@@ -215,7 +215,7 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 * @param master The master node name.
 	 * @return this.
 	 */
-	public RedisSentinelConfiguration master(String master) {
+	public ValkeySentinelConfiguration master(String master) {
 		this.setMaster(master);
 		return this;
 	}
@@ -225,35 +225,35 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	 * @param master the master node
 	 * @return this.
 	 */
-	public RedisSentinelConfiguration master(NamedNode master) {
+	public ValkeySentinelConfiguration master(NamedNode master) {
 		this.setMaster(master);
 		return this;
 	}
 
 	/**
-	 * @see #addSentinel(RedisNode)
+	 * @see #addSentinel(ValkeyNode)
 	 * @param sentinel the node to add as sentinel.
 	 * @return this.
 	 */
-	public RedisSentinelConfiguration sentinel(RedisNode sentinel) {
+	public ValkeySentinelConfiguration sentinel(ValkeyNode sentinel) {
 		this.addSentinel(sentinel);
 		return this;
 	}
 
 	/**
-	 * @see #sentinel(RedisNode)
+	 * @see #sentinel(ValkeyNode)
 	 * @param host redis sentinel node host name or ip.
 	 * @param port redis sentinel port.
 	 * @return this.
 	 */
-	public RedisSentinelConfiguration sentinel(String host, Integer port) {
-		return sentinel(new RedisNode(host, port));
+	public ValkeySentinelConfiguration sentinel(String host, Integer port) {
+		return sentinel(new ValkeyNode(host, port));
 	}
 
 	private void appendSentinels(Set<String> hostAndPorts) {
 
 		for (String hostAndPort : hostAndPorts) {
-			addSentinel(RedisNode.fromString(hostAndPort, RedisNode.DEFAULT_SENTINEL_PORT));
+			addSentinel(ValkeyNode.fromString(hostAndPort, ValkeyNode.DEFAULT_SENTINEL_PORT));
 		}
 	}
 
@@ -282,14 +282,14 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	}
 
 	@Override
-	public RedisPassword getPassword() {
+	public ValkeyPassword getPassword() {
 		return dataNodePassword;
 	}
 
 	@Override
-	public void setPassword(RedisPassword password) {
+	public void setPassword(ValkeyPassword password) {
 
-		Assert.notNull(password, "RedisPassword must not be null");
+		Assert.notNull(password, "ValkeyPassword must not be null");
 
 		this.dataNodePassword = password;
 	}
@@ -306,14 +306,14 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 	}
 
 	@Override
-	public void setSentinelPassword(RedisPassword sentinelPassword) {
+	public void setSentinelPassword(ValkeyPassword sentinelPassword) {
 
 		Assert.notNull(sentinelPassword, "SentinelPassword must not be null");
 		this.sentinelPassword = sentinelPassword;
 	}
 
 	@Override
-	public RedisPassword getSentinelPassword() {
+	public ValkeyPassword getSentinelPassword() {
 		return sentinelPassword;
 	}
 
@@ -324,7 +324,7 @@ public class RedisSentinelConfiguration implements RedisConfiguration, SentinelC
 			return true;
 		}
 
-		if (!(obj instanceof RedisSentinelConfiguration that)) {
+		if (!(obj instanceof ValkeySentinelConfiguration that)) {
 			return false;
 		}
 

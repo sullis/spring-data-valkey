@@ -20,9 +20,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.redis.util.ByteUtils.*;
 
-import io.lettuce.core.RedisConnectionException;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
+import io.lettuce.core.ValkeyConnectionException;
+import io.lettuce.core.pubsub.StatefulValkeyPubSubConnection;
+import io.lettuce.core.pubsub.api.reactive.ValkeyPubSubReactiveCommands;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.ValkeySystemException;
 import org.springframework.data.redis.connection.ReactiveSubscription.Message;
 import org.springframework.data.redis.connection.ReactiveSubscription.PatternMessage;
 import org.springframework.data.redis.connection.SubscriptionListener;
@@ -53,8 +53,8 @@ class LettuceReactiveSubscriptionUnitTests {
 
 	private LettuceReactiveSubscription subscription;
 
-	@Mock StatefulRedisPubSubConnection<ByteBuffer, ByteBuffer> connectionMock;
-	@Mock RedisPubSubReactiveCommands<ByteBuffer, ByteBuffer> commandsMock;
+	@Mock StatefulValkeyPubSubConnection<ByteBuffer, ByteBuffer> connectionMock;
+	@Mock ValkeyPubSubReactiveCommands<ByteBuffer, ByteBuffer> commandsMock;
 
 	@Mock LettuceReactivePubSubCommands pubSubMock;
 
@@ -62,7 +62,7 @@ class LettuceReactiveSubscriptionUnitTests {
 	void before() {
 		when(connectionMock.reactive()).thenReturn(commandsMock);
 		subscription = new LettuceReactiveSubscription(mock(SubscriptionListener.class), connectionMock, pubSubMock,
-				e -> new RedisSystemException(e.getMessage(), e));
+				e -> new ValkeySystemException(e.getMessage(), e));
 	}
 
 	@Test // DATAREDIS-612
@@ -83,11 +83,11 @@ class LettuceReactiveSubscriptionUnitTests {
 	@Test // DATAREDIS-612
 	void shouldSubscribeChannelsShouldFail() {
 
-		when(pubSubMock.subscribe(any(ByteBuffer[].class))).thenReturn(Mono.error(new RedisConnectionException("Foo")));
+		when(pubSubMock.subscribe(any(ByteBuffer[].class))).thenReturn(Mono.error(new ValkeyConnectionException("Foo")));
 
 		Mono<Void> subscribe = subscription.subscribe(getByteBuffer("foo"), getByteBuffer("bar"));
 
-		subscribe.as(StepVerifier::create).expectError(RedisSystemException.class).verify();
+		subscribe.as(StepVerifier::create).expectError(ValkeySystemException.class).verify();
 	}
 
 	@Test // DATAREDIS-612
@@ -186,8 +186,8 @@ class LettuceReactiveSubscriptionUnitTests {
 
 		subscription.receive().as(StepVerifier::create).then(() -> {
 
-			sink.tryEmitError(new RedisConnectionException("foo"));
-		}).expectError(RedisSystemException.class).verify();
+			sink.tryEmitError(new ValkeyConnectionException("foo"));
+		}).expectError(ValkeySystemException.class).verify();
 	}
 
 	@Test // DATAREDIS-612

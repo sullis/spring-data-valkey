@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
  * @author Mark Paluch
  * @since 2.0
  */
-public interface ReactiveRedisClusterConnection extends ReactiveRedisConnection, ReactiveClusterCommands {
+public interface ReactiveValkeyClusterConnection extends ReactiveValkeyConnection, ReactiveClusterCommands {
 
 	@Override
 	ReactiveClusterKeyCommands keyCommands();
@@ -58,12 +58,12 @@ public interface ReactiveRedisClusterConnection extends ReactiveRedisConnection,
 	ReactiveClusterStreamCommands streamCommands();
 
 	/**
-	 * Test the connection to a specific Redis cluster node.
+	 * Test the connection to a specific Valkey cluster node.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @return {@link Mono} wrapping server response message - usually {@literal PONG}.
 	 * @throws IllegalArgumentException when {@code node} is {@literal null}.
-	 * @see RedisConnectionCommands#ping()
+	 * @see ValkeyConnectionCommands#ping()
 	 */
-	Mono<String> ping(RedisClusterNode node);
+	Mono<String> ping(ValkeyClusterNode node);
 }

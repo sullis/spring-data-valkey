@@ -16,14 +16,14 @@
 package org.springframework.data.redis.repository.cdi;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.lang.Nullable;
 
 /**
  * @author Mark Paluch
  */
-@RedisHash
+@ValkeyHash
 class Person {
 
 	@Id private String id;

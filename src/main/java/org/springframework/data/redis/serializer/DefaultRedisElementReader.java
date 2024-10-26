@@ -21,17 +21,17 @@ import org.springframework.data.redis.util.ByteUtils;
 import org.springframework.lang.Nullable;
 
 /**
- * Default implementation of {@link RedisElementReader}.
+ * Default implementation of {@link ValkeyElementReader}.
  *
  * @author Mark Paluch
  * @author Christoph Strobl
  * @since 2.0
  */
-class DefaultRedisElementReader<T> implements RedisElementReader<T> {
+class DefaultValkeyElementReader<T> implements ValkeyElementReader<T> {
 
-	private final @Nullable RedisSerializer<T> serializer;
+	private final @Nullable ValkeySerializer<T> serializer;
 
-	DefaultRedisElementReader(@Nullable RedisSerializer<T> serializer) {
+	DefaultValkeyElementReader(@Nullable ValkeySerializer<T> serializer) {
 		this.serializer = serializer;
 	}
 

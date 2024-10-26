@@ -31,9 +31,9 @@ class LettuceRuntimeHints implements RuntimeHintsRegistrar {
 	@Override
 	public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
 
-		if (ClassUtils.isPresent("io.lettuce.core.RedisClient", classLoader)) {
+		if (ClassUtils.isPresent("io.lettuce.core.ValkeyClient", classLoader)) {
 
-			hints.reflection().registerType(TypeReference.of("io.lettuce.core.RedisClient"),
+			hints.reflection().registerType(TypeReference.of("io.lettuce.core.ValkeyClient"),
 					it -> it
 							.onReachableType(
 									TypeReference.of("org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider"))

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Reference;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.ValkeyHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
@@ -53,7 +53,7 @@ public class ConversionTestEntities {
 	static final String KEYSPACE_LOCATION = "locations";
 	static final String KEYSPACE_ACCOUNT = "accounts";
 
-	@RedisHash(KEYSPACE_PERSON)
+	@ValkeyHash(KEYSPACE_PERSON)
 	public static class Person {
 
 		@Id String id;
@@ -88,7 +88,7 @@ public class ConversionTestEntities {
 		Species species;
 	}
 
-	@RedisHash(KEYSPACE_PERSON)
+	@ValkeyHash(KEYSPACE_PERSON)
 	public static class RecursiveConstructorPerson {
 
 		final @Id String id;
@@ -157,7 +157,7 @@ public class ConversionTestEntities {
 		}
 	}
 
-	@RedisHash(KEYSPACE_PERSON)
+	@ValkeyHash(KEYSPACE_PERSON)
 	public static class PersonWithConstructorAndAddress {
 
 		final @Id String id;
@@ -240,7 +240,7 @@ public class ConversionTestEntities {
 		List<Object> items;
 	}
 
-	@RedisHash(KEYSPACE_LOCATION)
+	@ValkeyHash(KEYSPACE_LOCATION)
 	public static class Location {
 
 		@Id String id;
@@ -269,7 +269,7 @@ public class ConversionTestEntities {
 		}
 	}
 
-	@RedisHash(timeToLive = 5)
+	@ValkeyHash(timeToLive = 5)
 	public static class ExpiringPerson {
 
 		@Id String id;
@@ -287,7 +287,7 @@ public class ConversionTestEntities {
 		List<String> alsoKnownAs;
 	}
 
-	@RedisHash(KEYSPACE_TWOT)
+	@ValkeyHash(KEYSPACE_TWOT)
 	public static class TheWheelOfTime {
 
 		List<Person> mainCharacters;
@@ -381,7 +381,7 @@ public class ConversionTestEntities {
 		List<String> values;
 	}
 
-	@RedisHash(KEYSPACE_ACCOUNT)
+	@ValkeyHash(KEYSPACE_ACCOUNT)
 	public static class AccountInfo {
 
 		@Id private String id;

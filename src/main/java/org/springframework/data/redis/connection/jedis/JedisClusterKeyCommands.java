@@ -35,9 +35,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.connection.ClusterSlotHashUtil;
 import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.connection.RedisClusterNode;
-import org.springframework.data.redis.connection.RedisKeyCommands;
-import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.ValkeyClusterNode;
+import org.springframework.data.redis.connection.ValkeyKeyCommands;
+import org.springframework.data.redis.connection.ValkeyNode;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.connection.ValueEncoding;
 import org.springframework.data.redis.connection.convert.Converters;
@@ -58,7 +58,7 @@ import org.springframework.util.ObjectUtils;
  * @author Dan Smith
  * @since 2.0
  */
-class JedisClusterKeyCommands implements RedisKeyCommands {
+class JedisClusterKeyCommands implements ValkeyKeyCommands {
 
 	private final JedisClusterConnection connection;
 
@@ -143,9 +143,9 @@ class JedisClusterKeyCommands implements RedisKeyCommands {
 		return keys;
 	}
 
-	public Set<byte[]> keys(RedisClusterNode node, byte[] pattern) {
+	public Set<byte[]> keys(ValkeyClusterNode node, byte[] pattern) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 		Assert.notNull(pattern, "Pattern must not be null");
 
 		return connection.getClusterCommandExecutor()
@@ -159,16 +159,16 @@ class JedisClusterKeyCommands implements RedisKeyCommands {
 	}
 
 	/**
-	 * Use a {@link Cursor} to iterate over keys stored at the given {@link RedisClusterNode}.
+	 * Use a {@link Cursor} to iterate over keys stored at the given {@link ValkeyClusterNode}.
 	 *
 	 * @param node must not be {@literal null}.
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 2.1
 	 */
-	Cursor<byte[]> scan(RedisClusterNode node, ScanOptions options) {
+	Cursor<byte[]> scan(ValkeyClusterNode node, ScanOptions options) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 		Assert.notNull(options, "Options must not be null");
 
 		return connection.getClusterCommandExecutor()
@@ -191,13 +191,13 @@ class JedisClusterKeyCommands implements RedisKeyCommands {
 	@Override
 	public byte[] randomKey() {
 
-		List<RedisClusterNode> nodes = new ArrayList<>(
+		List<ValkeyClusterNode> nodes = new ArrayList<>(
 				connection.getTopologyProvider().getTopology().getActiveMasterNodes());
-		Set<RedisNode> inspectedNodes = new HashSet<>(nodes.size());
+		Set<ValkeyNode> inspectedNodes = new HashSet<>(nodes.size());
 
 		do {
 
-			RedisClusterNode node = nodes.get(ThreadLocalRandom.current().nextInt(nodes.size()));
+			ValkeyClusterNode node = nodes.get(ThreadLocalRandom.current().nextInt(nodes.size()));
 
 			while (inspectedNodes.contains(node)) {
 				node = nodes.get(ThreadLocalRandom.current().nextInt(nodes.size()));
@@ -213,9 +213,9 @@ class JedisClusterKeyCommands implements RedisKeyCommands {
 		return null;
 	}
 
-	public byte[] randomKey(RedisClusterNode node) {
+	public byte[] randomKey(ValkeyClusterNode node) {
 
-		Assert.notNull(node, "RedisClusterNode must not be null");
+		Assert.notNull(node, "ValkeyClusterNode must not be null");
 
 		return connection.getClusterCommandExecutor()
 				.executeCommandOnSingleNode((JedisClusterCommandCallback<byte[]>) client -> client.randomBinaryKey(), node)

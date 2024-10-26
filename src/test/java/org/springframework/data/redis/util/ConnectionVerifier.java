@@ -25,16 +25,16 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ValkeyConnection;
+import org.springframework.data.redis.connection.ValkeyConnectionFactory;
 
 /**
  * @author Christoph Strobl
  */
-public class ConnectionVerifier<T extends RedisConnectionFactory> {
+public class ConnectionVerifier<T extends ValkeyConnectionFactory> {
 
 	private final T connectionFactory;
-	private final List<Consumer<RedisConnection>> steps = new ArrayList<>(3);
+	private final List<Consumer<ValkeyConnection>> steps = new ArrayList<>(3);
 
 	private Consumer<T> initFactoryFunction = this::initializeFactoryIfRequired;
 
@@ -42,7 +42,7 @@ public class ConnectionVerifier<T extends RedisConnectionFactory> {
 		this.connectionFactory = connectionFactory;
 	}
 
-	public static <V extends RedisConnectionFactory> ConnectionVerifier<V> create(V connectionFactory) {
+	public static <V extends ValkeyConnectionFactory> ConnectionVerifier<V> create(V connectionFactory) {
 		return new ConnectionVerifier<>(connectionFactory);
 	}
 
@@ -52,7 +52,7 @@ public class ConnectionVerifier<T extends RedisConnectionFactory> {
 		return this;
 	}
 
-	public ConnectionVerifier<T> execute(Consumer<RedisConnection> connectionConsumer) {
+	public ConnectionVerifier<T> execute(Consumer<ValkeyConnection> connectionConsumer) {
 		this.steps.add(connectionConsumer);
 		return this;
 	}
@@ -69,7 +69,7 @@ public class ConnectionVerifier<T extends RedisConnectionFactory> {
 
 		initFactoryFunction.accept(connectionFactory);
 
-		try (RedisConnection connection = connectionFactory.getConnection()) {
+		try (ValkeyConnection connection = connectionFactory.getConnection()) {
 			steps.forEach(step -> step.accept(connection));
 		} finally {
 			disposeFunction.accept(connectionFactory);

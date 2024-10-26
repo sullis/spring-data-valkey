@@ -24,37 +24,37 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisClusterConnection} allows sending commands to dedicated nodes within the cluster. A
- * {@link RedisClusterNode} can be obtained from {@link #clusterGetNodes()} or it can be constructed using either
- * {@link RedisClusterNode#getHost() host} and {@link RedisClusterNode#getPort()} or the {@link RedisClusterNode#getId()
+ * {@link ValkeyClusterConnection} allows sending commands to dedicated nodes within the cluster. A
+ * {@link ValkeyClusterNode} can be obtained from {@link #clusterGetNodes()} or it can be constructed using either
+ * {@link ValkeyClusterNode#getHost() host} and {@link ValkeyClusterNode#getPort()} or the {@link ValkeyClusterNode#getId()
  * node Id}.
  * <p>
- * {@link RedisClusterConnection Redis connections}, unlike perhaps their underlying native connection are not
+ * {@link ValkeyClusterConnection Valkey connections}, unlike perhaps their underlying native connection are not
  * Thread-safe and should not be shared across multiple threads.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
  * @since 1.7
  */
-public interface RedisClusterConnection
-		extends RedisConnection, DefaultedRedisClusterConnection, RedisClusterCommandsProvider {
+public interface ValkeyClusterConnection
+		extends ValkeyConnection, DefaultedValkeyClusterConnection, ValkeyClusterCommandsProvider {
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see RedisConnectionCommands#ping()
+	 * @see ValkeyConnectionCommands#ping()
 	 */
 	@Nullable
-	String ping(RedisClusterNode node);
+	String ping(ValkeyClusterNode node);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @param pattern must not be {@literal null}.
 	 * @return {@literal null} when used in pipeline / transaction.
-	 * @see RedisKeyCommands#keys(byte[])
+	 * @see ValkeyKeyCommands#keys(byte[])
 	 */
 	@Nullable
-	Set<byte[]> keys(RedisClusterNode node, byte[] pattern);
+	Set<byte[]> keys(ValkeyClusterNode node, byte[] pattern);
 
 	/**
 	 * Use a {@link Cursor} to iterate over keys.
@@ -63,17 +63,17 @@ public interface RedisClusterConnection
 	 * @param options must not be {@literal null}.
 	 * @return never {@literal null}.
 	 * @since 2.1
-	 * @see <a href="https://redis.io/commands/scan">Redis Documentation: SCAN</a>
+	 * @see <a href="https://redis.io/commands/scan">Valkey Documentation: SCAN</a>
 	 */
-	Cursor<byte[]> scan(RedisClusterNode node, ScanOptions options);
+	Cursor<byte[]> scan(ValkeyClusterNode node, ScanOptions options);
 
 	/**
 	 * @param node must not be {@literal null}.
 	 * @return {@literal null} when no keys stored at node or when used in pipeline / transaction.
-	 * @see RedisKeyCommands#randomKey()
+	 * @see ValkeyKeyCommands#randomKey()
 	 */
 	@Nullable
-	byte[] randomKey(RedisClusterNode node);
+	byte[] randomKey(ValkeyClusterNode node);
 
 	/**
 	 * Execute the given command for the {@code key} provided potentially appending args. <br />
@@ -90,7 +90,7 @@ public interface RedisClusterConnection
 	 * @param command must not be {@literal null}.
 	 * @param key must not be {@literal null}.
 	 * @param args must not be {@literal null}.
-	 * @return command result as delivered by the underlying Redis driver. Can be {@literal null}.
+	 * @return command result as delivered by the underlying Valkey driver. Can be {@literal null}.
 	 * @since 2.1
 	 */
 	@Nullable

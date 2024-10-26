@@ -20,16 +20,16 @@ import io.lettuce.core.ScoredValue;
 import io.lettuce.core.ScoredValueScanCursor;
 import io.lettuce.core.ZAggregateArgs;
 import io.lettuce.core.ZStoreArgs;
-import io.lettuce.core.api.async.RedisSortedSetAsyncCommands;
-import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.api.async.ValkeySortedSetAsyncCommands;
+import io.lettuce.core.cluster.api.sync.ValkeyClusterCommands;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.redis.connection.RedisZSetCommands;
-import org.springframework.data.redis.connection.RedisZSetCommands.ZAddArgs.Flag;
+import org.springframework.data.redis.connection.ValkeyZSetCommands;
+import org.springframework.data.redis.connection.ValkeyZSetCommands.ZAddArgs.Flag;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Tuple;
@@ -44,7 +44,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link RedisZSetCommands} implementation for {@literal Lettuce}.
+ * {@link ValkeyZSetCommands} implementation for {@literal Lettuce}.
  *
  * @author Christoph Strobl
  * @author Mark Paluch
@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
  * @author John Blum
  * @since 2.0
  */
-class LettuceZSetCommands implements RedisZSetCommands {
+class LettuceZSetCommands implements ValkeyZSetCommands {
 
 	private final LettuceConnection connection;
 
@@ -68,7 +68,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(value, "Value must not be null");
 
 		return connection.invoke()
-				.from(RedisSortedSetAsyncCommands::zadd, key, LettuceZSetCommands.toZAddArgs(args), score, value)
+				.from(ValkeySortedSetAsyncCommands::zadd, key, LettuceZSetCommands.toZAddArgs(args), score, value)
 				.get(LettuceConverters.longToBoolean());
 	}
 
@@ -78,7 +78,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(tuples, "Tuples must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zadd, key, LettuceZSetCommands.toZAddArgs(args),
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zadd, key, LettuceZSetCommands.toZAddArgs(args),
 				LettuceConverters.toObjects(tuples).toArray());
 	}
 
@@ -89,7 +89,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(values, "Values must not be null");
 		Assert.noNullElements(values, "Values must not contain null elements");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrem, key, values);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrem, key, values);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zincrby, key, increment, value);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zincrby, key, increment, value);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrandmember, key);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrandmember, key);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrandmember, key, count);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrandmember, key, count);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisSortedSetAsyncCommands::zrandmemberWithScores, key)
+		return connection.invoke().from(ValkeySortedSetAsyncCommands::zrandmemberWithScores, key)
 				.get(LettuceConverters::toTuple);
 	}
 
@@ -131,7 +131,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrandmemberWithScores, key, count)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrandmemberWithScores, key, count)
 				.toList(LettuceConverters::toTuple);
 	}
 
@@ -141,7 +141,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrank, key, value);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrank, key, value);
 	}
 
 	@Override
@@ -149,7 +149,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrevrank, key, value);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrevrank, key, value);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrange, key, start, end).toSet();
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrange, key, start, end).toSet();
 	}
 
 	@Override
@@ -165,7 +165,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangeWithScores, key, start, end)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangeWithScores, key, start, end)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -179,11 +179,11 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		if (limit.isUnlimited()) {
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrangebyscoreWithScores, key, LettuceConverters.toRange(range))
+					.fromMany(ValkeySortedSetAsyncCommands::zrangebyscoreWithScores, key, LettuceConverters.toRange(range))
 					.toSet(LettuceConverters::toTuple);
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangebyscoreWithScores, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangebyscoreWithScores, key,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit)).toSet(LettuceConverters::toTuple);
 
 	}
@@ -193,7 +193,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrevrange, key, start, end)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrevrange, key, start, end)
 				.toSet(Converters.identityConverter());
 	}
 
@@ -202,7 +202,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrevrangeWithScores, key, start, end)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrevrangeWithScores, key, start, end)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -217,10 +217,10 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		if (limit.isUnlimited()) {
 
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrevrangebyscore, key, LettuceConverters.toRange(range)).toSet();
+					.fromMany(ValkeySortedSetAsyncCommands::zrevrangebyscore, key, LettuceConverters.toRange(range)).toSet();
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrevrangebyscore, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrevrangebyscore, key,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit)).toSet();
 
 	}
@@ -236,11 +236,11 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		if (limit.isUnlimited()) {
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrevrangebyscoreWithScores, key, LettuceConverters.toRange(range))
+					.fromMany(ValkeySortedSetAsyncCommands::zrevrangebyscoreWithScores, key, LettuceConverters.toRange(range))
 					.toSet(LettuceConverters::toTuple);
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrevrangebyscoreWithScores, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrevrangebyscoreWithScores, key,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit)).toSet(LettuceConverters::toTuple);
 
 	}
@@ -250,7 +250,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zcount, key, LettuceConverters.toRange(range));
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zcount, key, LettuceConverters.toRange(range));
 	}
 
 	@Override
@@ -259,7 +259,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(range, "Range must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zlexcount, key,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zlexcount, key,
 				LettuceConverters.toRange(range, true));
 	}
 
@@ -269,7 +269,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisSortedSetAsyncCommands::zpopmin, key).get(LettuceConverters::toTuple);
+		return connection.invoke().from(ValkeySortedSetAsyncCommands::zpopmin, key).get(LettuceConverters::toTuple);
 	}
 
 	@Nullable
@@ -278,7 +278,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zpopmin, key, count)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zpopmin, key, count)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -292,12 +292,12 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		if (TimeUnit.MILLISECONDS == unit) {
 
 			return connection.invoke(connection.getAsyncDedicatedConnection())
-					.from(RedisSortedSetAsyncCommands::bzpopmin, TimeoutUtils.toDoubleSeconds(timeout, unit), key)
+					.from(ValkeySortedSetAsyncCommands::bzpopmin, TimeoutUtils.toDoubleSeconds(timeout, unit), key)
 					.get(it -> it.map(LettuceConverters::toTuple).getValueOrElse(null));
 		}
 
 		return connection.invoke(connection.getAsyncDedicatedConnection())
-				.from(RedisSortedSetAsyncCommands::bzpopmin, unit.toSeconds(timeout), key)
+				.from(ValkeySortedSetAsyncCommands::bzpopmin, unit.toSeconds(timeout), key)
 				.get(it -> it.map(LettuceConverters::toTuple).getValueOrElse(null));
 	}
 
@@ -307,7 +307,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().from(RedisSortedSetAsyncCommands::zpopmax, key).get(LettuceConverters::toTuple);
+		return connection.invoke().from(ValkeySortedSetAsyncCommands::zpopmax, key).get(LettuceConverters::toTuple);
 	}
 
 	@Nullable
@@ -316,7 +316,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zpopmax, key, count)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zpopmax, key, count)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -330,12 +330,12 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		if (TimeUnit.MILLISECONDS == unit) {
 
 			return connection.invoke(connection.getAsyncDedicatedConnection())
-					.from(RedisSortedSetAsyncCommands::bzpopmax, TimeoutUtils.toDoubleSeconds(timeout, unit), key)
+					.from(ValkeySortedSetAsyncCommands::bzpopmax, TimeoutUtils.toDoubleSeconds(timeout, unit), key)
 					.get(it -> it.map(LettuceConverters::toTuple).getValueOrElse(null));
 		}
 
 		return connection.invoke(connection.getAsyncDedicatedConnection())
-				.from(RedisSortedSetAsyncCommands::bzpopmax, unit.toSeconds(timeout), key)
+				.from(ValkeySortedSetAsyncCommands::bzpopmax, unit.toSeconds(timeout), key)
 				.get(it -> it.map(LettuceConverters::toTuple).getValueOrElse(null));
 	}
 
@@ -344,7 +344,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zcard, key);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zcard, key);
 	}
 
 	@Override
@@ -353,7 +353,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(value, "Value must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zscore, key, value);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zscore, key, value);
 	}
 
 	@Override
@@ -362,7 +362,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(values, "Value must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zmscore, key, values);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zmscore, key, values);
 	}
 
 	@Override
@@ -370,7 +370,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zremrangebyrank, key, start, end);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zremrangebyrank, key, start, end);
 	}
 
 	@Override
@@ -379,7 +379,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(range, "Range must not be null for ZREMRANGEBYLEX");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zremrangebylex, key,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zremrangebylex, key,
 				LettuceConverters.toRange(range, true));
 	}
 
@@ -389,7 +389,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(range, "Range for ZREMRANGEBYSCORE must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zremrangebyscore, key,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zremrangebyscore, key,
 				LettuceConverters.toRange(range));
 	}
 
@@ -398,7 +398,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zdiff, sets).toSet();
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zdiff, sets).toSet();
 	}
 
 	@Override
@@ -406,7 +406,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zdiffWithScores, sets)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zdiffWithScores, sets)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -416,7 +416,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(destKey, "Destination key must not be null");
 		Assert.notNull(sets, "Source sets must not be null");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zdiffstore, destKey, sets);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zdiffstore, destKey, sets);
 	}
 
 	@Override
@@ -424,7 +424,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zinter, sets).toSet();
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zinter, sets).toSet();
 	}
 
 	@Override
@@ -432,7 +432,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zinterWithScores, sets)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zinterWithScores, sets)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -446,7 +446,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		ZAggregateArgs zAggregateArgs = zAggregateArgs(aggregate, weights);
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zinterWithScores, zAggregateArgs, sets)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zinterWithScores, zAggregateArgs, sets)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -461,7 +461,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		ZStoreArgs storeArgs = zStoreArgs(aggregate, weights);
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zinterstore, destKey, storeArgs, sets);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zinterstore, destKey, storeArgs, sets);
 	}
 
 	@Override
@@ -471,7 +471,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(sets, "Source sets must not be null");
 		Assert.noNullElements(sets, "Source sets must not contain null elements");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zinterstore, destKey, sets);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zinterstore, destKey, sets);
 	}
 
 	@Override
@@ -479,7 +479,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zunion, sets).toSet();
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zunion, sets).toSet();
 	}
 
 	@Override
@@ -487,7 +487,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(sets, "Sets must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zunionWithScores, sets)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zunionWithScores, sets)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -501,7 +501,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		ZAggregateArgs zAggregateArgs = zAggregateArgs(aggregate, weights);
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zunionWithScores, zAggregateArgs, sets)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zunionWithScores, zAggregateArgs, sets)
 				.toSet(LettuceConverters::toTuple);
 	}
 
@@ -516,7 +516,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		ZStoreArgs storeArgs = zStoreArgs(aggregate, weights);
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zunionstore, destKey, storeArgs, sets);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zunionstore, destKey, storeArgs, sets);
 	}
 
 	@Override
@@ -526,7 +526,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(sets, "Source sets must not be null");
 		Assert.noNullElements(sets, "Source sets must not contain null elements");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zunionstore, destKey, sets);
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zunionstore, destKey, sets);
 	}
 
 	@Override
@@ -554,7 +554,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 				ScanArgs scanArgs = LettuceConverters.toScanArgs(options);
 
 				ScoredValueScanCursor<byte[]> scoredValueScanCursor = connection.invoke()
-						.just(RedisSortedSetAsyncCommands::zscan, key, scanCursor, scanArgs);
+						.just(ValkeySortedSetAsyncCommands::zscan, key, scanCursor, scanArgs);
 				String nextCursorId = scoredValueScanCursor.getCursor();
 
 				List<ScoredValue<byte[]>> result = scoredValueScanCursor.getValues();
@@ -576,7 +576,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangebyscore, key, min, max).toSet();
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangebyscore, key, min, max).toSet();
 	}
 
 	@Override
@@ -584,7 +584,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		Assert.notNull(key, "Key must not be null");
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangebyscore, key, min, max, offset, count)
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangebyscore, key, min, max, offset, count)
 				.toSet();
 	}
 
@@ -598,10 +598,10 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		if (limit.isUnlimited()) {
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrangebyscore, key, LettuceConverters.toRange(range)).toSet();
+					.fromMany(ValkeySortedSetAsyncCommands::zrangebyscore, key, LettuceConverters.toRange(range)).toSet();
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangebyscore, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangebyscore, key,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit)).toSet();
 	}
 
@@ -615,10 +615,10 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		if (limit.isUnlimited()) {
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrangebylex, key, LettuceConverters.toRange(range, true)).toSet();
+					.fromMany(ValkeySortedSetAsyncCommands::zrangebylex, key, LettuceConverters.toRange(range, true)).toSet();
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrangebylex, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrangebylex, key,
 				LettuceConverters.toRange(range, true), LettuceConverters.toLimit(limit)).toSet();
 	}
 
@@ -632,10 +632,10 @@ class LettuceZSetCommands implements RedisZSetCommands {
 
 		if (limit.isUnlimited()) {
 			return connection.invoke()
-					.fromMany(RedisSortedSetAsyncCommands::zrevrangebylex, key, LettuceConverters.toRange(range, true)).toSet();
+					.fromMany(ValkeySortedSetAsyncCommands::zrevrangebylex, key, LettuceConverters.toRange(range, true)).toSet();
 		}
 
-		return connection.invoke().fromMany(RedisSortedSetAsyncCommands::zrevrangebylex, key,
+		return connection.invoke().fromMany(ValkeySortedSetAsyncCommands::zrevrangebylex, key,
 				LettuceConverters.toRange(range, true), LettuceConverters.toLimit(limit)).toSet();
 	}
 
@@ -648,7 +648,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(range, "Range for must not be null");
 		Assert.notNull(limit, "Limit must not be null. Use Limit.unlimited() instead.");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrangestorebylex, dstKey, srcKey,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrangestorebylex, dstKey, srcKey,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit));
 	}
 
@@ -661,7 +661,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(range, "Range for must not be null");
 		Assert.notNull(limit, "Limit must not be null. Use Limit.unlimited() instead.");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrevrangestorebylex, dstKey, srcKey,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrevrangestorebylex, dstKey, srcKey,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit));
 	}
 
@@ -675,7 +675,7 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(range, "Range for must not be null");
 		Assert.notNull(limit, "Limit must not be null. Use Limit.unlimited() instead.");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrangestorebyscore, dstKey, srcKey,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrangestorebyscore, dstKey, srcKey,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit));
 	}
 
@@ -689,11 +689,11 @@ class LettuceZSetCommands implements RedisZSetCommands {
 		Assert.notNull(range, "Range for must not be null");
 		Assert.notNull(limit, "Limit must not be null. Use Limit.unlimited() instead.");
 
-		return connection.invoke().just(RedisSortedSetAsyncCommands::zrevrangestorebyscore, dstKey, srcKey,
+		return connection.invoke().just(ValkeySortedSetAsyncCommands::zrevrangestorebyscore, dstKey, srcKey,
 				LettuceConverters.toRange(range), LettuceConverters.toLimit(limit));
 	}
 
-	public RedisClusterCommands<byte[], byte[]> getConnection() {
+	public ValkeyClusterCommands<byte[], byte[]> getConnection() {
 		return connection.getConnection();
 	}
 

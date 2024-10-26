@@ -19,7 +19,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.DataAccessException;
 
 /**
- * {@link FallbackExceptionTranslationStrategy} returns {@link RedisSystemException} for unknown {@link Exception}s.
+ * {@link FallbackExceptionTranslationStrategy} returns {@link ValkeySystemException} for unknown {@link Exception}s.
  *
  * @author Christoph Strobl
  * @author Thomas Darimont
@@ -40,13 +40,13 @@ public class FallbackExceptionTranslationStrategy extends PassThroughExceptionTr
 	}
 
 	/**
-	 * Returns a new {@link RedisSystemException} wrapping the given {@link Exception}.
+	 * Returns a new {@link ValkeySystemException} wrapping the given {@link Exception}.
 	 *
 	 * @param e causing exception.
 	 * @return the fallback exception.
 	 */
-	protected RedisSystemException getFallback(Exception e) {
-		return new RedisSystemException("Unknown redis exception", e);
+	protected ValkeySystemException getFallback(Exception e) {
+		return new ValkeySystemException("Unknown redis exception", e);
 	}
 
 }
