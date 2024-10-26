@@ -217,7 +217,7 @@ public class LettuceConnectionFactory implements ValkeyConnectionFactory, Reacti
 
 		Assert.notNull(redisConfiguration, "ValkeyConfiguration must not be null");
 
-		this.configuration = redisConfiguration;
+		this.configuration = valkeyConfiguration;
 	}
 
 	/**

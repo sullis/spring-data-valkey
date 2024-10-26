@@ -65,7 +65,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 
 	private final ObjectFactory<K> keyFactory;
 
@@ -77,7 +77,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 	public ReactiveValkeyTemplateIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
+		this.valkeyTemplate = fixture.getTemplate();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 	}
@@ -85,7 +85,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
@@ -95,7 +95,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 	@EnabledOnCommand("COPY")
 	void copy() {
 
-		try (ReactiveValkeyClusterConnection connection = redisTemplate.getConnectionFactory()
+		try (ReactiveValkeyClusterConnection connection = valkeyTemplate.getConnectionFactory()
 				.getReactiveClusterConnection()){
 			assumeThat(connection).isNull();
 		} catch (InvalidDataAccessApiUsageException ignore) {
@@ -106,13 +106,13 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		V value = valueFactory.instance();
 		V nextValue = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.copy(key, targetKey, false).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.opsForValue().get(targetKey).as(StepVerifier::create).expectNext(value).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.copy(key, targetKey, false).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().get(targetKey).as(StepVerifier::create).expectNext(value).verifyComplete();
 
-		redisTemplate.opsForValue().set(key, nextValue).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.copy(key, targetKey, true).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.opsForValue().get(targetKey).as(StepVerifier::create).expectNext(nextValue).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, nextValue).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.copy(key, targetKey, true).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().get(targetKey).as(StepVerifier::create).expectNext(nextValue).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602
@@ -120,12 +120,12 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		K key = keyFactory.instance();
 
-		redisTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
 
-		redisTemplate.opsForValue().set(key, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.hasKey(key).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.hasKey(key).as(StepVerifier::create).expectNext(true).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-743
@@ -138,9 +138,9 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		tuples.put(keyFactory.instance(), valueFactory.instance());
 		tuples.put(keyFactory.instance(), valueFactory.instance());
 
-		redisTemplate.opsForValue().multiSet(tuples).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().multiSet(tuples).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.scan().collectList().as(StepVerifier::create) //
+		valkeyTemplate.scan().collectList().as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).containsAll(tuples.keySet())) //
 				.verifyComplete();
 	}
@@ -150,12 +150,12 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		K key = keyFactory.instance();
 
-		redisTemplate.type(key).as(StepVerifier::create).expectNext(DataType.NONE).verifyComplete();
+		valkeyTemplate.type(key).as(StepVerifier::create).expectNext(DataType.NONE).verifyComplete();
 
-		redisTemplate.opsForValue().set(key, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.type(key).as(StepVerifier::create).expectNext(DataType.STRING).verifyComplete();
+		valkeyTemplate.type(key).as(StepVerifier::create).expectNext(DataType.STRING).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602
@@ -164,10 +164,10 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K oldName = keyFactory.instance();
 		K newName = keyFactory.instance();
 
-		redisTemplate.opsForValue().set(oldName, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(oldName, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.rename(oldName, newName).as(StepVerifier::create) //
+		valkeyTemplate.rename(oldName, newName).as(StepVerifier::create) //
 				.expectNext(true) //
 				.expectComplete() //
 				.verify();
@@ -180,20 +180,20 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K existing = keyFactory.instance();
 		K newName = keyFactory.instance();
 
-		redisTemplate.opsForValue().set(oldName, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(oldName, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
-		redisTemplate.opsForValue().set(existing, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(existing, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.renameIfAbsent(oldName, newName).as(StepVerifier::create) //
+		valkeyTemplate.renameIfAbsent(oldName, newName).as(StepVerifier::create) //
 				.expectNext(true) //
 				.expectComplete() //
 				.verify();
 
-		redisTemplate.opsForValue().set(existing, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(existing, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.renameIfAbsent(newName, existing).as(StepVerifier::create).expectNext(false) //
+		valkeyTemplate.renameIfAbsent(newName, existing).as(StepVerifier::create).expectNext(false) //
 				.expectComplete() //
 				.verify();
 	}
@@ -203,12 +203,12 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		K single = keyFactory.instance();
 
-		redisTemplate.opsForValue().set(single, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(single, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.unlink(single).as(StepVerifier::create).expectNext(1L).verifyComplete();
+		valkeyTemplate.unlink(single).as(StepVerifier::create).expectNext(1L).verifyComplete();
 
-		redisTemplate.hasKey(single).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(single).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-693
@@ -217,15 +217,15 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		K key2 = keyFactory.instance();
 
-		redisTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
-		redisTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.unlink(key1, key2).as(StepVerifier::create).expectNext(2L).verifyComplete();
+		valkeyTemplate.unlink(key1, key2).as(StepVerifier::create).expectNext(2L).verifyComplete();
 
-		redisTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
-		redisTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-913
@@ -236,15 +236,15 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		assumeThat(key1 instanceof String && valueFactory instanceof StringObjectFactory).isTrue();
 
-		redisTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
-		redisTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.unlink(redisTemplate.keys((K) "*")).as(StepVerifier::create).expectNext(2L).verifyComplete();
+		valkeyTemplate.unlink(valkeyTemplate.keys((K) "*")).as(StepVerifier::create).expectNext(2L).verifyComplete();
 
-		redisTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
-		redisTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-913
@@ -255,15 +255,15 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		assumeThat(key1 instanceof String && valueFactory instanceof StringObjectFactory).isTrue();
 
-		redisTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key1, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
-		redisTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
+		valkeyTemplate.opsForValue().set(key2, valueFactory.instance()).as(StepVerifier::create).expectNext(true)
 				.verifyComplete();
 
-		redisTemplate.delete(redisTemplate.keys((K) "*")).as(StepVerifier::create).expectNext(2L).verifyComplete();
+		valkeyTemplate.delete(valkeyTemplate.keys((K) "*")).as(StepVerifier::create).expectNext(2L).verifyComplete();
 
-		redisTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
-		redisTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key1).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key2).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-683
@@ -275,9 +275,9 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		assumeThat(value instanceof Long).isFalse();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		Flux<V> execute = redisTemplate.execute(
+		Flux<V> execute = valkeyTemplate.execute(
 				new DefaultValkeyScript<>("return redis.call('get', KEYS[1])", (Class<V>) value.getClass()),
 				Collections.singletonList(key));
 
@@ -296,13 +296,13 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		assumeThat(value instanceof Long).isFalse();
 
 		Person person = new Person("Walter", "White", 51);
-		redisTemplate
+		valkeyTemplate
 				.execute(new DefaultValkeyScript<>("return redis.call('set', KEYS[1], ARGV[1])", String.class),
 						Collections.singletonList(key), Collections.singletonList(person), json.getWriter(), resultReader)
 				.as(StepVerifier::create)
 				.expectNext("OK").verifyComplete();
 
-		Flux<Person> execute = redisTemplate.execute(
+		Flux<Person> execute = valkeyTemplate.execute(
 				new DefaultValkeyScript<>("return redis.call('get', KEYS[1])", Person.class), Collections.singletonList(key),
 				Collections.emptyList(), json.getWriter(), json.getReader());
 
@@ -315,11 +315,11 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.expire(key, Duration.ofSeconds(10)).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.expire(key, Duration.ofSeconds(10)).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).isGreaterThan(Duration.ofSeconds(8))).verifyComplete();
 	}
 
@@ -329,11 +329,11 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.expire(key, Duration.ofMillis(10_001)).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.expire(key, Duration.ofMillis(10_001)).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).isGreaterThan(Duration.ofSeconds(8))).verifyComplete();
 	}
 
@@ -343,13 +343,13 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
 		Instant expireAt = Instant.ofEpochSecond(Instant.now().plus(Duration.ofSeconds(10)).getEpochSecond());
 
-		redisTemplate.expireAt(key, expireAt).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.expireAt(key, expireAt).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).isGreaterThan(Duration.ofSeconds(8))) //
 				.verifyComplete();
 	}
@@ -360,13 +360,13 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
 		Instant expireAt = Instant.ofEpochSecond(Instant.now().plus(Duration.ofSeconds(10)).getEpochSecond(), 5);
 
-		redisTemplate.expireAt(key, expireAt).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.expireAt(key, expireAt).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).isGreaterThan(Duration.ofSeconds(8))) //
 				.verifyComplete();
 	}
@@ -376,7 +376,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		K key = keyFactory.instance();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create).verifyComplete();
+		valkeyTemplate.getExpire(key).as(StepVerifier::create).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602
@@ -385,15 +385,15 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create).expectNext(Duration.ZERO).verifyComplete();
+		valkeyTemplate.getExpire(key).as(StepVerifier::create).expectNext(Duration.ZERO).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602
 	void move() {
 
-		try (ReactiveValkeyClusterConnection connection = redisTemplate.getConnectionFactory()
+		try (ReactiveValkeyClusterConnection connection = valkeyTemplate.getConnectionFactory()
 				.getReactiveClusterConnection()) {
 			assumeThat(connection).isNull();
 		} catch (InvalidDataAccessApiUsageException ignore) {
@@ -402,9 +402,9 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.move(key, 5).as(StepVerifier::create).expectNext(true).verifyComplete();
-		redisTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.opsForValue().set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.move(key, 5).as(StepVerifier::create).expectNext(true).verifyComplete();
+		valkeyTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602
@@ -421,7 +421,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 				.hashValue(jdkSerializer) //
 				.build();
 
-		ReactiveValueOperations<Object, Object> valueOperations = redisTemplate.opsForValue(objectSerializers);
+		ReactiveValueOperations<Object, Object> valueOperations = valkeyTemplate.opsForValue(objectSerializers);
 
 		valueOperations.set(key, value).as(StepVerifier::create).expectNext(true).verifyComplete();
 
@@ -431,7 +431,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest // DATAREDIS-602
 	void shouldApplyCustomSerializationContextToHash() {
 
-		ValkeySerializationContext<K, V> serializationContext = redisTemplate.getSerializationContext();
+		ValkeySerializationContext<K, V> serializationContext = valkeyTemplate.getSerializationContext();
 
 		K key = keyFactory.instance();
 		String hashField = "foo";
@@ -444,7 +444,7 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 				.hashValue(new JdkSerializationValkeySerializer()) //
 				.build();
 
-		ReactiveHashOperations<K, String, Object> hashOperations = redisTemplate.opsForHash(objectSerializers);
+		ReactiveHashOperations<K, String, Object> hashOperations = valkeyTemplate.opsForHash(objectSerializers);
 
 		hashOperations.put(key, hashField, hashValue).as(StepVerifier::create).expectNext(true).verifyComplete();
 
@@ -459,9 +459,9 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		V message = valueFactory.instance();
 
-		redisTemplate.listenToChannel(channel).as(StepVerifier::create) //
+		valkeyTemplate.listenToChannel(channel).as(StepVerifier::create) //
 				.thenAwait(Duration.ofMillis(500)) // just make sure we the subscription completed
-				.then(() -> redisTemplate.convertAndSend(channel, message).subscribe()) //
+				.then(() -> valkeyTemplate.convertAndSend(channel, message).subscribe()) //
 				.assertNext(received -> {
 
 					assertThat(received).isInstanceOf(ChannelMessage.class);
@@ -481,8 +481,8 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		V message = valueFactory.instance();
 
-		redisTemplate.listenToChannelLater(channel) //
-				.doOnNext(it -> redisTemplate.convertAndSend(channel, message).subscribe()).flatMapMany(Function.identity()) //
+		valkeyTemplate.listenToChannelLater(channel) //
+				.doOnNext(it -> valkeyTemplate.convertAndSend(channel, message).subscribe()).flatMapMany(Function.identity()) //
 				.cast(Message.class)  // why? java16 why?
 				.as(StepVerifier::create) //
 				.assertNext(received -> {
@@ -504,11 +504,11 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		V message = valueFactory.instance();
 
-		Flux<? extends Message<String, V>> stream = redisTemplate.listenToPattern(pattern);
+		Flux<? extends Message<String, V>> stream = valkeyTemplate.listenToPattern(pattern);
 
 		stream.as(StepVerifier::create) //
 				.thenAwait(Duration.ofMillis(500)) // just make sure we the subscription completed
-				.then(() -> redisTemplate.convertAndSend(channel, message).subscribe()) //
+				.then(() -> valkeyTemplate.convertAndSend(channel, message).subscribe()) //
 				.assertNext(received -> {
 
 					assertThat(received).isInstanceOf(PatternMessage.class);
@@ -528,9 +528,9 @@ public class ReactiveValkeyTemplateIntegrationTests<K, V> {
 
 		V message = valueFactory.instance();
 
-		Mono<Flux<? extends Message<String, V>>> stream = redisTemplate.listenToPatternLater(pattern);
+		Mono<Flux<? extends Message<String, V>>> stream = valkeyTemplate.listenToPatternLater(pattern);
 
-		stream.doOnNext(it -> redisTemplate.convertAndSend(channel, message).subscribe()) //
+		stream.doOnNext(it -> valkeyTemplate.convertAndSend(channel, message).subscribe()) //
 				.flatMapMany(Function.identity()) //
 				.cast(Message.class) // why? java16 why?
 				.as(StepVerifier::create) //

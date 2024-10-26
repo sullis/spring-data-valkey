@@ -42,18 +42,18 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @SuppressWarnings("unchecked")
 public class DefaultSetOperationsIntegrationTests<K, V> {
 
-	private final ValkeyTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final SetOperations<K, V> setOps;
 
-	public DefaultSetOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultSetOperationsIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.setOps = redisTemplate.opsForSet();
+		this.setOps = valkeyTemplate.opsForSet();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -62,7 +62,7 @@ public class DefaultSetOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});

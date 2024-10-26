@@ -177,7 +177,7 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 		mappingConverter.afterPropertiesSet();
 
 		this.converter = mappingConverter;
-		this.redisOps = redisOps;
+		this.redisOps = valkeyOps;
 		initMessageListenerContainer();
 	}
 
@@ -193,8 +193,8 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 
 		Assert.notNull(redisOps, "ValkeyOperations must not be null");
 
-		this.converter = redisConverter;
-		this.redisOps = redisOps;
+		this.converter = valkeyConverter;
+		this.redisOps = valkeyOps;
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 
 		ValkeyCallback<Map<byte[], byte[]>> command = connection -> connection.hGetAll(binId);
 
-		Map<byte[], byte[]> raw = redisOps.execute(command);
+		Map<byte[], byte[]> raw = valkeyOps.execute(command);
 
 		if (CollectionUtils.isEmpty(raw)) {
 			return null;
@@ -369,7 +369,7 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 
 		byte[] binKeyspace = toBytes(keyspace);
 
-		Set<byte[]> ids = redisOps.execute((ValkeyCallback<Set<byte[]>>) connection -> connection.sMembers(binKeyspace));
+		Set<byte[]> ids = valkeyOps.execute((ValkeyCallback<Set<byte[]>>) connection -> connection.sMembers(binKeyspace));
 
 		List<T> result = new ArrayList<>();
 		List<byte[]> keys = new ArrayList<>(ids);
@@ -410,7 +410,7 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 	@Override
 	public long count(String keyspace) {
 
-		Long count = redisOps.execute((ValkeyCallback<Long>) connection -> connection.sCard(toBytes(keyspace)));
+		Long count = valkeyOps.execute((ValkeyCallback<Long>) connection -> connection.sCard(toBytes(keyspace)));
 
 		return count != null ? count : 0;
 	}
@@ -615,7 +615,7 @@ public class ValkeyKeyValueAdapter extends AbstractKeyValueAdapter
 
 			TimeToLive ttl = ttlProperty.findAnnotation(TimeToLive.class);
 
-			Long timeout = redisOps.execute((ValkeyCallback<Long>) connection -> {
+			Long timeout = valkeyOps.execute((ValkeyCallback<Long>) connection -> {
 
 				if (ObjectUtils.nullSafeEquals(TimeUnit.SECONDS, ttl.unit())) {
 					return connection.ttl(key);

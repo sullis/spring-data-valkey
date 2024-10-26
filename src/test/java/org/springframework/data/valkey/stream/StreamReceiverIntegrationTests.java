@@ -67,13 +67,13 @@ import reactor.test.StepVerifier;
 public class StreamReceiverIntegrationTests {
 
 	final LettuceConnectionFactory connectionFactory;
-	final StringValkeyTemplate redisTemplate;
+	final StringValkeyTemplate valkeyTemplate;
 	final ReactiveValkeyTemplate<String, String> reactiveValkeyTemplate;
 
 	public StreamReceiverIntegrationTests(LettuceConnectionFactory connectionFactory) {
 
 		this.connectionFactory = connectionFactory;
-		this.redisTemplate = new StringValkeyTemplate(connectionFactory);
+		this.valkeyTemplate = new StringValkeyTemplate(connectionFactory);
 
 		ValkeySerializationContext<String, String> serializationContext = ValkeySerializationContext
 				.<String, String> newSerializationContext(StringValkeySerializer.UTF_8).hashKey(SerializationPair.raw())
@@ -219,9 +219,9 @@ public class StreamReceiverIntegrationTests {
 		Flux<MapRecord<String, String, String>> messages = receiver.receive(Consumer.from("my-group", "my-consumer-id"),
 				StreamOffset.create("my-stream", ReadOffset.lastConsumed()));
 
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key2", "value2"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key2", "value2"));
 
 		messages.as(StepVerifier::create) //
 				.consumeNextWith(it -> {
@@ -251,8 +251,8 @@ public class StreamReceiverIntegrationTests {
 		Flux<MapRecord<String, String, String>> messages = receiver.receive(Consumer.from("my-group", "my-consumer-id"),
 				StreamOffset.create("my-stream", ReadOffset.lastConsumed()));
 
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value"));
 
 		messages.as(StepVerifier::create) //
 				.expectNextCount(1) //
@@ -276,10 +276,10 @@ public class StreamReceiverIntegrationTests {
 
 		Flux<ObjectRecord<String, Long>> messages = receiver.receive(StreamOffset.fromStart("my-stream"));
 
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "1"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "foo"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "3"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from("0-0"), "my-group");
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "1"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "foo"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "3"));
 
 		messages.map(Record::getValue).as(StepVerifier::create) //
 				.expectNext(1L) //

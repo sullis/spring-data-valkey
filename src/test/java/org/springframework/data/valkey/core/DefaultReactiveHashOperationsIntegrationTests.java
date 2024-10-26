@@ -55,18 +55,18 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @SuppressWarnings("unchecked")
 public class DefaultReactiveHashOperationsIntegrationTests<K, HK, HV> {
 
-	private final ReactiveValkeyTemplate<K, ?> redisTemplate;
+	private final ReactiveValkeyTemplate<K, ?> valkeyTemplate;
 	private final ReactiveHashOperations<K, HK, HV> hashOperations;
 
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<HK> hashKeyFactory;
 	private final ObjectFactory<HV> hashValueFactory;
 
-	public DefaultReactiveHashOperationsIntegrationTests(ReactiveValkeyTemplate<K, ?> redisTemplate,
+	public DefaultReactiveHashOperationsIntegrationTests(ReactiveValkeyTemplate<K, ?> valkeyTemplate,
 			ObjectFactory<K> keyFactory, ObjectFactory<HK> hashKeyFactory, ObjectFactory<HV> hashValueFactory) {
 
-		this.redisTemplate = redisTemplate;
-		this.hashOperations = redisTemplate.opsForHash();
+		this.valkeyTemplate = valkeyTemplate;
+		this.hashOperations = valkeyTemplate.opsForHash();
 		this.keyFactory = keyFactory;
 		this.hashKeyFactory = hashKeyFactory;
 		this.hashValueFactory = hashValueFactory;
@@ -99,7 +99,7 @@ public class DefaultReactiveHashOperationsIntegrationTests<K, HK, HV> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();

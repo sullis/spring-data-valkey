@@ -40,7 +40,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @SuppressWarnings("unchecked")
 public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 	private final ReactiveHyperLogLogOperations<K, V> hyperLogLogOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -52,8 +52,8 @@ public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 
 	public DefaultReactiveHyperLogLogOperationsIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
-		this.hyperLogLogOperations = redisTemplate.opsForHyperLogLog();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.hyperLogLogOperations = valkeyTemplate.opsForHyperLogLog();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 	}
@@ -61,7 +61,7 @@ public class DefaultReactiveHyperLogLogOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();

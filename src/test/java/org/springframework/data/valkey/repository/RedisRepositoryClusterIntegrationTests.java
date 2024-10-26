@@ -55,7 +55,7 @@ class ValkeyRepositoryClusterIntegrationTests extends ValkeyRepositoryIntegratio
 	static class Config {
 
 		@Bean
-		ValkeyTemplate<?, ?> redisTemplate(ValkeyConnectionFactory connectionFactory) {
+		ValkeyTemplate<?, ?> valkeyTemplate(ValkeyConnectionFactory connectionFactory) {
 
 			ValkeyTemplate<byte[], byte[]> template = new ValkeyTemplate<>();
 

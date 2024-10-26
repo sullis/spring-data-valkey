@@ -46,20 +46,20 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 
-	private final ValkeyTemplate<K, ?> redisTemplate;
+	private final ValkeyTemplate<K, ?> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<HK> hashKeyFactory;
 	private final ObjectFactory<HV> hashValueFactory;
 	private final HashOperations<K, HK, HV> hashOps;
 
-	public DefaultHashOperationsIntegrationTests(ValkeyTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultHashOperationsIntegrationTests(ValkeyTemplate<K, ?> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<HK> hashKeyFactory, ObjectFactory<HV> hashValueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.hashKeyFactory = hashKeyFactory;
 		this.hashValueFactory = hashValueFactory;
-		this.hashOps = redisTemplate.opsForHash();
+		this.hashOps = valkeyTemplate.opsForHash();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -84,7 +84,7 @@ public class DefaultHashOperationsIntegrationTests<K, HK, HV> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});

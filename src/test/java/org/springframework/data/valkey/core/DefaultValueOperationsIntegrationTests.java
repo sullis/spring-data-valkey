@@ -48,18 +48,18 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class DefaultValueOperationsIntegrationTests<K, V> {
 
-	private final ValkeyTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final ValueOperations<K, V> valueOps;
 
-	public DefaultValueOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultValueOperationsIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.valueOps = redisTemplate.opsForValue();
+		this.valueOps = valkeyTemplate.opsForValue();
 	}
 
 	static Collection<Object[]> testParams() {
@@ -68,7 +68,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
@@ -223,7 +223,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		valueOps.set(key, value1);
 
 		assertThat(valueOps.getAndExpire(key, Duration.ofSeconds(10))).isEqualTo(value1);
-		assertThat(redisTemplate.getExpire(key)).isGreaterThan(1);
+		assertThat(valkeyTemplate.getExpire(key)).isGreaterThan(1);
 	}
 
 	@ParameterizedValkeyTest // GH-2050
@@ -236,7 +236,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		valueOps.set(key, value1, Duration.ofSeconds(10));
 
 		assertThat(valueOps.getAndPersist(key)).isEqualTo(value1);
-		assertThat(redisTemplate.getExpire(key)).isEqualTo(-1);
+		assertThat(valkeyTemplate.getExpire(key)).isEqualTo(-1);
 	}
 
 	@ParameterizedValkeyTest // GH-2050
@@ -249,7 +249,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		valueOps.set(key, value1);
 
 		assertThat(valueOps.getAndDelete(key)).isEqualTo(value1);
-		assertThat(redisTemplate.hasKey(key)).isFalse();
+		assertThat(valkeyTemplate.hasKey(key)).isFalse();
 	}
 
 	@ParameterizedValkeyTest
@@ -272,7 +272,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		valueOps.set(key, value, 5, TimeUnit.SECONDS);
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 	}
@@ -285,7 +285,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		valueOps.set(key, value, Duration.ofSeconds(5));
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 	}
@@ -298,7 +298,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		valueOps.set(key, value, Duration.ofMillis(5500));
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6));
 		assertThat(expire).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
@@ -313,7 +313,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		valueOps.set(key, value, 1, TimeUnit.MILLISECONDS);
 
-		await().atMost(Duration.ofMillis(500L)).until(() -> !redisTemplate.hasKey(key));
+		await().atMost(Duration.ofMillis(500L)).until(() -> !valkeyTemplate.hasKey(key));
 	}
 
 	@ParameterizedValkeyTest
@@ -322,7 +322,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		K key = keyFactory.instance();
 		V value = valueFactory.instance();
 
-		assumeThat(redisTemplate).isInstanceOf(StringValkeyTemplate.class);
+		assumeThat(valkeyTemplate).isInstanceOf(StringValkeyTemplate.class);
 
 		valueOps.set(key, value);
 
@@ -379,7 +379,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		assertThat(valueOps.setIfAbsent(key, value1, 5, TimeUnit.SECONDS)).isTrue();
 		assertThat(valueOps.setIfAbsent(key, value2, 5, TimeUnit.SECONDS)).isFalse();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 	}
@@ -394,7 +394,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		assertThat(valueOps.setIfAbsent(key, value1, Duration.ofSeconds(5))).isTrue();
 		assertThat(valueOps.setIfAbsent(key, value2, Duration.ofSeconds(5))).isFalse();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 	}
@@ -409,7 +409,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 		assertThat(valueOps.setIfAbsent(key, value1, Duration.ofMillis(5500))).isTrue();
 		assertThat(valueOps.setIfAbsent(key, value2, Duration.ofMillis(5500))).isFalse();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 	}
@@ -444,7 +444,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		assertThat(valueOps.setIfPresent(key, value2, 5, TimeUnit.SECONDS)).isTrue();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 		assertThat(valueOps.get(key)).isEqualTo(value2);
 	}
@@ -461,7 +461,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		assertThat(valueOps.setIfPresent(key, value2, Duration.ofSeconds(5))).isTrue();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 		assertThat(valueOps.get(key)).isEqualTo(value2);
 	}
@@ -478,7 +478,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 
 		assertThat(valueOps.setIfPresent(key, value2, Duration.ofMillis(5500))).isTrue();
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 		assertThat(expire).isLessThan(TimeUnit.SECONDS.toMillis(6)).isGreaterThan(TimeUnit.MILLISECONDS.toMillis(1));
 		assertThat(valueOps.get(key)).isEqualTo(value2);
 	}
@@ -532,7 +532,7 @@ public class DefaultValueOperationsIntegrationTests<K, V> {
 	@ParameterizedValkeyTest // DATAREDIS-197
 	void testSetAndGetBit() {
 
-		assumeThat(redisTemplate).isInstanceOf(StringValkeyTemplate.class);
+		assumeThat(valkeyTemplate).isInstanceOf(StringValkeyTemplate.class);
 
 		K key = keyFactory.instance();
 		int bitOffset = 65;

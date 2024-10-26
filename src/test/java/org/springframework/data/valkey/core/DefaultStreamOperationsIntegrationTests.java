@@ -67,7 +67,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @EnabledOnCommand("XADD")
 public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 
-	private final ValkeyTemplate<K, ?> redisTemplate;
+	private final ValkeyTemplate<K, ?> valkeyTemplate;
 	private final @EnabledOnValkeyDriver.DriverQualifier ValkeyConnectionFactory connectionFactory;
 
 	private final ObjectFactory<K> keyFactory;
@@ -75,15 +75,15 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 	private final ObjectFactory<HV> hashValueFactory;
 	private final StreamOperations<K, HK, HV> streamOps;
 
-	public DefaultStreamOperationsIntegrationTests(ValkeyTemplate<K, ?> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultStreamOperationsIntegrationTests(ValkeyTemplate<K, ?> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<?> objectFactory) {
 
-		this.redisTemplate = redisTemplate;
-		this.connectionFactory = redisTemplate.getRequiredConnectionFactory();
+		this.valkeyTemplate = valkeyTemplate;
+		this.connectionFactory = valkeyTemplate.getRequiredConnectionFactory();
 		this.keyFactory = keyFactory;
 		this.hashKeyFactory = (ObjectFactory<HK>) keyFactory;
 		this.hashValueFactory = (ObjectFactory<HV>) objectFactory;
-		streamOps = redisTemplate.opsForStream();
+		streamOps = valkeyTemplate.opsForStream();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -111,7 +111,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 	@BeforeEach
 	void setUp() {
 
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
@@ -536,7 +536,7 @@ public class DefaultStreamOperationsIntegrationTests<K, HK, HV> {
 	@ParameterizedValkeyTest // DATAREDIS-1084
 	void pendingShouldReadMessageSummary() {
 		// XPENDING summary not supported by Jedis
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		HK hashKey = hashKeyFactory.instance();

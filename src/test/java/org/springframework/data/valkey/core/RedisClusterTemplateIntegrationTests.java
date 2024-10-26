@@ -51,9 +51,9 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @EnabledOnValkeyClusterAvailable
 public class ValkeyClusterTemplateIntegrationTests<K, V> extends ValkeyTemplateIntegrationTests<K, V> {
 
-	public ValkeyClusterTemplateIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public ValkeyClusterTemplateIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
-		super(redisTemplate, keyFactory, valueFactory);
+		super(valkeyTemplate, keyFactory, valueFactory);
 	}
 
 	@ParameterizedValkeyTest
@@ -146,7 +146,7 @@ public class ValkeyClusterTemplateIntegrationTests<K, V> extends ValkeyTemplateI
 	void testScan() {
 
 		// Only Lettuce supports cluster-wide scanning
-		assumeThat(redisTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 		super.testScan();
 	}
 

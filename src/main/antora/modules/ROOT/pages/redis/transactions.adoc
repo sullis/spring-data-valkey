@@ -10,7 +10,7 @@ Spring Data Valkey provides the javadoc:org.springframework.data.valkey.core.Ses
 [source,java]
 ----
 //execute a transaction
-List<Object> txResults = redisOperations.execute(new SessionCallback<List<Object>>() {
+List<Object> txResults = valkeyOperations.execute(new SessionCallback<List<Object>>() {
   public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
     operations.multi();
     operations.opsForSet().add("key", "value1");
@@ -30,7 +30,7 @@ To prevent such a situation need have to discard the transactional state to clea
 
 [source,java]
 ----
-List<Object> txResults = redisOperations.execute(new SessionCallback<List<Object>>() {
+List<Object> txResults = valkeyOperations.execute(new SessionCallback<List<Object>>() {
   public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
     boolean transactionStateIsActive = true;
 	try {
@@ -72,7 +72,7 @@ The following example shows how to configure transaction management:
 public class ValkeyTxContextConfiguration {
 
   @Bean
-  public StringValkeyTemplate redisTemplate() {
+  public StringValkeyTemplate valkeyTemplate() {
     StringValkeyTemplate template = new StringValkeyTemplate(redisConnectionFactory());
     // explicitly enable transaction support
     template.setEnableTransactionSupport(true);              <2>

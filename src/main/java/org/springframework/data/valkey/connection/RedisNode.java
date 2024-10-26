@@ -57,12 +57,12 @@ public class ValkeyNode implements NamedNode {
 
 	private ValkeyNode(ValkeyNode redisNode) {
 
-		this.id = redisNode.id;
-		this.name = redisNode.name;
-		this.host = redisNode.host;
-		this.port = redisNode.port;
-		this.type = redisNode.type;
-		this.masterId = redisNode.masterId;
+		this.id = valkeyNode.id;
+		this.name = valkeyNode.name;
+		this.host = valkeyNode.host;
+		this.port = valkeyNode.port;
+		this.type = valkeyNode.type;
+		this.masterId = valkeyNode.masterId;
 	}
 
 	/**

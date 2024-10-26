@@ -32,18 +32,18 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 
-	private final ValkeyTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final HyperLogLogOperations<K, V> hyperLogLogOps;
 
-	public DefaultHyperLogLogOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultHyperLogLogOperationsIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.hyperLogLogOps = redisTemplate.opsForHyperLogLog();
+		this.hyperLogLogOps = valkeyTemplate.opsForHyperLogLog();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -52,7 +52,7 @@ public class DefaultHyperLogLogOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});

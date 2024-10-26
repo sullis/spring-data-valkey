@@ -69,7 +69,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @EnabledOnCommand("XADD")
 public class DefaultReactiveStreamOperationsIntegrationTests<K, HK, HV> {
 
-	private final ReactiveValkeyTemplate<K, ?> redisTemplate;
+	private final ReactiveValkeyTemplate<K, ?> valkeyTemplate;
 	private final ReactiveStreamOperations<K, HK, HV> streamOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -98,15 +98,15 @@ public class DefaultReactiveStreamOperationsIntegrationTests<K, HK, HV> {
 					.key(keyFactory instanceof PersonObjectFactory ? ValkeySerializer.java() : ValkeySerializer.string()).build();
 		}
 
-		this.redisTemplate = fixture.getTemplate();
-		this.streamOperations = fixture.getSerializer() != null ? redisTemplate.opsForStream(context)
-				: redisTemplate.opsForStream();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.streamOperations = fixture.getSerializer() != null ? valkeyTemplate.opsForStream(context)
+				: valkeyTemplate.opsForStream();
 	}
 
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
@@ -164,13 +164,13 @@ public class DefaultReactiveStreamOperationsIntegrationTests<K, HK, HV> {
 		assumeTrue(!(serializer instanceof Jackson2JsonValkeySerializer)
 				&& !(serializer instanceof GenericJackson2JsonValkeySerializer));
 
-		SerializationPair<K> keySerializer = redisTemplate.getSerializationContext().getKeySerializationPair();
+		SerializationPair<K> keySerializer = valkeyTemplate.getSerializationContext().getKeySerializationPair();
 
 		ValkeySerializationContext<K, String> serializationContext = ValkeySerializationContext
 				.<K, String> newSerializationContext(StringValkeySerializer.UTF_8).key(keySerializer)
 				.hashValue(SerializationPair.raw()).hashKey(SerializationPair.raw()).build();
 
-		ReactiveValkeyTemplate<K, String> raw = new ReactiveValkeyTemplate<>(redisTemplate.getConnectionFactory(),
+		ReactiveValkeyTemplate<K, String> raw = new ReactiveValkeyTemplate<>(valkeyTemplate.getConnectionFactory(),
 				serializationContext);
 
 		K key = keyFactory.instance();
@@ -248,13 +248,13 @@ public class DefaultReactiveStreamOperationsIntegrationTests<K, HK, HV> {
 		assumeTrue(!(serializer instanceof Jackson2JsonValkeySerializer)
 				&& !(serializer instanceof GenericJackson2JsonValkeySerializer));
 
-		SerializationPair<K> keySerializer = redisTemplate.getSerializationContext().getKeySerializationPair();
+		SerializationPair<K> keySerializer = valkeyTemplate.getSerializationContext().getKeySerializationPair();
 
 		ValkeySerializationContext<K, String> serializationContext = ValkeySerializationContext
 				.<K, String> newSerializationContext(StringValkeySerializer.UTF_8).key(keySerializer)
 				.hashValue(SerializationPair.raw()).hashKey(SerializationPair.raw()).build();
 
-		ReactiveValkeyTemplate<K, String> raw = new ReactiveValkeyTemplate<>(redisTemplate.getConnectionFactory(),
+		ReactiveValkeyTemplate<K, String> raw = new ReactiveValkeyTemplate<>(valkeyTemplate.getConnectionFactory(),
 				serializationContext);
 
 		K key = keyFactory.instance();

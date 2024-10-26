@@ -56,7 +56,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @SuppressWarnings("unchecked")
 public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 	private final ReactiveValueOperations<K, V> valueOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -70,8 +70,8 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
 	public DefaultReactiveValueOperationsIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
-		this.valueOperations = redisTemplate.opsForValue();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.valueOperations = valkeyTemplate.opsForValue();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 		this.serializer = fixture.getSerializer();
@@ -80,7 +80,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
@@ -108,7 +108,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
 		valueOperations.get(key).as(StepVerifier::create).expectNext(value).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.consumeNextWith(actual -> assertThat(actual).isGreaterThan(Duration.ofSeconds(8))) //
 				.expectComplete() //
 				.verify();
@@ -138,7 +138,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.setIfAbsent(key, value, Duration.ofSeconds(5)).as(StepVerifier::create).expectNext(false)
 				.verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.assertNext(actual -> {
 
 					assertThat(actual).isBetween(Duration.ofMillis(1), Duration.ofSeconds(5));
@@ -178,7 +178,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
 		valueOperations.get(key).as(StepVerifier::create).expectNext(laterValue).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create) //
+		valkeyTemplate.getExpire(key).as(StepVerifier::create) //
 				.assertNext(actual -> {
 
 					assertThat(actual).isBetween(Duration.ofMillis(1), Duration.ofSeconds(5));
@@ -249,7 +249,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 		valueOperations.getAndExpire(key, Duration.ofSeconds(10)).as(StepVerifier::create).expectNext(value)
 				.verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create)
+		valkeyTemplate.getExpire(key).as(StepVerifier::create)
 				.assertNext(actual -> assertThat(actual).isGreaterThan(Duration.ZERO)).verifyComplete();
 	}
 
@@ -264,7 +264,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
 		valueOperations.getAndDelete(key).as(StepVerifier::create).expectNext(value).verifyComplete();
 
-		redisTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
+		valkeyTemplate.hasKey(key).as(StepVerifier::create).expectNext(false).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // GH-2050
@@ -278,7 +278,7 @@ public class DefaultReactiveValueOperationsIntegrationTests<K, V> {
 
 		valueOperations.getAndPersist(key).as(StepVerifier::create).expectNext(value).verifyComplete();
 
-		redisTemplate.getExpire(key).as(StepVerifier::create).expectNext(Duration.ZERO).verifyComplete();
+		valkeyTemplate.getExpire(key).as(StepVerifier::create).expectNext(Duration.ZERO).verifyComplete();
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-602

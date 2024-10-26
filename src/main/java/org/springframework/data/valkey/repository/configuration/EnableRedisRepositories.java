@@ -148,11 +148,11 @@ public @interface EnableValkeyRepositories {
 	boolean considerNestedRepositories() default false;
 
 	/**
-	 * Configures the bean name of the {@link ValkeyOperations} to be used. Defaulted to {@literal redisTemplate}.
+	 * Configures the bean name of the {@link ValkeyOperations} to be used. Defaulted to {@literal valkeyTemplate}.
 	 *
 	 * @return
 	 */
-	String redisTemplateRef() default "valkeyTemplate";
+	String valkeyTemplateRef() default "valkeyTemplate";
 
 	/**
 	 * Set up index patterns using simple configuration class.

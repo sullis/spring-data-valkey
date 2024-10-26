@@ -198,16 +198,16 @@ public interface LettuceClientConfiguration {
 		 */
 		public LettuceClientConfigurationBuilder apply(ValkeyURI redisUri) {
 
-			this.useSsl = redisUri.isSsl();
-			this.verifyMode = redisUri.getVerifyMode();
-			this.startTls = redisUri.isStartTls();
+			this.useSsl = valkeyUri.isSsl();
+			this.verifyMode = valkeyUri.getVerifyMode();
+			this.startTls = valkeyUri.isStartTls();
 
 			if (!redisUri.getTimeout().equals(ValkeyURI.DEFAULT_TIMEOUT_DURATION)) {
-				this.timeout = redisUri.getTimeout();
+				this.timeout = valkeyUri.getTimeout();
 			}
 
 			if (!ObjectUtils.isEmpty(redisUri.getClientName())) {
-				this.clientName = redisUri.getClientName();
+				this.clientName = valkeyUri.getClientName();
 			}
 
 			return this;
@@ -284,7 +284,7 @@ public interface LettuceClientConfiguration {
 
 			Assert.notNull(redisCredentialsProviderFactory, "ValkeyCredentialsProviderFactory must not be null");
 
-			this.redisCredentialsProviderFactory = redisCredentialsProviderFactory;
+			this.redisCredentialsProviderFactory = valkeyCredentialsProviderFactory;
 			return this;
 		}
 

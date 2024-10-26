@@ -22,7 +22,7 @@ class MyConfig {
   // …
 
   @Bean
-  ValkeyList<String> stringValkeyTemplate(ValkeyTemplate<String, String> redisTemplate) {
+  ValkeyList<String> stringValkeyTemplate(ValkeyTemplate<String, String> valkeyTemplate) {
     return new DefaultValkeyList<>(template, "queue-key");
   }
 }

@@ -39,7 +39,7 @@ class DefaultValkeyScriptTests {
 		DefaultValkeyScript<String> redisScript = new DefaultValkeyScript<>();
 		redisScript.setScriptSource(script);
 		redisScript.setResultType(String.class);
-		String sha1 = redisScript.getSha1();
+		String sha1 = valkeyScript.getSha1();
 		// Ensure multiple calls return same sha
 		assertThat(redisScript.getSha1()).isEqualTo(sha1);
 		script.setScript("return KEYS[2]");
@@ -61,7 +61,7 @@ class DefaultValkeyScriptTests {
 
 		ValkeyScript<String> redisScript = ValkeyScript
 				.of(new ClassPathResource("org/springframework/data/valkey/core/script/cas.lua"));
-		assertThat(redisScript.getScriptAsString()).startsWith("local current = redis.call('GET', KEYS[1])");
+		assertThat(redisScript.getScriptAsString()).startsWith("local current = valkey.call('GET', KEYS[1])");
 	}
 
 	@Test

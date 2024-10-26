@@ -52,7 +52,7 @@ public class ValkeyKeyValueAdapterBean extends CdiBean<ValkeyKeyValueAdapter> {
 
 		super(qualifiers, ValkeyKeyValueAdapter.class, beanManager);
 		Assert.notNull(redisOperations, "ValkeyOperations Bean must not be null");
-		this.redisOperations = redisOperations;
+		this.redisOperations = valkeyOperations;
 	}
 
 	@Override

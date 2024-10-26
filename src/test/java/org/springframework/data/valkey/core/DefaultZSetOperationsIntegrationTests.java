@@ -60,18 +60,18 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class DefaultZSetOperationsIntegrationTests<K, V> {
 
-	private final ValkeyTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<V> valueFactory;
 	private final ZSetOperations<K, V> zSetOps;
 
-	public DefaultZSetOperationsIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultZSetOperationsIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.zSetOps = redisTemplate.opsForZSet();
+		this.zSetOps = valkeyTemplate.opsForZSet();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -80,7 +80,7 @@ public class DefaultZSetOperationsIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});

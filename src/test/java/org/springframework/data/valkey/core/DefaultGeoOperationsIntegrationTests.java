@@ -66,18 +66,18 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	private static final double DISTANCE_PALERMO_CATANIA_MILES = 103.31822459492733;
 	private static final double DISTANCE_PALERMO_CATANIA_FEET = 545518.8699790037;
 
-	private final ValkeyTemplate<K, M> redisTemplate;
+	private final ValkeyTemplate<K, M> valkeyTemplate;
 	private final ObjectFactory<K> keyFactory;
 	private final ObjectFactory<M> valueFactory;
 	private final GeoOperations<K, M> geoOperations;
 
-	public DefaultGeoOperationsIntegrationTests(ValkeyTemplate<K, M> redisTemplate, ObjectFactory<K> keyFactory,
+	public DefaultGeoOperationsIntegrationTests(ValkeyTemplate<K, M> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<M> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.geoOperations = redisTemplate.opsForGeo();
+		this.geoOperations = valkeyTemplate.opsForGeo();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -86,7 +86,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
@@ -236,7 +236,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 		geoOperations.add(key, POINT_PALERMO, valueFactory.instance());
 		geoOperations.add(key, POINT_CATANIA, valueFactory.instance());
 
-		List<Object> result = redisTemplate.executePipelined(new SessionCallback<GeoResults>() {
+		List<Object> result = valkeyTemplate.executePipelined(new SessionCallback<GeoResults>() {
 			@Nullable
 			@Override
 			public <K, V> GeoResults execute(ValkeyOperations<K, V> operations) throws DataAccessException {
@@ -464,7 +464,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchWithinShouldReturnMembers() {
 
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		M member1 = valueFactory.instance();
@@ -495,7 +495,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByMemberShouldReturnResults() {
 
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		M member1 = valueFactory.instance();
@@ -526,7 +526,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByPointWithinBoundingBoxShouldReturnMembers() {
 
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		M member1 = valueFactory.instance();
@@ -558,7 +558,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	@EnabledOnCommand("GEOSEARCH")
 	void geoSearchByMemberWithinBoundingBoxShouldReturnMembers() {
 
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		M member1 = valueFactory.instance();
@@ -589,7 +589,7 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 	@EnabledOnCommand("GEOSEARCHSTORE")
 	void geoSearchAndStoreWithinShouldReturnMembers() {
 
-		assumeThat(redisTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getRequiredConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key = keyFactory.instance();
 		K destKey = keyFactory.instance();
@@ -606,6 +606,6 @@ public class DefaultGeoOperationsIntegrationTests<K, M> {
 				ValkeyGeoCommands.GeoSearchStoreCommandArgs.newGeoSearchStoreArgs().sortAscending());
 
 		assertThat(result).isEqualTo(2);
-		assertThat(redisTemplate.boundZSetOps(destKey).size()).isEqualTo(2);
+		assertThat(valkeyTemplate.boundZSetOps(destKey).size()).isEqualTo(2);
 	}
 }

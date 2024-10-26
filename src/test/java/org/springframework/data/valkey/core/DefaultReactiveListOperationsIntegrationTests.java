@@ -46,7 +46,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @SuppressWarnings("unchecked")
 public class DefaultReactiveListOperationsIntegrationTests<K, V> {
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 	private final ReactiveListOperations<K, V> listOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -58,8 +58,8 @@ public class DefaultReactiveListOperationsIntegrationTests<K, V> {
 
 	public DefaultReactiveListOperationsIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
-		this.listOperations = redisTemplate.opsForList();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.listOperations = valkeyTemplate.opsForList();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 	}
@@ -67,7 +67,7 @@ public class DefaultReactiveListOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();

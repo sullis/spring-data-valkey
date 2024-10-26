@@ -39,7 +39,7 @@ public class ValkeyTestData implements AssertProvider<ValkeyTestData.ValkeyBucke
 	private final ValkeyData redisData;
 
 	ValkeyTestData(ValkeyData redisData) {
-		this.redisData = redisData;
+		this.redisData = valkeyData;
 	}
 
 	public static ValkeyTestData from(ValkeyData data) {
@@ -72,7 +72,7 @@ public class ValkeyTestData implements AssertProvider<ValkeyTestData.ValkeyBucke
 		ValkeyBucketAssert(ValkeyData redisData) {
 
 			super(toStringMap(redisData.getBucket().asMap()));
-			this.redisData = redisData;
+			this.redisData = valkeyData;
 		}
 
 		/**

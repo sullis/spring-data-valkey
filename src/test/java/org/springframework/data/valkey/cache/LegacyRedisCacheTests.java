@@ -383,7 +383,7 @@ public class LegacyValkeyCacheTests {
 
 		CacheGetWithValueLoaderIsThreadSafe(Cache redisCache) {
 
-			this.redisCache = redisCache;
+			this.redisCache = valkeyCache;
 
 			cacheLoader = new TestCacheLoader<>("test") {
 

@@ -127,7 +127,7 @@ The following example shows how to access `ValkeyClusterConnection` with `Valkey
 ====
 [source,java]
 ----
-ClusterOperations clusterOps = redisTemplate.opsForCluster();
+ClusterOperations clusterOps = valkeyTemplate.opsForCluster();
 clusterOps.shutdown(NODE_7379);                                              <1>
 ----
 

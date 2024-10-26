@@ -111,15 +111,15 @@ public class ValkeyAtomicInteger extends Number implements Serializable, BoundKe
 
 	private ValkeyAtomicInteger(String redisCounter, ValkeyConnectionFactory factory, @Nullable Integer initialValue) {
 
-		ValkeyTemplate<String, Integer> redisTemplate = new ValkeyTemplate<>();
-		redisTemplate.setKeySerializer(ValkeySerializer.string());
-		redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
-		redisTemplate.setExposeConnection(true);
-		redisTemplate.setConnectionFactory(factory);
-		redisTemplate.afterPropertiesSet();
+		ValkeyTemplate<String, Integer> valkeyTemplate = new ValkeyTemplate<>();
+		valkeyTemplate.setKeySerializer(ValkeySerializer.string());
+		valkeyTemplate.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
+		valkeyTemplate.setExposeConnection(true);
+		valkeyTemplate.setConnectionFactory(factory);
+		valkeyTemplate.afterPropertiesSet();
 
-		this.key = redisCounter;
-		this.generalOps = redisTemplate;
+		this.key = valkeyCounter;
+		this.generalOps = valkeyTemplate;
 		this.operations = generalOps.opsForValue();
 
 		if (initialValue == null) {
@@ -137,7 +137,7 @@ public class ValkeyAtomicInteger extends Number implements Serializable, BoundKe
 		Assert.notNull(template.getKeySerializer(), "a valid key serializer in template is required");
 		Assert.notNull(template.getValueSerializer(), "a valid value serializer in template is required");
 
-		this.key = redisCounter;
+		this.key = valkeyCounter;
 		this.generalOps = template;
 		this.operations = generalOps.opsForValue();
 

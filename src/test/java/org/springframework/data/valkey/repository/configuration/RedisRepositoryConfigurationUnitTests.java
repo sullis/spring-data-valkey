@@ -70,7 +70,7 @@ public class ValkeyRepositoryConfigurationUnitTests {
 		static class Config {
 
 			@Bean
-			ValkeyTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> valkeyTemplate() {
 				return createTemplateMock();
 			}
 
@@ -105,7 +105,7 @@ public class ValkeyRepositoryConfigurationUnitTests {
 		static class Config {
 
 			@Bean
-			ValkeyTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> valkeyTemplate() {
 				return createTemplateMock();
 			}
 		}
@@ -144,7 +144,7 @@ public class ValkeyRepositoryConfigurationUnitTests {
 			}
 
 			@Bean
-			ValkeyTemplate<?, ?> redisTemplate() {
+			ValkeyTemplate<?, ?> valkeyTemplate() {
 				return createTemplateMock();
 			}
 		}

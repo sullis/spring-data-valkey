@@ -137,7 +137,7 @@ class MyConfig {
   }
 
   @Bean
-  ValkeyTemplate<String, String> redisTemplate(ValkeyConnectionFactory connectionFactory) {
+  ValkeyTemplate<String, String> valkeyTemplate(ValkeyConnectionFactory connectionFactory) {
 
     ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
     template.setConnectionFactory(connectionFactory);
@@ -301,10 +301,10 @@ Imperative::
 public class Example {
 
   @Autowired
-  private StringValkeyTemplate redisTemplate;
+  private StringValkeyTemplate valkeyTemplate;
 
   public void addLink(String userId, URL url) {
-    redisTemplate.opsForList().leftPush(userId, url.toExternalForm());
+    valkeyTemplate.opsForList().leftPush(userId, url.toExternalForm());
   }
 }
 ----
@@ -316,10 +316,10 @@ Reactive::
 public class Example {
 
   @Autowired
-  private ReactiveStringValkeyTemplate redisTemplate;
+  private ReactiveStringValkeyTemplate valkeyTemplate;
 
   public Mono<Long> addLink(String userId, URL url) {
-    return redisTemplate.opsForList().leftPush(userId, url.toExternalForm());
+    return valkeyTemplate.opsForList().leftPush(userId, url.toExternalForm());
   }
 }
 ----

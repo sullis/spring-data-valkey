@@ -65,14 +65,14 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(2);
 
 	private final ValkeyConnectionFactory connectionFactory;
-	private final StringValkeyTemplate redisTemplate;
+	private final StringValkeyTemplate valkeyTemplate;
 	private final StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> containerOptions = StreamMessageListenerContainerOptions
 			.builder().pollTimeout(Duration.ofMillis(100)).build();
 
 	AbstractStreamMessageListenerContainerIntegrationTests(ValkeyConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
-		this.redisTemplate = new StringValkeyTemplate(connectionFactory);
-		this.redisTemplate.afterPropertiesSet();
+		this.valkeyTemplate = new StringValkeyTemplate(connectionFactory);
+		this.valkeyTemplate.afterPropertiesSet();
 	}
 
 	@BeforeEach
@@ -95,9 +95,9 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value3"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value3"));
 
 		assertThat(queue.poll(1, TimeUnit.SECONDS)).isNotNull();
 		assertThat(queue.poll(1, TimeUnit.SECONDS)).isNotNull();
@@ -123,7 +123,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add(ObjectRecord.create("my-stream", "value1"));
+		valkeyTemplate.opsForStream().add(ObjectRecord.create("my-stream", "value1"));
 
 		assertThat(queue.poll(1, TimeUnit.SECONDS)).isNotNull().extracting(Record::getValue).isEqualTo("value1");
 
@@ -147,7 +147,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add(ObjectRecord.create("my-stream", new LoginEvent("Walter", "White")));
+		valkeyTemplate.opsForStream().add(ObjectRecord.create("my-stream", new LoginEvent("Walter", "White")));
 
 		assertThat(queue.poll(1, TimeUnit.SECONDS)).isNotNull().extracting(Record::getValue)
 				.isEqualTo(new LoginEvent("Walter", "White"));
@@ -163,8 +163,8 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 		StreamMessageListenerContainer<String, MapRecord<String, String, String>> container = StreamMessageListenerContainer
 				.create(connectionFactory, containerOptions);
 		BlockingQueue<MapRecord<String, String, String>> queue = new LinkedBlockingQueue<>();
-		RecordId messageId = redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
+		RecordId messageId = valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
 
 		container.start();
 		Subscription subscription = container.receive(Consumer.from("my-group", "my-consumer"),
@@ -172,7 +172,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
 
 		MapRecord<String, String, String> message = queue.poll(1, TimeUnit.SECONDS);
 		assertThat(message).isNotNull();
@@ -189,8 +189,8 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 		StreamMessageListenerContainer<String, MapRecord<String, String, String>> container = StreamMessageListenerContainer
 				.create(connectionFactory, containerOptions);
 		BlockingQueue<MapRecord<String, String, String>> queue = new LinkedBlockingQueue<>();
-		RecordId messageId = redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
+		RecordId messageId = valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
 
 		container.start();
 		Subscription subscription = container.receiveAutoAck(Consumer.from("my-group", "my-consumer"),
@@ -198,7 +198,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value2"));
 
 		MapRecord<String, String, String> message = queue.poll(1, TimeUnit.SECONDS);
 		assertThat(message).isNotNull();
@@ -244,14 +244,14 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 				.builder(StreamOffset.create("my-stream", ReadOffset.lastConsumed())).errorHandler(failures::add)
 				.consumer(Consumer.from("my-group", "my-consumer")).build();
 
-		RecordId messageId = redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
+		RecordId messageId = valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
 
 		container.start();
 		Subscription subscription = container.register(readRequest, it -> {});
 		subscription.await(Duration.ofSeconds(1));
 
-		redisTemplate.delete("my-stream");
+		valkeyTemplate.delete("my-stream");
 
 		assertThat(failures.poll(3, TimeUnit.SECONDS)).isNotNull();
 
@@ -276,15 +276,15 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 				.consumer(Consumer.from("my-group", "my-consumer")) //
 				.build();
 
-		RecordId messageId = redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
-		redisTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
+		RecordId messageId = valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().createGroup("my-stream", ReadOffset.from(messageId), "my-group");
 
 		container.start();
 		Subscription subscription = container.register(readRequest, it -> {});
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.delete("my-stream");
+		valkeyTemplate.delete("my-stream");
 
 		assertThat(failures.poll(1, TimeUnit.SECONDS)).isNotNull();
 		assertThat(failures.poll(1, TimeUnit.SECONDS)).isNotNull();
@@ -311,9 +311,9 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 				.cancelOnError(t -> false) //
 				.build();
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "1"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "foo"));
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "3"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "1"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "foo"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("payload", "3"));
 
 		container.start();
 		Subscription subscription = container.register(readRequest, records::add);
@@ -352,7 +352,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 		subscription.await(DEFAULT_TIMEOUT);
 		cancelAwait(subscription);
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value4"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value4"));
 
 		assertThat(queue.poll(200, TimeUnit.MILLISECONDS)).isNull();
 	}
@@ -377,7 +377,7 @@ abstract class AbstractStreamMessageListenerContainerIntegrationTests {
 
 		subscription.await(DEFAULT_TIMEOUT);
 
-		redisTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
+		valkeyTemplate.opsForStream().add("my-stream", Collections.singletonMap("key", "value1"));
 
 		assertThat(queue.poll(1, TimeUnit.SECONDS)).isNotNull();
 

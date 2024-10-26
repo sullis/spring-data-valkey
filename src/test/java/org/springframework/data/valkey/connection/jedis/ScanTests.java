@@ -78,7 +78,7 @@ public class ScanTests {
 	@ParameterizedValkeyTest
 	void contextLoads() throws InterruptedException {
 
-		BoundHashOperations<String, String, String> hash = redisOperations.boundHashOps("hash");
+		BoundHashOperations<String, String, String> hash = valkeyOperations.boundHashOps("hash");
 		final AtomicReference<Exception> exception = new AtomicReference<>();
 
 		// Create some keys so that SCAN requires a while to return all data.
@@ -92,7 +92,7 @@ public class ScanTests {
 			executor.submit(() -> {
 				try {
 
-					Cursor<Entry<Object, Object>> cursorMap = redisOperations.boundHashOps("hash")
+					Cursor<Entry<Object, Object>> cursorMap = valkeyOperations.boundHashOps("hash")
 							.scan(ScanOptions.scanOptions().match("*").count(100).build());
 
 					// This line invokes the lazy SCAN invocation

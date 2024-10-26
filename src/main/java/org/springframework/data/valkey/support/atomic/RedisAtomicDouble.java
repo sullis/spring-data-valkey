@@ -82,15 +82,15 @@ public class ValkeyAtomicDouble extends Number implements Serializable, BoundKey
 		Assert.hasText(redisCounter, "a valid counter name is required");
 		Assert.notNull(factory, "a valid factory is required");
 
-		ValkeyTemplate<String, Double> redisTemplate = new ValkeyTemplate<>();
-		redisTemplate.setKeySerializer(ValkeySerializer.string());
-		redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Double.class));
-		redisTemplate.setExposeConnection(true);
-		redisTemplate.setConnectionFactory(factory);
-		redisTemplate.afterPropertiesSet();
+		ValkeyTemplate<String, Double> valkeyTemplate = new ValkeyTemplate<>();
+		valkeyTemplate.setKeySerializer(ValkeySerializer.string());
+		valkeyTemplate.setValueSerializer(new GenericToStringSerializer<>(Double.class));
+		valkeyTemplate.setExposeConnection(true);
+		valkeyTemplate.setConnectionFactory(factory);
+		valkeyTemplate.afterPropertiesSet();
 
-		this.key = redisCounter;
-		this.generalOps = redisTemplate;
+		this.key = valkeyCounter;
+		this.generalOps = valkeyTemplate;
 		this.operations = generalOps.opsForValue();
 
 		if (initialValue == null) {
@@ -137,7 +137,7 @@ public class ValkeyAtomicDouble extends Number implements Serializable, BoundKey
 		Assert.notNull(template.getKeySerializer(), "a valid key serializer in template is required");
 		Assert.notNull(template.getValueSerializer(), "a valid value serializer in template is required");
 
-		this.key = redisCounter;
+		this.key = valkeyCounter;
 		this.generalOps = template;
 		this.operations = generalOps.opsForValue();
 

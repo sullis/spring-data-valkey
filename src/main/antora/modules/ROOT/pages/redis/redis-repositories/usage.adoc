@@ -54,7 +54,7 @@ public class ApplicationConfig {
   }
 
   @Bean
-  public ValkeyTemplate<?, ?> redisTemplate(ValkeyConnectionFactory redisConnectionFactory) {
+  public ValkeyTemplate<?, ?> valkeyTemplate(ValkeyConnectionFactory redisConnectionFactory) {
 
     ValkeyTemplate<byte[], byte[]> template = new ValkeyTemplate<byte[], byte[]>();
     template.setConnectionFactory(redisConnectionFactory);

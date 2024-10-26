@@ -61,7 +61,7 @@ public class DefaultReactiveGeoOperationsIntegrationTests<K, V> {
 	private static final double DISTANCE_PALERMO_CATANIA_METERS = 166274.15156960033;
 	private static final double DISTANCE_PALERMO_CATANIA_KILOMETERS = 166.27415156960033;
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 	private final ReactiveGeoOperations<K, V> geoOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -73,8 +73,8 @@ public class DefaultReactiveGeoOperationsIntegrationTests<K, V> {
 
 	public DefaultReactiveGeoOperationsIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
-		this.geoOperations = redisTemplate.opsForGeo();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.geoOperations = valkeyTemplate.opsForGeo();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 	}
@@ -82,7 +82,7 @@ public class DefaultReactiveGeoOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
@@ -485,7 +485,7 @@ public class DefaultReactiveGeoOperationsIntegrationTests<K, V> {
 				.expectNext(2L) //
 				.verifyComplete();
 
-		redisTemplate.opsForZSet().size(destKey) //
+		valkeyTemplate.opsForZSet().size(destKey) //
 				.as(StepVerifier::create) //
 				.expectNext(2L) //
 				.verifyComplete();

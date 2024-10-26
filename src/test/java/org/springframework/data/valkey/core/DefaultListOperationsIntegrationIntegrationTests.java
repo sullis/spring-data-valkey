@@ -47,7 +47,7 @@ import org.springframework.data.valkey.test.extension.parametrized.Parameterized
 @MethodSource("testParams")
 public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 
-	private final ValkeyTemplate<K, V> redisTemplate;
+	private final ValkeyTemplate<K, V> valkeyTemplate;
 
 	private final ObjectFactory<K> keyFactory;
 
@@ -55,13 +55,13 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 
 	private final ListOperations<K, V> listOps;
 
-	public DefaultListOperationsIntegrationIntegrationTests(ValkeyTemplate<K, V> redisTemplate,
+	public DefaultListOperationsIntegrationIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate,
 			ObjectFactory<K> keyFactory, ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
-		this.listOps = redisTemplate.opsForList();
+		this.listOps = valkeyTemplate.opsForList();
 	}
 
 	public static Collection<Object[]> testParams() {
@@ -71,7 +71,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 	@BeforeEach
 	void setUp() {
 
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
@@ -269,7 +269,7 @@ public class DefaultListOperationsIntegrationIntegrationTests<K, V> {
 	@ParameterizedValkeyTest // DATAREDIS-288
 	void testLeftPushAllCollection() {
 
-		assumeThat(redisTemplate.getConnectionFactory() instanceof LettuceConnectionFactory).isTrue();
+		assumeThat(valkeyTemplate.getConnectionFactory() instanceof LettuceConnectionFactory).isTrue();
 
 		K key = keyFactory.instance();
 

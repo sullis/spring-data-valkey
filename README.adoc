@@ -45,7 +45,7 @@ public class Example {
     public void addLink(String userId, URL url) {
         listOps.leftPush(userId, url.toExternalForm());
         // or use template directly
-        redisTemplate.boundListOps(userId).leftPush(url.toExternalForm());
+        valkeyTemplate.boundListOps(userId).leftPush(url.toExternalForm());
     }
 }
 

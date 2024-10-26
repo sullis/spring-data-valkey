@@ -230,7 +230,7 @@ done reading, on error or cancellation all bound resources are freed again.
 
 [source,java]
 ----
-redisTemplate.listenToChannel("channel1", "channel2").doOnNext(msg -> {
+valkeyTemplate.listenToChannel("channel1", "channel2").doOnNext(msg -> {
     // message processing ...
 }).subscribe();
 ----

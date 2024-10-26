@@ -72,11 +72,11 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 	@Override
 	public void registerBeansForRoot(BeanDefinitionRegistry registry, RepositoryConfigurationSource configuration) {
 
-		String redisTemplateRef = configuration.getAttribute("valkeyTemplateRef").get();
+		String valkeyTemplateRef = configuration.getAttribute("valkeyTemplateRef").get();
 
-		if (!StringUtils.hasText(redisTemplateRef)) {
+		if (!StringUtils.hasText(valkeyTemplateRef)) {
 			throw new IllegalStateException(
-					"@EnableValkeyRepositories(redisTemplateRef = … ) must be configured to a non empty value");
+					"@EnableValkeyRepositories(valkeyTemplateRef = … ) must be configured to a non empty value");
 		}
 
 		// Mapping config
@@ -108,7 +108,7 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 				VALKEY_CUSTOM_CONVERSIONS_BEAN_NAME, configuration.getSource());
 
 		// Register referenceResolver
-		registerIfNotAlreadyRegistered(() -> createValkeyReferenceResolverDefinition(redisTemplateRef), registry,
+		registerIfNotAlreadyRegistered(() -> createValkeyReferenceResolverDefinition(valkeyTemplateRef), registry,
 				VALKEY_REFERENCE_RESOLVER_BEAN_NAME, configuration.getSource());
 
 		// Register converter
@@ -153,10 +153,10 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 		return builder.getBeanDefinition();
 	}
 
-	private static AbstractBeanDefinition createValkeyReferenceResolverDefinition(String redisTemplateRef) {
+	private static AbstractBeanDefinition createValkeyReferenceResolverDefinition(String valkeyTemplateRef) {
 
 		return BeanDefinitionBuilder.rootBeanDefinition("org.springframework.data.valkey.core.convert.ReferenceResolverImpl") //
-				.addConstructorArgReference(redisTemplateRef) //
+				.addConstructorArgReference(valkeyTemplateRef) //
 				.getBeanDefinition();
 	}
 

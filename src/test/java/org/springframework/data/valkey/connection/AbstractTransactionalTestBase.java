@@ -56,7 +56,7 @@ public abstract class AbstractTransactionalTestBase {
 	public abstract static class ValkeyContextConfiguration {
 
 		@Bean
-		public StringValkeyTemplate redisTemplate() {
+		public StringValkeyTemplate valkeyTemplate() {
 
 			StringValkeyTemplate template = new StringValkeyTemplate(redisConnectionFactory());
 

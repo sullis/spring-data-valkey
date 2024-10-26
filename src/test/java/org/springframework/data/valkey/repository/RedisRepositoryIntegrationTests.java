@@ -66,7 +66,7 @@ public class ValkeyRepositoryIntegrationTests extends ValkeyRepositoryIntegratio
 		}
 
 		@Bean
-		ValkeyTemplate<?, ?> redisTemplate(ValkeyConnectionFactory connectionFactory) {
+		ValkeyTemplate<?, ?> valkeyTemplate(ValkeyConnectionFactory connectionFactory) {
 
 			ValkeyTemplate<String, String> template = new ValkeyTemplate<>();
 

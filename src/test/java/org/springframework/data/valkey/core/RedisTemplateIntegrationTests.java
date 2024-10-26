@@ -68,14 +68,14 @@ import org.springframework.data.valkey.test.util.CollectionAwareComparator;
 @MethodSource("testParams")
 public class ValkeyTemplateIntegrationTests<K, V> {
 
-	protected final ValkeyTemplate<K, V> redisTemplate;
+	protected final ValkeyTemplate<K, V> valkeyTemplate;
 	protected final ObjectFactory<K> keyFactory;
 	protected final ObjectFactory<V> valueFactory;
 
-	ValkeyTemplateIntegrationTests(ValkeyTemplate<K, V> redisTemplate, ObjectFactory<K> keyFactory,
+	ValkeyTemplateIntegrationTests(ValkeyTemplate<K, V> valkeyTemplate, ObjectFactory<K> keyFactory,
 			ObjectFactory<V> valueFactory) {
 
-		this.redisTemplate = redisTemplate;
+		this.valkeyTemplate = valkeyTemplate;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
 	}
@@ -86,7 +86,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 
 	@BeforeEach
 	void setUp() {
-		redisTemplate.execute((ValkeyCallback<Object>) connection -> {
+		valkeyTemplate.execute((ValkeyCallback<Object>) connection -> {
 			connection.flushDb();
 			return null;
 		});
@@ -96,25 +96,25 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testDumpAndRestoreNoTtl() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		byte[] serializedValue = redisTemplate.dump(key1);
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		byte[] serializedValue = valkeyTemplate.dump(key1);
 		assertThat(serializedValue).isNotNull();
-		redisTemplate.delete(key1);
-		redisTemplate.restore(key1, serializedValue, 0, TimeUnit.SECONDS);
-		assertThat(redisTemplate.boundValueOps(key1).get()).isEqualTo(value1);
+		valkeyTemplate.delete(key1);
+		valkeyTemplate.restore(key1, serializedValue, 0, TimeUnit.SECONDS);
+		assertThat(valkeyTemplate.boundValueOps(key1).get()).isEqualTo(value1);
 	}
 
 	@ParameterizedValkeyTest
 	void testRestoreTtl() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		byte[] serializedValue = redisTemplate.dump(key1);
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		byte[] serializedValue = valkeyTemplate.dump(key1);
 		assertThat(serializedValue).isNotNull();
-		redisTemplate.delete(key1);
-		redisTemplate.restore(key1, serializedValue, 10000, TimeUnit.MILLISECONDS);
-		assertThat(redisTemplate.boundValueOps(key1).get()).isEqualTo(value1);
-		assertThat(redisTemplate.getExpire(key1)).isGreaterThan(1L);
+		valkeyTemplate.delete(key1);
+		valkeyTemplate.restore(key1, serializedValue, 10000, TimeUnit.MILLISECONDS);
+		assertThat(valkeyTemplate.boundValueOps(key1).get()).isEqualTo(value1);
+		assertThat(valkeyTemplate.getExpire(key1)).isGreaterThan(1L);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -123,9 +123,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 		assumeThat(key1 instanceof String || key1 instanceof byte[]).isTrue();
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 		K keyPattern = key1 instanceof String ? (K) "*" : (K) "*".getBytes();
-		assertThat(redisTemplate.keys(keyPattern)).isNotNull();
+		assertThat(valkeyTemplate.keys(keyPattern)).isNotNull();
 	}
 
 	@ParameterizedValkeyTest // GH-2260
@@ -133,9 +133,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 		assumeThat(key1 instanceof String || key1 instanceof byte[]).isTrue();
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 		long count = 0;
-		try (Cursor<K> cursor = redisTemplate.scan(ScanOptions.scanOptions().count(1).build())) {
+		try (Cursor<K> cursor = valkeyTemplate.scan(ScanOptions.scanOptions().count(1).build())) {
 			while (cursor.hasNext()) {
 				assertThat(cursor.next()).isEqualTo(key1);
 				count++;
@@ -148,14 +148,14 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest
 	void testTemplateNotInitialized() throws Exception {
 		ValkeyTemplate tpl = new ValkeyTemplate();
-		tpl.setConnectionFactory(redisTemplate.getConnectionFactory());
+		tpl.setConnectionFactory(valkeyTemplate.getConnectionFactory());
 		assertThatIllegalArgumentException().isThrownBy(() -> tpl.exec());
 	}
 
 	@ParameterizedValkeyTest
 	void testStringTemplateExecutesWithStringConn() {
-		assumeThat(redisTemplate instanceof StringValkeyTemplate).isTrue();
-		String value = redisTemplate.execute((ValkeyCallback<String>) connection -> {
+		assumeThat(valkeyTemplate instanceof StringValkeyTemplate).isTrue();
+		String value = valkeyTemplate.execute((ValkeyCallback<String>) connection -> {
 			StringValkeyConnection stringConn = (StringValkeyConnection) connection;
 			stringConn.set("test", "it");
 			return stringConn.get("test");
@@ -173,7 +173,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V setValue = valueFactory.instance();
 		K zsetKey = keyFactory.instance();
 		V zsetValue = valueFactory.instance();
-		List<Object> results = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		List<Object> results = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 				operations.multi();
@@ -202,8 +202,8 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
-		redisTemplate.execute(new SessionCallback<List<Object>>() {
+		valkeyTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 				operations.multi();
@@ -212,13 +212,13 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 				return null;
 			}
 		});
-		assertThat(redisTemplate.boundValueOps(key1).get()).isEqualTo(value1);
+		assertThat(valkeyTemplate.boundValueOps(key1).get()).isEqualTo(value1);
 	}
 
 	@ParameterizedValkeyTest
 	void testExecCustomSerializer() {
-		assumeThat(redisTemplate instanceof StringValkeyTemplate).isTrue();
-		List<Object> results = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		assumeThat(valkeyTemplate instanceof StringValkeyTemplate).isTrue();
+		List<Object> results = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 				operations.multi();
@@ -281,13 +281,13 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K listKey = keyFactory.instance();
 		V listValue = valueFactory.instance();
 		V listValue2 = valueFactory.instance();
-		List<Object> results = redisTemplate.executePipelined((ValkeyCallback) connection -> {
-			byte[] rawKey = serialize(key1, redisTemplate.getKeySerializer());
-			byte[] rawListKey = serialize(listKey, redisTemplate.getKeySerializer());
-			connection.set(rawKey, serialize(value1, redisTemplate.getValueSerializer()));
+		List<Object> results = valkeyTemplate.executePipelined((ValkeyCallback) connection -> {
+			byte[] rawKey = serialize(key1, valkeyTemplate.getKeySerializer());
+			byte[] rawListKey = serialize(listKey, valkeyTemplate.getKeySerializer());
+			connection.set(rawKey, serialize(value1, valkeyTemplate.getValueSerializer()));
 			connection.get(rawKey);
-			connection.rPush(rawListKey, serialize(listValue, redisTemplate.getValueSerializer()));
-			connection.rPush(rawListKey, serialize(listValue2, redisTemplate.getValueSerializer()));
+			connection.rPush(rawListKey, serialize(listValue, valkeyTemplate.getValueSerializer()));
+			connection.rPush(rawListKey, serialize(listValue2, valkeyTemplate.getValueSerializer()));
 			connection.lRange(rawListKey, 0, -1);
 			return null;
 		});
@@ -299,9 +299,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest
 	void testExecutePipelinedCustomSerializer() {
 
-		assumeThat(redisTemplate instanceof StringValkeyTemplate).isTrue();
+		assumeThat(valkeyTemplate instanceof StringValkeyTemplate).isTrue();
 
-		List<Object> results = redisTemplate.executePipelined((ValkeyCallback) connection -> {
+		List<Object> results = valkeyTemplate.executePipelined((ValkeyCallback) connection -> {
 			StringValkeyConnection stringValkeyConn = (StringValkeyConnection) connection;
 			stringValkeyConn.set("foo", "5");
 			stringValkeyConn.get("foo");
@@ -317,18 +317,18 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest // DATAREDIS-500
 	void testExecutePipelinedWidthDifferentHashKeySerializerAndHashValueSerializer() {
 
-		assumeThat(redisTemplate instanceof StringValkeyTemplate).isTrue();
+		assumeThat(valkeyTemplate instanceof StringValkeyTemplate).isTrue();
 
-		redisTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
-		redisTemplate.setHashKeySerializer(new GenericToStringSerializer<>(Long.class));
-		redisTemplate.setHashValueSerializer(new Jackson2JsonValkeySerializer<>(Person.class));
+		valkeyTemplate.setKeySerializer(StringValkeySerializer.UTF_8);
+		valkeyTemplate.setHashKeySerializer(new GenericToStringSerializer<>(Long.class));
+		valkeyTemplate.setHashValueSerializer(new Jackson2JsonValkeySerializer<>(Person.class));
 
 		Person person = new Person("Homer", "Simpson", 38);
 
-		redisTemplate.opsForHash().put((K) "foo", 1L, person);
+		valkeyTemplate.opsForHash().put((K) "foo", 1L, person);
 
-		List<Object> results = redisTemplate.executePipelined((ValkeyCallback) connection -> {
-			connection.hGetAll(((StringValkeySerializer) redisTemplate.getKeySerializer()).serialize("foo"));
+		List<Object> results = valkeyTemplate.executePipelined((ValkeyCallback) connection -> {
+			connection.hGetAll(((StringValkeySerializer) valkeyTemplate.getKeySerializer()).serialize("foo"));
 			return null;
 		});
 
@@ -338,18 +338,18 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest
 	public void testExecutePipelinedNonNullValkeyCallback() {
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
-				.isThrownBy(() -> redisTemplate.executePipelined((ValkeyCallback<String>) connection -> "Hey There"));
+				.isThrownBy(() -> valkeyTemplate.executePipelined((ValkeyCallback<String>) connection -> "Hey There"));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ParameterizedValkeyTest
 	public void testExecutePipelinedTx() {
 
-		assumeThat(redisTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
 
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		List<Object> pipelinedResults = redisTemplate.executePipelined(new SessionCallback() {
+		List<Object> pipelinedResults = valkeyTemplate.executePipelined(new SessionCallback() {
 			public Object execute(ValkeyOperations operations) throws DataAccessException {
 
 				operations.multi();
@@ -377,9 +377,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ParameterizedValkeyTest
 	void testExecutePipelinedTxCustomSerializer() {
-		assumeThat(redisTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
-		assumeThat(redisTemplate instanceof StringValkeyTemplate).isTrue();
-		List<Object> pipelinedResults = redisTemplate.executePipelined(new SessionCallback() {
+		assumeThat(valkeyTemplate.getConnectionFactory()).isInstanceOf(LettuceConnectionFactory.class);
+		assumeThat(valkeyTemplate instanceof StringValkeyTemplate).isTrue();
+		List<Object> pipelinedResults = valkeyTemplate.executePipelined(new SessionCallback() {
 			public Object execute(ValkeyOperations operations) throws DataAccessException {
 				operations.multi();
 				operations.opsForList().leftPush("fooList", "5");
@@ -398,7 +398,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest
 	public void testExecutePipelinedNonNullSessionCallback() {
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
-				.isThrownBy(() -> redisTemplate.executePipelined(new SessionCallback<String>() {
+				.isThrownBy(() -> valkeyTemplate.executePipelined(new SessionCallback<String>() {
 					@SuppressWarnings("rawtypes")
 					public String execute(ValkeyOperations operations) throws DataAccessException {
 						return "Whatup";
@@ -412,17 +412,17 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 
-		assertThat(redisTemplate.hasKey(key1)).isTrue();
-		assertThat(redisTemplate.delete(key1)).isTrue();
-		assertThat(redisTemplate.hasKey(key1)).isFalse();
+		assertThat(valkeyTemplate.hasKey(key1)).isTrue();
+		assertThat(valkeyTemplate.delete(key1)).isTrue();
+		assertThat(valkeyTemplate.hasKey(key1)).isFalse();
 	}
 
 	@ParameterizedValkeyTest
 	void testCopy() {
 
-		assumeThat(redisTemplate.execute((ValkeyCallback<ValkeyConnection>) it -> it))
+		assumeThat(valkeyTemplate.execute((ValkeyCallback<ValkeyConnection>) it -> it))
 				.isNotInstanceOf(ValkeyClusterConnection.class);
 
 		K key1 = keyFactory.instance();
@@ -430,15 +430,15 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 
-		redisTemplate.copy(key1, key2, false);
-		assertThat(redisTemplate.opsForValue().get(key2)).isEqualTo(value1);
+		valkeyTemplate.copy(key1, key2, false);
+		assertThat(valkeyTemplate.opsForValue().get(key2)).isEqualTo(value1);
 
-		redisTemplate.opsForValue().set(key1, value2);
+		valkeyTemplate.opsForValue().set(key1, value2);
 
-		redisTemplate.copy(key1, key2, true);
-		assertThat(redisTemplate.opsForValue().get(key2)).isEqualTo(value2);
+		valkeyTemplate.copy(key1, key2, true);
+		assertThat(valkeyTemplate.opsForValue().get(key2)).isEqualTo(value2);
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-688
@@ -449,12 +449,12 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
 
-		redisTemplate.opsForValue().set(key1, value1);
-		redisTemplate.opsForValue().set(key2, value2);
+		valkeyTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key2, value2);
 
-		assertThat(redisTemplate.delete(Arrays.asList(key1, key2)).longValue()).isEqualTo(2L);
-		assertThat(redisTemplate.hasKey(key1)).isFalse();
-		assertThat(redisTemplate.hasKey(key2)).isFalse();
+		assertThat(valkeyTemplate.delete(Arrays.asList(key1, key2)).longValue()).isEqualTo(2L);
+		assertThat(valkeyTemplate.hasKey(key1)).isFalse();
+		assertThat(valkeyTemplate.hasKey(key2)).isFalse();
 	}
 
 	@ParameterizedValkeyTest
@@ -465,9 +465,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 
 		assumeThat(value1 instanceof Number).isTrue();
 
-		redisTemplate.opsForList().rightPush(key1, value1);
+		valkeyTemplate.opsForList().rightPush(key1, value1);
 
-		List<V> results = redisTemplate.sort(SortQueryBuilder.sort(key1).build());
+		List<V> results = valkeyTemplate.sort(SortQueryBuilder.sort(key1).build());
 		assertThat(results).isEqualTo(Collections.singletonList(value1));
 	}
 
@@ -477,9 +477,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key2 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 		assumeThat(value1 instanceof Number).isTrue();
-		redisTemplate.opsForList().rightPush(key1, value1);
-		assertThat(redisTemplate.sort(SortQueryBuilder.sort(key1).build(), key2)).isEqualTo(Long.valueOf(1));
-		assertThat(redisTemplate.boundListOps(key2).range(0, -1)).isEqualTo(Collections.singletonList(value1));
+		valkeyTemplate.opsForList().rightPush(key1, value1);
+		assertThat(valkeyTemplate.sort(SortQueryBuilder.sort(key1).build(), key2)).isEqualTo(Long.valueOf(1));
+		assertThat(valkeyTemplate.boundListOps(key2).range(0, -1)).isEqualTo(Collections.singletonList(value1));
 	}
 
 	@ParameterizedValkeyTest
@@ -487,8 +487,8 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 		assumeThat(value1 instanceof Number).isTrue();
-		redisTemplate.opsForList().rightPush(key1, value1);
-		List<String> results = redisTemplate.sort(SortQueryBuilder.sort(key1).get("#").build(), tuple -> "FOO");
+		valkeyTemplate.opsForList().rightPush(key1, value1);
+		List<String> results = valkeyTemplate.sort(SortQueryBuilder.sort(key1).get("#").build(), tuple -> "FOO");
 		assertThat(results).isEqualTo(Collections.singletonList("FOO"));
 	}
 
@@ -497,19 +497,19 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		redisTemplate.expire(key1, 500, TimeUnit.MILLISECONDS);
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		valkeyTemplate.expire(key1, 500, TimeUnit.MILLISECONDS);
 
-		assertThat(redisTemplate.getExpire(key1, TimeUnit.MILLISECONDS)).isGreaterThan(0L);
+		assertThat(valkeyTemplate.getExpire(key1, TimeUnit.MILLISECONDS)).isGreaterThan(0L);
 	}
 
 	@ParameterizedValkeyTest
 	void testGetExpireNoTimeUnit() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		redisTemplate.expire(key1, 2, TimeUnit.SECONDS);
-		Long expire = redisTemplate.getExpire(key1);
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		valkeyTemplate.expire(key1, 2, TimeUnit.SECONDS);
+		Long expire = valkeyTemplate.getExpire(key1);
 		// Default behavior is to return seconds
 		assertThat(expire > 0L && expire <= 2L).isTrue();
 	}
@@ -518,15 +518,15 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testGetExpireSeconds() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		redisTemplate.expire(key1, 1500, TimeUnit.MILLISECONDS);
-		assertThat(redisTemplate.getExpire(key1, TimeUnit.SECONDS)).isEqualTo(Long.valueOf(1));
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		valkeyTemplate.expire(key1, 1500, TimeUnit.MILLISECONDS);
+		assertThat(valkeyTemplate.getExpire(key1, TimeUnit.SECONDS)).isEqualTo(Long.valueOf(1));
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-526
 	void testGetExpireSecondsForKeyDoesNotExist() {
 
-		Long expire = redisTemplate.getExpire(keyFactory.instance(), TimeUnit.SECONDS);
+		Long expire = valkeyTemplate.getExpire(keyFactory.instance(), TimeUnit.SECONDS);
 		assertThat(expire).isLessThan(0L);
 	}
 
@@ -534,7 +534,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testGetExpireSecondsForKeyExistButHasNoAssociatedExpire() {
 
 		K key = keyFactory.instance();
-		Long expire = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.SECONDS);
 
 		assertThat(expire).isLessThan(0L);
 	}
@@ -542,7 +542,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	@ParameterizedValkeyTest // DATAREDIS-526
 	void testGetExpireMillisForKeyDoesNotExist() {
 
-		Long expire = redisTemplate.getExpire(keyFactory.instance(), TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(keyFactory.instance(), TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(0L);
 	}
@@ -551,9 +551,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testGetExpireMillisForKeyExistButHasNoAssociatedExpire() {
 
 		K key = keyFactory.instance();
-		redisTemplate.boundValueOps(key).set(valueFactory.instance());
+		valkeyTemplate.boundValueOps(key).set(valueFactory.instance());
 
-		Long expire = redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+		Long expire = valkeyTemplate.getExpire(key, TimeUnit.MILLISECONDS);
 
 		assertThat(expire).isLessThan(0L);
 	}
@@ -562,10 +562,10 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testGetExpireMillis() {
 
 		K key = keyFactory.instance();
-		redisTemplate.boundValueOps(key).set(valueFactory.instance());
-		redisTemplate.expire(key, 1, TimeUnit.DAYS);
+		valkeyTemplate.boundValueOps(key).set(valueFactory.instance());
+		valkeyTemplate.expire(key, 1, TimeUnit.DAYS);
 
-		Long ttl = redisTemplate.getExpire(key, TimeUnit.HOURS);
+		Long ttl = valkeyTemplate.getExpire(key, TimeUnit.HOURS);
 
 		assertThat(ttl).isGreaterThanOrEqualTo(23L);
 		assertThat(ttl).isLessThan(25L);
@@ -575,10 +575,10 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testGetExpireDuration() {
 
 		K key = keyFactory.instance();
-		redisTemplate.boundValueOps(key).set(valueFactory.instance());
-		redisTemplate.expire(key, Duration.ofDays(1));
+		valkeyTemplate.boundValueOps(key).set(valueFactory.instance());
+		valkeyTemplate.expire(key, Duration.ofDays(1));
 
-		Long ttl = redisTemplate.getExpire(key, TimeUnit.HOURS);
+		Long ttl = valkeyTemplate.getExpire(key, TimeUnit.HOURS);
 
 		assertThat(ttl).isGreaterThanOrEqualTo(23L);
 		assertThat(ttl).isLessThan(25L);
@@ -589,7 +589,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	public void testGetExpireMillisUsingTransactions() {
 
 		K key = keyFactory.instance();
-		List<Object> result = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		List<Object> result = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 
 			@Override
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
@@ -613,7 +613,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	public void testGetExpireMillisUsingPipelining() {
 
 		K key = keyFactory.instance();
-		List<Object> result = redisTemplate.executePipelined(new SessionCallback<Object>() {
+		List<Object> result = valkeyTemplate.executePipelined(new SessionCallback<Object>() {
 
 			@Override
 			public Object execute(ValkeyOperations operations) throws DataAccessException {
@@ -635,32 +635,32 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testExpireAt() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		redisTemplate.expireAt(key1, new Date(System.currentTimeMillis() + 5L));
-		await().until(() -> !redisTemplate.hasKey(key1));
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		valkeyTemplate.expireAt(key1, new Date(System.currentTimeMillis() + 5L));
+		await().until(() -> !valkeyTemplate.hasKey(key1));
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-611
 	void testExpireAtInstant() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.boundValueOps(key1).set(value1);
-		redisTemplate.expireAt(key1, Instant.now().plus(5, ChronoUnit.MILLIS));
-		await().until(() -> !redisTemplate.hasKey(key1));
+		valkeyTemplate.boundValueOps(key1).set(value1);
+		valkeyTemplate.expireAt(key1, Instant.now().plus(5, ChronoUnit.MILLIS));
+		await().until(() -> !valkeyTemplate.hasKey(key1));
 	}
 
 	@ParameterizedValkeyTest
 	@EnabledIfLongRunningTest
 	void testExpireAtMillisNotSupported() {
 
-		assumeThat(redisTemplate.getConnectionFactory() instanceof JedisConnectionFactory).isTrue();
+		assumeThat(valkeyTemplate.getConnectionFactory() instanceof JedisConnectionFactory).isTrue();
 
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
 
 		assumeThat(key1 instanceof String && value1 instanceof String).isTrue();
 
-		StringValkeyTemplate template2 = new StringValkeyTemplate(redisTemplate.getConnectionFactory());
+		StringValkeyTemplate template2 = new StringValkeyTemplate(valkeyTemplate.getConnectionFactory());
 		template2.boundValueOps((String) key1).set((String) value1);
 		template2.expireAt((String) key1, new Date(System.currentTimeMillis() + 5L));
 		// Just ensure this works as expected, pExpireAt just adds some precision over expireAt
@@ -671,11 +671,11 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 	void testRandomKey() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 
 		for (int i = 0; i < 20; i++) {
 
-			K k = redisTemplate.randomKey();
+			K k = valkeyTemplate.randomKey();
 			if (k == null) {
 				continue;
 			}
@@ -689,9 +689,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		K key2 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
-		redisTemplate.rename(key1, key2);
-		assertThat(redisTemplate.opsForValue().get(key2)).isEqualTo(value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.rename(key1, key2);
+		assertThat(valkeyTemplate.opsForValue().get(key2)).isEqualTo(value1);
 	}
 
 	@ParameterizedValkeyTest
@@ -699,17 +699,17 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		K key1 = keyFactory.instance();
 		K key2 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
-		redisTemplate.renameIfAbsent(key1, key2);
-		assertThat(redisTemplate.hasKey(key2)).isTrue();
+		valkeyTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.renameIfAbsent(key1, key2);
+		assertThat(valkeyTemplate.hasKey(key2)).isTrue();
 	}
 
 	@ParameterizedValkeyTest
 	void testType() {
 		K key1 = keyFactory.instance();
 		V value1 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
-		assertThat(redisTemplate.type(key1)).isEqualTo(DataType.STRING);
+		valkeyTemplate.opsForValue().set(key1, value1);
+		assertThat(valkeyTemplate.type(key1)).isEqualTo(DataType.STRING);
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-506
@@ -718,11 +718,11 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
 		V value3 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 
-		Thread th = new Thread(() -> redisTemplate.opsForValue().set(key1, value2));
+		Thread th = new Thread(() -> valkeyTemplate.opsForValue().set(key1, value2));
 
-		List<Object> results = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		List<Object> results = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 
@@ -741,7 +741,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 
 		assertThat(results).isEmpty();
 
-		assertThat(redisTemplate.opsForValue().get(key1)).isEqualTo(value2);
+		assertThat(valkeyTemplate.opsForValue().get(key1)).isEqualTo(value2);
 	}
 
 	@ParameterizedValkeyTest
@@ -751,10 +751,10 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
 		V value3 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
-		Thread th = new Thread(() -> redisTemplate.opsForValue().set(key1, value2));
+		valkeyTemplate.opsForValue().set(key1, value1);
+		Thread th = new Thread(() -> valkeyTemplate.opsForValue().set(key1, value2));
 
-		List<Object> results = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		List<Object> results = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 
@@ -773,7 +773,7 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		});
 
 		assertThat(results.size()).isEqualTo(1);
-		assertThat(redisTemplate.opsForValue().get(key1)).isEqualTo(value3);
+		assertThat(valkeyTemplate.opsForValue().get(key1)).isEqualTo(value3);
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-506
@@ -784,11 +784,11 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		V value1 = valueFactory.instance();
 		V value2 = valueFactory.instance();
 		V value3 = valueFactory.instance();
-		redisTemplate.opsForValue().set(key1, value1);
+		valkeyTemplate.opsForValue().set(key1, value1);
 
-		Thread th = new Thread(() -> redisTemplate.opsForValue().set(key1, value2));
+		Thread th = new Thread(() -> valkeyTemplate.opsForValue().set(key1, value2));
 
-		List<Object> results = redisTemplate.execute(new SessionCallback<List<Object>>() {
+		List<Object> results = valkeyTemplate.execute(new SessionCallback<List<Object>>() {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public List<Object> execute(ValkeyOperations operations) throws DataAccessException {
 
@@ -810,14 +810,14 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 
 		assertThat(results).isEmpty();
 
-		assertThat(redisTemplate.opsForValue().get(key1)).isEqualTo(value2);
+		assertThat(valkeyTemplate.opsForValue().get(key1)).isEqualTo(value2);
 	}
 
 	@ParameterizedValkeyTest
 	void testConvertAndSend() {
 		V value1 = valueFactory.instance();
 		// Make sure basic message sent without Exception on serialization
-		assertThat(redisTemplate.convertAndSend("Channel", value1)).isEqualTo(0L);
+		assertThat(valkeyTemplate.convertAndSend("Channel", value1)).isEqualTo(0L);
 	}
 
 	@ParameterizedValkeyTest
@@ -826,13 +826,13 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
 		script.setScriptText("return 'Hey'");
 		script.setResultType(String.class);
-		assertThat(redisTemplate.execute(script, redisTemplate.getValueSerializer(), StringValkeySerializer.UTF_8,
+		assertThat(valkeyTemplate.execute(script, valkeyTemplate.getValueSerializer(), StringValkeySerializer.UTF_8,
 				Collections.singletonList(key1))).isEqualTo("Hey");
 	}
 
 	@ParameterizedValkeyTest
 	void clientListShouldReturnCorrectly() {
-		assertThat(redisTemplate.getClientList().size()).isNotEqualTo(0);
+		assertThat(valkeyTemplate.getClientList().size()).isNotEqualTo(0);
 	}
 
 	@ParameterizedValkeyTest // DATAREDIS-529
@@ -843,9 +843,9 @@ public class ValkeyTemplateIntegrationTests<K, V> {
 		source.put(keyFactory.instance(), valueFactory.instance());
 		source.put(keyFactory.instance(), valueFactory.instance());
 
-		redisTemplate.opsForValue().multiSet(source);
+		valkeyTemplate.opsForValue().multiSet(source);
 
-		assertThat(redisTemplate.countExistingKeys(source.keySet())).isEqualTo(3L);
+		assertThat(valkeyTemplate.countExistingKeys(source.keySet())).isEqualTo(3L);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

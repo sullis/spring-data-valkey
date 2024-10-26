@@ -45,7 +45,7 @@ class AbstractValkeyCollectionUnitTests {
 	private AbstractValkeyCollection<String> collection;
 
 	@SuppressWarnings("rawtypes")//
-	private ValkeyTemplate redisTemplateSpy;
+	private ValkeyTemplate valkeyTemplateSpy;
 	private @Mock ValkeyConnectionFactory connectionFactoryMock;
 	private @Mock(answer = Answers.RETURNS_MOCKS) ValkeyConnection connectionMock;
 
@@ -53,16 +53,16 @@ class AbstractValkeyCollectionUnitTests {
 	@BeforeEach
 	void setUp() {
 
-		redisTemplateSpy = spy(new ValkeyTemplate() {
+		valkeyTemplateSpy = spy(new ValkeyTemplate() {
 
 			public Boolean hasKey(Object key) {
 				return false;
 			}
 		});
-		redisTemplateSpy.setConnectionFactory(connectionFactoryMock);
-		redisTemplateSpy.afterPropertiesSet();
+		valkeyTemplateSpy.setConnectionFactory(connectionFactoryMock);
+		valkeyTemplateSpy.afterPropertiesSet();
 
-		collection = new AbstractValkeyCollection<String>("key", redisTemplateSpy) {
+		collection = new AbstractValkeyCollection<String>("key", valkeyTemplateSpy) {
 
 			private List<String> delegate = new ArrayList<>();
 
@@ -101,17 +101,17 @@ class AbstractValkeyCollectionUnitTests {
 	void testRenameOfEmptyCollectionShouldNotTriggerValkeyOperation() {
 
 		collection.rename("new-key");
-		verify(redisTemplateSpy, never()).rename(eq("key"), eq("new-key"));
+		verify(valkeyTemplateSpy, never()).rename(eq("key"), eq("new-key"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test // DATAREDIS-188
 	void testRenameCollectionShouldTriggerValkeyOperation() {
 
-		when(redisTemplateSpy.hasKey(any())).thenReturn(Boolean.TRUE);
+		when(valkeyTemplateSpy.hasKey(any())).thenReturn(Boolean.TRUE);
 
 		collection.add("spring-data-valkey");
 		collection.rename("new-key");
-		verify(redisTemplateSpy, times(1)).rename(eq("key"), eq("new-key"));
+		verify(valkeyTemplateSpy, times(1)).rename(eq("key"), eq("new-key"));
 	}
 }

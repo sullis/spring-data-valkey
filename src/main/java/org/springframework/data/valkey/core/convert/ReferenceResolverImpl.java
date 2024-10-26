@@ -43,7 +43,7 @@ public class ReferenceResolverImpl implements ReferenceResolver {
 
 		Assert.notNull(redisOperations, "ValkeyOperations must not be null");
 
-		this.redisOps = redisOperations;
+		this.redisOps = valkeyOperations;
 		this.converter = new StringToBytesConverter();
 	}
 

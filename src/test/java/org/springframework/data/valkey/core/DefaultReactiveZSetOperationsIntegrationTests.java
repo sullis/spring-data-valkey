@@ -60,7 +60,7 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 	private static final Range<Double> ZERO_TO_HUNDRED_DOUBLE = Range.closed(0d, 100d);
 	private static final Range<Double> NINE_TO_ELEVEN_DOUBLE = Range.closed(9d, 11d);
 
-	private final ReactiveValkeyTemplate<K, V> redisTemplate;
+	private final ReactiveValkeyTemplate<K, V> valkeyTemplate;
 	private final ReactiveZSetOperations<K, V> zSetOperations;
 
 	private final ObjectFactory<K> keyFactory;
@@ -74,8 +74,8 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 
 	public DefaultReactiveZSetOperationsIntegrationTests(Fixture<K, V> fixture) {
 
-		this.redisTemplate = fixture.getTemplate();
-		this.zSetOperations = redisTemplate.opsForZSet();
+		this.valkeyTemplate = fixture.getTemplate();
+		this.zSetOperations = valkeyTemplate.opsForZSet();
 		this.keyFactory = fixture.getKeyFactory();
 		this.valueFactory = fixture.getValueFactory();
 		this.serializer = fixture.getSerializer();
@@ -84,7 +84,7 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 	@BeforeEach
 	public void before() {
 
-		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) redisTemplate.getConnectionFactory();
+		ValkeyConnectionFactory connectionFactory = (ValkeyConnectionFactory) valkeyTemplate.getConnectionFactory();
 		ValkeyConnection connection = connectionFactory.getConnection();
 		connection.flushAll();
 		connection.close();
