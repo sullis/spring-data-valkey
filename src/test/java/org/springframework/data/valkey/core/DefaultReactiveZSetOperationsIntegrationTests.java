@@ -163,7 +163,7 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 	}
 
 	@ParameterizedValkeyTest // GH-2049
-	@Disabled("https://github.com/redis/redis/issues/9160")
+	@Disabled("https://github.com/valkey/redis/issues/9160")
 	@EnabledOnCommand("ZRANDMEMBER")
 	void randomMemberWithScore() {
 

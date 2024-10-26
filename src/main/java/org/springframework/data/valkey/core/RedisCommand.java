@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  * @author John Blum
  * @since 1.3
  * @link <a href=
- *       "https://github.com/antirez/redis/blob/843de8b786562d8d77c78d83a971060adc61f77a/src/server.c#L180">Valkey
+ *       "https://github.com/antirez/valkey/blob/843de8b786562d8d77c78d83a971060adc61f77a/src/server.c#L180">Valkey
  *       command list</a>
  */
 public enum ValkeyCommand {

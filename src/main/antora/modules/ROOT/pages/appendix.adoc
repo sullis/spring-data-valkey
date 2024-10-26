@@ -4,7 +4,7 @@
 [[schema]]
 == Schema
 
-link:https://www.springframework.org/schema/redis/spring-redis-1.0.xsd[Spring Data Valkey Schema (redis-namespace)]
+link:https://www.springframework.org/schema/valkey/spring-valkey-1.0.xsd[Spring Data Valkey Schema (redis-namespace)]
 
 [[supported-commands]]
 == Supported Commands

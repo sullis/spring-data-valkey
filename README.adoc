@@ -6,11 +6,11 @@ This module provides integration with the https://redis.io/[Valkey] store.
 
 == Features
 
-* Connection package as low-level abstraction across multiple Valkey drivers (https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/redis/jedis[Jedis]).
+* Connection package as low-level abstraction across multiple Valkey drivers (https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/valkey/jedis[Jedis]).
 * Exception translation to Spring’s portable Data Access exception hierarchy for Valkey driver exceptions
-* https://docs.spring.io/spring-data/redis/reference/redis/template.html[`ValkeyTemplate`] that provides a high level abstraction for performing various Valkey operations, exception translation and serialization support.
+* https://docs.spring.io/spring-data/valkey/reference/valkey/template.html[`ValkeyTemplate`] that provides a high level abstraction for performing various Valkey operations, exception translation and serialization support.
 * Pubsub support (such as a MessageListenerContainer for message-driven POJOs).
-* https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#redis:sentinel[Valkey Sentinel] and https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html#cluster.enable[Valkey Cluster] support.
+* https://docs.spring.io/spring-data/valkey/reference/valkey/connection-modes.html#redis:sentinel[Valkey Sentinel] and https://docs.spring.io/spring-data/valkey/reference/valkey/connection-modes.html#cluster.enable[Valkey Cluster] support.
 * Reactive API using the Lettuce driver.
 * JDK, String, JSON and Spring Object/XML mapping serializers.
 * JDK Collection implementations on top of Valkey.
@@ -94,7 +94,7 @@ If you'd rather like the latest snapshots of the upcoming major version, use our
 Having trouble with Spring Data? We’d love to help!
 
 * Check the
-https://docs.spring.io/spring-data/redis/reference/[reference documentation], and https://docs.spring.io/spring-data/redis/docs/current/api/[Javadocs].
+https://docs.spring.io/spring-data/valkey/reference/[reference documentation], and https://docs.spring.io/spring-data/valkey/docs/current/api/[Javadocs].
 * Learn the Spring basics – Spring Data builds on Spring Framework, check the https://spring.io[spring.io] web-site for a wealth of reference documentation.
 If you are just starting out with Spring, try one of the https://spring.io/guides[guides].
 * If you are upgrading, check out the https://github.com/spring-projects/spring-data-commons/wiki#release-notes[Release notes] for "`new and noteworthy`" features.

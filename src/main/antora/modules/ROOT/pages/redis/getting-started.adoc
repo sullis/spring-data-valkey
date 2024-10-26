@@ -12,7 +12,7 @@ The GitHub https://github.com/spring-projects/spring-data-examples[spring-data-e
 == Hello World
 
 First, you need to set up a running Valkey server.
-Spring Data Valkey requires Valkey 2.6 or above and Spring Data Valkey integrates with https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/redis/jedis[Jedis], two popular open-source Java libraries for Valkey.
+Spring Data Valkey requires Valkey 2.6 or above and Spring Data Valkey integrates with https://github.com/lettuce-io/lettuce-core[Lettuce] and https://github.com/valkey/jedis[Jedis], two popular open-source Java libraries for Valkey.
 
 Now you can create a simple Java application that stores and reads a value to and from Valkey.
 

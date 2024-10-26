@@ -186,7 +186,7 @@ This section contains details about migration steps, deprecations, and removals.
 [[upgrading.2-to-3.jedis]]
 === Jedis
 
-Please read the Jedis https://github.com/redis/jedis/blob/v4.0.0/docs/3to4.md[upgrading guide] which covers important driver changes.
+Please read the Jedis https://github.com/valkey/jedis/blob/v4.0.0/docs/3to4.md[upgrading guide] which covers important driver changes.
 
 .Jedis Valkey Connection
 |===

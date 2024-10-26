@@ -75,7 +75,7 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.util.Pool;
 
 /**
- * {@code ValkeyConnection} implementation on top of <a href="https://github.com/redis/jedis">Jedis</a> library.
+ * {@code ValkeyConnection} implementation on top of <a href="https://github.com/valkey/jedis">Jedis</a> library.
  * <p>
  * This class is not Thread-safe and instances should not be shared across threads.
  *

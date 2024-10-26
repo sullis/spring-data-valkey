@@ -71,7 +71,7 @@ class JedisAclIntegrationTests {
 	@EnabledOnValkeySentinelAvailable(26382)
 	void shouldConnectSentinelWithAclAuthentication() throws IOException {
 
-		// Note: As per https://github.com/redis/redis/issues/7708, Sentinel does not support ACL authentication yet.
+		// Note: As per https://github.com/valkey/redis/issues/7708, Sentinel does not support ACL authentication yet.
 
 		ValkeySentinelConfiguration sentinelConfiguration = new ValkeySentinelConfiguration("mymaster",
 				Collections.singleton("localhost:26382"));

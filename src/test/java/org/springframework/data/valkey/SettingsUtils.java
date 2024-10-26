@@ -26,7 +26,7 @@ import org.springframework.data.valkey.connection.ValkeyStandaloneConfiguration;
 
 /**
  * Utility class exposing connection settings to connect Valkey instances during test execution. Settings can be adjusted
- * by overriding these in {@literal org/springframework/data/redis/test.properties}.
+ * by overriding these in {@literal org/springframework/data/valkey/test.properties}.
  *
  * @author Costin Leau
  * @author Mark Paluch
