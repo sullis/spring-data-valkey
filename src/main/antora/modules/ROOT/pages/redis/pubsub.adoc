@@ -168,18 +168,18 @@ The preceding example uses the Valkey namespace to declare the message listener 
 
 [source,xml]
 ----
-<bean id="messageListener" class="org.springframework.data.redis.listener.adapter.MessageListenerAdapter">
+<bean id="messageListener" class="org.springframework.data.valkey.listener.adapter.MessageListenerAdapter">
   <constructor-arg>
     <bean class="redisexample.DefaultMessageDelegate"/>
   </constructor-arg>
 </bean>
 
-<bean id="redisContainer" class="org.springframework.data.redis.listener.ValkeyMessageListenerContainer">
+<bean id="redisContainer" class="org.springframework.data.valkey.listener.ValkeyMessageListenerContainer">
   <property name="connectionFactory" ref="connectionFactory"/>
   <property name="messageListeners">
     <map>
       <entry key-ref="messageListener">
-        <bean class="org.springframework.data.redis.listener.ChannelTopic">
+        <bean class="org.springframework.data.valkey.listener.ChannelTopic">
           <constructor-arg value="chatroom"/>
         </bean>
       </entry>

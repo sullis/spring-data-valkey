@@ -175,9 +175,9 @@ XML::
   xmlns:p="http://www.springframework.org/schema/p"
   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"/>
+  <bean id="redisConnectionFactory" class="org.springframework.data.valkey.connection.lettuce.LettuceConnectionFactory"/>
   <!-- redis template definition -->
-  <bean id="redisTemplate" class="org.springframework.data.redis.core.ValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
+  <bean id="redisTemplate" class="org.springframework.data.valkey.core.ValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
   ...
 
 </beans>
@@ -284,9 +284,9 @@ XML::
   xmlns:p="http://www.springframework.org/schema/p"
   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"/>
+  <bean id="redisConnectionFactory" class="org.springframework.data.valkey.connection.lettuce.LettuceConnectionFactory"/>
 
-  <bean id="stringValkeyTemplate" class="org.springframework.data.redis.core.StringValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
+  <bean id="stringValkeyTemplate" class="org.springframework.data.valkey.core.StringValkeyTemplate" p:connection-factory-ref="redisConnectionFactory"/>
 
 </beans>
 ----
