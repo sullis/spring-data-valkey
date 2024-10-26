@@ -36,7 +36,7 @@ public enum ValkeyObservation implements ObservationDocumentation {
 
 		@Override
 		public String getName() {
-			return "spring.data.redis";
+			return "spring.data.valkey";
 		}
 
 		@Override

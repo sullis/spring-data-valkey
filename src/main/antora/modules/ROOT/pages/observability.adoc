@@ -45,7 +45,7 @@ ____
 Timer created around a Valkey command execution.
 ____
 
-**Metric name** `spring.data.redis`. **Type** `timer` and **base unit** `seconds`.
+**Metric name** `spring.data.valkey`. **Type** `timer` and **base unit** `seconds`.
 
 Fully qualified name of the enclosing class `org.springframework.data.valkey.connection.lettuce.observability.ValkeyObservation`.
 
@@ -84,7 +84,7 @@ Below you can find a list of all spans declared by this project.
 
 > Timer created around a Valkey command execution.
 
-**Span name** `spring.data.redis`.
+**Span name** `spring.data.valkey`.
 
 Fully qualified name of the enclosing class `org.springframework.data.valkey.connection.lettuce.observability.ValkeyObservation`.
 
