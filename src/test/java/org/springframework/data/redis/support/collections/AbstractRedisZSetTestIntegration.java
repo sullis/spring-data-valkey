@@ -610,7 +610,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 	}
 
 	@ParameterizedRedisTest // GH-2345
-	@Disabled("https://github.com/spring-projects/spring-data-redis/issues/2441")
+	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void testRangeAndStoreByScore() {
 
 		T t1 = getT();
@@ -626,7 +626,7 @@ public abstract class AbstractRedisZSetTestIntegration<T> extends AbstractRedisC
 	}
 
 	@ParameterizedRedisTest // GH-2345
-	@Disabled("https://github.com/spring-projects/spring-data-redis/issues/2441")
+	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void testRangeAndStoreRevByScore() {
 
 		T t1 = getT();

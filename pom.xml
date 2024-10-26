@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.springframework.data</groupId>
-	<artifactId>spring-data-redis</artifactId>
+	<artifactId>spring-data-valkey</artifactId>
 	<version>3.4.0-SNAPSHOT</version>
 
 	<name>Spring Data Redis</name>
 	<description>Spring Data module for Redis</description>
-	<url>https://spring.io/projects/spring-data-redis</url>
+	<url>https://spring.io/projects/spring-data-valkey</url>
 
 	<parent>
 		<groupId>org.springframework.data.build</groupId>
@@ -32,14 +32,14 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:https://github.com/spring-projects/spring-data-redis.git</connection>
-		<developerConnection>scm:git:git@github.com:spring-projects/spring-data-redis.git</developerConnection>
-		<url>https://github.com/spring-projects/spring-data-redis</url>
+		<connection>scm:git:https://github.com/spring-projects/spring-data-valkey.git</connection>
+		<developerConnection>scm:git:git@github.com:spring-projects/spring-data-valkey.git</developerConnection>
+		<url>https://github.com/spring-projects/spring-data-valkey</url>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/spring-projects/spring-data-redis/issues</url>
+		<url>https://github.com/spring-projects/spring-data-valkey/issues</url>
 	</issueManagement>
 
 	<dependencyManagement>

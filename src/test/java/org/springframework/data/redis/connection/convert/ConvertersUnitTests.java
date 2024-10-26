@@ -239,7 +239,7 @@ class ConvertersUnitTests {
 		assertThat(node.getSlotRange().getSlots().size()).isEqualTo(0);
 	}
 
-	@Test // https://github.com/spring-projects/spring-data-redis/issues/2678
+	@Test // https://github.com/spring-projects/spring-data-valkey/issues/2678
 	void toClusterNodeWithIPv6Hostname() {
 		RedisClusterNode node = Converters.toClusterNode(CLUSTER_NODE_WITH_SINGLE_IPV6_HOST);
 

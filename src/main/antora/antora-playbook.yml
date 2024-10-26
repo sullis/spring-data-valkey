@@ -7,7 +7,7 @@ antora:
       root_component_name: 'data-redis'
 site:
   title: Spring Data Redis
-  url: https://docs.spring.io/spring-data-redis/reference/
+  url: https://docs.spring.io/spring-data-valkey/reference/
 content:
   sources:
     - url: ./../../..

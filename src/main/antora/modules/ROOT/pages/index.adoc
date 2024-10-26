@@ -1,4 +1,4 @@
-[[spring-data-redis-reference-documentation]]
+[[spring-data-valkey-reference-documentation]]
 = Spring Data Redis
 :revnumber: {version}
 :revdate: {localdate}

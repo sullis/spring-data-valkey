@@ -248,9 +248,9 @@ pipeline {
 									"-Dartifactory.username=${ARTIFACTORY_USR} " +
 									"-Dartifactory.password=${ARTIFACTORY_PSW} " +
 									"-Dartifactory.staging-repository=${p['artifactory.repository.snapshot']} " +
-									"-Dartifactory.build-name=spring-data-redis " +
-									"-Dartifactory.build-number=spring-data-redis-${BRANCH_NAME}-build-${BUILD_NUMBER} " +
-									"-Dmaven.repo.local=/tmp/jenkins-home/.m2/spring-data-redis " +
+									"-Dartifactory.build-name=spring-data-valkey " +
+									"-Dartifactory.build-number=spring-data-valkey-${BRANCH_NAME}-build-${BUILD_NUMBER} " +
+									"-Dmaven.repo.local=/tmp/jenkins-home/.m2/spring-data-valkey " +
 									"-Dmaven.test.skip=true clean deploy -U -B"
 						}
 					}

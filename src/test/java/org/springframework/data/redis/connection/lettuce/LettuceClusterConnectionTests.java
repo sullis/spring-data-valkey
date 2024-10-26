@@ -864,7 +864,7 @@ public class LettuceClusterConnectionTests implements ClusterConnectionTests {
 		Properties result = clusterConnection.getConfig("*max-*-entries*");
 
 		// config get *max-*-entries on redis 3.0.7 returns 8 entries per node while on 3.2.0-rc3 returns 6.
-		// @link https://github.com/spring-projects/spring-data-redis/pull/187
+		// @link https://github.com/spring-projects/spring-data-valkey/pull/187
 		assertThat(result.size() % 3).isEqualTo(0);
 
 		for (Object key : result.keySet()) {

@@ -440,7 +440,7 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 	}
 
 	@ParameterizedRedisTest // GH-2345
-	@Disabled("https://github.com/spring-projects/spring-data-redis/issues/2441")
+	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void rangeAndStoreByScore() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();
@@ -486,7 +486,7 @@ public class DefaultReactiveZSetOperationsIntegrationTests<K, V> {
 	}
 
 	@ParameterizedRedisTest // GH-2345
-	@Disabled("https://github.com/spring-projects/spring-data-redis/issues/2441")
+	@Disabled("https://github.com/spring-projects/spring-data-valkey/issues/2441")
 	void reverseRangeAndStoreByScore() {
 
 		assumeThat(valueFactory instanceof ByteBufferObjectFactory).isFalse();

@@ -1999,7 +1999,7 @@ class MappingRedisConverterUnitTests {
 
 	@Test // DATAREDIS-1175
 	@EnabledOnJre(JRE.JAVA_8)
-		// FIXME: https://github.com/spring-projects/spring-data-redis/issues/2168
+		// FIXME: https://github.com/spring-projects/spring-data-valkey/issues/2168
 	void writePlainList() {
 
 		List<Object> source = Arrays.asList("Hello", "stream", "message", 100L);

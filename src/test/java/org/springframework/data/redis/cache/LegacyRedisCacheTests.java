@@ -258,7 +258,7 @@ public class LegacyRedisCacheTests {
 		Object value = getValue();
 		cache.put(key, value);
 
-		Object invalidKey = "spring-data-redis".getBytes();
+		Object invalidKey = "spring-data-valkey".getBytes();
 		assertThat(cache.get(invalidKey, value.getClass())).isNull();
 	}
 

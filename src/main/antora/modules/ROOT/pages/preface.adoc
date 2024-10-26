@@ -74,9 +74,9 @@ Professional Support :: Professional, from-the-source support, with guaranteed r
 For information on the Spring Data source code repository, nightly builds, and snapshot artifacts, see the Spring Data home https://spring.io/projects/spring-data/[page].
 
 You can help make Spring Data best serve the needs of the Spring community by interacting with developers on Stack Overflow at either
-https://stackoverflow.com/questions/tagged/spring-data[spring-data] or https://stackoverflow.com/questions/tagged/spring-data-redis[spring-data-redis].
+https://stackoverflow.com/questions/tagged/spring-data[spring-data] or https://stackoverflow.com/questions/tagged/spring-data-valkey[spring-data-valkey].
 
-If you encounter a bug or want to suggest an improvement (including to this documentation), please create a ticket on https://github.com/spring-projects/spring-data-redis/issues/new[Github].
+If you encounter a bug or want to suggest an improvement (including to this documentation), please create a ticket on https://github.com/spring-projects/spring-data-valkey/issues/new[Github].
 
 To stay up to date with the latest news and announcements in the Spring eco system, subscribe to the Spring Community https://spring.io/[Portal].
 

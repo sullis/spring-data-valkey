@@ -110,7 +110,7 @@ class AbstractRedisCollectionUnitTests {
 
 		when(redisTemplateSpy.hasKey(any())).thenReturn(Boolean.TRUE);
 
-		collection.add("spring-data-redis");
+		collection.add("spring-data-valkey");
 		collection.rename("new-key");
 		verify(redisTemplateSpy, times(1)).rename(eq("key"), eq("new-key"));
 	}
