@@ -86,7 +86,7 @@ public abstract class AbstractTransactionalTestBase {
 
 	private @Autowired ValkeyConnectionFactory factory;
 
-	private List<String> KEYS = Arrays.asList("spring", "data", "redis");
+	private List<String> KEYS = Arrays.asList("spring", "data", "valkey");
 	private boolean valuesShouldHaveBeenPersisted = false;
 
 	@BeforeEach

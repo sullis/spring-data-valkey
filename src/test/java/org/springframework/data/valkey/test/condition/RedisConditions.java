@@ -56,7 +56,7 @@ class ValkeyConditions {
 			Properties p = new Properties();
 			p.load(inputStream);
 
-			version = Version.parse(p.getProperty("redis_version"));
+			version = Version.parse(p.getProperty("valkey_version"));
 		} catch (IOException ex) {
 			throw new IllegalStateException(ex);
 		}

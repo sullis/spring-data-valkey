@@ -39,7 +39,7 @@ public class Example {
 
     // inject the template as ListOperations
     // can also inject as Value, Set, ZSet, and HashOperations
-    @Resource(name="redisTemplate")
+    @Resource(name="valkeyTemplate")
     private ListOperations<String, String> listOps;
 
     public void addLink(String userId, URL url) {

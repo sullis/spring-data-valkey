@@ -73,7 +73,7 @@ public class SynchronousIntegrationTests extends SampleTestRunner {
 			assertThat(tracer.getFinishedSpans()).isNotEmpty();
 
 			for (FinishedSpan finishedSpan : tracer.getFinishedSpans()) {
-				assertThat(finishedSpan.getTags()).containsEntry("db.system", "redis")
+				assertThat(finishedSpan.getTags()).containsEntry("db.system", "valkey")
 						.containsEntry("net.sock.peer.addr", SettingsUtils.getHost())
 						.containsEntry("net.sock.peer.port", "" + SettingsUtils.getPort());
 				assertThat(finishedSpan.getTags()).containsKeys("db.operation");

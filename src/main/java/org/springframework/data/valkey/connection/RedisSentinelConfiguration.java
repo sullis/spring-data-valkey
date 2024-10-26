@@ -47,13 +47,13 @@ import org.springframework.util.StringUtils;
  */
 public class ValkeySentinelConfiguration implements ValkeyConfiguration, SentinelConfiguration {
 
-	private static final String REDIS_SENTINEL_MASTER_CONFIG_PROPERTY = "spring.valkey.sentinel.master";
-	private static final String REDIS_SENTINEL_NODES_CONFIG_PROPERTY = "spring.valkey.sentinel.nodes";
-	private static final String REDIS_SENTINEL_USERNAME_CONFIG_PROPERTY = "spring.valkey.sentinel.username";
-	private static final String REDIS_SENTINEL_PASSWORD_CONFIG_PROPERTY = "spring.valkey.sentinel.password";
-	private static final String REDIS_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.username";
-	private static final String REDIS_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.password";
-	private static final String REDIS_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.database";
+	private static final String VALKEY_SENTINEL_MASTER_CONFIG_PROPERTY = "spring.valkey.sentinel.master";
+	private static final String VALKEY_SENTINEL_NODES_CONFIG_PROPERTY = "spring.valkey.sentinel.nodes";
+	private static final String VALKEY_SENTINEL_USERNAME_CONFIG_PROPERTY = "spring.valkey.sentinel.username";
+	private static final String VALKEY_SENTINEL_PASSWORD_CONFIG_PROPERTY = "spring.valkey.sentinel.password";
+	private static final String VALKEY_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.username";
+	private static final String VALKEY_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.password";
+	private static final String VALKEY_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY = "spring.valkey.sentinel.dataNode.database";
 
 	private int database;
 
@@ -110,41 +110,41 @@ public class ValkeySentinelConfiguration implements ValkeyConfiguration, Sentine
 
 		this.sentinels = new LinkedHashSet<>();
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_MASTER_CONFIG_PROPERTY)) {
-			String sentinelMaster = String.valueOf(propertySource.getProperty(REDIS_SENTINEL_MASTER_CONFIG_PROPERTY));
+		if (propertySource.containsProperty(VALKEY_SENTINEL_MASTER_CONFIG_PROPERTY)) {
+			String sentinelMaster = String.valueOf(propertySource.getProperty(VALKEY_SENTINEL_MASTER_CONFIG_PROPERTY));
 			this.setMaster(sentinelMaster);
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_NODES_CONFIG_PROPERTY)) {
-			String sentinelNodes = String.valueOf(propertySource.getProperty(REDIS_SENTINEL_NODES_CONFIG_PROPERTY));
+		if (propertySource.containsProperty(VALKEY_SENTINEL_NODES_CONFIG_PROPERTY)) {
+			String sentinelNodes = String.valueOf(propertySource.getProperty(VALKEY_SENTINEL_NODES_CONFIG_PROPERTY));
 			appendSentinels(commaDelimitedListToSet(sentinelNodes));
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_PASSWORD_CONFIG_PROPERTY)) {
-			String sentinelPassword = String.valueOf(propertySource.getProperty(REDIS_SENTINEL_PASSWORD_CONFIG_PROPERTY));
+		if (propertySource.containsProperty(VALKEY_SENTINEL_PASSWORD_CONFIG_PROPERTY)) {
+			String sentinelPassword = String.valueOf(propertySource.getProperty(VALKEY_SENTINEL_PASSWORD_CONFIG_PROPERTY));
 			this.setSentinelPassword(sentinelPassword);
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_USERNAME_CONFIG_PROPERTY)) {
-			String sentinelUsername = String.valueOf(propertySource.getProperty(REDIS_SENTINEL_USERNAME_CONFIG_PROPERTY));
+		if (propertySource.containsProperty(VALKEY_SENTINEL_USERNAME_CONFIG_PROPERTY)) {
+			String sentinelUsername = String.valueOf(propertySource.getProperty(VALKEY_SENTINEL_USERNAME_CONFIG_PROPERTY));
 			this.setSentinelUsername(sentinelUsername);
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY)) {
+		if (propertySource.containsProperty(VALKEY_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY)) {
 			String dataNodeUsername = String
-					.valueOf(propertySource.getProperty(REDIS_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY));
+					.valueOf(propertySource.getProperty(VALKEY_SENTINEL_DATA_NODE_USERNAME_CONFIG_PROPERTY));
 			this.setUsername(dataNodeUsername);
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY)) {
+		if (propertySource.containsProperty(VALKEY_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY)) {
 			String dataNodePassword = String
-					.valueOf(propertySource.getProperty(REDIS_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY));
+					.valueOf(propertySource.getProperty(VALKEY_SENTINEL_DATA_NODE_PASSWORD_CONFIG_PROPERTY));
 			this.setPassword(dataNodePassword);
 		}
 
-		if (propertySource.containsProperty(REDIS_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY)) {
+		if (propertySource.containsProperty(VALKEY_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY)) {
 			String databaseSource = String
-					.valueOf(propertySource.getProperty(REDIS_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY));
+					.valueOf(propertySource.getProperty(VALKEY_SENTINEL_DATA_NODE_DATABASE_CONFIG_PROPERTY));
 			int database;
 			try {
 				database = Integer.parseInt(databaseSource);
@@ -364,8 +364,8 @@ public class ValkeySentinelConfiguration implements ValkeyConfiguration, Sentine
 
 		Map<String, Object> map = new HashMap<>();
 
-		map.put(REDIS_SENTINEL_MASTER_CONFIG_PROPERTY, master);
-		map.put(REDIS_SENTINEL_NODES_CONFIG_PROPERTY, StringUtils.collectionToCommaDelimitedString(sentinelHostAndPorts));
+		map.put(VALKEY_SENTINEL_MASTER_CONFIG_PROPERTY, master);
+		map.put(VALKEY_SENTINEL_NODES_CONFIG_PROPERTY, StringUtils.collectionToCommaDelimitedString(sentinelHostAndPorts));
 
 		return map;
 	}

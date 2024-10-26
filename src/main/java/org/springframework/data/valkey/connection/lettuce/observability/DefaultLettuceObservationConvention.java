@@ -41,8 +41,8 @@ record DefaultLettuceObservationConvention(
 	public KeyValues getLowCardinalityKeyValues(LettuceObservationContext context) {
 
 		Endpoint ep = context.getRequiredEndpoint();
-		KeyValues keyValues = KeyValues.of(LowCardinalityCommandKeyNames.DATABASE_SYSTEM.withValue("redis"), //
-				LowCardinalityCommandKeyNames.REDIS_COMMAND.withValue(context.getRequiredCommand().getType().name()));
+		KeyValues keyValues = KeyValues.of(LowCardinalityCommandKeyNames.DATABASE_SYSTEM.withValue("valkey"), //
+				LowCardinalityCommandKeyNames.VALKEY_COMMAND.withValue(context.getRequiredCommand().getType().name()));
 
 		if (ep instanceof SocketAddressEndpoint endpoint) {
 

@@ -64,7 +64,7 @@ public abstract class Jackson2HashMapperUnitTests extends AbstractHashMapperTest
 	void shouldMapTypedListOfSimpleType() {
 
 		WithList source = new WithList();
-		source.strings = Arrays.asList("spring", "data", "redis");
+		source.strings = Arrays.asList("spring", "data", "valkey");
 		assertBackAndForwardMapping(source);
 	}
 
@@ -119,7 +119,7 @@ public abstract class Jackson2HashMapperUnitTests extends AbstractHashMapperTest
 		source.strings = new LinkedHashMap<>();
 		source.strings.put("1", "spring");
 		source.strings.put("2", "data");
-		source.strings.put("3", "redis");
+		source.strings.put("3", "valkey");
 		assertBackAndForwardMapping(source);
 	}
 
@@ -140,7 +140,7 @@ public abstract class Jackson2HashMapperUnitTests extends AbstractHashMapperTest
 		source.objects = new LinkedHashMap<>();
 		source.objects.put("1", "spring");
 		source.objects.put("2", 100);
-		source.objects.put("3", "redis");
+		source.objects.put("3", "valkey");
 		assertBackAndForwardMapping(source);
 	}
 

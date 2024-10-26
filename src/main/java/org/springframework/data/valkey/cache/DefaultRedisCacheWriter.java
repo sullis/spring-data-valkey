@@ -65,7 +65,7 @@ import org.springframework.util.ObjectUtils;
  */
 class DefaultValkeyCacheWriter implements ValkeyCacheWriter {
 
-	private static final boolean REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT = ClassUtils
+	private static final boolean REACTIVE_VALKEY_CONNECTION_FACTORY_PRESENT = ClassUtils
 			.isPresent("org.springframework.data.valkey.connection.ReactiveValkeyConnectionFactory", null);
 
 	private final BatchStrategy batchStrategy;
@@ -121,7 +121,7 @@ class DefaultValkeyCacheWriter implements ValkeyCacheWriter {
 		this.statistics = cacheStatisticsCollector;
 		this.batchStrategy = batchStrategy;
 
-		if (REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT && this.connectionFactory instanceof ReactiveValkeyConnectionFactory) {
+		if (REACTIVE_VALKEY_CONNECTION_FACTORY_PRESENT && this.connectionFactory instanceof ReactiveValkeyConnectionFactory) {
 			asyncCacheWriter = new AsynchronousCacheWriterDelegate();
 		} else {
 			asyncCacheWriter = UnsupportedAsyncCacheWriter.INSTANCE;

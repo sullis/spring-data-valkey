@@ -48,11 +48,11 @@ import org.springframework.util.StringUtils;
  */
 public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryConfigurationExtension {
 
-	private static final String REDIS_CONVERTER_BEAN_NAME = "redisConverter";
-	private static final String REDIS_REFERENCE_RESOLVER_BEAN_NAME = "redisReferenceResolver";
-	private static final String REDIS_ADAPTER_BEAN_NAME = "redisKeyValueAdapter";
-	private static final String REDIS_CUSTOM_CONVERSIONS_BEAN_NAME = "redisCustomConversions";
-	private static final String REDIS_MAPPING_CONFIG_BEAN_NAME = "redisMappingConfiguration";
+	private static final String VALKEY_CONVERTER_BEAN_NAME = "valkeyConverter";
+	private static final String VALKEY_REFERENCE_RESOLVER_BEAN_NAME = "valkeyReferenceResolver";
+	private static final String VALKEY_ADAPTER_BEAN_NAME = "valkeyKeyValueAdapter";
+	private static final String VALKEY_CUSTOM_CONVERSIONS_BEAN_NAME = "valkeyCustomConversions";
+	private static final String VALKEY_MAPPING_CONFIG_BEAN_NAME = "valkeyMappingConfiguration";
 
 	@Override
 	public String getModuleName() {
@@ -66,13 +66,13 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 
 	@Override
 	protected String getDefaultKeyValueTemplateRef() {
-		return "redisKeyValueTemplate";
+		return "valkeyKeyValueTemplate";
 	}
 
 	@Override
 	public void registerBeansForRoot(BeanDefinitionRegistry registry, RepositoryConfigurationSource configuration) {
 
-		String redisTemplateRef = configuration.getAttribute("redisTemplateRef").get();
+		String redisTemplateRef = configuration.getAttribute("valkeyTemplateRef").get();
 
 		if (!StringUtils.hasText(redisTemplateRef)) {
 			throw new IllegalStateException(
@@ -81,9 +81,9 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 
 		// Mapping config
 
-		String mappingConfigBeanName = BeanDefinitionReaderUtils.uniqueBeanName(REDIS_MAPPING_CONFIG_BEAN_NAME, registry);
-		String indexConfigurationBeanName = BeanDefinitionReaderUtils.uniqueBeanName("redisIndexConfiguration", registry);
-		String keyspaceConfigurationBeanName = BeanDefinitionReaderUtils.uniqueBeanName("redisKeyspaceConfiguration",
+		String mappingConfigBeanName = BeanDefinitionReaderUtils.uniqueBeanName(VALKEY_MAPPING_CONFIG_BEAN_NAME, registry);
+		String indexConfigurationBeanName = BeanDefinitionReaderUtils.uniqueBeanName("valkeyIndexConfiguration", registry);
+		String keyspaceConfigurationBeanName = BeanDefinitionReaderUtils.uniqueBeanName("valkeyKeyspaceConfiguration",
 				registry);
 
 		registerIfNotAlreadyRegistered(() -> BeanDefinitionBuilder
@@ -105,17 +105,17 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 
 		// Register custom conversions
 		registerIfNotAlreadyRegistered(() -> new RootBeanDefinition(ValkeyCustomConversions.class), registry,
-				REDIS_CUSTOM_CONVERSIONS_BEAN_NAME, configuration.getSource());
+				VALKEY_CUSTOM_CONVERSIONS_BEAN_NAME, configuration.getSource());
 
 		// Register referenceResolver
 		registerIfNotAlreadyRegistered(() -> createValkeyReferenceResolverDefinition(redisTemplateRef), registry,
-				REDIS_REFERENCE_RESOLVER_BEAN_NAME, configuration.getSource());
+				VALKEY_REFERENCE_RESOLVER_BEAN_NAME, configuration.getSource());
 
 		// Register converter
-		registerIfNotAlreadyRegistered(() -> createValkeyConverterDefinition(), registry, REDIS_CONVERTER_BEAN_NAME,
+		registerIfNotAlreadyRegistered(() -> createValkeyConverterDefinition(), registry, VALKEY_CONVERTER_BEAN_NAME,
 				configuration.getSource());
 
-		registerIfNotAlreadyRegistered(() -> createValkeyKeyValueAdapter(configuration), registry, REDIS_ADAPTER_BEAN_NAME,
+		registerIfNotAlreadyRegistered(() -> createValkeyKeyValueAdapter(configuration), registry, VALKEY_ADAPTER_BEAN_NAME,
 				configuration.getSource());
 
 		super.registerBeansForRoot(registry, configuration);
@@ -126,7 +126,7 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 			RepositoryConfigurationSource configurationSource) {
 
 		return BeanDefinitionBuilder.rootBeanDefinition(ValkeyKeyValueTemplate.class) //
-				.addConstructorArgReference(REDIS_ADAPTER_BEAN_NAME) //
+				.addConstructorArgReference(VALKEY_ADAPTER_BEAN_NAME) //
 				.addConstructorArgReference(MAPPING_CONTEXT_BEAN_NAME) //
 				.getBeanDefinition();
 	}
@@ -139,8 +139,8 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 	private static AbstractBeanDefinition createValkeyKeyValueAdapter(RepositoryConfigurationSource configuration) {
 
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ValkeyKeyValueAdapter.class) //
-				.addConstructorArgReference(configuration.getRequiredAttribute("redisTemplateRef", String.class)) //
-				.addConstructorArgReference(REDIS_CONVERTER_BEAN_NAME) //
+				.addConstructorArgReference(configuration.getRequiredAttribute("valkeyTemplateRef", String.class)) //
+				.addConstructorArgReference(VALKEY_CONVERTER_BEAN_NAME) //
 				.addPropertyValue("enableKeyspaceEvents",
 						configuration.getRequiredAttribute("enableKeyspaceEvents", EnableKeyspaceEvents.class)) //
 				.addPropertyValue("keyspaceNotificationsConfigParameter",
@@ -178,8 +178,8 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 
 		return BeanDefinitionBuilder.rootBeanDefinition(MappingValkeyConverter.class) //
 				.addConstructorArgReference(MAPPING_CONTEXT_BEAN_NAME) //
-				.addPropertyReference("referenceResolver", REDIS_REFERENCE_RESOLVER_BEAN_NAME) //
-				.addPropertyReference("customConversions", REDIS_CUSTOM_CONVERSIONS_BEAN_NAME) //
+				.addPropertyReference("referenceResolver", VALKEY_REFERENCE_RESOLVER_BEAN_NAME) //
+				.addPropertyReference("customConversions", VALKEY_CUSTOM_CONVERSIONS_BEAN_NAME) //
 				.getBeanDefinition();
 	}
 }

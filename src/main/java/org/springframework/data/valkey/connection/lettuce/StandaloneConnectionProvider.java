@@ -88,7 +88,7 @@ class StandaloneConnectionProvider implements LettuceConnectionProvider, TargetA
 					return uri;
 				}
 
-				uri = ValkeyURI.class.cast(new DirectFieldAccessor(client).getPropertyValue("redisURI"));
+				uri = ValkeyURI.class.cast(new DirectFieldAccessor(client).getPropertyValue("valkeyURI"));
 
 				return uriFieldReference.compareAndSet(null, uri) ? uri : uriFieldReference.get();
 			}

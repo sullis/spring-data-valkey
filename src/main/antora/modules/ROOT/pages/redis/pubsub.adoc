@@ -156,7 +156,7 @@ XML::
   <redis:listener ref="listener" method="handleMessage" topic="chatroom" />
 </redis:listener-container>
 
-<bean id="listener" class="redisexample.DefaultMessageDelegate"/>
+<bean id="listener" class="valkeyexample.DefaultMessageDelegate"/>
  ...
 </beans>
 ----
@@ -170,11 +170,11 @@ The preceding example uses the Valkey namespace to declare the message listener 
 ----
 <bean id="messageListener" class="org.springframework.data.valkey.listener.adapter.MessageListenerAdapter">
   <constructor-arg>
-    <bean class="redisexample.DefaultMessageDelegate"/>
+    <bean class="valkeyexample.DefaultMessageDelegate"/>
   </constructor-arg>
 </bean>
 
-<bean id="redisContainer" class="org.springframework.data.valkey.listener.ValkeyMessageListenerContainer">
+<bean id="valkeyContainer" class="org.springframework.data.valkey.listener.ValkeyMessageListenerContainer">
   <property name="connectionFactory" ref="connectionFactory"/>
   <property name="messageListeners">
     <map>

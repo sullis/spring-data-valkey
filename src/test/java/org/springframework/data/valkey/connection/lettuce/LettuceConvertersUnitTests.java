@@ -92,7 +92,7 @@ class LettuceConvertersUnitTests {
 		partition.setNodeId(CLUSTER_NODE_1.getId());
 		partition.setConnected(true);
 		partition.setFlags(new HashSet<>(Arrays.asList(NodeFlag.MASTER, NodeFlag.MYSELF)));
-		partition.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
+		partition.setUri(ValkeyURI.create("valkey://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
 		partition.setSlots(Arrays.asList(1, 2, 3, 4, 5));
 
 		partitions.add(partition);

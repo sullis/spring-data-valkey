@@ -91,19 +91,19 @@ class LettuceClusterConnectionUnitTests {
 		partition1.setNodeId(CLUSTER_NODE_1.getId());
 		partition1.setConnected(true);
 		partition1.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition1.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
+		partition1.setUri(ValkeyURI.create("valkey://" + CLUSTER_HOST + ":" + MASTER_NODE_1_PORT));
 
 		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition2 = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition2.setNodeId(CLUSTER_NODE_2.getId());
 		partition2.setConnected(true);
 		partition2.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition2.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_2_PORT));
+		partition2.setUri(ValkeyURI.create("valkey://" + CLUSTER_HOST + ":" + MASTER_NODE_2_PORT));
 
 		io.lettuce.core.cluster.models.partitions.ValkeyClusterNode partition3 = new io.lettuce.core.cluster.models.partitions.ValkeyClusterNode();
 		partition3.setNodeId(CLUSTER_NODE_3.getId());
 		partition3.setConnected(true);
 		partition3.setFlags(Collections.singleton(NodeFlag.MASTER));
-		partition3.setUri(ValkeyURI.create("redis://" + CLUSTER_HOST + ":" + MASTER_NODE_3_PORT));
+		partition3.setUri(ValkeyURI.create("valkey://" + CLUSTER_HOST + ":" + MASTER_NODE_3_PORT));
 
 		partitions.addPartition(partition1);
 		partitions.addPartition(partition2);

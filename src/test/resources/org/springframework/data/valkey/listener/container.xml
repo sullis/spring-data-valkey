@@ -12,7 +12,7 @@
 
 	<bean id="connectionFactory" class="org.springframework.data.valkey.connection.jedis.JedisConnectionFactory"/>
 	
-	<bean id="redisContainer"
+	<bean id="valkeyContainer"
 		class="org.springframework.data.valkey.listener.ValkeyMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="messageListeners">

@@ -569,7 +569,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		List<Object> results = getResults();
 		Properties info = (Properties) results.get(0);
 		assertThat(info.size() >= 5).as("at least 5 settings should be present").isTrue();
-		String version = info.getProperty("redis_version");
+		String version = info.getProperty("valkey_version");
 		assertThat(version).isNotNull();
 	}
 
@@ -579,7 +579,7 @@ public abstract class AbstractConnectionIntegrationTests {
 		List<Object> results = getResults();
 		Properties info = (Properties) results.get(0);
 		assertThat(info.size() >= 5).as("at least 5 settings should be present").isTrue();
-		String version = info.getProperty("redis_version");
+		String version = info.getProperty("valkey_version");
 		assertThat(version).isNotNull();
 	}
 

@@ -139,7 +139,7 @@ public @interface EnableValkeyRepositories {
 	 *
 	 * @return
 	 */
-	String keyValueTemplateRef() default "redisKeyValueTemplate";
+	String keyValueTemplateRef() default "valkeyKeyValueTemplate";
 
 	/**
 	 * Configures whether nested repository-interfaces (e.g. defined as inner classes) should be discovered by the
@@ -152,7 +152,7 @@ public @interface EnableValkeyRepositories {
 	 *
 	 * @return
 	 */
-	String redisTemplateRef() default "redisTemplate";
+	String redisTemplateRef() default "valkeyTemplate";
 
 	/**
 	 * Set up index patterns using simple configuration class.

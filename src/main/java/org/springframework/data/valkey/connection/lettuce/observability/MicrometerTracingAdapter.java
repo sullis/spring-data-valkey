@@ -135,7 +135,7 @@ public class MicrometerTracingAdapter implements Tracing {
 
 		private Observation createObservation(@Nullable TraceContext parentContext) {
 
-			return ValkeyObservation.REDIS_COMMAND_OBSERVATION.observation(observationRegistry, () -> {
+			return ValkeyObservation.VALKEY_COMMAND_OBSERVATION.observation(observationRegistry, () -> {
 
 				LettuceObservationContext context = new LettuceObservationContext(serviceName);
 

@@ -32,7 +32,7 @@ public enum ValkeyObservation implements ObservationDocumentation {
 	/**
 	 * Timer created around a Valkey command execution.
 	 */
-	REDIS_COMMAND_OBSERVATION {
+	VALKEY_COMMAND_OBSERVATION {
 
 		@Override
 		public String getName() {
@@ -138,7 +138,7 @@ public enum ValkeyObservation implements ObservationDocumentation {
 		/**
 		 * Valkey command value.
 		 */
-		REDIS_COMMAND {
+		VALKEY_COMMAND {
 			@Override
 			public String asString() {
 				return "db.operation";

@@ -234,7 +234,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI uri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI uri = (ValkeyURI) getField(client, "valkeyURI");
 
 		uri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 			assertThat(actual.getUsername()).isEqualTo("foo");
@@ -255,7 +255,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.getPassword()).isEqualTo(connectionFactory.getPassword().toCharArray());
 
@@ -279,7 +279,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.getPassword()).isEqualTo(connectionFactory.getPassword().toCharArray());
 
@@ -306,7 +306,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		redisUri.getCredentialsProvider().resolveCredentials().as(StepVerifier::create).consumeNextWith(actual -> {
 			assertThat(actual.getUsername()).isEqualTo("data-user");
@@ -336,7 +336,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.getPassword()).isNull();
 
@@ -369,7 +369,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isSsl()).isFalse();
 		assertThat(connectionFactory.isUseSsl()).isFalse();
@@ -392,7 +392,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isSsl()).isTrue();
 		assertThat(connectionFactory.isUseSsl()).isTrue();
@@ -414,7 +414,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isVerifyPeer()).isFalse();
 		assertThat(redisUri.getVerifyMode().equals(SslVerifyMode.NONE));
@@ -434,7 +434,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isStartTls()).isTrue();
 		assertThat(connectionFactory.isStartTls()).isTrue();
@@ -453,7 +453,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isSsl()).isTrue();
 		assertThat(connectionFactory.isUseSsl()).isTrue();
@@ -476,7 +476,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isVerifyPeer()).isFalse();
 		assertThat(connectionFactory.isVerifyPeer()).isFalse();
@@ -496,7 +496,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.isStartTls()).isTrue();
 		assertThat(connectionFactory.isStartTls()).isTrue();
@@ -571,7 +571,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.getSocket()).isEqualTo("/tmp/redis.sock");
 	}
@@ -1026,7 +1026,7 @@ class LettuceConnectionFactoryUnitTests {
 		AbstractValkeyClient client = (AbstractValkeyClient) getField(connectionFactory, "client");
 		assertThat(client).isInstanceOf(ValkeyClient.class);
 
-		ValkeyURI redisUri = (ValkeyURI) getField(client, "redisURI");
+		ValkeyURI redisUri = (ValkeyURI) getField(client, "valkeyURI");
 
 		assertThat(redisUri.getDatabase()).isEqualTo(1);
 	}
@@ -1147,7 +1147,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2116
 	void createMinimalValkeyStandaloneConfiguration() {
 
-		ValkeyURI redisURI = ValkeyURI.create("redis://myserver");
+		ValkeyURI redisURI = ValkeyURI.create("valkey://myserver");
 
 		ValkeyStandaloneConfiguration expected = new ValkeyStandaloneConfiguration();
 		expected.setHostName("myserver");
@@ -1160,7 +1160,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2116
 	void createFullValkeyStanaloneConfiguration() {
 
-		ValkeyURI redisURI = ValkeyURI.create("redis://fooUser:fooPass@myserver1:111/7");
+		ValkeyURI redisURI = ValkeyURI.create("valkey://fooUser:fooPass@myserver1:111/7");
 
 		ValkeyStandaloneConfiguration expected = new ValkeyStandaloneConfiguration();
 		expected.setHostName("myserver1");
@@ -1207,7 +1207,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2116
 	void createMinimalValkeySentinelConfiguration() {
 
-		ValkeyURI redisURI = ValkeyURI.create("redis-sentinel://myserver?sentinelMasterId=5150");
+		ValkeyURI redisURI = ValkeyURI.create("valkey-sentinel://myserver?sentinelMasterId=5150");
 
 		ValkeySentinelConfiguration expected = new ValkeySentinelConfiguration();
 		expected.setMaster("5150");
@@ -1222,7 +1222,7 @@ class LettuceConnectionFactoryUnitTests {
 	void createFullValkeySentinelConfiguration() {
 
 		ValkeyURI redisURI = ValkeyURI
-				.create("redis-sentinel://fooUser:fooPass@myserver1:111,myserver2:222/7?sentinelMasterId=5150");
+				.create("valkey-sentinel://fooUser:fooPass@myserver1:111,myserver2:222/7?sentinelMasterId=5150");
 		// Set the passwords directly on the sentinels so that it gets picked up by converter
 		char[] sentinelPass = "changeme".toCharArray();
 		redisURI.getSentinels().forEach(sentinelValkeyUri -> sentinelValkeyUri.setPassword(sentinelPass));
@@ -1262,7 +1262,7 @@ class LettuceConnectionFactoryUnitTests {
 	@Test // GH-2594
 	void createValkeyConfigurationWithValidValkeyUriString() {
 
-		ValkeyConfiguration redisConfiguration = LettuceConnectionFactory.createValkeyConfiguration("redis://skullbox:6789");
+		ValkeyConfiguration redisConfiguration = LettuceConnectionFactory.createValkeyConfiguration("valkey://skullbox:6789");
 
 		assertThat(redisConfiguration).isInstanceOf(ValkeyStandaloneConfiguration.class);
 

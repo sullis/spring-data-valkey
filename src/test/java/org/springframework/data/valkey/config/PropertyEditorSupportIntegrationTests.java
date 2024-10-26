@@ -39,14 +39,14 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 @SpringJUnitConfig(locations = "namespace.xml")
 class PropertyEditorSupportIntegrationTests {
 
-	@Resource(name = "redisTemplate") ClusterOperations<String, String> cluster;
-	@Resource(name = "redisTemplate") GeoOperations<String, String> geo;
-	@Resource(name = "redisTemplate") HashOperations<String, String, String> hash;
-	@Resource(name = "redisTemplate") HyperLogLogOperations<String, String> hll;
-	@Resource(name = "redisTemplate") SetOperations<String, String> set;
-	@Resource(name = "redisTemplate") StreamOperations<String, String, String> stream;
-	@Resource(name = "redisTemplate") ValueOperations<String, String> value;
-	@Resource(name = "redisTemplate") ZSetOperations<String, String> zSet;
+	@Resource(name = "valkeyTemplate") ClusterOperations<String, String> cluster;
+	@Resource(name = "valkeyTemplate") GeoOperations<String, String> geo;
+	@Resource(name = "valkeyTemplate") HashOperations<String, String, String> hash;
+	@Resource(name = "valkeyTemplate") HyperLogLogOperations<String, String> hll;
+	@Resource(name = "valkeyTemplate") SetOperations<String, String> set;
+	@Resource(name = "valkeyTemplate") StreamOperations<String, String, String> stream;
+	@Resource(name = "valkeyTemplate") ValueOperations<String, String> value;
+	@Resource(name = "valkeyTemplate") ZSetOperations<String, String> zSet;
 
 	@Test // GH-2828, GH-2825
 	void shouldInjectResources() {

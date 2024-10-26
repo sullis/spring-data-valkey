@@ -86,11 +86,11 @@ public class ValkeyRepositoryConfigurationUnitTests {
 		@Test // DATAREDIS-425
 		public void shouldPickUpReferenceResolver() {
 
-			ValkeyKeyValueAdapter adapter = (ValkeyKeyValueAdapter) ctx.getBean("redisKeyValueAdapter");
+			ValkeyKeyValueAdapter adapter = (ValkeyKeyValueAdapter) ctx.getBean("valkeyKeyValueAdapter");
 
 			Object referenceResolver = ReflectionTestUtils.getField(adapter.getConverter(), "referenceResolver");
 
-			assertThat(referenceResolver).isEqualTo((ctx.getBean("redisReferenceResolver")));
+			assertThat(referenceResolver).isEqualTo((ctx.getBean("valkeyReferenceResolver")));
 			assertThat(mockingDetails(referenceResolver).isMock()).isTrue();
 		}
 	}
@@ -122,9 +122,9 @@ public class ValkeyRepositoryConfigurationUnitTests {
 		public void shouldRegisterDefaultBeans() {
 
 			assertThat(ctx.getBean(ContextSampleRepository.class)).isNotNull();
-			assertThat(ctx.getBean("redisKeyValueAdapter")).isNotNull();
-			assertThat(ctx.getBean("redisCustomConversions")).isNotNull();
-			assertThat(ctx.getBean("redisReferenceResolver")).isNotNull();
+			assertThat(ctx.getBean("valkeyKeyValueAdapter")).isNotNull();
+			assertThat(ctx.getBean("valkeyCustomConversions")).isNotNull();
+			assertThat(ctx.getBean("valkeyReferenceResolver")).isNotNull();
 		}
 	}
 
@@ -154,7 +154,7 @@ public class ValkeyRepositoryConfigurationUnitTests {
 		@Test // DATAREDIS-425
 		public void shouldConfigureMessageListenerContainer() {
 
-			ValkeyKeyValueAdapter adapter = ctx.getBean("redisKeyValueAdapter", ValkeyKeyValueAdapter.class);
+			ValkeyKeyValueAdapter adapter = ctx.getBean("valkeyKeyValueAdapter", ValkeyKeyValueAdapter.class);
 			Object messageListenerContainer = ReflectionTestUtils.getField(adapter, "messageListenerContainer");
 
 			assertThat(Mockito.mockingDetails(messageListenerContainer).isMock()).isTrue();

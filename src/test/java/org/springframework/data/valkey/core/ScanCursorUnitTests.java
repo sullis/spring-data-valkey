@@ -54,7 +54,7 @@ class ScanCursorUnitTests {
 	void cursorShouldNotLoopWhenReachingStartingPointInFistLoop() {
 
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
-		values.add(createIteration(0, "spring", "data", "redis"));
+		values.add(createIteration(0, "spring", "data", "valkey"));
 		CapturingCursorDummy cursor = initCursor(values);
 
 		assertThat(cursor.next()).isEqualTo("spring");
@@ -65,7 +65,7 @@ class ScanCursorUnitTests {
 		assertThat(cursor.getCursorId()).isEqualTo(0L);
 		assertThat(cursor.hasNext()).isTrue();
 
-		assertThat(cursor.next()).isEqualTo("redis");
+		assertThat(cursor.next()).isEqualTo("valkey");
 		assertThat(cursor.getCursorId()).isEqualTo(0L);
 		assertThat(cursor.hasNext()).isFalse();
 	}
@@ -76,7 +76,7 @@ class ScanCursorUnitTests {
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
 		values.add(createIteration(1, "spring"));
 		values.add(createIteration(2, "data"));
-		values.add(createIteration(0, "redis"));
+		values.add(createIteration(0, "valkey"));
 		CapturingCursorDummy cursor = initCursor(values);
 
 		assertThat(cursor.next()).isEqualTo("spring");
@@ -87,7 +87,7 @@ class ScanCursorUnitTests {
 		assertThat(cursor.getCursorId()).isEqualTo(2L);
 		assertThat(cursor.hasNext()).isTrue();
 
-		assertThat(cursor.next()).isEqualTo("redis");
+		assertThat(cursor.next()).isEqualTo("valkey");
 		assertThat(cursor.getCursorId()).isEqualTo(0L);
 		assertThat(cursor.hasNext()).isFalse();
 	}
@@ -109,7 +109,7 @@ class ScanCursorUnitTests {
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
 		values.add(createIteration(1, "spring"));
 		values.add(createIteration(2, "data"));
-		values.add(createIteration(0, "redis"));
+		values.add(createIteration(0, "valkey"));
 
 		assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> initCursor(values).open());
 	}
@@ -120,7 +120,7 @@ class ScanCursorUnitTests {
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
 		values.add(createIteration(1, "spring"));
 		values.add(createIteration(2, "data"));
-		values.add(createIteration(0, "redis"));
+		values.add(createIteration(0, "valkey"));
 		Cursor<String> cursor = initCursor(values);
 
 		assertThat(cursor.getPosition()).isEqualTo(0L);
@@ -141,7 +141,7 @@ class ScanCursorUnitTests {
 		values.add(createIteration(3));
 		values.add(createIteration(4));
 		values.add(createIteration(5));
-		values.add(createIteration(0, "redis"));
+		values.add(createIteration(0, "valkey"));
 		Cursor<String> cursor = initCursor(values);
 
 		List<String> result = new ArrayList<>();
@@ -150,7 +150,7 @@ class ScanCursorUnitTests {
 		}
 
 		assertThat(result.size()).isEqualTo(2);
-		assertThat(result).contains("spring", "redis");
+		assertThat(result).contains("spring", "valkey");
 	}
 
 	@Test // DATAREDIS-417
@@ -206,7 +206,7 @@ class ScanCursorUnitTests {
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
 		values.add(createIteration(1, "spring"));
 		values.add(createIteration(2, "data"));
-		values.add(createIteration(3, "redis"));
+		values.add(createIteration(3, "valkey"));
 		values.add(createIteration(0));
 
 		Cursor<String> cursor = initCursor(values);
@@ -220,7 +220,7 @@ class ScanCursorUnitTests {
 		LinkedList<ScanIteration<String>> values = new LinkedList<>();
 		values.add(createIteration(1, "spring"));
 		values.add(createIteration(2, "data"));
-		values.add(createIteration(3, "redis"));
+		values.add(createIteration(3, "valkey"));
 		values.add(createIteration(0));
 		Cursor<String> cursor = initCursor(values);
 

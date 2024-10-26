@@ -377,12 +377,12 @@ public class ValkeyCacheTests {
 
 		ValkeyCache cacheWithCustomPrefix = new ValkeyCache("cache",
 				ValkeyCacheWriter.nonLockingValkeyCacheWriter(connectionFactory), ValkeyCacheConfiguration.defaultCacheConfig()
-						.serializeValuesWith(SerializationPair.fromSerializer(serializer)).prefixCacheNameWith("redis::"));
+						.serializeValuesWith(SerializationPair.fromSerializer(serializer)).prefixCacheNameWith("valkey::"));
 
 		cacheWithCustomPrefix.put("key-1", sample);
 
 		doWithConnection(connection -> assertThat(
-				connection.stringCommands().get("redis::cache::key-1".getBytes(StandardCharsets.UTF_8)))
+				connection.stringCommands().get("valkey::cache::key-1".getBytes(StandardCharsets.UTF_8)))
 				.isEqualTo(binarySample));
 	}
 

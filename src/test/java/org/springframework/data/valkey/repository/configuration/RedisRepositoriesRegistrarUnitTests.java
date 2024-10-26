@@ -62,9 +62,9 @@ class ValkeyRepositoriesRegistrarUnitTests {
 	static Stream<Arguments> args() {
 		return Stream.of(
 				Arguments.of(AnnotationMetadata.introspect(Config.class),
-						new String[] { "redisRepositoriesRegistrarUnitTests.PersonRepository" }),
+						new String[] { "valkeyRepositoriesRegistrarUnitTests.PersonRepository" }),
 				Arguments.of(AnnotationMetadata.introspect(ConfigWithBeanNameGenerator.class),
-						new String[] { "redisRepositoriesRegistrarUnitTests.PersonREPO" }));
+						new String[] { "valkeyRepositoriesRegistrarUnitTests.PersonREPO" }));
 	}
 
 	@EnableValkeyRepositories(basePackageClasses = PersonRepository.class, considerNestedRepositories = true)

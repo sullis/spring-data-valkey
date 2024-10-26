@@ -114,7 +114,7 @@ class LettuceClientConfigurationUnitTests {
 	void shouldApplySettingsFromValkeyURI() {
 
 		LettuceClientConfiguration configuration = LettuceClientConfiguration.builder() //
-				.apply(ValkeyURI.create("rediss://foo?verifyPeer=FULL&clientName=bar&timeout=10s")).build();
+				.apply(ValkeyURI.create("valkeys://foo?verifyPeer=FULL&clientName=bar&timeout=10s")).build();
 
 		assertThat(configuration.isUseSsl()).isTrue();
 		assertThat(configuration.isVerifyPeer()).isTrue();
@@ -130,7 +130,7 @@ class LettuceClientConfigurationUnitTests {
 		LettuceClientConfiguration configuration = LettuceClientConfiguration.builder() //
 				.clientName("hello") //
 				.commandTimeout(Duration.ofMillis(1)) //
-				.apply(ValkeyURI.create("rediss://foo")).build();
+				.apply(ValkeyURI.create("valkeys://foo")).build();
 
 		assertThat(configuration.getClientName()).contains("hello");
 		assertThat(configuration.getCommandTimeout()).isEqualTo(Duration.ofMillis(1));

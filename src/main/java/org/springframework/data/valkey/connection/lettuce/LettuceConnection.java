@@ -1048,7 +1048,7 @@ public class LettuceConnection extends AbstractValkeyConnection {
 
 	private int getPort(ValkeyNode node) {
 		Integer port = node.getPort();
-		return port != null ? port : ValkeyURI.DEFAULT_REDIS_PORT;
+		return port != null ? port : ValkeyURI.DEFAULT_VALKEY_PORT;
 	}
 
 	private boolean customizedDatabaseIndex() {

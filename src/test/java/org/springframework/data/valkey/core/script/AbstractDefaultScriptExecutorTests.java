@@ -172,7 +172,7 @@ public abstract class AbstractDefaultScriptExecutorTests {
 		template.setConnectionFactory(getConnectionFactory());
 		template.afterPropertiesSet();
 		DefaultValkeyScript<String> script = new DefaultValkeyScript<>();
-		script.setScriptSource(new StaticScriptSource("redis.call('SET',KEYS[1], ARGV[1])\nreturn 'FOO'"));
+		script.setScriptSource(new StaticScriptSource("valkey.call('SET',KEYS[1], ARGV[1])\nreturn 'FOO'"));
 		script.setResultType(String.class);
 		ScriptExecutor<String> scriptExecutor = new DefaultScriptExecutor<String>(template);
 		Person joe = new Person("Joe", "Schmoe", 23);

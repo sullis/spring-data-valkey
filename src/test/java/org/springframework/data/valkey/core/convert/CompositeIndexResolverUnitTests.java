@@ -53,9 +53,9 @@ class CompositeIndexResolverUnitTests {
 	void shouldCollectionIndexesFromResolvers() {
 
 		when(resolver1.resolveIndexesFor(any(TypeInformation.class), any())).thenReturn(
-				Collections.<IndexedData> singleton(new SimpleIndexedPropertyValue("spring", "data", "redis")));
+				Collections.<IndexedData> singleton(new SimpleIndexedPropertyValue("spring", "data", "valkey")));
 		when(resolver2.resolveIndexesFor(any(TypeInformation.class), any())).thenReturn(
-				Collections.<IndexedData> singleton(new SimpleIndexedPropertyValue("redis", "data", "spring")));
+				Collections.<IndexedData> singleton(new SimpleIndexedPropertyValue("valkey", "data", "spring")));
 
 		CompositeIndexResolver resolver = new CompositeIndexResolver(Arrays.asList(resolver1, resolver2));
 

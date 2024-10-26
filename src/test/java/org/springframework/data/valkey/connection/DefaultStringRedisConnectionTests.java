@@ -1805,9 +1805,9 @@ public class DefaultStringValkeyConnectionTests {
 	@Test // DATAREDIS-308
 	void pfAddShouldDelegateToNativeConnectionCorrectly() {
 
-		connection.pfAdd("hll", "spring", "data", "redis");
+		connection.pfAdd("hll", "spring", "data", "valkey");
 		verify(nativeConnection, times(1)).pfAdd("hll".getBytes(), "spring".getBytes(), "data".getBytes(),
-				"redis".getBytes());
+				"valkey".getBytes());
 	}
 
 	@Test // DATAREDIS-308
@@ -1820,9 +1820,9 @@ public class DefaultStringValkeyConnectionTests {
 	@Test // DATAREDIS-308
 	void pfMergeShouldDelegateToNativeConnectionCorrectly() {
 
-		connection.pfMerge("merged", "spring", "data", "redis");
+		connection.pfMerge("merged", "spring", "data", "valkey");
 		verify(nativeConnection, times(1)).pfMerge("merged".getBytes(), "spring".getBytes(), "data".getBytes(),
-				"redis".getBytes());
+				"valkey".getBytes());
 	}
 
 	@Test // DATAREDIS-270

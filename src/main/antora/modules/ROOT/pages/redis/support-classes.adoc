@@ -39,7 +39,7 @@ XML::
   http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="queue" class="org.springframework.data.valkey.support.collections.DefaultValkeyList">
-    <constructor-arg ref="redisTemplate"/>
+    <constructor-arg ref="valkeyTemplate"/>
     <constructor-arg value="queue-key"/>
   </bean>
 

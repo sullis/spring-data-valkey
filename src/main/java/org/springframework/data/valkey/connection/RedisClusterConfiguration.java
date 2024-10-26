@@ -43,8 +43,8 @@ import org.springframework.util.StringUtils;
  */
 public class ValkeyClusterConfiguration implements ValkeyConfiguration, ClusterConfiguration {
 
-	private static final String REDIS_CLUSTER_NODES_CONFIG_PROPERTY = "spring.valkey.cluster.nodes";
-	private static final String REDIS_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY = "spring.valkey.cluster.max-redirects";
+	private static final String VALKEY_CLUSTER_NODES_CONFIG_PROPERTY = "spring.valkey.cluster.nodes";
+	private static final String VALKEY_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY = "spring.valkey.cluster.max-redirects";
 
 	private @Nullable Integer maxRedirects;
 
@@ -95,14 +95,14 @@ public class ValkeyClusterConfiguration implements ValkeyConfiguration, ClusterC
 
 		Assert.notNull(propertySource, "PropertySource must not be null");
 
-		if (propertySource.containsProperty(REDIS_CLUSTER_NODES_CONFIG_PROPERTY)) {
+		if (propertySource.containsProperty(VALKEY_CLUSTER_NODES_CONFIG_PROPERTY)) {
 
-			Object redisClusterNodes = propertySource.getProperty(REDIS_CLUSTER_NODES_CONFIG_PROPERTY);
+			Object redisClusterNodes = propertySource.getProperty(VALKEY_CLUSTER_NODES_CONFIG_PROPERTY);
 			appendClusterNodes(StringUtils.commaDelimitedListToSet(String.valueOf(redisClusterNodes)));
 		}
-		if (propertySource.containsProperty(REDIS_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY)) {
+		if (propertySource.containsProperty(VALKEY_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY)) {
 
-			Object clusterMaxRedirects = propertySource.getProperty(REDIS_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY);
+			Object clusterMaxRedirects = propertySource.getProperty(VALKEY_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY);
 			this.maxRedirects = NumberUtils.parseNumber(String.valueOf(clusterMaxRedirects), Integer.class);
 		}
 	}
@@ -260,10 +260,10 @@ public class ValkeyClusterConfiguration implements ValkeyConfiguration, ClusterC
 
 		Map<String, Object> map = new HashMap<>();
 
-		map.put(REDIS_CLUSTER_NODES_CONFIG_PROPERTY, StringUtils.collectionToCommaDelimitedString(clusterHostAndPorts));
+		map.put(VALKEY_CLUSTER_NODES_CONFIG_PROPERTY, StringUtils.collectionToCommaDelimitedString(clusterHostAndPorts));
 
 		if (redirects >= 0) {
-			map.put(REDIS_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY, redirects);
+			map.put(VALKEY_CLUSTER_MAX_REDIRECTS_CONFIG_PROPERTY, redirects);
 		}
 
 		return map;

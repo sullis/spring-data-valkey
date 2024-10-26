@@ -177,10 +177,10 @@ public class LettuceConnectionIntegrationTests extends AbstractConnectionIntegra
 
 		connection.set("spring", "awesome");
 		connection.set("data", "cool");
-		connection.set("redis", "supercalifragilisticexpialidocious");
+		connection.set("valkey", "supercalifragilisticexpialidocious");
 
 		assertThat(
-				(Iterable<byte[]>) connection.execute("MGET", "spring".getBytes(), "data".getBytes(), "redis".getBytes()))
+				(Iterable<byte[]>) connection.execute("MGET", "spring".getBytes(), "data".getBytes(), "valkey".getBytes()))
 						.isInstanceOf(List.class)
 						.contains("awesome".getBytes(), "cool".getBytes(), "supercalifragilisticexpialidocious".getBytes());
 	}

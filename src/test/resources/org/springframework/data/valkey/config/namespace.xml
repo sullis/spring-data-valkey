@@ -8,7 +8,7 @@
 				http://www.springframework.org/schema/redis https://www.springframework.org/schema/redis/spring-redis.xsd">
 
 	<!-- the default ConnectionFactory -->
-	<bean id="redisConnectionFactory" class="org.springframework.data.valkey.connection.jedis.JedisConnectionFactory"/>
+	<bean id="valkeyConnectionFactory" class="org.springframework.data.valkey.connection.jedis.JedisConnectionFactory"/>
 
 	<task:executor id="testTaskExecutor" />
 	 			
@@ -27,8 +27,8 @@
 	
 	<bean id="handler" class="org.springframework.data.valkey.config.StubErrorHandler"/>
 	
-	<bean id="redisTemplate" class="org.springframework.data.valkey.core.StringValkeyTemplate">
-		<property name="connectionFactory" ref="redisConnectionFactory"/>
+	<bean id="valkeyTemplate" class="org.springframework.data.valkey.core.StringValkeyTemplate">
+		<property name="connectionFactory" ref="valkeyConnectionFactory"/>
 	</bean>
 	
 </beans>

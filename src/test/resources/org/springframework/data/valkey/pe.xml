@@ -6,13 +6,13 @@
 
 	<bean id="connectionFactory" class="org.springframework.data.valkey.connection.jedis.JedisConnectionFactory"/>
 	
-	<bean id="redisTemplate" class="org.springframework.data.valkey.core.ValkeyTemplate" p:connection-factory-ref="connectionFactory"/>
+	<bean id="valkeyTemplate" class="org.springframework.data.valkey.core.ValkeyTemplate" p:connection-factory-ref="connectionFactory"/>
 	
 	<bean id="injected" class="org.springframework.data.valkey.ValkeyViewPE"
-		p:value-ops-ref="redisTemplate" 
-		p:list-ops-ref="redisTemplate"
-		p:set-ops-ref="redisTemplate"
-		p:zset-ops-ref="redisTemplate"
-		p:hash-ops-ref="redisTemplate"
+		p:value-ops-ref="valkeyTemplate"
+		p:list-ops-ref="valkeyTemplate"
+		p:set-ops-ref="valkeyTemplate"
+		p:zset-ops-ref="valkeyTemplate"
+		p:hash-ops-ref="valkeyTemplate"
 		/>
 </beans>

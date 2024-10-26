@@ -32,11 +32,11 @@ Container of Valkey listeners. All listeners will be hosted by the same containe
       <xsd:sequence>
         <xsd:element name="listener" type="listenerType" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
-      <xsd:attribute name="connection-factory" type="xsd:string" default="redisConnectionFactory">
+      <xsd:attribute name="connection-factory" type="xsd:string" default="valkeyConnectionFactory">
         <xsd:annotation>
           <xsd:documentation><![CDATA[
 A reference to the Valkey ConnectionFactory bean.
-Default is "redisConnectionFactory".
+Default is "valkeyConnectionFactory".
           ]]></xsd:documentation>
           <xsd:appinfo>
             <tool:annotation kind="ref">
@@ -168,10 +168,10 @@ Valkey key of the created collection. Defaults to bean id.
           ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
-      <xsd:attribute name="template" type="xsd:string" default="redisTemplate">
+      <xsd:attribute name="template" type="xsd:string" default="valkeyTemplate">
         <xsd:annotation>
           <xsd:documentation><![CDATA[
-A reference to a ValkeyTemplate bean.Default is "redisTemplate".
+A reference to a ValkeyTemplate bean.Default is "valkeyTemplate".
           ]]></xsd:documentation>
           <xsd:appinfo>
             <tool:annotation kind="ref">

@@ -41,7 +41,7 @@ import org.springframework.data.valkey.connection.convert.Converters.ClusterNode
  */
 class ConvertersUnitTests {
 
-	private static final String REDIS_3_0_CLUSTER_NODES_RESPONSE = "" //
+	private static final String VALKEY_3_0_CLUSTER_NODES_RESPONSE = "" //
 			+ "ef570f86c7b1a953846668debc177a3a16733420 127.0.0.1:6379@16379 myself,master - 0 0 1 connected 0-5460 5602"
 			+ "\n"
 			+ "0f2ee5df45d18c50aca07228cc18b1da96fd5e84 127.0.0.1:6380@16380 master - 0 1427718161587 2 connected 5461 5603-10922"
@@ -50,7 +50,7 @@ class ConvertersUnitTests {
 			+ "\n"
 			+ "8cad73f63eb996fedba89f041636f17d88cda075 127.0.0.1:7369@7369 slave ef570f86c7b1a953846668debc177a3a16733420 0 1427718161587 1 connected";
 
-	private static final String REDIS_3_2_CLUSTER_NODES_RESPONSE = "" //
+	private static final String VALKEY_3_2_CLUSTER_NODES_RESPONSE = "" //
 			+ "ef570f86c7b1a953846668debc177a3a16733420 127.0.0.1:6379@16379 myself,master - 0 0 1 connected 0-5460 5602"
 			+ "\n"
 			+ "0f2ee5df45d18c50aca07228cc18b1da96fd5e84 127.0.0.1:6380@16380 master - 0 1427718161587 2 connected 5461 5603-10922"
@@ -80,7 +80,7 @@ class ConvertersUnitTests {
 	@Test // DATAREDIS-315
 	void toSetOfValkey30ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
 
-		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(REDIS_3_0_CLUSTER_NODES_RESPONSE).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(VALKEY_3_0_CLUSTER_NODES_RESPONSE).iterator();
 
 		ValkeyClusterNode node = nodes.next(); // 127.0.0.1:6379
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");
@@ -130,7 +130,7 @@ class ConvertersUnitTests {
 	@Test // DATAREDIS-315
 	void toSetOfValkey32ClusterNodesShouldConvertSingleStringNodesResponseCorrectly() {
 
-		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(REDIS_3_2_CLUSTER_NODES_RESPONSE).iterator();
+		Iterator<ValkeyClusterNode> nodes = Converters.toSetOfValkeyClusterNodes(VALKEY_3_2_CLUSTER_NODES_RESPONSE).iterator();
 
 		ValkeyClusterNode node = nodes.next(); // 127.0.0.1:6379
 		assertThat(node.getId()).isEqualTo("ef570f86c7b1a953846668debc177a3a16733420");

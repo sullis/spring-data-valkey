@@ -47,13 +47,13 @@ class StreamRecordsUnitTests {
 	private static final String STRING_VAL = "string-val";
 	private static final DummyObject OBJECT_VAL = new DummyObject();
 
-	private static final Jackson2JsonValkeySerializer<DummyObject> JSON_REDIS_SERIALIZER = new Jackson2JsonValkeySerializer<>(
+	private static final Jackson2JsonValkeySerializer<DummyObject> JSON_VALKEY_SERIALIZER = new Jackson2JsonValkeySerializer<>(
 			DummyObject.class);
 
 	private static final byte[] SERIALIZED_STRING_VAL = ValkeySerializer.string().serialize(STRING_VAL);
 	private static final byte[] SERIALIZED_STRING_MAP_KEY = ValkeySerializer.string().serialize(STRING_MAP_KEY);
 	private static final byte[] SERIALIZED_STRING_STREAM_KEY = ValkeySerializer.string().serialize(STRING_STREAM_KEY);
-	private static final byte[] SERIALIZED_JSON_OBJECT_VAL = JSON_REDIS_SERIALIZER.serialize(OBJECT_VAL);
+	private static final byte[] SERIALIZED_JSON_OBJECT_VAL = JSON_VALKEY_SERIALIZER.serialize(OBJECT_VAL);
 
 	private static class DummyObject implements Serializable {
 		private final Integer dummyId = 1;
@@ -109,7 +109,7 @@ class StreamRecordsUnitTests {
 		MapRecord<String, String, DummyObject> source = Record.of(Collections.singletonMap(STRING_MAP_KEY, OBJECT_VAL))
 				.withId(RECORD_ID).withStreamKey(STRING_STREAM_KEY);
 
-		ByteRecord target = source.serialize(ValkeySerializer.string(), ValkeySerializer.string(), JSON_REDIS_SERIALIZER);
+		ByteRecord target = source.serialize(ValkeySerializer.string(), ValkeySerializer.string(), JSON_VALKEY_SERIALIZER);
 
 		assertThat(target.getId()).isEqualTo(RECORD_ID);
 		assertThat(target.getStream()).isEqualTo(SERIALIZED_STRING_STREAM_KEY);

@@ -157,12 +157,12 @@ class ValkeyRepositoryConfigurationExtensionUnitTests {
 	}
 
 	private Object getEnableKeyspaceEvents(BeanDefinitionRegistry beanDefintionRegistry) {
-		return beanDefintionRegistry.getBeanDefinition("redisKeyValueAdapter").getPropertyValues()
+		return beanDefintionRegistry.getBeanDefinition("valkeyKeyValueAdapter").getPropertyValues()
 				.getPropertyValue("enableKeyspaceEvents").getValue();
 	}
 
 	private Object getKeyspaceNotificationsConfigParameter(BeanDefinitionRegistry beanDefintionRegistry) {
-		return beanDefintionRegistry.getBeanDefinition("redisKeyValueAdapter").getPropertyValues()
+		return beanDefintionRegistry.getBeanDefinition("valkeyKeyValueAdapter").getPropertyValues()
 				.getPropertyValue("keyspaceNotificationsConfigParameter").getValue();
 	}
 
