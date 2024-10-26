@@ -935,7 +935,7 @@ public class ValkeyTemplate<K, V> extends ValkeyAccessor implements ValkeyOperat
 	}
 
 	/*
-	 * @see org.springframework.data.redis.core.ValkeyOperations#replicaOf(java.lang.String, int)
+	 * @see org.springframework.data.valkey.core.ValkeyOperations#replicaOf(java.lang.String, int)
 	 */
 	@Override
 	public void replicaOf(String host, int port) {

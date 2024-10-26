@@ -4,7 +4,7 @@
 One of the first tasks when using Valkey and Spring is to connect to the store through the IoC container.
 To do that, a Java connector (or binding) is required.
 No matter the library you choose, you need to use only one set of Spring Data Valkey APIs (which behaves consistently across all connectors).
-The `org.springframework.data.redis.connection` package and its `ValkeyConnection` and `ValkeyConnectionFactory` interfaces for working with and retrieving active connections to Valkey.
+The `org.springframework.data.valkey.connection` package and its `ValkeyConnection` and `ValkeyConnectionFactory` interfaces for working with and retrieving active connections to Valkey.
 
 [[redis:connectors:connection]]
 == ValkeyConnection and ValkeyConnectionFactory
@@ -100,7 +100,7 @@ The following overview explains features that are supported by the individual Va
 [[redis:connectors:lettuce]]
 == Configuring the Lettuce Connector
 
-https://github.com/lettuce-io/lettuce-core[Lettuce] is a https://netty.io/[Netty]-based open-source connector supported by Spring Data Valkey through the `org.springframework.data.redis.connection.lettuce` package.
+https://github.com/lettuce-io/lettuce-core[Lettuce] is a https://netty.io/[Netty]-based open-source connector supported by Spring Data Valkey through the `org.springframework.data.valkey.connection.lettuce` package.
 
 .Add the following to the pom.xml files `dependencies` element:
 [source,xml,subs="+attributes"]
@@ -154,7 +154,7 @@ public LettuceConnectionFactory lettuceConnectionFactory() {
 }
 ----
 
-For more detailed client configuration tweaks, see javadoc:org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration[].
+For more detailed client configuration tweaks, see javadoc:org.springframework.data.valkey.connection.lettuce.LettuceClientConfiguration[].
 
 Lettuce integrates with Netty's https://netty.io/wiki/native-transports.html[native transports], letting you use Unix domain sockets to communicate with Valkey.
 Make sure to include the appropriate native transport dependencies that match your runtime environment.
@@ -178,7 +178,7 @@ NOTE: Netty currently supports the epoll (Linux) and kqueue (BSD/macOS) interfac
 [[redis:connectors:jedis]]
 == Configuring the Jedis Connector
 
-https://github.com/redis/jedis[Jedis] is a community-driven connector supported by the Spring Data Valkey module through the `org.springframework.data.redis.connection.jedis` package.
+https://github.com/redis/jedis[Jedis] is a community-driven connector supported by the Spring Data Valkey module through the `org.springframework.data.valkey.connection.jedis` package.
 
 .Add the following to the pom.xml files `dependencies` element:
 [source,xml,subs="+attributes"]

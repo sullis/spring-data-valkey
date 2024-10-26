@@ -2582,7 +2582,7 @@ public class DefaultStringValkeyConnection implements StringValkeyConnection, De
 	}
 
 	/*
-	 * @see org.springframework.data.redis.connection.ValkeyServerCommands#getClientName()
+	 * @see org.springframework.data.valkey.connection.ValkeyServerCommands#getClientName()
 	 */
 	@Override
 	public String getClientName() {

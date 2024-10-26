@@ -66,7 +66,7 @@ import org.springframework.util.ObjectUtils;
 class DefaultValkeyCacheWriter implements ValkeyCacheWriter {
 
 	private static final boolean REACTIVE_REDIS_CONNECTION_FACTORY_PRESENT = ClassUtils
-			.isPresent("org.springframework.data.redis.connection.ReactiveValkeyConnectionFactory", null);
+			.isPresent("org.springframework.data.valkey.connection.ReactiveValkeyConnectionFactory", null);
 
 	private final BatchStrategy batchStrategy;
 

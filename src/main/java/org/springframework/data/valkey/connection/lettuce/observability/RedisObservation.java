@@ -131,7 +131,7 @@ public enum ValkeyObservation implements ObservationDocumentation {
 		DB_INDEX {
 			@Override
 			public String asString() {
-				return "db.redis.database_index";
+				return "db.valkey.database_index";
 			}
 		},
 
@@ -168,7 +168,7 @@ public enum ValkeyObservation implements ObservationDocumentation {
 		ERROR {
 			@Override
 			public String asString() {
-				return "spring.data.redis.command.error";
+				return "spring.data.valkey.command.error";
 			}
 		}
 	}

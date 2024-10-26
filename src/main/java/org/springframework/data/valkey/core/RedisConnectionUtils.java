@@ -478,7 +478,7 @@ public abstract class ValkeyConnectionUtils {
 			String returnTypeName = returnType.getSimpleName();
 
 			// bridge keyCommands etc. to defer target invocations
-			if (returnType.isInterface() && returnType.getPackageName().equals("org.springframework.data.redis.connection")
+			if (returnType.isInterface() && returnType.getPackageName().equals("org.springframework.data.valkey.connection")
 					&& returnTypeName.startsWith("Valkey") && returnTypeName.endsWith("Commands")) {
 
 				ProxyFactory proxyFactory = new ProxyFactory(ReflectionUtils.invokeMethod(method, obj));

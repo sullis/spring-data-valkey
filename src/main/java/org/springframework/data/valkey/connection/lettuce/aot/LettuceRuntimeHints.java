@@ -36,7 +36,7 @@ class LettuceRuntimeHints implements RuntimeHintsRegistrar {
 			hints.reflection().registerType(TypeReference.of("io.lettuce.core.ValkeyClient"),
 					it -> it
 							.onReachableType(
-									TypeReference.of("org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider"))
+									TypeReference.of("org.springframework.data.valkey.connection.lettuce.StandaloneConnectionProvider"))
 							.withMembers(MemberCategory.INVOKE_PUBLIC_METHODS, MemberCategory.DECLARED_FIELDS));
 		}
 	}

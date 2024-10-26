@@ -47,7 +47,7 @@ ____
 
 **Metric name** `spring.data.redis`. **Type** `timer` and **base unit** `seconds`.
 
-Fully qualified name of the enclosing class `org.springframework.data.redis.connection.lettuce.observability.ValkeyObservation`.
+Fully qualified name of the enclosing class `org.springframework.data.valkey.connection.lettuce.observability.ValkeyObservation`.
 
 
 
@@ -56,7 +56,7 @@ Fully qualified name of the enclosing class `org.springframework.data.redis.conn
 |===
 |Name | Description
 |`db.operation`|Valkey command value.
-|`db.redis.database_index`|Valkey database index.
+|`db.valkey.database_index`|Valkey database index.
 |`db.system`|Database system.
 |`db.user`|Valkey user.
 |`net.peer.name`|Name of the database host.
@@ -71,7 +71,7 @@ Fully qualified name of the enclosing class `org.springframework.data.redis.conn
 |===
 |Name | Description
 |`db.statement`|Valkey statement.
-|`spring.data.redis.command.error`|Valkey error response.
+|`spring.data.valkey.command.error`|Valkey error response.
 |===
 
 [[observability-spans]]
@@ -86,7 +86,7 @@ Below you can find a list of all spans declared by this project.
 
 **Span name** `spring.data.redis`.
 
-Fully qualified name of the enclosing class `org.springframework.data.redis.connection.lettuce.observability.ValkeyObservation`.
+Fully qualified name of the enclosing class `org.springframework.data.valkey.connection.lettuce.observability.ValkeyObservation`.
 
 
 
@@ -94,7 +94,7 @@ Fully qualified name of the enclosing class `org.springframework.data.redis.conn
 |===
 |Name | Description
 |`db.operation`|Valkey command value.
-|`db.redis.database_index`|Valkey database index.
+|`db.valkey.database_index`|Valkey database index.
 |`db.statement`|Valkey statement.
 |`db.system`|Database system.
 |`db.user`|Valkey user.
@@ -103,5 +103,5 @@ Fully qualified name of the enclosing class `org.springframework.data.redis.conn
 |`net.sock.peer.addr`|Mongo peer address.
 |`net.sock.peer.port`|Mongo peer port.
 |`net.transport`|Network transport.
-|`spring.data.redis.command.error`|Valkey error response.
+|`spring.data.valkey.command.error`|Valkey error response.
 |===

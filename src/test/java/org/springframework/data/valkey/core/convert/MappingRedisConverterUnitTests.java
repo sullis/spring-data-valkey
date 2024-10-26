@@ -1973,10 +1973,10 @@ class MappingValkeyConverterUnitTests {
 
 		assertThat(write(generic)).hasSize(3) //
 			.containsEntry("_class",
-				"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$WithGenericEntity")
+				"org.springframework.data.valkey.core.convert.MappingValkeyConverterUnitTests$WithGenericEntity")
 			.containsEntry("entity.name", "hello") //
 			.containsEntry("entity._class",
-				"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$User");
+				"org.springframework.data.valkey.core.convert.MappingValkeyConverterUnitTests$User");
 	}
 
 	@Test // GH-2349
@@ -1985,7 +1985,7 @@ class MappingValkeyConverterUnitTests {
 		Bucket bucket = new Bucket();
 		bucket.put("entity.name", "hello".getBytes());
 		bucket.put("entity._class",
-			"org.springframework.data.redis.core.convert.MappingValkeyConverterUnitTests$User".getBytes());
+			"org.springframework.data.valkey.core.convert.MappingValkeyConverterUnitTests$User".getBytes());
 
 		ValkeyData redisData = new ValkeyData(bucket);
 		redisData.setKeyspace(KEYSPACE_ACCOUNT);

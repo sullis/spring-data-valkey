@@ -155,7 +155,7 @@ public class ValkeyRepositoryConfigurationExtension extends KeyValueRepositoryCo
 
 	private static AbstractBeanDefinition createValkeyReferenceResolverDefinition(String redisTemplateRef) {
 
-		return BeanDefinitionBuilder.rootBeanDefinition("org.springframework.data.redis.core.convert.ReferenceResolverImpl") //
+		return BeanDefinitionBuilder.rootBeanDefinition("org.springframework.data.valkey.core.convert.ReferenceResolverImpl") //
 				.addConstructorArgReference(redisTemplateRef) //
 				.getBeanDefinition();
 	}

@@ -33,7 +33,7 @@ pipeline {
 
 					steps {
 						script {
-							def image = docker.build("springci/spring-data-with-redis-6.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.redis.6.version']} -f ci/openjdk17-redis-6.2/Dockerfile .")
+							def image = docker.build("springci/spring-data-with-redis-6.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.valkey.6.version']} -f ci/openjdk17-redis-6.2/Dockerfile .")
 							docker.withRegistry(p['docker.registry'], p['docker.credentials']) {
 								image.push()
 							}
@@ -53,7 +53,7 @@ pipeline {
 
 					steps {
 						script {
-							def image = docker.build("springci/spring-data-with-redis-7.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.redis.7.version']} -f ci/openjdk17-redis-7.2/Dockerfile .")
+							def image = docker.build("springci/spring-data-with-redis-7.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.valkey.7.version']} -f ci/openjdk17-redis-7.2/Dockerfile .")
 							docker.withRegistry(p['docker.registry'], p['docker.credentials']) {
 								image.push()
 							}
@@ -73,7 +73,7 @@ pipeline {
 
 					steps {
 						script {
-							def image = docker.build("springci/spring-data-with-valkey-7.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.redis.7.version']} -f ci/openjdk17-redis-7.2/Dockerfile .")
+							def image = docker.build("springci/spring-data-with-valkey-7.2:${p['java.main.tag']}", "--build-arg BASE=${p['docker.java.main.image']} --build-arg VERSION=${p['docker.valkey.7.version']} -f ci/openjdk17-redis-7.2/Dockerfile .")
 							docker.withRegistry(p['docker.registry'], p['docker.credentials']) {
 								image.push()
 							}
@@ -93,7 +93,7 @@ pipeline {
 
 					steps {
 						script {
-							def image = docker.build("springci/spring-data-with-redis-6.2:${p['java.next.tag']}", "--build-arg BASE=${p['docker.java.next.image']} --build-arg VERSION=${p['docker.redis.6.version']} -f ci/openjdk21-redis-6.2/Dockerfile .")
+							def image = docker.build("springci/spring-data-with-redis-6.2:${p['java.next.tag']}", "--build-arg BASE=${p['docker.java.next.image']} --build-arg VERSION=${p['docker.valkey.6.version']} -f ci/openjdk21-redis-6.2/Dockerfile .")
 							docker.withRegistry(p['docker.registry'], p['docker.credentials']) {
 								image.push()
 							}

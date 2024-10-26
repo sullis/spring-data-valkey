@@ -120,15 +120,15 @@ public class ValkeyRuntimeHints implements RuntimeHintsRegistrar {
 						TypeReference.of(MessageListener.class), TypeReference.of(ValkeyMessageListenerContainer.class),
 
 						TypeReference
-								.of("org.springframework.data.redis.core.BoundOperationsProxyFactory$DefaultBoundKeyOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultGeoOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultHashOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultKeyOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultListOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultSetOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultStreamOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultValueOperations"),
-						TypeReference.of("org.springframework.data.redis.core.DefaultZSetOperations"),
+								.of("org.springframework.data.valkey.core.BoundOperationsProxyFactory$DefaultBoundKeyOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultGeoOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultHashOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultKeyOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultListOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultSetOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultStreamOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultValueOperations"),
+						TypeReference.of("org.springframework.data.valkey.core.DefaultZSetOperations"),
 
 						TypeReference.of(ValkeyKeyValueAdapter.class), TypeReference.of(ValkeyKeyValueTemplate.class),
 

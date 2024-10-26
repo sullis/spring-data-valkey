@@ -187,8 +187,8 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 
 		assertThat(serializer.deserialize(serializer.serialize(source))).isEqualTo(source);
 		assertThat(serializer.deserialize(
-				("{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$FinalObject\",\"longValue\":1,\"myArray\":[1,2,3],\n"
-						+ "\"simpleObject\":{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$SimpleObject\",\"longValue\":2}}")
+				("{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$FinalObject\",\"longValue\":1,\"myArray\":[1,2,3],\n"
+						+ "\"simpleObject\":{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$SimpleObject\",\"longValue\":2}}")
 								.getBytes())).isEqualTo(source);
 	}
 
@@ -197,7 +197,7 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 
 		GenericJackson2JsonValkeySerializer gs = new GenericJackson2JsonValkeySerializer();
 		CountAndArray result = (CountAndArray) gs.deserialize(
-				("{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$CountAndArray\", \"count\":1, \"available\":[0,1]}")
+				("{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$CountAndArray\", \"count\":1, \"available\":[0,1]}")
 						.getBytes());
 
 		assertThat(result.getCount()).isEqualTo(1);
@@ -290,7 +290,7 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 
 		GenericJackson2JsonValkeySerializer gs = new GenericJackson2JsonValkeySerializer();
 		CountAndArray result = (CountAndArray) gs.deserialize(
-				("{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$CountAndArray\", \"count\":1, \"arrayOfPrimitiveWrapper\":[0,1]}")
+				("{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$CountAndArray\", \"count\":1, \"arrayOfPrimitiveWrapper\":[0,1]}")
 						.getBytes());
 
 		assertThat(result.getCount()).isEqualTo(1);
@@ -356,7 +356,7 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 
 		assertThat(new String(serializedValue)) //
 				.contains(
-						"\"simpleObjectWrapper\":{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$SimpleObject\",\"longValue\":100}");
+						"\"simpleObjectWrapper\":{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$SimpleObject\",\"longValue\":100}");
 
 		assertThat(serializer.deserialize(serializedValue)) //
 				.isInstanceOf(WithWrapperTypes.class) //
@@ -409,7 +409,7 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 		WithJsr310 source = new WithJsr310();
 		source.myDate = java.time.LocalDate.of(2022,9,2);
 
-		assertThat(serializer.serialize(source)).isEqualTo(("{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$WithJsr310\",\"myDate\":[2022,9,2]}").getBytes(StandardCharsets.UTF_8));
+		assertThat(serializer.serialize(source)).isEqualTo(("{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$WithJsr310\",\"myDate\":[2022,9,2]}").getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test // GH-2396
@@ -417,7 +417,7 @@ class GenericJackson2JsonValkeySerializerUnitTests {
 
 		GenericJackson2JsonValkeySerializer serializer = new GenericJackson2JsonValkeySerializer();
 
-		byte[] source = "{\"@class\":\"org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializerUnitTests$WithJsr310\",\"myDate\":[2022,9,2]}".getBytes(StandardCharsets.UTF_8);
+		byte[] source = "{\"@class\":\"org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializerUnitTests$WithJsr310\",\"myDate\":[2022,9,2]}".getBytes(StandardCharsets.UTF_8);
 		assertThat(serializer.deserialize(source, WithJsr310.class).myDate).isEqualTo(java.time.LocalDate.of(2022,9,2));
 	}
 

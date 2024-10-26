@@ -9,7 +9,7 @@ Each mode of operation requires specific configuration that is explained in the 
 
 The easiest way to get started is by using Valkey Standalone with a single Valkey server,
 
-Configure javadoc:org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory[] or javadoc:org.springframework.data.redis.connection.jedis.JedisConnectionFactory[], as shown in the following example:
+Configure javadoc:org.springframework.data.valkey.connection.lettuce.LettuceConnectionFactory[] or javadoc:org.springframework.data.valkey.connection.jedis.JedisConnectionFactory[], as shown in the following example:
 
 [source,java]
 ----
@@ -60,12 +60,12 @@ class WriteToMasterReadFromReplicaConfiguration {
 }
 ----
 
-TIP: For environments reporting non-public addresses through the `INFO` command (for example, when using AWS), use javadoc:org.springframework.data.redis.connection.ValkeyStaticMasterReplicaConfiguration[] instead of javadoc:org.springframework.data.redis.connection.ValkeyStandaloneConfiguration[]. Please note that `ValkeyStaticMasterReplicaConfiguration` does not support Pub/Sub because of missing Pub/Sub message propagation across individual servers.
+TIP: For environments reporting non-public addresses through the `INFO` command (for example, when using AWS), use javadoc:org.springframework.data.valkey.connection.ValkeyStaticMasterReplicaConfiguration[] instead of javadoc:org.springframework.data.valkey.connection.ValkeyStandaloneConfiguration[]. Please note that `ValkeyStaticMasterReplicaConfiguration` does not support Pub/Sub because of missing Pub/Sub message propagation across individual servers.
 
 [[redis:sentinel]]
 == Valkey Sentinel
 
-For dealing with high-availability Valkey, Spring Data Valkey has support for https://redis.io/topics/sentinel[Valkey Sentinel], using javadoc:org.springframework.data.redis.connection.ValkeySentinelConfiguration[], as shown in the following example:
+For dealing with high-availability Valkey, Spring Data Valkey has support for https://redis.io/topics/sentinel[Valkey Sentinel], using javadoc:org.springframework.data.valkey.connection.ValkeySentinelConfiguration[], as shown in the following example:
 
 [source,java]
 ----
@@ -99,13 +99,13 @@ public ValkeyConnectionFactory jedisConnectionFactory() {
 `ValkeySentinelConfiguration` can also be defined through `ValkeySentinelConfiguration.of(PropertySource)`, which lets you pick up the following properties:
 
 .Configuration Properties
-* `spring.redis.sentinel.master`: name of the master node.
-* `spring.redis.sentinel.nodes`: Comma delimited list of host:port pairs.
-* `spring.redis.sentinel.username`: The username to apply when authenticating with Valkey Sentinel (requires Valkey 6)
-* `spring.redis.sentinel.password`: The password to apply when authenticating with Valkey Sentinel
-* `spring.redis.sentinel.dataNode.username`: The username to apply when authenticating with Valkey Data Node
-* `spring.redis.sentinel.dataNode.password`: The password to apply when authenticating with Valkey Data Node
-* `spring.redis.sentinel.dataNode.database`: The database index to apply when authenticating with Valkey Data Node
+* `spring.valkey.sentinel.master`: name of the master node.
+* `spring.valkey.sentinel.nodes`: Comma delimited list of host:port pairs.
+* `spring.valkey.sentinel.username`: The username to apply when authenticating with Valkey Sentinel (requires Valkey 6)
+* `spring.valkey.sentinel.password`: The password to apply when authenticating with Valkey Sentinel
+* `spring.valkey.sentinel.dataNode.username`: The username to apply when authenticating with Valkey Data Node
+* `spring.valkey.sentinel.dataNode.password`: The password to apply when authenticating with Valkey Data Node
+* `spring.valkey.sentinel.dataNode.database`: The database index to apply when authenticating with Valkey Data Node
 ====
 
 Sometimes, direct interaction with one of the Sentinels is required. Using `ValkeyConnectionFactory.getSentinelConnection()` or `ValkeyConnection.getSentinelCommands()` gives you access to the first active Sentinel configured.
@@ -113,20 +113,20 @@ Sometimes, direct interaction with one of the Sentinels is required. Using `Valk
 [[cluster.enable]]
 == Valkey Cluster
 
-xref:redis/cluster.adoc[Cluster support] is based on the same building blocks as non-clustered communication. javadoc:org.springframework.data.redis.connection.ValkeyClusterConnection[], an extension to `ValkeyConnection`, handles the communication with the Valkey Cluster and translates errors into the Spring DAO exception hierarchy.
-`ValkeyClusterConnection` instances are created with the `ValkeyConnectionFactory`, which has to be set up with the associated javadoc:org.springframework.data.redis.connection.ValkeyClusterConfiguration[], as shown in the following example:
+xref:redis/cluster.adoc[Cluster support] is based on the same building blocks as non-clustered communication. javadoc:org.springframework.data.valkey.connection.ValkeyClusterConnection[], an extension to `ValkeyConnection`, handles the communication with the Valkey Cluster and translates errors into the Spring DAO exception hierarchy.
+`ValkeyClusterConnection` instances are created with the `ValkeyConnectionFactory`, which has to be set up with the associated javadoc:org.springframework.data.valkey.connection.ValkeyClusterConfiguration[], as shown in the following example:
 
 .Sample ValkeyConnectionFactory Configuration for Valkey Cluster
 ====
 [source,java]
 ----
 @Component
-@ConfigurationProperties(prefix = "spring.redis.cluster")
+@ConfigurationProperties(prefix = "spring.valkey.cluster")
 public class ClusterConfigurationProperties {
 
     /*
-     * spring.redis.cluster.nodes[0] = 127.0.0.1:7379
-     * spring.redis.cluster.nodes[1] = 127.0.0.1:7380
+     * spring.valkey.cluster.nodes[0] = 127.0.0.1:7379
+     * spring.valkey.cluster.nodes[1] = 127.0.0.1:7380
      * ...
      */
     List<String> nodes;
@@ -167,8 +167,8 @@ public class AppConfig {
 `ValkeyClusterConfiguration` can also be defined through `ValkeyClusterConfiguration.of(PropertySource)`, which lets you pick up the following properties:
 
 .Configuration Properties
-- `spring.redis.cluster.nodes`: Comma-delimited list of host:port pairs.
-- `spring.redis.cluster.max-redirects`: Number of allowed cluster redirections.
+- `spring.valkey.cluster.nodes`: Comma-delimited list of host:port pairs.
+- `spring.valkey.cluster.max-redirects`: Number of allowed cluster redirections.
 ====
 
 NOTE: The initial configuration points driver libraries to an initial set of cluster nodes. Changes resulting from live cluster reconfiguration are kept only in the native driver and are not written back to the configuration.

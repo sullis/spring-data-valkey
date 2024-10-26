@@ -1,1 +1,1 @@
-org.springframework.data.repository.core.support.RepositoryFactorySupport=org.springframework.data.redis.repository.support.ValkeyRepositoryFactory
+org.springframework.data.repository.core.support.RepositoryFactorySupport=org.springframework.data.valkey.repository.support.ValkeyRepositoryFactory

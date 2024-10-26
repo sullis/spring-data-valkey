@@ -1,12 +1,12 @@
 [[redis:template]]
 = Working with Objects through `ValkeyTemplate`
 
-Most users are likely to use javadoc:org.springframework.data.redis.core.ValkeyTemplate[] and its corresponding package, `org.springframework.data.redis.core` or its reactive variant javadoc:org.springframework.data.redis.core.ReactiveValkeyTemplate[].
+Most users are likely to use javadoc:org.springframework.data.valkey.core.ValkeyTemplate[] and its corresponding package, `org.springframework.data.valkey.core` or its reactive variant javadoc:org.springframework.data.valkey.core.ReactiveValkeyTemplate[].
 The template is, in fact, the central class of the Valkey module, due to its rich feature set.
 The template offers a high-level abstraction for Valkey interactions.
 While `[Reactive]ValkeyConnection` offers low-level methods that accept and return binary values (`byte` arrays), the template takes care of serialization and connection management, freeing the user from dealing with such details.
 
-The javadoc:org.springframework.data.redis.core.ValkeyTemplate[] class implements the javadoc:org.springframework.data.redis.core.ValkeyOperations[]  interface and its reactive variant javadoc:org.springframework.data.redis.core.ReactiveValkeyTemplate[] implements javadoc:org.springframework.data.redis.core.ReactiveValkeyOperations[].
+The javadoc:org.springframework.data.valkey.core.ValkeyTemplate[] class implements the javadoc:org.springframework.data.valkey.core.ValkeyOperations[]  interface and its reactive variant javadoc:org.springframework.data.valkey.core.ReactiveValkeyTemplate[] implements javadoc:org.springframework.data.valkey.core.ReactiveValkeyOperations[].
 
 NOTE: The preferred way to reference operations on a `[Reactive]ValkeyTemplate` instance is through the
 `[Reactive]ValkeyOperations` interface.
@@ -27,48 +27,48 @@ Imperative::
 
 2+^|_Key Type Operations_
 
-|javadoc:org.springframework.data.redis.core.GeoOperations[]
+|javadoc:org.springframework.data.valkey.core.GeoOperations[]
 |Valkey geospatial operations, such as `GEOADD`, `GEORADIUS`,...
 
-|javadoc:org.springframework.data.redis.core.HashOperations[]
+|javadoc:org.springframework.data.valkey.core.HashOperations[]
 |Valkey hash operations
 
-|javadoc:org.springframework.data.redis.core.HyperLogLogOperations[]
+|javadoc:org.springframework.data.valkey.core.HyperLogLogOperations[]
 |Valkey HyperLogLog operations, such as `PFADD`, `PFCOUNT`,...
 
-|javadoc:org.springframework.data.redis.core.ListOperations[]
+|javadoc:org.springframework.data.valkey.core.ListOperations[]
 |Valkey list operations
 
-|javadoc:org.springframework.data.redis.core.SetOperations[]
+|javadoc:org.springframework.data.valkey.core.SetOperations[]
 |Valkey set operations
 
-|javadoc:org.springframework.data.redis.core.ValueOperations[]
+|javadoc:org.springframework.data.valkey.core.ValueOperations[]
 |Valkey string (or value) operations
 
-|javadoc:org.springframework.data.redis.core.ZSetOperations[]
+|javadoc:org.springframework.data.valkey.core.ZSetOperations[]
 |Valkey zset (or sorted set) operations
 
 2+^|_Key Bound Operations_
 
-|javadoc:org.springframework.data.redis.core.BoundGeoOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundGeoOperations[]
 |Valkey key bound geospatial operations
 
-|javadoc:org.springframework.data.redis.core.BoundHashOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundHashOperations[]
 |Valkey hash key bound operations
 
-|javadoc:org.springframework.data.redis.core.BoundKeyOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundKeyOperations[]
 |Valkey key bound operations
 
-|javadoc:org.springframework.data.redis.core.BoundListOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundListOperations[]
 |Valkey list key bound operations
 
-|javadoc:org.springframework.data.redis.core.BoundSetOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundSetOperations[]
 |Valkey set key bound operations
 
-|javadoc:org.springframework.data.redis.core.BoundValueOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundValueOperations[]
 |Valkey string (or value) key bound operations
 
-|javadoc:org.springframework.data.redis.core.BoundZSetOperations[]
+|javadoc:org.springframework.data.valkey.core.BoundZSetOperations[]
 |Valkey zset (or sorted set) key bound operations
 
 |====
@@ -82,25 +82,25 @@ Reactive::
 
 2+^|_Key Type Operations_
 
-|javadoc:org.springframework.data.redis.core.ReactiveGeoOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveGeoOperations[]
 |Valkey geospatial operations such as `GEOADD`, `GEORADIUS`, and others)
 
-|javadoc:org.springframework.data.redis.core.ReactiveHashOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveHashOperations[]
 |Valkey hash operations
 
-|javadoc:org.springframework.data.redis.core.ReactiveHyperLogLogOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveHyperLogLogOperations[]
 |Valkey HyperLogLog operations such as (`PFADD`, `PFCOUNT`, and others)
 
-|javadoc:org.springframework.data.redis.core.ReactiveListOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveListOperations[]
 |Valkey list operations
 
-|javadoc:org.springframework.data.redis.core.ReactiveSetOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveSetOperations[]
 |Valkey set operations
 
-|javadoc:org.springframework.data.redis.core.ReactiveValueOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveValueOperations[]
 |Valkey string (or value) operations
 
-|javadoc:org.springframework.data.redis.core.ReactiveZSetOperations[]
+|javadoc:org.springframework.data.valkey.core.ReactiveZSetOperations[]
 |Valkey zset (or sorted set) operations
 |====
 ======
@@ -111,7 +111,7 @@ Once configured, the template is thread-safe and can be reused across multiple i
 `ValkeyTemplate` uses a Java-based serializer for most of its operations.
 This means that any object written or read by the template is serialized and deserialized through Java.
 
-You can change the serialization mechanism on the template, and the Valkey module offers several implementations, which are available in the `org.springframework.data.redis.serializer` package.
+You can change the serialization mechanism on the template, and the Valkey module offers several implementations, which are available in the `org.springframework.data.valkey.serializer` package.
 See <<redis:serializer,Serializers>> for more information.
 You can also set any of the serializers to null and use ValkeyTemplate with raw byte arrays by setting the `enableDefaultSerializer` property to `false`.
 Note that the template requires all keys to be non-null.
@@ -351,28 +351,28 @@ From the framework perspective, the data stored in Valkey is only bytes.
 While Valkey itself supports various types, for the most part, these refer to the way the data is stored rather than what it represents.
 It is up to the user to decide whether the information gets translated into strings or any other objects.
 
-In Spring Data, the conversion between the user (custom) types and raw data (and vice-versa) is handled by Spring Data Valkey in the `org.springframework.data.redis.serializer` package.
+In Spring Data, the conversion between the user (custom) types and raw data (and vice-versa) is handled by Spring Data Valkey in the `org.springframework.data.valkey.serializer` package.
 
 This package contains two types of serializers that, as the name implies, take care of the serialization process:
 
-* Two-way serializers based on javadoc:org.springframework.data.redis.serializer.ValkeySerializer[].
+* Two-way serializers based on javadoc:org.springframework.data.valkey.serializer.ValkeySerializer[].
 * Element readers and writers that use `ValkeyElementReader` and ``ValkeyElementWriter``.
 
 The main difference between these variants is that `ValkeySerializer` primarily serializes to `byte[]` while readers and writers use `ByteBuffer`.
 
 Multiple implementations are available (including two that have been already mentioned in this documentation):
 
-* javadoc:org.springframework.data.redis.serializer.JdkSerializationValkeySerializer[], which is used by default for javadoc:org.springframework.data.redis.cache.ValkeyCache[] and javadoc:org.springframework.data.redis.core.ValkeyTemplate[].
+* javadoc:org.springframework.data.valkey.serializer.JdkSerializationValkeySerializer[], which is used by default for javadoc:org.springframework.data.valkey.cache.ValkeyCache[] and javadoc:org.springframework.data.valkey.core.ValkeyTemplate[].
 * the `StringValkeySerializer`.
 
-However, one can use `OxmSerializer` for Object/XML mapping through Spring {spring-framework-docs}/data-access.html#oxm[OXM] support or javadoc:org.springframework.data.redis.serializer.Jackson2JsonValkeySerializer[] or javadoc:org.springframework.data.redis.serializer.GenericJackson2JsonValkeySerializer[] for storing data in https://en.wikipedia.org/wiki/JSON[JSON] format.
+However, one can use `OxmSerializer` for Object/XML mapping through Spring {spring-framework-docs}/data-access.html#oxm[OXM] support or javadoc:org.springframework.data.valkey.serializer.Jackson2JsonValkeySerializer[] or javadoc:org.springframework.data.valkey.serializer.GenericJackson2JsonValkeySerializer[] for storing data in https://en.wikipedia.org/wiki/JSON[JSON] format.
 
 Do note that the storage format is not limited only to values.
 It can be used for keys, values, or hashes without any restrictions.
 
 [WARNING]
 ====
-By default, javadoc:org.springframework.data.redis.cache.ValkeyCache[] and javadoc:org.springframework.data.redis.core.ValkeyTemplate[] are configured to use Java native serialization.
+By default, javadoc:org.springframework.data.valkey.cache.ValkeyCache[] and javadoc:org.springframework.data.valkey.core.ValkeyTemplate[] are configured to use Java native serialization.
 Java native serialization is known for allowing the running of remote code caused by payloads that exploit vulnerable libraries and classes injecting unverified bytecode.
 Manipulated input could lead to unwanted code being run in the application during the deserialization step.
 As a consequence, do not use serialization in untrusted environments.

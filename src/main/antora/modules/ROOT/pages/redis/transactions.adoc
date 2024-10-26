@@ -2,10 +2,10 @@
 = Valkey Transactions
 
 Valkey provides support for https://redis.io/topics/transactions[transactions] through the `multi`, `exec`, and `discard` commands.
-These operations are available on javadoc:org.springframework.data.redis.core.ValkeyTemplate[].
+These operations are available on javadoc:org.springframework.data.valkey.core.ValkeyTemplate[].
 However, `ValkeyTemplate` is not guaranteed to run all the operations in the transaction with the same connection.
 
-Spring Data Valkey provides the javadoc:org.springframework.data.redis.core.SessionCallback[] interface for use when multiple operations need to be performed with the same `connection`, such as when using Valkey transactions.The following example uses the `multi` method:
+Spring Data Valkey provides the javadoc:org.springframework.data.valkey.core.SessionCallback[] interface for use when multiple operations need to be performed with the same `connection`, such as when using Valkey transactions.The following example uses the `multi` method:
 
 [source,java]
 ----
